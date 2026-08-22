@@ -1,0 +1,499 @@
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #1a1a2e;
+    overflow: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+  }
+  #gameCanvas {
+    display: block;
+    background: #16213e;
+    cursor: crosshair;
+  }
+  #muteBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 20;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  #muteBtn:hover { background: rgba(0,0,0,0.7); }
+  #bossAlert {
+    display: none;
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    color: #ff3838;
+    font-size: 40px;
+    font-weight: bold;
+    text-shadow: 0 0 10px rgba(255,56,56,0.9), 0 3px 8px rgba(0,0,0,0.8);
+    letter-spacing: 2px;
+    animation: bossAlertPulse 0.5s infinite alternate;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+  }
+  @keyframes bossAlertPulse {
+    from { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    to   { opacity: 1;   transform: translateX(-50%) scale(1.06); }
+  }
+  #musicBtn {
+    position: absolute;
+    top: 12px;
+    right: 60px;
+    z-index: 20;
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  #musicBtn:hover { background: rgba(0,0,0,0.7); }
+  #musicPanel {
+    display: none;
+    position: absolute;
+    top: 54px;
+    right: 12px;
+    z-index: 25;
+    background: rgba(10,10,20,0.95);
+    border: 1px solid #555;
+    border-radius: 8px;
+    padding: 6px;
+    min-width: 150px;
+  }
+  .musicOption {
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #eee;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .musicOption:last-child { margin-bottom: 0; }
+  .musicOption:hover { background: rgba(255,255,255,0.1); }
+  .musicOption.active { background: #ffd60a; color: #16213e; font-weight: bold; }
+  #hud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    color: #eee;
+    font-size: 18px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+    user-select: none;
+  }
+  #hud .score { color: #ffd60a; font-weight: bold; }
+  #hud .hp { color: #ff5c5c; font-weight: bold; }
+  #stopBtn {
+    position: absolute;
+    top: 46px;
+    left: 12px;
+    background: rgba(255,56,56,0.15);
+    color: #ff5c5c;
+    border: 1px solid #ff5c5c;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+  }
+  #stopBtn:hover { background: rgba(255,56,56,0.3); }
+  #pauseBtn {
+    position: absolute;
+    top: 46px;
+    left: 90px;
+    background: rgba(255,214,10,0.15);
+    color: #ffd60a;
+    border: 1px solid #ffd60a;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+  }
+  #pauseBtn:hover { background: rgba(255,214,10,0.3); }
+  #pauseOverlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(10,10,20,0.75);
+    z-index: 12;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+  }
+  #pauseOverlay h2 {
+    font-size: 40px;
+    letter-spacing: 3px;
+    color: #ffd60a;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.8);
+    margin-bottom: 20px;
+  }
+  #pauseOverlay button {
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    background: #ffd60a;
+    color: #16213e;
+    cursor: pointer;
+    margin: 6px;
+  }
+  #pauseOverlay button.secondary {
+    background: #333;
+    color: #eee;
+  }
+  #msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 32px;
+    text-align: center;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+  }
+  #msg button {
+    margin-top: 16px;
+    padding: 10px 24px;
+    font-size: 18px;
+    border: none;
+    border-radius: 8px;
+    background: #ffd60a;
+    color: #16213e;
+    cursor: pointer;
+    font-weight: bold;
+    display: block;
+  }
+  #msg button + button {
+    margin-top: 10px;
+  }
+  #msgMenuBtn {
+    background: #333 !important;
+    color: #eee !important;
+  }
+  #instructions {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    color: #999;
+    font-size: 13px;
+    user-select: none;
+  }
+  #authScreen {
+    position: absolute;
+    inset: 0;
+    background: #0a0a14;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    z-index: 50;
+  }
+  #authScreen h1 {
+    font-size: 36px;
+    margin-bottom: 4px;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+  }
+  #authScreen p {
+    color: #999;
+    margin-bottom: 18px;
+  }
+  #authScreen input {
+    display: block;
+    width: 260px;
+    margin: 8px auto;
+    padding: 12px 14px;
+    font-size: 15px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1a1a2e;
+    color: #fff;
+    box-sizing: border-box;
+  }
+  #authScreen input:focus {
+    outline: none;
+    border-color: #ffd60a;
+  }
+  .authError {
+    color: #ff5c5c;
+    font-size: 13px;
+    min-height: 18px;
+    margin: 4px 0 10px;
+  }
+  #startScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 20, 0.92);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    z-index: 10;
+  }
+  #startScreen h1 {
+    font-size: 36px;
+    margin-bottom: 4px;
+    text-shadow: 0 3px 8px rgba(0,0,0,0.7);
+  }
+  #startScreen p {
+    color: #999;
+    margin-bottom: 28px;
+  }
+  .modeBtn {
+    display: block;
+    width: 260px;
+    margin: 10px auto;
+    padding: 16px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: #4cc9f0;
+    color: #16213e;
+    transition: transform 0.1s ease;
+  }
+  .modeBtn:hover { transform: scale(1.04); }
+  .modeBtn.levels { background: #ffd60a; }
+  .modeBtn.hardcore { background: #8b0000; color: #fff; }
+  .modeBtnRow {
+    display: flex;
+    gap: 10px;
+    width: 620px;
+    max-width: 92vw;
+    margin: 10px auto;
+  }
+  .modeBtnRow .modeBtn {
+    width: auto;
+    flex: 1;
+    margin: 0;
+    padding: 16px 12px;
+    font-size: 16px;
+  }
+  .modeBtn small {
+    display: block;
+    font-weight: normal;
+    font-size: 13px;
+    color: #16213eaa;
+    margin-top: 3px;
+  }
+  .shopOpenBtn {
+    display: block;
+    width: 260px;
+    margin: 18px auto 0;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: 2px solid #ffd60a;
+    border-radius: 10px;
+    cursor: pointer;
+    background: transparent;
+    color: #ffd60a;
+    transition: transform 0.1s ease;
+  }
+  .menuBtnRow {
+    display: flex;
+    gap: 10px;
+    width: 260px;
+    margin: 18px auto 0;
+  }
+  .menuBtnRow .shopOpenBtn {
+    width: auto;
+    flex: 1;
+    margin: 0;
+  }
+  .shopOpenBtn:hover { transform: scale(1.04); }
+  .dodgePracticeRow {
+    display: flex;
+    gap: 8px;
+    width: 260px;
+    margin: 18px auto 0;
+    align-items: stretch;
+  }
+  .dodgePracticeRow input[type="number"] {
+    width: 56px;
+    border-radius: 8px;
+    border: 1px solid #444;
+    background: #1a1a2e;
+    color: #fff;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .dodgePracticeRow input[type="number"]:focus {
+    outline: none;
+    border-color: #ffd60a;
+  }
+  .dodgePracticeRow .shopOpenBtn {
+    flex: 1;
+    margin: 0;
+  }
+  .coinDisplay {
+    font-size: 15px;
+    color: #ffd60a;
+    font-weight: bold;
+    margin-bottom: 6px;
+  }
+  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen {
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 20, 0.96);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    color: #fff;
+    text-align: center;
+    z-index: 10;
+    overflow-y: auto;
+    padding: 30px 0 50px;
+  }
+  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1 {
+    margin: 0 0 4px;
+    font-size: 30px;
+  }
+  .shopSection {
+    width: 92%;
+    max-width: 640px;
+    margin: 18px auto 0;
+    text-align: left;
+  }
+  .armorSlotsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    width: 92%;
+    max-width: 640px;
+    margin: 18px auto 0;
+  }
+  .armorSlotsRow .shopSection {
+    width: auto;
+    max-width: none;
+    margin: 0;
+    flex: 1 1 260px;
+    min-width: 240px;
+  }
+  .shopCategoryNav {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    width: 92%;
+    max-width: 640px;
+    margin: 14px auto 0;
+    padding: 10px 8px;
+    background: rgba(10, 10, 20, 0.97);
+    border-radius: 10px;
+    border: 1px solid #333;
+  }
+  .shopCategoryNav button {
+    padding: 7px 14px;
+    border: 1px solid #ffd60a;
+    border-radius: 20px;
+    background: transparent;
+    color: #ffd60a;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .shopCategoryNav button:hover {
+    background: rgba(255, 214, 10, 0.15);
+  }
+  .shopSection h3 {
+    color: #ffd60a;
+    border-bottom: 1px solid #333;
+    padding-bottom: 6px;
+    margin-bottom: 10px;
+  }
+  .shopItem { display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.06); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; gap: 12px; }
+  .shopItem .info { text-align: left; }
+  .shopItem .info .name { font-weight: bold; }
+  .shopItem .info .desc { font-size: 12px; color: #999; margin-top: 2px; }
+  #skinsShopList .shopItem { display: grid; grid-template-columns: 60px 1fr auto; }
+  #skinsShopList .shopItem .info { min-width: 0; }
+  .botPreview {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 8px;
+  }
+  .speedBar {
+    width: 100%;
+    max-width: 180px;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    margin: 4px 0;
+    overflow: hidden;
+  }
+  .speedBarFill {
+    height: 100%;
+    background: #4cc9f0;
+    border-radius: 3px;
+  }
+  .shopItem button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 13px;
+  }
+  .shopItem button.buy { background: #4cc9f0; color: #16213e; }
+  .shopItem button.equip { background: #ff9999; color: #16213e; }
+  .shopItem button.equipped { background: #4cd964; color: #16213e; cursor: default; }
+  .shopItem button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .backBtn {
+    margin-top: 24px;
+    padding: 10px 24px;
+    font-size: 15px;
+    border: none;
+    border-radius: 8px;
+    background: #333;
+    color: #eee;
+    cursor: pointer;
+  }
+  .topBackBtn {
+    margin: 4px auto 0;
+    display: block;
+    padding: 7px 16px;
+    font-size: 13px;
+    font-weight: bold;
+    border: 1px solid #ff5c5c;
+    border-radius: 20px;
+    background: transparent;
+    color: #ff5c5c;
+    cursor: pointer;
+  }
+  .topBackBtn:hover {
+    background: rgba(255,92,92,0.15);
+  }
