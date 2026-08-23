@@ -348,6 +348,24 @@ const SHARPSHOOTER_BONUSES = [0.15, 0.25, 0.35];
 let lvlFlyingStart = Number(localStorage.getItem('botShooterLvlFlyingStart')) || 0;
 const FLYING_START_LEVELS = [500, 800, 1150];
 const FLYING_START_DURATIONS = [3000, 5000, 7000];
+let lvlCriticalHit = Number(localStorage.getItem('botShooterLvlCriticalHit')) || 0;
+const CRITICAL_HIT_LEVELS = [600, 950, 1350];
+const CRITICAL_HIT_CHANCES = [0.15, 0.25, 0.35];
+let lvlSplinterShot = Number(localStorage.getItem('botShooterLvlSplinterShot')) || 0;
+const SPLINTER_SHOT_LEVELS = [700, 1100, 1550];
+let lvlShockwave = Number(localStorage.getItem('botShooterLvlShockwave')) || 0;
+const SHOCKWAVE_LEVELS = [800, 1300, 1900];
+const SHOCKWAVE_RADII = [80, 120, 160];
+let lvlMultiShield = Number(localStorage.getItem('botShooterLvlMultiShield')) || 0;
+const MULTI_SHIELD_LEVELS = [1000, 1500, 2100];
+let lvlGoldRush = Number(localStorage.getItem('botShooterLvlGoldRush')) || 0;
+const GOLD_RUSH_LEVELS = [500, 850, 1250];
+const GOLD_RUSH_RADIUS = [150, 200, 250];
+let lvlOverkill = Number(localStorage.getItem('botShooterLvlOverkill')) || 0;
+const OVERKILL_LEVELS = [850, 1300, 1900];
+let lvlBloodlust = Number(localStorage.getItem('botShooterLvlBloodlust')) || 0;
+const BLOODLUST_LEVELS = [750, 1150, 1650];
+const BLOODLUST_BONUSES = [0.05, 0.08, 0.12];
 
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
 let powerupLevels = JSON.parse(localStorage.getItem('botShooterPowerupLevels') || '{}'); // id -> huidig niveau (0-3)

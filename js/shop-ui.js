@@ -19,6 +19,13 @@ function saveShopState() {
   localStorage.setItem('botShooterLvlSecondWind', lvlSecondWind);
   localStorage.setItem('botShooterLvlSharpshooter', lvlSharpshooter);
   localStorage.setItem('botShooterLvlFlyingStart', lvlFlyingStart);
+  localStorage.setItem('botShooterLvlCriticalHit', lvlCriticalHit);
+  localStorage.setItem('botShooterLvlSplinterShot', lvlSplinterShot);
+  localStorage.setItem('botShooterLvlShockwave', lvlShockwave);
+  localStorage.setItem('botShooterLvlMultiShield', lvlMultiShield);
+  localStorage.setItem('botShooterLvlGoldRush', lvlGoldRush);
+  localStorage.setItem('botShooterLvlOverkill', lvlOverkill);
+  localStorage.setItem('botShooterLvlBloodlust', lvlBloodlust);
   localStorage.setItem('botShooterPowerupLevels', JSON.stringify(powerupLevels));
   localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
   localStorage.setItem('botShooterEquippedSkin', equippedSkin);
@@ -815,6 +822,76 @@ function buyFlyingStart() {
 }
 window.buyFlyingStart = buyFlyingStart;
 
+function buyCriticalHit() {
+  const price = CRITICAL_HIT_LEVELS[lvlCriticalHit];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlCriticalHit++;
+  saveShopState();
+  renderShop();
+}
+window.buyCriticalHit = buyCriticalHit;
+
+function buySplinterShot() {
+  const price = SPLINTER_SHOT_LEVELS[lvlSplinterShot];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlSplinterShot++;
+  saveShopState();
+  renderShop();
+}
+window.buySplinterShot = buySplinterShot;
+
+function buyShockwave() {
+  const price = SHOCKWAVE_LEVELS[lvlShockwave];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlShockwave++;
+  saveShopState();
+  renderShop();
+}
+window.buyShockwave = buyShockwave;
+
+function buyMultiShield() {
+  const price = MULTI_SHIELD_LEVELS[lvlMultiShield];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlMultiShield++;
+  saveShopState();
+  renderShop();
+}
+window.buyMultiShield = buyMultiShield;
+
+function buyGoldRush() {
+  const price = GOLD_RUSH_LEVELS[lvlGoldRush];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlGoldRush++;
+  saveShopState();
+  renderShop();
+}
+window.buyGoldRush = buyGoldRush;
+
+function buyOverkill() {
+  const price = OVERKILL_LEVELS[lvlOverkill];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlOverkill++;
+  saveShopState();
+  renderShop();
+}
+window.buyOverkill = buyOverkill;
+
+function buyBloodlust() {
+  const price = BLOODLUST_LEVELS[lvlBloodlust];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlBloodlust++;
+  saveShopState();
+  renderShop();
+}
+window.buyBloodlust = buyBloodlust;
+
 function weaponStatsLine(w) {
   const cooldownMs = shootCooldown * w.cooldownMult;
   const shotsPerSec = 1000 / cooldownMs;
@@ -885,7 +962,14 @@ function renderShop() {
     leveledUpgradeItemHtml('Muntenregen', `Niveau 1: +${COIN_RAIN_BONUSES[0]} munten. Niveau 2: +${COIN_RAIN_BONUSES[1]} munten. Niveau 3: +${COIN_RAIN_BONUSES[2]} munten. Niveau 4: +${COIN_RAIN_BONUSES[3]} munten.`, COIN_RAIN_LEVELS, lvlCoinRain, 'buyCoinRain'),
     leveledUpgradeItemHtml('IJzeren Wil', `Eenmalig per leven, activeert onder 50% HP. Niveau 1: geneest ${SECOND_WIND_HEALS[0]} HP. Niveau 2: geneest ${SECOND_WIND_HEALS[1]} HP. Niveau 3: geneest ${SECOND_WIND_HEALS[2]} HP.`, SECOND_WIND_LEVELS, lvlSecondWind, 'buySecondWind'),
     leveledUpgradeItemHtml('Scherpschutter', `Niveau 1: +${Math.round(SHARPSHOOTER_BONUSES[0]*100)}% kogelsnelheid. Niveau 2: +${Math.round(SHARPSHOOTER_BONUSES[1]*100)}% kogelsnelheid. Niveau 3: +${Math.round(SHARPSHOOTER_BONUSES[2]*100)}% kogelsnelheid.`, SHARPSHOOTER_LEVELS, lvlSharpshooter, 'buySharpshooter'),
-    leveledUpgradeItemHtml('Vliegende Start', `Niveau 1: ${FLYING_START_DURATIONS[0]/1000}s schild. Niveau 2: ${FLYING_START_DURATIONS[1]/1000}s schild. Niveau 3: ${FLYING_START_DURATIONS[2]/1000}s schild.`, FLYING_START_LEVELS, lvlFlyingStart, 'buyFlyingStart')
+    leveledUpgradeItemHtml('Vliegende Start', `Niveau 1: ${FLYING_START_DURATIONS[0]/1000}s schild. Niveau 2: ${FLYING_START_DURATIONS[1]/1000}s schild. Niveau 3: ${FLYING_START_DURATIONS[2]/1000}s schild.`, FLYING_START_LEVELS, lvlFlyingStart, 'buyFlyingStart'),
+    leveledUpgradeItemHtml('Kritieke Hit', `Niveau 1: ${Math.round(CRITICAL_HIT_CHANCES[0]*100)}% kans op 2x schade. Niveau 2: ${Math.round(CRITICAL_HIT_CHANCES[1]*100)}% kans. Niveau 3: ${Math.round(CRITICAL_HIT_CHANCES[2]*100)}% kans.`, CRITICAL_HIT_LEVELS, lvlCriticalHit, 'buyCriticalHit'),
+    leveledUpgradeItemHtml('Splinter-schoten', 'Niveau 1: Bij elke kill schieten 3 splinters. Niveau 2: 5 splinters. Niveau 3: 7 splinters.', SPLINTER_SHOT_LEVELS, lvlSplinterShot, 'buySplinterShot'),
+    leveledUpgradeItemHtml('Schokgolf', `Niveau 1: Bij kills radius ${SHOCKWAVE_RADII[0]}px schade. Niveau 2: ${SHOCKWAVE_RADII[1]}px. Niveau 3: ${SHOCKWAVE_RADII[2]}px.`, SHOCKWAVE_LEVELS, lvlShockwave, 'buyShockwave'),
+    leveledUpgradeItemHtml('Multi-schild', 'Niveau 1: Schilden stapelen (2 tegelijk). Niveau 2: 3 tegelijk. Niveau 3: 4 tegelijk.', MULTI_SHIELD_LEVELS, lvlMultiShield, 'buyMultiShield'),
+    leveledUpgradeItemHtml('Goudtrek', `Niveau 1: Munten trekken van ${GOLD_RUSH_RADIUS[0]}px. Niveau 2: ${GOLD_RUSH_RADIUS[1]}px. Niveau 3: ${GOLD_RUSH_RADIUS[2]}px.`, GOLD_RUSH_LEVELS, lvlGoldRush, 'buyGoldRush'),
+    leveledUpgradeItemHtml('Overkill', 'Niveau 1: Overkill-schade veroorzaakt mini-explosies. Niveau 2: Groter + meer schade. Niveau 3: Nog groter radius.', OVERKILL_LEVELS, lvlOverkill, 'buyOverkill'),
+    leveledUpgradeItemHtml('Bloedlust', `Niveau 1: +${Math.round(BLOODLUST_BONUSES[0]*100)}% schade per actieve kill-streak. Niveau 2: +${Math.round(BLOODLUST_BONUSES[1]*100)}%. Niveau 3: +${Math.round(BLOODLUST_BONUSES[2]*100)}%.`, BLOODLUST_LEVELS, lvlBloodlust, 'buyBloodlust')
   ].join('');
 
   // 2e armor-slot sectie tonen zodra gekocht

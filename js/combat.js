@@ -22,7 +22,11 @@ function shoot() {
   const dy = mouse.y - player.y;
   const baseAngle = Math.atan2(dy, dx);
   const streakMult = (weapon.effect === 'killstreak') ? 1 + Math.min(player.killStreak, 10) * 0.15 : 1;
-  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult;
+  const bloodlustBonus = lvlBloodlust > 0 && player.killStreak > 0 ? 1 + BLOODLUST_BONUSES[lvlBloodlust - 1] * player.killStreak : 1;
+  const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : 0;
+  const isCrit = Math.random() < critChance;
+  const critMult = isCrit ? 2 : 1;
+  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult;
   const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (lvlSharpshooter > 0 ? SHARPSHOOTER_BONUSES[lvlSharpshooter - 1] : 0));
   const extraPierce = lvlPiercingRounds;
 
@@ -401,6 +405,52 @@ function damageBotSimple(bot, dmg, color) {
     if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
     if (bot.isBoss) bossAlive = false;
     if (bot.poisonSpread) spreadPoison(bot);
+
+    // Shockwave bij kills
+    if (lvlShockwave > 0) {
+      const radius = SHOCKWAVE_RADII[lvlShockwave - 1];
+      const shockDmg = 5 + lvlShockwave * 2;
+      bots.forEach(other => {
+        if (other === bot || other.dead) return;
+        const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+        if (dd < radius) damageBotSimple(other, shockDmg, '#ff8800');
+      });
+      explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
+    }
+
+    // Splinter-schoten bij kills
+    if (lvlSplinterShot > 0) {
+      const splinterCount = [3, 5, 7][lvlSplinterShot - 1];
+      for (let i = 0; i < splinterCount; i++) {
+        const angle = (Math.PI * 2 / splinterCount) * i;
+        bullets.push({
+          x: bot.x + Math.cos(angle) * 10,
+          y: bot.y + Math.sin(angle) * 10,
+          vx: Math.cos(angle) * 6,
+          vy: Math.sin(angle) * 6,
+          r: 3,
+          owner: 'player',
+          dmg: 3,
+          pierce: 0,
+          hitBots: null,
+          splashRadius: 0,
+          splashDmg: 0,
+          effect: null
+        });
+      }
+    }
+
+    // Overkill-explosies
+    if (lvlOverkill > 0 && dmg > bot.maxHp * 0.2) {
+      const overkillDmg = dmg - bot.maxHp;
+      const radius = 60 + lvlOverkill * 30;
+      bots.forEach(other => {
+        if (other === bot || other.dead) return;
+        const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+        if (dd < radius) damageBotSimple(other, Math.max(3, Math.round(overkillDmg * 0.3)), '#ff3838');
+      });
+      explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
+    }
   }
 }
 

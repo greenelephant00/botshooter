@@ -556,7 +556,7 @@ function update() {
   powerups = powerups.filter(p => now - p.bornAt < p.life);
   // Powerups: pickup by player
   const boostDurMult = 1 + lvlLongBoosts * LONG_BOOSTS_MULT_PER_LEVEL;
-  const pickupBonus = lvlMagnet * MAGNET_RADIUS_PER_LEVEL;
+  const pickupBonus = lvlMagnet * MAGNET_RADIUS_PER_LEVEL + (lvlGoldRush > 0 ? GOLD_RUSH_RADIUS[lvlGoldRush - 1] : 0);
   powerups.forEach(p => {
     const d = Math.hypot(player.x - p.x, player.y - p.y);
     if (d < player.r + p.r + pickupBonus) {
@@ -573,7 +573,13 @@ function update() {
         player.fireBoostUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#ffd60a');
       } else if (p.type === 'shield') {
-        player.shieldUntil = now + info.durations[lvl] * boostDurMult;
+        const maxShields = lvlMultiShield > 0 ? [2, 3, 4][lvlMultiShield - 1] : 1;
+        const newShieldUntil = now + info.durations[lvl] * boostDurMult;
+        if (now < player.shieldUntil && maxShields > 1) {
+          player.shieldUntil = Math.max(player.shieldUntil, newShieldUntil);
+        } else {
+          player.shieldUntil = newShieldUntil;
+        }
         spawnParticles(p.x, p.y, '#c77dff');
       } else if (p.type === 'damage') {
         player.damageBoostUntil = now + info.durations[lvl] * boostDurMult;
