@@ -48,7 +48,8 @@ function resetPlayer() {
     : (equippedTransform !== 'none' && !weaponPracticeActive ? equippedTransform : 'none');
   player.activeTransform = gameMode !== 'practice' ? wantedTransform : 'none';
   const tStats = TRANSFORM_STATS[player.activeTransform] || TRANSFORM_STATS.none;
-  player.baseSpeed = 3.5 * (1 + lvlSprint * SPRINT_PER_LEVEL) * tStats.speedMult;
+  const armorSpeed = 1 + getArmorStats().speedBonus;
+  player.baseSpeed = 3.5 * (1 + lvlSprint * SPRINT_PER_LEVEL) * tStats.speedMult * armorSpeed;
   player.r = PLAYER_BASE_R * tStats.rMult;
   player.maxHp = 100 + getArmorStats().hpBonus + lvlExtraHp * EXTRA_HP_PER_LEVEL + tStats.hpBonus;
   player.hp = player.maxHp;

@@ -407,7 +407,14 @@ const ARMOR = [
   { id: 'thorns',     name: 'Doornpantser',        price: 500,  hpBonus: 20,  reduction: 0,    thorns: 3,       desc: '+20 max HP. Kaatst 3 schade terug naar bots die je van dichtbij raken.' },
   { id: 'vampire',    name: 'Vampierpantser',      price: 550,  hpBonus: 15,  reduction: 0,    vampireHeal: 4,  desc: '+15 max HP. Geneest 4 HP bij elke gedode bot.' },
   { id: 'fortune',    name: 'Fortuinpantser',      price: 400,  hpBonus: 15,  reduction: 0,    coinMult: 1.5,   desc: '+15 max HP. Munten zijn 50% meer waard.' },
-  { id: 'adrenaline', name: 'Adrenalinepantser',   price: 700,  hpBonus: 40,  reduction: 0,    adrenaline: true, desc: '+40 max HP. Onder 25% HP krijg je eenmalig automatisch 3s schild + snelheidsboost.' }
+  { id: 'adrenaline', name: 'Adrenalinepantser',   price: 700,  hpBonus: 40,  reduction: 0,    adrenaline: true, desc: '+40 max HP. Onder 25% HP krijg je eenmalig automatisch 3s schild + snelheidsboost.' },
+  { id: 'reflection', name: 'Reflectie-pantser',   price: 600,  hpBonus: 50,  reduction: 0,    reflection: 0.3, desc: '+50 max HP. Kaatst 30% van inkomende schade terug naar aanvallers.' },
+  { id: 'spikes',     name: 'Spijkerpantser',      price: 550,  hpBonus: 25,  reduction: 0,    thorns: 6,       desc: '+25 max HP. Kaatst 6 schade terug naar bots die je van dichtbij raken.' },
+  { id: 'fortress',   name: 'Vesting-pantser',     price: 750,  hpBonus: 80,  reduction: 0.5,  desc: '+80 max HP, -50% inkomende schade. Zeer defensief.' },
+  { id: 'mystic',     name: 'Mystiek-pantser',     price: 650,  hpBonus: 35,  reduction: 0,    regen: 3, vampireHeal: 2, desc: '+35 max HP. Geneest 3 HP/sec passief EN 2 HP per kill.' },
+  { id: 'leather',    name: 'Lederen Armor',       price: 350,  hpBonus: 40,  reduction: 0.1,  speedBonus: 0.15, desc: '+40 max HP, -10% schade, +15% bewegingssnelheid.' },
+  { id: 'plague',     name: 'Pesteuntzer-pantser', price: 600,  hpBonus: 25,  reduction: 0,    poisonReflect: true, desc: '+25 max HP. Bots die je van dichtbij raken, worden vergiftigd.' },
+  { id: 'ice',        name: 'Ijs-pantser',         price: 650,  hpBonus: 30,  reduction: 0.15, freezeReflect: true, desc: '+30 max HP, -15% schade. Bots die je raken, bevriezen voor 3 sec.' }
 ];
 
 let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oefensessie
@@ -430,7 +437,11 @@ function getArmorStats() {
     thorns: (a1.thorns || 0) + (a2.thorns || 0),
     vampireHeal: (a1.vampireHeal || 0) + (a2.vampireHeal || 0),
     coinMult: (a1.coinMult || 1) * (a2.coinMult || 1),
-    adrenaline: !!(a1.adrenaline || a2.adrenaline)
+    adrenaline: !!(a1.adrenaline || a2.adrenaline),
+    reflection: (a1.reflection || 0) + (a2.reflection || 0),
+    speedBonus: (a1.speedBonus || 0) + (a2.speedBonus || 0),
+    poisonReflect: !!(a1.poisonReflect || a2.poisonReflect),
+    freezeReflect: !!(a1.freezeReflect || a2.freezeReflect)
   };
 }
 

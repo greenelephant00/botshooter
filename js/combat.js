@@ -685,19 +685,45 @@ function spreadPoison(bot) {
 }
 
 function meleeAttack(bot) {
-  const notBlocked = applyDamageToPlayer(bot.meleeDamage || 15);
+  const now = performance.now();
+  const dmg = bot.meleeDamage || 15;
+  const notBlocked = applyDamageToPlayer(dmg);
   spawnParticles(player.x, player.y, notBlocked ? '#ff5c5c' : '#c77dff');
-  bot.slashUntil = performance.now() + 200;
+  bot.slashUntil = now + 200;
 
-  const thorns = getArmorStats().thorns;
-  if (thorns && notBlocked && !bot.dead) {
-    bot.hp -= thorns;
-    spawnParticles(bot.x, bot.y, '#ffbb33');
+  const armor = getArmorStats();
+  const thorns = armor.thorns;
+
+  if (notBlocked && !bot.dead) {
+    // Thorns
+    if (thorns) {
+      bot.hp -= thorns;
+      spawnParticles(bot.x, bot.y, '#ffbb33');
+    }
+
+    // Reflection
+    if (armor.reflection > 0) {
+      const reflectDmg = Math.ceil(dmg * armor.reflection);
+      bot.hp -= reflectDmg;
+      spawnParticles(bot.x, bot.y, '#ffff00');
+    }
+
+    // Poison Reflect
+    if (armor.poisonReflect) {
+      bot.poisonUntil = Math.max(bot.poisonUntil || 0, now + 4000);
+      bot.poisonSpread = true;
+    }
+
+    // Freeze Reflect
+    if (armor.freezeReflect) {
+      bot.frozenUntil = Math.max(bot.frozenUntil || 0, now + 3000);
+    }
+
     if (bot.hp <= 0 && !bot.immortal) {
       bot.dead = true;
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
-      if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
+      if (armor.vampireHeal) player.hp = Math.min(player.maxHp, player.hp + armor.vampireHeal);
     }
   }
 }

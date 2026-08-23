@@ -402,11 +402,39 @@ function update() {
         spawnParticles(b.x, b.y, '#ff8c00');
       } else {
         b.hit = true;
+        const armor = getArmorStats();
         if (now0 < player.shieldUntil) {
           spawnParticles(b.x, b.y, '#c77dff');
         } else {
-          applyDamageToPlayer(b.dmg || 8);
+          const dmg = b.dmg || 8;
+          applyDamageToPlayer(dmg);
           spawnParticles(b.x, b.y, '#ff5c5c');
+
+          // Reflection: kaats schade terug
+          if (armor.reflection > 0) {
+            const botsAtLocation = bots.filter(bot => !bot.dead && Math.hypot(bot.x - b.x, bot.y - b.y) < 60);
+            botsAtLocation.forEach(bot => {
+              const reflectDmg = Math.ceil(dmg * armor.reflection);
+              damageBotSimple(bot, reflectDmg, '#ffff00');
+            });
+          }
+
+          // Poison Reflect: vergiftigt aanvallers
+          if (armor.poisonReflect) {
+            const botsAtLocation = bots.filter(bot => !bot.dead && Math.hypot(bot.x - b.x, bot.y - b.y) < 80);
+            botsAtLocation.forEach(bot => {
+              bot.poisonUntil = Math.max(bot.poisonUntil || 0, now0 + 4000);
+              bot.poisonSpread = true;
+            });
+          }
+
+          // Freeze Reflect: bevriest aanvallers
+          if (armor.freezeReflect) {
+            const botsAtLocation = bots.filter(bot => !bot.dead && Math.hypot(bot.x - b.x, bot.y - b.y) < 80);
+            botsAtLocation.forEach(bot => {
+              bot.frozenUntil = Math.max(bot.frozenUntil || 0, now0 + 3000);
+            });
+          }
         }
       }
     }
