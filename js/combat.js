@@ -381,7 +381,8 @@ function fireBotBullet(bot, angle, speedMult = 1) {
     vy: Math.sin(angle) * bot.bulletSpeed * speedMult,
     r: bot.pattern === 'fast' ? 3 : 4,
     dmg: (bot.pattern === 'fast' ? 15 : 8) * hcMult,
-    owner: 'bot'
+    owner: 'bot',
+    sourceBot: bot
   });
 }
 

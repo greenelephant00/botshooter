@@ -397,12 +397,19 @@ function update() {
     const d = Math.hypot(b.x - player.x, b.y - player.y);
     if (d < player.r + b.r) {
       if (now0 < player.ricochetUntil) {
-        // Ricochet: kogel terugkaatsen naar schutter
-        const angle = Math.atan2(player.y - b.y, player.x - b.x);
+        // Ricochet-schild: kogel kaatst terug naar de bot die hem afvuurde
+        const source = b.sourceBot;
+        let angle;
+        if (source && !source.dead) {
+          angle = Math.atan2(source.y - b.y, source.x - b.x);
+        } else {
+          angle = Math.atan2(player.y - b.y, player.x - b.x) + Math.PI;
+        }
         b.vx = Math.cos(angle) * 9;
         b.vy = Math.sin(angle) * 9;
         b.owner = 'player';
         b.dmg = 6;
+        b.homingTarget = (source && !source.dead) ? source : null;
         spawnParticles(b.x, b.y, '#ff8c00');
       } else {
         b.hit = true;
