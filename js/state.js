@@ -411,7 +411,7 @@ const ARMOR = [
   { id: 'reflection', name: 'Reflectie-pantser',   price: 600,  hpBonus: 50,  reduction: 0,    reflection: 0.3, desc: '+50 max HP. Kaatst 30% van inkomende schade terug naar aanvallers.' },
   { id: 'spikes',     name: 'Spijkerpantser',      price: 550,  hpBonus: 25,  reduction: 0,    thorns: 6,       desc: '+25 max HP. Kaatst 6 schade terug naar bots die je van dichtbij raken.' },
   { id: 'fortress',   name: 'Vesting-pantser',     price: 750,  hpBonus: 80,  reduction: 0.5,  desc: '+80 max HP, -50% inkomende schade. Zeer defensief.' },
-  { id: 'mystic',     name: 'Mystiek-pantser',     price: 650,  hpBonus: 35,  reduction: 0,    regen: 3, vampireHeal: 2, desc: '+35 max HP. Geneest 3 HP/sec passief EN 2 HP per kill.' },
+  { id: 'mystic',     name: 'Mystiek-pantser',     price: 650,  hpBonus: 20,  reduction: 0,    regen: 2, vampireHeal: 1, desc: '+20 max HP. Geneest 2 HP/sec passief en 1 HP per kill.' },
   { id: 'leather',    name: 'Lederen Armor',       price: 350,  hpBonus: 40,  reduction: 0.1,  speedBonus: 0.15, desc: '+40 max HP, -10% schade, +15% bewegingssnelheid.' },
   { id: 'plague',     name: 'Pesteuntzer-pantser', price: 600,  hpBonus: 25,  reduction: 0,    poisonReflect: true, desc: '+25 max HP. Bots die je van dichtbij raken, worden vergiftigd.' },
   { id: 'ice',        name: 'Ijs-pantser',         price: 650,  hpBonus: 30,  reduction: 0.15, freezeReflect: true, desc: '+30 max HP, -15% schade. Bots die je raken, bevriezen voor 3 sec.' }
