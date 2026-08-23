@@ -458,6 +458,146 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(0, 0, 3.2, 0, Math.PI * 2); ctx.fill();
       break;
     }
+    case 'samurai': {
+      // rode bladschijf
+      ctx.fillStyle = '#c41e3a';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffff00';
+      ctx.fillRect(-1, -6, 2, 12);
+      break;
+    }
+    case 'cyborg': {
+      // elektrische puls
+      ctx.fillStyle = '#ff00ff';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0ff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(0, 0, 6, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'vampire': {
+      // bloeddruppel
+      ctx.fillStyle = '#ff0000';
+      ctx.beginPath();
+      ctx.arc(0, -2, 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-3, 2); ctx.lineTo(0, 5); ctx.lineTo(3, 2); ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'ghost': {
+      // witte spookbol
+      ctx.fillStyle = '#f5f5f5';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 0.5;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = 1;
+      break;
+    }
+    case 'neon': {
+      // gloeiende neon-bol
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'clown': {
+      // gekleurde pompoen-bol
+      ctx.fillStyle = '#ff6b9d';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffff00';
+      ctx.fillRect(-2, -4, 4, 2);
+      ctx.fillRect(-2, 2, 4, 2);
+      break;
+    }
+    case 'monster': {
+      // groen monster-bolletje met bobbels
+      ctx.fillStyle = '#228b22';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#32cd32';
+      ctx.beginPath(); ctx.arc(-3, -2, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(3, 2, 2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'angel': {
+      // gouden ster
+      const s = 4;
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath();
+      ctx.moveTo(0, -s); ctx.lineTo(s * 0.3, -s * 0.3); ctx.lineTo(s, 0); ctx.lineTo(s * 0.3, s * 0.3);
+      ctx.lineTo(0, s); ctx.lineTo(-s * 0.3, s * 0.3); ctx.lineTo(-s, 0); ctx.lineTo(-s * 0.3, -s * 0.3);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'demon': {
+      // rood vuur-bolletje
+      const dgrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 5);
+      dgrad.addColorStop(0, '#ff6347');
+      dgrad.addColorStop(1, '#8b0000');
+      ctx.fillStyle = dgrad;
+      ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'robot_simple': {
+      // zilver blokkig bolletje
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(-3, -3, 6, 6);
+      ctx.strokeStyle = '#888';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-3, -3, 6, 6);
+      break;
+    }
+    case 'gemstone': {
+      // diamant-achtige kristal
+      const ggrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 5);
+      ggrad.addColorStop(0, '#fff');
+      ggrad.addColorStop(1, '#4169e1');
+      ctx.fillStyle = ggrad;
+      ctx.beginPath();
+      ctx.moveTo(0, -5); ctx.lineTo(3.5, 0); ctx.lineTo(0, 5); ctx.lineTo(-3.5, 0); ctx.closePath();
+      ctx.fill();
+      break;
+    }
+    case 'mushroom': {
+      // rood paddestoel-hoofd
+      ctx.fillStyle = '#c41e3a';
+      ctx.beginPath(); ctx.arc(0, -2, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#daa520';
+      ctx.fillRect(-2, 2, 4, 3);
+      break;
+    }
+    case 'pumpkin': {
+      // oranje pompoen-bolletje
+      ctx.fillStyle = '#ff8c00';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#228b22';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(0, -5); ctx.lineTo(0, -8); ctx.stroke();
+      break;
+    }
+    case 'mummy': {
+      // gewikkeld linnen
+      ctx.fillStyle = '#d2b48c';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#8b7355';
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 3; i++) {
+        ctx.beginPath(); ctx.arc(0, 0, 2 + i * 1.5, 0, Math.PI * 2); ctx.stroke();
+      }
+      break;
+    }
+    case 'werewolf': {
+      // bruin haar-bolletje
+      ctx.fillStyle = '#4a3728';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#8b7355';
+      ctx.beginPath(); ctx.arc(-2, -3, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(2, -3, 1.5, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
