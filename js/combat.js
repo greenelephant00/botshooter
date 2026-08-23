@@ -924,6 +924,77 @@ function bossCrossLaser(bot) {
   }, 1000);
 }
 
+function bossWaterStrike(bot) {
+  // Leviathan special 2 - Waterstraal: brede straal die scant over de arena
+  const targetY = player.y;
+  const startX = -100;
+  const endX = canvas.width + 100;
+  const duration = 800;
+  const dmgPerTick = Math.round((bot.specialDmg || 55) * 0.2);
+
+  const startTime = performance.now();
+  const scanInterval = setInterval(() => {
+    if (gameOver || levelTransition || bot.dead) {
+      clearInterval(scanInterval);
+      return;
+    }
+    const elapsed = performance.now() - startTime;
+    if (elapsed > duration) {
+      clearInterval(scanInterval);
+      return;
+    }
+    const progress = elapsed / duration;
+    const currentX = startX + (endX - startX) * progress;
+
+    // Beschadig speler als hij in de straal staat
+    const dx = Math.abs(player.x - currentX);
+    if (dx < 80 && Math.abs(player.y - targetY) < 100) {
+      applyDamageToPlayer(dmgPerTick);
+    }
+  }, 100);
+
+  telegraphs.push({ x: player.x, y: targetY, radius: 100, warnUntil: performance.now() + 200 });
+}
+
+function bossChaosBurst(bot) {
+  // Abomination special 2 - Chaos Burst: willekeurige kogels in alle richtingen
+  const n = 20;
+  for (let i = 0; i < n; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 5 + Math.random() * 4;
+    fireBotBullet(bot, angle, speed / 5);
+  }
+}
+
+function bossSpawnMinions(bot) {
+  // Abomination special 3 - Spawn Minions: laat mini-bots verschijnen
+  const count = 3;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i;
+    const dist = 120;
+    const spawnType = BOT_TYPES[Math.floor(Math.random() * 4)]; // random grunt-like type
+    bots.push({
+      x: bot.x + Math.cos(angle) * dist,
+      y: bot.y + Math.sin(angle) * dist,
+      r: 12,
+      speed: 1.8,
+      hp: 2,
+      maxHp: 2,
+      lastShot: 0,
+      shootCooldown: 1200,
+      color: '#a020f0',
+      type: 'abominion',
+      pattern: 'single',
+      bulletSpeed: 5,
+      meleeDamage: 0,
+      splits: false,
+      spiralAngle: 0,
+      frozenUntil: 0,
+      slashUntil: 0
+    });
+  }
+}
+
 function botShoot(bot) {
   // Stun: bots kunnen niet schieten als stunned
   const now = performance.now();

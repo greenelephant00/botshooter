@@ -131,11 +131,15 @@ function update() {
         else if (bot.type === 'titan') bossMeteorShower(bot);
         else if (bot.type === 'behemoth') bossLaserSweep(bot);
         else if (bot.type === 'nemesis') bossDoomSpiral(bot);
+        else if (bot.type === 'leviathan') bossWaterStrike(bot);
+        else if (bot.type === 'abomination') bossChaosBurst(bot);
       }
-      // Special 3 - alleen Nemesis heeft er een derde
+      // Special 3 - Nemesis, Leviathan, Abomination
       if (bot.specialCCooldown && now - (bot.specialCLastUsed || 0) > bot.specialCCooldown) {
         bot.specialCLastUsed = now;
         if (bot.type === 'nemesis') bossCrossLaser(bot);
+        else if (bot.type === 'leviathan') bossWaterStrike(bot);
+        else if (bot.type === 'abomination') bossSpawnMinions(bot);
       }
       return;
     }
