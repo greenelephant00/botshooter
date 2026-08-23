@@ -155,7 +155,22 @@ const SKINS = [
   { id: 'alien',      name: 'Alien',         price: SKIN_PRICE_HIGH, desc: 'Groen buitenaards wezen met grote zwarte ogen en een antenne.' },
   { id: 'knight',     name: 'Ridder',        price: SKIN_PRICE_HIGH, desc: 'Zilveren harnas met vizier en een rode pluim.' },
   { id: 'phoenix',    name: 'Phoenix',       price: SKIN_PRICE_HIGH, desc: 'Vlammend lijf in geel, oranje en rood, met flakkerende vleugels.' },
-  { id: 'cosmic',     name: 'Cosmic',        price: SKIN_PRICE_HIGH, desc: 'Sterrenhemel-lijf met een paarse nevelgloed en fonkelende sterren.' }
+  { id: 'cosmic',     name: 'Cosmic',        price: SKIN_PRICE_HIGH, desc: 'Sterrenhemel-lijf met een paarse nevelgloed en fonkelende sterren.' },
+  { id: 'samurai',    name: 'Samurai',       price: 550,             desc: 'Japanse krijger met rood-zwart gewaad en een gloeiend zwaard.' },
+  { id: 'cyborg',     name: 'Cyborg',        price: 650,             desc: 'Futuristische krijger met mechanische onderdelen en neon-accenten.' },
+  { id: 'vampire',    name: 'Vampier',       price: 600,             desc: 'Spookachtige vampier met zwarte cape en rode ogen.' },
+  { id: 'ghost',      name: 'Geest',         price: 550,             desc: 'Wit spookachtig figuur dat doorschijnend gloeit.' },
+  { id: 'neon',       name: 'Neon Punk',     price: 650,             desc: 'Gloeiend cyberpunk-look met felle kleuren en geometrische vormen.' },
+  { id: 'clown',      name: 'Clown',         price: 600,             desc: 'Kleurig circuskarakter met grote neus en grappige uiterlijk.' },
+  { id: 'monster',    name: 'Monster',       price: 550,             desc: 'Griezelig groen monster met bobbels en tanden.' },
+  { id: 'angel',      name: 'Engel',         price: 700,             desc: 'Hemels karakter met gloeiende witte vleugels en aureool.' },
+  { id: 'demon',      name: 'Demon',         price: 700,             desc: 'Duiveachtig karakter met hoorns, staart en vlammen.' },
+  { id: 'robot_simple', name: 'Blok-robot',  price: 600,             desc: 'Simpele blocky robot van zilver met kleurrijke antennes.' },
+  { id: 'gemstone',   name: 'Edelsteen',     price: 750,             desc: 'Kristallig diamant-achtig lichaam dat schittert en gloeit.' },
+  { id: 'mushroom',   name: 'Paddestoel',    price: 550,             desc: 'Grote felgekleurde paddestoel met stippen op het kapje.' },
+  { id: 'pumpkin',    name: 'Pompoen',       price: 600,             desc: 'Halloween-pompoen met gloeiende ogen en een grappig gezicht.' },
+  { id: 'mummy',      name: 'Momie',         price: 650,             desc: 'Oude momie gewikkeld in crèmekleurig linnen met gloeiende ogen.' },
+  { id: 'werewolf',   name: 'Weerwolf',      price: 700,             desc: 'Behaard beest-karakter met scherpe nagels en gele ogen.' }
 ];
 let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';

@@ -730,6 +730,178 @@ function drawPlayerSkin(c, skinId, r) {
     });
     c.fillStyle = '#333';
     c.fillRect(0, -4, 22, 8);
+  } else if (skinId === 'samurai') {
+    c.fillStyle = '#8b0000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#daa520';
+    c.fillRect(-r * 0.7, -r * 0.4, r * 1.4, r * 0.6);
+    c.fillStyle = '#ffff00';
+    c.beginPath();
+    c.moveTo(r + 8, -2); c.lineTo(r + 20, 0); c.lineTo(r + 8, 2); c.closePath(); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 22, 8);
+  } else if (skinId === 'cyborg') {
+    c.fillStyle = '#555';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ff00ff';
+    c.fillRect(-r * 0.6, -r * 0.6, r * 0.5, r * 0.5);
+    c.fillRect(r * 0.1, r * 0.1, r * 0.5, r * 0.5);
+    c.fillStyle = '#0ff';
+    c.beginPath(); c.arc(r * 0.3, -r * 0.3, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 22, 8);
+  } else if (skinId === 'vampire') {
+    c.fillStyle = '#1a0a1a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#8b0000';
+    c.beginPath(); c.moveTo(-r, -r * 0.3); c.lineTo(-r, r * 0.8); c.lineTo(0, r * 1); c.lineTo(r, r * 0.8); c.lineTo(r, -r * 0.3); c.closePath(); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.2, r * 0.18, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.2, r * 0.18, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ff0000';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.2, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.2, r * 0.08, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'ghost') {
+    c.fillStyle = '#f5f5f5';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = 0.6;
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, r * 0.8, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = 1;
+    c.fillStyle = '#333';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.fillRect(-r * 0.3, r * 0.1, r * 0.15, r * 0.25);
+    c.fillRect(r * 0.15, r * 0.1, r * 0.15, r * 0.25);
+  } else if (skinId === 'neon') {
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#0ff';
+    c.lineWidth = 2;
+    c.strokeRect(-r * 0.6, -r * 0.6, r * 1.2, r * 1.2);
+    c.fillStyle = '#ff00ff';
+    c.fillRect(-r * 0.3, -r * 0.3, r * 0.2, r * 0.2);
+    c.fillRect(r * 0.1, r * 0.1, r * 0.2, r * 0.2);
+    c.fillStyle = '#00ff00';
+    c.fillRect(r * 0.2, -r * 0.4, r * 0.15, r * 0.15);
+  } else if (skinId === 'clown') {
+    c.fillStyle = '#ff6b9d';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ffff00';
+    c.fillRect(-r * 0.7, -r * 0.3, r * 1.4, r * 0.6);
+    c.fillStyle = '#ff0000';
+    c.beginPath(); c.arc(0, r * 0.4, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.25, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.25, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 22, 8);
+  } else if (skinId === 'monster') {
+    c.fillStyle = '#228b22';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 / 6) * i;
+      c.fillStyle = '#32cd32';
+      c.beginPath(); c.arc(Math.cos(a) * r * 0.8, Math.sin(a) * r * 0.8, r * 0.25, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = '#ffff00';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'angel') {
+    c.fillStyle = '#fffacd';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#ffd700';
+    c.lineWidth = 2;
+    c.beginPath(); c.arc(0, -r * 1.2, r * 0.2, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#fff';
+    c.beginPath();
+    c.moveTo(-r * 0.7, 0); c.quadraticCurveTo(-r * 1.2, -r * 0.5, -r * 0.8, -r * 1); c.quadraticCurveTo(-r * 0.6, -r * 0.3, -r * 0.7, 0); c.fill();
+    c.beginPath();
+    c.moveTo(r * 0.7, 0); c.quadraticCurveTo(r * 1.2, -r * 0.5, r * 0.8, -r * 1); c.quadraticCurveTo(r * 0.6, -r * 0.3, r * 0.7, 0); c.fill();
+  } else if (skinId === 'demon') {
+    c.fillStyle = '#8b0000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ff6347';
+    c.beginPath(); c.moveTo(-r * 0.3, -r * 0.8); c.lineTo(-r * 0.6, -r * 1.2); c.lineTo(-r * 0.1, -r * 0.6); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(r * 0.3, -r * 0.8); c.lineTo(r * 0.6, -r * 1.2); c.lineTo(r * 0.1, -r * 0.6); c.closePath(); c.fill();
+    c.fillStyle = '#ffff00';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'robot_simple') {
+    c.fillStyle = '#c0c0c0';
+    c.fillRect(-r * 0.8, -r * 0.8, r * 1.6, r * 1.6);
+    c.strokeStyle = '#888';
+    c.lineWidth = 2;
+    c.strokeRect(-r * 0.8, -r * 0.8, r * 1.6, r * 1.6);
+    c.fillStyle = '#ff0000';
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ffff00';
+    for (let i = 0; i < 3; i++) {
+      const y = -r * 0.6 + i * r * 0.6;
+      c.beginPath(); c.arc(-r * 0.5, y, r * 0.12, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(r * 0.5, y, r * 0.12, 0, Math.PI * 2); c.fill();
+    }
+  } else if (skinId === 'gemstone') {
+    const ggemGrad = c.createRadialGradient(0, 0, 0, 0, 0, r);
+    ggemGrad.addColorStop(0, '#fff');
+    ggemGrad.addColorStop(0.5, '#87ceeb');
+    ggemGrad.addColorStop(1, '#4169e1');
+    c.fillStyle = ggemGrad;
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#fff';
+    c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(0, -r); c.lineTo(r, 0); c.lineTo(0, r); c.lineTo(-r, 0); c.closePath(); c.stroke();
+  } else if (skinId === 'mushroom') {
+    c.fillStyle = '#c41e3a';
+    c.beginPath(); c.arc(0, -r * 0.2, r * 0.9, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff';
+    for (let i = 0; i < 5; i++) {
+      const a = (Math.PI * 2 / 5) * i;
+      c.beginPath(); c.arc(Math.cos(a) * r * 0.6, -r * 0.2 + Math.sin(a) * r * 0.4, r * 0.15, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = '#daa520';
+    c.fillRect(-r * 0.3, r * 0.3, r * 0.6, r * 0.5);
+  } else if (skinId === 'pumpkin') {
+    c.fillStyle = '#ff8c00';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    for (let i = 0; i < 4; i++) {
+      c.fillStyle = '#ffa500';
+      c.beginPath();
+      const a = (Math.PI * 2 / 4) * i;
+      c.arc(Math.cos(a) * r * 0.5, Math.sin(a) * r * 0.5, r * 0.25, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = '#228b22';
+    c.beginPath(); c.moveTo(0, -r); c.lineTo(-r * 0.1, -r * 1.3); c.lineTo(r * 0.1, -r); c.closePath(); c.fill();
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.2, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.fillRect(-r * 0.2, r * 0.2, r * 0.4, r * 0.1);
+  } else if (skinId === 'mummy') {
+    c.fillStyle = '#8b7355';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#d2b48c';
+    c.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+      const y = -r * 0.7 + i * r * 0.35;
+      c.beginPath(); c.moveTo(-r * 0.8, y); c.lineTo(r * 0.8, y); c.stroke();
+    }
+    c.fillStyle = '#ffff00';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.3, r * 0.15, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.2, -r * 0.3, r * 0.15, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'werewolf') {
+    c.fillStyle = '#4a3728';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#8b7355';
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 / 8) * i;
+      c.beginPath(); c.arc(Math.cos(a) * r * 0.9, Math.sin(a) * r * 0.9, r * 0.2, 0, Math.PI * 2); c.fill();
+    }
+    c.fillStyle = '#ffff00';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.25, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.25, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.25, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.25, r * 0.08, 0, Math.PI * 2); c.fill();
   } else {
     // standaard
     c.fillStyle = '#4cc9f0';
