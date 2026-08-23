@@ -1098,7 +1098,7 @@ function spawnParticles(x, y, color) {
 
 function spawnPowerup() {
   const margin = 60;
-  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp'];
+  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),
