@@ -968,7 +968,7 @@ function bossChaosBurst(bot) {
 
 function bossSpawnMinions(bot) {
   // Abomination special 3 - Spawn Minions: laat mini-bots verschijnen
-  const count = 3;
+  const count = 6;
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 / count) * i;
     const dist = 120;
