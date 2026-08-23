@@ -49,10 +49,12 @@ function shoot() {
 
   angles.forEach(angle => {
     let target = null;
-    if (now < player.homingUntil && bots.length > 0) {
-      const nearest = bots.filter(b => !b.dead).reduce((a, b) =>
-        Math.hypot(b.x - player.x, b.y - player.y) < Math.hypot(a.x - player.x, a.y - player.y) ? b : a, null);
-      if (nearest) target = nearest;
+    if (now < player.homingUntil) {
+      const aliveBots = bots.filter(b => !b.dead);
+      if (aliveBots.length > 0) {
+        target = aliveBots.reduce((a, b) =>
+          Math.hypot(b.x - player.x, b.y - player.y) < Math.hypot(a.x - player.x, a.y - player.y) ? b : a);
+      }
     }
     bullets.push({
       x: player.x + Math.cos(angle) * (player.r + 5),
