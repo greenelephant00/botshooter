@@ -149,11 +149,19 @@ function update() {
     if (isMelee) {
       if (bdist < bot.r + player.r + 14 && now - bot.lastShot > bot.shootCooldown * cooldownMult) {
         bot.lastShot = now;
-        meleeAttack(bot);
+        if (now < player.stunUntil) {
+          bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
+        } else {
+          meleeAttack(bot);
+        }
       }
     } else if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
       bot.lastShot = now;
-      botShoot(bot);
+      if (now < player.stunUntil) {
+        bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
+      } else {
+        botShoot(bot);
+      }
     }
   });
 
@@ -384,12 +392,22 @@ function update() {
     if (b.owner !== 'bot' || b.hit) return;
     const d = Math.hypot(b.x - player.x, b.y - player.y);
     if (d < player.r + b.r) {
-      b.hit = true;
-      if (now0 < player.shieldUntil) {
-        spawnParticles(b.x, b.y, '#c77dff');
+      if (now0 < player.ricochetUntil) {
+        // Ricochet: kogel terugkaatsen naar schutter
+        const angle = Math.atan2(player.y - b.y, player.x - b.x);
+        b.vx = Math.cos(angle) * 9;
+        b.vy = Math.sin(angle) * 9;
+        b.owner = 'player';
+        b.dmg = 6;
+        spawnParticles(b.x, b.y, '#ff8c00');
       } else {
-        applyDamageToPlayer(b.dmg || 8);
-        spawnParticles(b.x, b.y, '#ff5c5c');
+        b.hit = true;
+        if (now0 < player.shieldUntil) {
+          spawnParticles(b.x, b.y, '#c77dff');
+        } else {
+          applyDamageToPlayer(b.dmg || 8);
+          spawnParticles(b.x, b.y, '#ff5c5c');
+        }
       }
     }
   });
@@ -488,6 +506,18 @@ function update() {
     player.killStreak = 0;
   }
 
+  // Aura: periodic damage rond speler
+  if (now0 < player.auraUntil) {
+    if (!player.auraLastTick || now0 - player.auraLastTick > 400) {
+      player.auraLastTick = now0;
+      bots.forEach(bot => {
+        if (bot.dead) return;
+        const d = Math.hypot(bot.x - player.x, bot.y - player.y);
+        if (d < 120) damageBotSimple(bot, 3, '#7fff00');
+      });
+    }
+  }
+
   // Powerups: spawn periodically (niet tijdens oefenen)
   const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
   if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
@@ -546,6 +576,22 @@ function update() {
       } else if (p.type === 'timewarp') {
         player.timewarpUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#66ccff');
+      } else if (p.type === 'ricochet') {
+        player.ricochetUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#ff8c00');
+      } else if (p.type === 'homing') {
+        player.homingUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#ff1493');
+      } else if (p.type === 'stun') {
+        player.stunUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#ffff00');
+      } else if (p.type === 'aura') {
+        player.auraUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#7fff00');
+      } else if (p.type === 'overload') {
+        player.overloadUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#ffff00');
+        spawnParticles(p.x, p.y, '#ff6347');
       }
     }
   });

@@ -10,7 +10,12 @@ function drawPowerup(p) {
     freeze: '#9be3ff',
     nuke: '#ff8800',
     invisible: '#aaaaaa',
-    timewarp: '#66ccff'
+    timewarp: '#66ccff',
+    ricochet: '#ff8c00',
+    homing: '#ff1493',
+    stun: '#ffff00',
+    aura: '#7fff00',
+    overload: '#ff6347'
   };
   const icons = {
     speed: '⚡',
@@ -22,7 +27,12 @@ function drawPowerup(p) {
     freeze: '❄',
     nuke: '💣',
     invisible: '👻',
-    timewarp: '⏳'
+    timewarp: '⏳',
+    ricochet: '🔄',
+    homing: '🎯',
+    stun: '⊗',
+    aura: '💫',
+    overload: '⚡'
   };
   const col = colors[p.type];
   ctx.save();
@@ -1169,6 +1179,67 @@ function draw() {
     ctx.lineWidth = 3;
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.r + 30, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.ricochetUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.5;
+    ctx.strokeStyle = 'rgba(255, 140, 0, 0.8)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 34, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.homingUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = 'rgba(255, 20, 147, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 24, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.stunUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 38, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 255, 0, 0.8)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 38, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.auraUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.4;
+    ctx.fillStyle = 'rgba(127, 255, 0, 0.3)';
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 120, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = 'rgba(127, 255, 0, 0.9)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, 120, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.overloadUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = 'rgba(255, 99, 71, 0.9)';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 26, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }

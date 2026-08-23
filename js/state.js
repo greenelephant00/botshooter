@@ -346,9 +346,14 @@ const POWERUP_LEVELS = {
   freeze:    { name: '❄ Freeze',       prices: [350, 550, 800],   durations: [5000, 6000, 7000, 9000] },
   nuke:      { name: '💣 Nuke',        prices: [500, 800, 1150],  dmgs: [10, 13, 16, 20] },
   invisible: { name: '👻 Onzichtbaar', prices: [450, 700, 1000],  durations: [5000, 6000, 7000, 9000] },
-  timewarp:  { name: '⏳ Timewarp',    prices: [450, 700, 1000],  durations: [5000, 6000, 7000, 8000] }
+  timewarp:  { name: '⏳ Timewarp',    prices: [450, 700, 1000],  durations: [5000, 6000, 7000, 8000] },
+  ricochet:  { name: '🔄 Terugkaats',  prices: [400, 650, 950],   durations: [5000, 7000, 9000, 11000] },
+  homing:    { name: '🎯 Homing',      prices: [450, 700, 1000],  durations: [6000, 8000, 10000, 12000] },
+  stun:      { name: '⊗ Stun',         prices: [350, 550, 800],   durations: [4000, 5000, 6000, 7000] },
+  aura:      { name: '💫 Aura',        prices: [400, 650, 950],   durations: [7000, 8000, 9000, 10000] },
+  overload:  { name: '⚡ Overload',     prices: [500, 800, 1150],  durations: [5000, 6000, 7000, 8000] }
 };
-const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp'];
+const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload'];
 
 function getPuLevel(id) { return powerupLevels[id] || 0; }
 

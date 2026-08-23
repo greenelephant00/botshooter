@@ -30,6 +30,11 @@ const player = {
   multiShotUntil: 0,
   invisibleUntil: 0,
   timewarpUntil: 0,
+  ricochetUntil: 0,
+  homingUntil: 0,
+  stunUntil: 0,
+  auraUntil: 0,
+  overloadUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   activeTransform: 'none'
@@ -55,6 +60,11 @@ function resetPlayer() {
   player.multiShotUntil = 0;
   player.invisibleUntil = 0;
   player.timewarpUntil = 0;
+  player.ricochetUntil = 0;
+  player.homingUntil = 0;
+  player.stunUntil = 0;
+  player.auraUntil = 0;
+  player.overloadUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -332,6 +342,11 @@ function updateHUD() {
   if (now < player.multiShotUntil) active.push('✦ Multishot');
   if (now < player.invisibleUntil) active.push('👻 Onzichtbaar');
   if (now < player.timewarpUntil) active.push('⏳ Timewarp');
+  if (now < player.ricochetUntil) active.push('🔄 Terugkaats');
+  if (now < player.homingUntil) active.push('🎯 Homing');
+  if (now < player.stunUntil) active.push('⊗ Stun');
+  if (now < player.auraUntil) active.push('💫 Aura');
+  if (now < player.overloadUntil) active.push('⚡ Overload');
   if (player.activeTransform === 'tank') {
     active.push('🚜 Tank — alleen handgranaten');
   } else if (player.activeTransform === 'berserker') {

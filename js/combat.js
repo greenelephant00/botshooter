@@ -13,7 +13,7 @@ function shoot() {
   if (player.activeTransform === 'engineer') { engineerDeployTurret(); return; }
   const now = performance.now();
   const weapon = getWeapon();
-  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const fireRateMult = (now < player.fireBoostUntil || now < player.overloadUntil) ? 0.4 : 1;
   const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = shootCooldown * weapon.cooldownMult * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
@@ -22,7 +22,7 @@ function shoot() {
   const dy = mouse.y - player.y;
   const baseAngle = Math.atan2(dy, dx);
   const streakMult = (weapon.effect === 'killstreak') ? 1 + Math.min(player.killStreak, 10) * 0.15 : 1;
-  const dmg = weapon.dmg * (now < player.damageBoostUntil ? 2 : 1) * streakMult;
+  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult;
   const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (lvlSharpshooter > 0 ? SHARPSHOOTER_BONUSES[lvlSharpshooter - 1] : 0));
   const extraPierce = lvlPiercingRounds;
 
@@ -44,6 +44,12 @@ function shoot() {
   }
 
   angles.forEach(angle => {
+    let target = null;
+    if (now < player.homingUntil && bots.length > 0) {
+      const nearest = bots.filter(b => !b.dead).reduce((a, b) =>
+        Math.hypot(b.x - player.x, b.y - player.y) < Math.hypot(a.x - player.x, a.y - player.y) ? b : a, null);
+      if (nearest) target = nearest;
+    }
     bullets.push({
       x: player.x + Math.cos(angle) * (player.r + 5),
       y: player.y + Math.sin(angle) * (player.r + 5),
@@ -56,7 +62,8 @@ function shoot() {
       hitBots: ((weapon.pierce || 0) + extraPierce) ? [] : null,
       splashRadius: weapon.splashRadius || 0,
       splashDmg: weapon.splashDmg || 0,
-      effect: weapon.effect || null
+      effect: weapon.effect || null,
+      homingTarget: target
     });
   });
 }
@@ -842,6 +849,10 @@ function bossCrossLaser(bot) {
 }
 
 function botShoot(bot) {
+  // Stun: bots kunnen niet schieten als stunned
+  const now = performance.now();
+  if (now < (bot.stunUntil || 0)) return;
+
   // Field Engineer: als er een koepel dichterbij staat dan de speler, richten bots daarop
   let target = player;
   let nearestTurretDist = Math.hypot(player.x - bot.x, player.y - bot.y);
