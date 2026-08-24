@@ -899,7 +899,7 @@ function freezeTrap(bot) {
     if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
-      player.rootedUntil = performance.now() + 3000;
+      player.rootedUntil = performance.now() + 2200;
       applyDamageToPlayer(bot.specialDmg || 8);
       spawnParticles(targetX, targetY, '#9be3ff');
     }
