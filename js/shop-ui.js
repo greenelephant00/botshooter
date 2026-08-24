@@ -666,6 +666,12 @@ function botCardHtml(type) {
 }
 
 function renderBotsInfo() {
+  if (currentWorld === 2) {
+    document.getElementById('botsInfoList').innerHTML = '<p style="color:#999;">Nog niks te zien in deze wereld. Kom later terug!</p>';
+    document.getElementById('specialBotsInfoList').innerHTML = '';
+    document.getElementById('bossInfoList').innerHTML = '';
+    return;
+  }
   const normalHtml = BOT_TYPES.map(botCardHtml).join('');
   const specialHtml = SPECIAL_BOT_TYPES.map(botCardHtml).join('');
   const bossHtml = BOSS_TYPES.map(botCardHtml).join('');
