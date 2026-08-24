@@ -150,7 +150,7 @@ const BOT_PATTERN_INFO = {
   shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.',
   gascloud:  'Geen kogels — laat regelmatig een gifwolk achter op zijn positie die schade-over-tijd doet zolang je erin staat.',
   shieldbash: 'Geen kogels — beukt continu op je af en stoot je bij impact weg met veel schade en een flinke terugstoot.',
-  summon:    'Geen kogels — houdt afstand en roept periodiek 2 zwakke broodlings op om je te overweldigen.'
+  summon:    'Geen kogels — houdt afstand en roept periodiek 5 zwakke broodlings op in een ruime cirkel om zich heen, om je te overweldigen.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',

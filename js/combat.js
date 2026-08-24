@@ -846,11 +846,11 @@ function shieldBash(bot) {
 }
 
 function broodSummon(bot) {
-  // broodmother: roept 2 kleine, zwakke broodlings op naast zichzelf
-  const count = 2;
+  // broodmother: roept 5 kleine, zwakke broodlings op in een ruime cirkel om zichzelf
+  const count = 5;
   for (let i = 0; i < count; i++) {
     const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
-    const dist = 45;
+    const dist = 90 + Math.random() * 40;
     bots.push({
       x: Math.max(15, Math.min(canvas.width - 15, bot.x + Math.cos(angle) * dist)),
       y: Math.max(15, Math.min(canvas.height - 15, bot.y + Math.sin(angle) * dist)),
