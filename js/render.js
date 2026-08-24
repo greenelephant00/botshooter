@@ -158,6 +158,67 @@ function drawExplosion(e) {
   ctx.restore();
 }
 
+function drawFallingMeteor(m) {
+  // Natuurramp Meteorenregen: een echte meteoor die uit de lucht valt, even gloeiend blijft liggen en dan langzaam wegtrekt
+  const age = performance.now() - m.born;
+  ctx.save();
+  if (age < m.fallDelay) {
+    const t = age / m.fallDelay;
+    const startX = m.x - 200;
+    const startY = m.y - 420;
+    const curX = startX + (m.x - startX) * t;
+    const curY = startY + (m.y - startY) * t;
+    const tailX = startX + (m.x - startX) * Math.max(0, t - 0.18);
+    const tailY = startY + (m.y - startY) * Math.max(0, t - 0.18);
+    const grad = ctx.createLinearGradient(tailX, tailY, curX, curY);
+    grad.addColorStop(0, 'rgba(255, 136, 0, 0)');
+    grad.addColorStop(1, 'rgba(255, 220, 120, 0.9)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 6;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(curX, curY);
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 136, 0, 0.6)';
+    ctx.beginPath();
+    ctx.arc(curX, curY, 15, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff3c4';
+    ctx.beginPath();
+    ctx.arc(curX, curY, 9, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    const landAge = age - m.fallDelay;
+    let alpha = 1;
+    let r = m.radius;
+    if (landAge > m.lingerDuration) {
+      const fadeT = Math.min(1, (landAge - m.lingerDuration) / m.fadeDuration);
+      alpha = 1 - fadeT;
+      r = m.radius * (1 - fadeT * 0.4);
+    }
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = 'rgba(40, 20, 10, 0.5)';
+    ctx.beginPath();
+    ctx.arc(m.x, m.y, r * 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    const rockGrad = ctx.createRadialGradient(m.x, m.y, 0, m.x, m.y, r);
+    rockGrad.addColorStop(0, '#ffdca0');
+    rockGrad.addColorStop(0.5, '#ff8800');
+    rockGrad.addColorStop(1, '#3a1d0a');
+    ctx.fillStyle = rockGrad;
+    ctx.beginPath();
+    ctx.arc(m.x, m.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 150, 50, 0.7)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(m.x, m.y, r, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawIceGrenade(g) {
   // Cryo Rifle special: ijsgranaat die richting het doelwit vliegt
   const age = performance.now() - g.born;
@@ -2095,6 +2156,7 @@ function draw() {
   blackHoles.forEach(drawBlackHole);
   explosions.forEach(drawExplosion);
   lightningBolts.forEach(drawLightningBolt);
+  fallingMeteors.forEach(drawFallingMeteor);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);

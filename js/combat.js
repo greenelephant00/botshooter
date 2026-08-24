@@ -1150,8 +1150,9 @@ function triggerMeteorImpact() {
   const x = 40 + Math.random() * (canvas.width - 80);
   const y = 40 + Math.random() * (canvas.height - 80);
   const radius = 65;
-  const delay = 650;
+  const delay = 700;
   telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
+  fallingMeteors.push({ x, y, born: performance.now(), fallDelay: delay, lingerDuration: 1200, fadeDuration: 900, totalLife: delay + 1200 + 900, radius: 22 });
   setTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x, y, born: performance.now(), maxR: radius });

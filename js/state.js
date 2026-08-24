@@ -32,6 +32,7 @@ let lightningStormUntil = 0; // Bliksemstorm: periodieke blikseminslagen
 let lastLightningStrike = 0;
 let meteorShowerUntil = 0; // Meteorenregen: periodieke inslagen
 let lastMeteorImpact = 0;
+let fallingMeteors = []; // Meteorenregen: zichtbare meteoren die uit de lucht vallen, blijven liggen en wegtrekken
 let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
 let lastEarthquakeShake = 0;
 let activeDisasterType = null;
@@ -42,7 +43,7 @@ const DISASTER_TYPES = [
   { id: 'sandstorm', name: '🌪 Zandstorm', desc: 'Een zandstorm trekt over het veld: 14 sec lang beperkt zicht (donkere waas rond je) en 30% minder bewegingssnelheid.' },
   { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaan er om de ~0,35 sec razendsnel echte bliksemschichten in op willekeurige, kort getelegrafeerde plekken op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
   { id: 'earthquake', name: '🌋 Aardbeving', desc: 'Een korte maar zeer hevige aardbeving: het scherm schudt keihard en alle bots worden abrupt en ver weg in willekeurige richtingen weggeslingerd.' },
-  { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,9 sec getelegrafeerde meteorieten in op willekeurige plekken. Zowel bots als jijzelf lopen schade op als je erin staat.' }
+  { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,5 sec getelegrafeerde meteorieten uit de lucht op willekeurige plekken. Je ziet ze echt naar beneden vallen, ze blijven even gloeiend liggen en trekken daarna langzaam weer weg. Zowel bots als jijzelf lopen schade op als je erin staat.' }
 ];
 let chargeTrails = []; // Juggernaut-transformatie: spoor van de beuk-charge
 let deployedTurrets = []; // Field Engineer-transformatie: neergezette geschutskoepels

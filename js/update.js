@@ -720,6 +720,7 @@ function update() {
   explosions = explosions.filter(e => now0 - e.born < 400);
   telegraphs = telegraphs.filter(t => now0 < t.warnUntil);
   lightningBolts = lightningBolts.filter(l => now0 - l.born < 150);
+  fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);
   vampBolts = vampBolts.filter(g => now0 - g.born < g.duration);
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);
@@ -956,7 +957,7 @@ function update() {
     lastLightningStrike = now;
     triggerLightningStrike();
   }
-  if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 900) {
+  if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 500) {
     lastMeteorImpact = now;
     triggerMeteorImpact();
   }
