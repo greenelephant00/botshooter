@@ -159,6 +159,10 @@ function powerupDescForLevel(id) {
 
 function renderPowerupShop() {
   document.getElementById('powerupShopCoins').textContent = coins;
+  if (currentWorld === 2) {
+    document.getElementById('powerupShopList').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    return;
+  }
   document.getElementById('powerupShopList').innerHTML = POWERUP_IDS.map(id => {
     const info = POWERUP_LEVELS[id];
     const level = getPuLevel(id);
@@ -879,6 +883,10 @@ window.closeTransformShop = closeTransformShop;
 
 function renderTransformShop() {
   document.getElementById('transformShopCoins').textContent = coins;
+  if (currentWorld === 2) {
+    document.getElementById('transformShopList').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    return;
+  }
   document.getElementById('transformShopList').innerHTML = TRANSFORMS.map(t => {
     const owned = ownedTransforms.includes(t.id);
     const equipped = equippedTransform === t.id;
@@ -1169,6 +1177,15 @@ function leveledUpgradeItemHtml(name, desc, levels, currentLevel, buyFnName) {
 
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
+  if (currentWorld === 2) {
+    document.getElementById('shopWeapons').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    document.getElementById('shopSpecialWeapons').innerHTML = '';
+    document.getElementById('shopArmor').innerHTML = '';
+    document.getElementById('shopUpgrades').innerHTML = '';
+    const section2 = document.getElementById('shopArmor2Section');
+    if (section2) section2.style.display = 'none';
+    return;
+  }
   document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
     weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
   ).join('');
