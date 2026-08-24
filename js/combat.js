@@ -908,13 +908,12 @@ function freezeTrap(bot) {
 }
 
 function railgunSnipe(bot) {
-  // railgunner: lange telegraaf, daarna een instant maar verwoestende precisiestraal
+  // railgunner: lange telegraaf, daarna een instant maar verwoestende precisiestraal die exact langs de getelegrafeerde lijn schiet
   const angle0 = Math.atan2(player.y - bot.y, player.x - bot.x);
   laserTelegraphs.push({ bot, angle: angle0, warnUntil: performance.now() + 1400 });
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
-    const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x);
-    const beam = { x1: bot.x, y1: bot.y, angle: beamAngle, born: performance.now(), duration: 180 };
+    const beam = { x1: bot.x, y1: bot.y, angle: angle0, born: performance.now(), duration: 180 };
     activeLasers.push(beam);
     if (isPlayerInBeam(beam)) applyDamageToPlayer(bot.specialDmg || 42);
   }, 1400);
