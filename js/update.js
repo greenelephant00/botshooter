@@ -109,6 +109,51 @@ function update() {
       return;
     }
 
+    if (bot.pattern === 'sentinellaser') {
+      // sentinel: houdt afstand en vuurt periodiek een dodelijke, getelegrafeerde laserstraal
+      if (bdist > 220) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
+        bot.lastShot = now;
+        bossLaserSweep(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'mine') {
+      // warden: legt een stilstaande mijn neer die afgaat bij nadering of na een fuse
+      if (bot.mine && !bot.mine.exploded) {
+        const dd = Math.hypot(player.x - bot.mine.x, player.y - bot.mine.y);
+        if (dd < bot.mine.radius * 0.7 || now - bot.mine.armedAt > bot.mine.fuse) {
+          detonateMine(bot);
+        }
+      }
+      if (bdist > 160) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (!bot.mine && now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
+        bot.lastShot = now;
+        mineDrop(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'shockbolt') {
+      // arclight: blijft dichtbij en zapt de speler met een instant bliksemschicht
+      if (bdist > 200) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
+        bot.lastShot = now;
+        shockBolt(bot);
+      }
+      return;
+    }
+
     if (bot.pattern === 'boss') {
       // boss: enorm, traag, schiet regelmatig een salvo en heeft 2 unieke special attacks
       const standoffB = 170;

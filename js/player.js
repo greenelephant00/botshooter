@@ -98,7 +98,10 @@ const SPECIAL_BOT_TYPES = [
   { name: 'artillery',  minScore: 700, minLevel: 9,  r: 20, hp: 8,  speed: [0.4, 0.7], cooldown: [3200, 4200], pattern: 'mortar',    bulletSpeed: 0,   meleeDamage: 40, color: () => `hsl(${Math.floor(Math.random()*10)+0}, 70%, 32%)` },
   { name: 'swarmqueen', minScore: 700, minLevel: 9,  r: 22, hp: 10, speed: [0.9, 1.3], cooldown: [1400, 2000], pattern: 'triple',    bulletSpeed: 5,   splits: true, color: () => `hsl(${Math.floor(Math.random()*15)+95}, 70%, 40%)` },
   { name: 'vortex',     minScore: 700, minLevel: 9,  r: 19, hp: 9,  speed: [0.7, 1.1], cooldown: [180, 180],   pattern: 'spiral',    bulletSpeed: 5,   color: () => `hsl(${Math.floor(Math.random()*15)+195}, 80%, 55%)` },
-  { name: 'swapper',    minScore: 700, minLevel: 9,  r: 18, hp: 12, speed: [1.0, 1.5], cooldown: [500, 500],   pattern: 'single',    bulletSpeed: 6.5, bulletDmg: 10, swapOnHit: true, color: () => `hsl(${Math.floor(Math.random()*15)+300}, 85%, 45%)` }
+  { name: 'swapper',    minScore: 700, minLevel: 9,  r: 18, hp: 12, speed: [1.0, 1.5], cooldown: [500, 500],   pattern: 'single',    bulletSpeed: 6.5, bulletDmg: 10, swapOnHit: true, color: () => `hsl(${Math.floor(Math.random()*15)+300}, 85%, 45%)` },
+  { name: 'sentinel',   minScore: 700, minLevel: 9,  r: 20, hp: 11, speed: [0.6, 1.0], cooldown: [3200, 4000], pattern: 'sentinellaser', bulletSpeed: 0, specialDmg: 16, color: () => `hsl(${Math.floor(Math.random()*15)+185}, 85%, 45%)` },
+  { name: 'warden',     minScore: 700, minLevel: 9,  r: 19, hp: 10, speed: [0.9, 1.3], cooldown: [2600, 3400], pattern: 'mine',          bulletSpeed: 0, specialDmg: 26, color: () => `hsl(${Math.floor(Math.random()*15)+25}, 80%, 40%)` },
+  { name: 'arclight',   minScore: 700, minLevel: 9,  r: 17, hp: 9,  speed: [1.1, 1.6], cooldown: [2200, 2800], pattern: 'shockbolt',     bulletSpeed: 0, specialDmg: 18, color: () => `hsl(${Math.floor(Math.random()*15)+50}, 90%, 55%)` }
 ];
 const SPECIAL_SPAWN_CHANCE = 0.08; // 8% kans zodra ze ontgrendeld zijn
 
@@ -162,6 +165,8 @@ function spawnBot() {
     bulletDmg: type.bulletDmg || 0,
     swapOnHit: type.swapOnHit || false,
     meleeDamage: (type.meleeDamage || 0) * hcMult,
+    specialDmg: (type.specialDmg || 0) * hcMult,
+    specialLastUsed: 0,
     splits: type.splits || false,
     spiralAngle: 0,
     frozenUntil: 0,

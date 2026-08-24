@@ -1282,6 +1282,9 @@ function drawBot(bot) {
   const isBomber = bot.pattern === 'suicide';
   const isBoss = !!bot.isBoss;
   const isSwapper = bot.type === 'swapper';
+  const isSentinel = bot.type === 'sentinel';
+  const isWarden = bot.type === 'warden';
+  const isArclight = bot.type === 'arclight';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -1304,6 +1307,45 @@ function drawBot(bot) {
     ctx.arc(0, 0, bot.r * 0.4, 0, Math.PI * 2);
     ctx.fillStyle = '#faf0ff';
     ctx.fill();
+  } else if (isSentinel) {
+    // driehoekig sensor-lichaam met een gloeiend laser-oog vooraan
+    ctx.moveTo(bot.r * 1.2, 0);
+    ctx.lineTo(-bot.r * 0.8, bot.r * 0.95);
+    ctx.lineTo(-bot.r * 0.8, -bot.r * 0.95);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#c8fbff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(bot.r * 0.35, 0, bot.r * 0.28, 0, Math.PI * 2);
+    ctx.fillStyle = '#c8fbff';
+    ctx.fill();
+  } else if (isWarden) {
+    // zeshoekig gepantserd lichaam
+    ctx.moveTo(bot.r, 0);
+    for (let i = 1; i <= 6; i++) {
+      const a = (Math.PI * 2 / 6) * i;
+      ctx.lineTo(Math.cos(a) * bot.r, Math.sin(a) * bot.r);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ffcf8c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  } else if (isArclight) {
+    // bliksemschicht-vormig lichaam
+    ctx.moveTo(bot.r * 0.7, -bot.r);
+    ctx.lineTo(-bot.r * 0.3, -bot.r * 0.15);
+    ctx.lineTo(bot.r * 0.15, -bot.r * 0.15);
+    ctx.lineTo(-bot.r * 0.7, bot.r);
+    ctx.lineTo(bot.r * 0.3, bot.r * 0.15);
+    ctx.lineTo(-bot.r * 0.15, bot.r * 0.15);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fffbd6';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
     ctx.fill();

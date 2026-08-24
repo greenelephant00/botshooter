@@ -782,6 +782,47 @@ function meleeAttack(bot) {
   }
 }
 
+function mineDrop(bot) {
+  // warden: legt een stilstaande mijn neer die afgaat zodra de speler dichtbij komt, of anders na een fuse
+  const mx = bot.x, my = bot.y;
+  const radius = 60;
+  const fuse = 3500;
+  const armedAt = performance.now();
+  bot.mine = { x: mx, y: my, radius, armedAt, fuse, exploded: false };
+  telegraphs.push({ x: mx, y: my, radius, warnUntil: armedAt + fuse });
+}
+
+function detonateMine(bot) {
+  const mine = bot.mine;
+  if (!mine || mine.exploded) return;
+  mine.exploded = true;
+  explosions.push({ x: mine.x, y: mine.y, born: performance.now(), maxR: mine.radius });
+  spawnParticles(mine.x, mine.y, '#ff8800');
+  const dd = Math.hypot(player.x - mine.x, player.y - mine.y);
+  if (dd < mine.radius + player.r) {
+    applyDamageToPlayer(bot.specialDmg || 26);
+  }
+  bot.mine = null;
+}
+
+function shockBolt(bot) {
+  // arclight: telegrafeert kort een inslagpunt op de speler, en zapt daarna met een instant bliksemschicht
+  const targetX = player.x;
+  const targetY = player.y;
+  const radius = 45;
+  const delay = 550;
+  telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
+    spawnParticles(targetX, targetY, '#fff066');
+    const dd = Math.hypot(player.x - targetX, player.y - targetY);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(bot.specialDmg || 18);
+    }
+  }, delay);
+}
+
 function mortarStrike(bot) {
   // artillery: telegrafeert een inslagpunt, en beschadigt de speler pas na een korte waarschuwing
   const targetX = player.x;

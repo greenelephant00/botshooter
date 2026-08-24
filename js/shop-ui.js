@@ -124,6 +124,7 @@ const BOT_DISPLAY_NAMES = {
   ghost: 'Ghost', turret: 'Turret', bomber: 'Bomber',
   overlord: 'Overlord', phantom: 'Phantom', artillery: 'Artillery',
   swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
+  sentinel: 'Sentinel', warden: 'Warden', arclight: 'Arclight',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
 };
 const BOT_PATTERN_INFO = {
@@ -142,7 +143,10 @@ const BOT_PATTERN_INFO = {
   phantom:   'Geen vuurwapen — teleporteert vlak naast je en valt aan met een mes.',
   mortar:    'Vuurt op afstand een zware, langzame granaat met een korte waarschuwing vooraf.',
   spiral:    'Schiet continu kogels in een langzaam roterende spiraal om zich heen.',
-  boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.'
+  boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
+  sentinellaser: 'Geen kogels — houdt afstand en vuurt periodiek een getelegrafeerde, doorlopende laserstraal af.',
+  mine:      'Geen kogels — legt een stilstaande mijn neer die afgaat zodra je dichtbij komt, of anders na een paar seconden.',
+  shockbolt: 'Geen kogels — telegrafeert kort een inslagpunt op je positie en zapt je daarna met een instant bliksemschicht.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',
@@ -157,6 +161,15 @@ function botDamageText(type) {
   }
   if (type.pattern === 'mortar') {
     return `${type.meleeDamage || 40} schade per inslag (op afstand)`;
+  }
+  if (type.pattern === 'sentinellaser') {
+    return `${type.specialDmg || 16} schade over tijd bij laserstraal`;
+  }
+  if (type.pattern === 'mine') {
+    return `${type.specialDmg || 26} schade bij mijn-ontploffing`;
+  }
+  if (type.pattern === 'shockbolt') {
+    return `${type.specialDmg || 18} schade per bliksemschicht`;
   }
   if (type.pattern === 'boss') {
     return `8 schade per kogel + ${type.specialDmg || 30} schade bij schokgolf-aanval`;
