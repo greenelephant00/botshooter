@@ -102,7 +102,7 @@ const SPECIAL_BOT_TYPES = [
   { name: 'sentinel',   minScore: 700, minLevel: 9,  r: 20, hp: 11, speed: [0.6, 1.0], cooldown: [3200, 4000], pattern: 'sentinellaser', bulletSpeed: 0, specialDmg: 50, color: () => `hsl(${Math.floor(Math.random()*15)+185}, 85%, 45%)` },
   { name: 'warden',     minScore: 700, minLevel: 9,  r: 19, hp: 10, speed: [0.9, 1.3], cooldown: [1000, 1000], pattern: 'mine',          bulletSpeed: 0, specialDmg: 26, color: () => `hsl(${Math.floor(Math.random()*15)+25}, 80%, 40%)` },
   { name: 'arclight',   minScore: 700, minLevel: 9,  r: 17, hp: 9,  speed: [1.1, 1.6], cooldown: [2200, 2800], pattern: 'shockbolt',     bulletSpeed: 0, specialDmg: 18, color: () => `hsl(${Math.floor(Math.random()*15)+50}, 90%, 55%)` },
-  { name: 'miasma',     minScore: 700, minLevel: 9,  r: 18, hp: 10, speed: [0.9, 1.3], cooldown: [500, 500],   pattern: 'gascloud',      bulletSpeed: 0, specialDmg: 9,  color: () => `hsl(${Math.floor(Math.random()*15)+100}, 65%, 40%)` },
+  { name: 'miasma',     minScore: 700, minLevel: 9,  r: 18, hp: 10, speed: [0.9, 1.3], cooldown: [1000, 1000], pattern: 'gascloud',      bulletSpeed: 0, specialDmg: 9,  color: () => `hsl(${Math.floor(Math.random()*15)+100}, 65%, 40%)` },
   { name: 'bulwark',    minScore: 700, minLevel: 9,  r: 23, hp: 15, speed: [1.3, 1.8], cooldown: [1800, 2400], pattern: 'shieldbash',    bulletSpeed: 0, specialDmg: 22, color: () => `hsl(${Math.floor(Math.random()*15)+215}, 55%, 40%)` },
   { name: 'broodmother', minScore: 700, minLevel: 9, r: 21, hp: 13, speed: [0.7, 1.1], cooldown: [4500, 5500], pattern: 'summon',        bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+265}, 65%, 40%)` }
 ];
