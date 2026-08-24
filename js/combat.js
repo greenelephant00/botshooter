@@ -1545,7 +1545,7 @@ function spawnPowerup() {
 }
 
 function rootGrabAttack(count) {
-  // Wortelgreep (Wereld 2): bomen schieten uit de grond, grijpen willekeurige bots en trekken ze naar beneden
+  // Wortelgreep (Wereld 2): bomen schieten uit de grond, wikkelen hun takken om willekeurige bots en trekken ze de grond in
   const pool = bots.filter(b => !b.dead);
   const picks = [];
   for (let i = 0; i < count && pool.length; i++) {
@@ -1553,17 +1553,29 @@ function rootGrabAttack(count) {
   }
   picks.forEach(bot => {
     const tx = bot.x, ty = bot.y;
-    const duration = 1400;
-    treeGrabs.push({ x: tx, y: ty, born: performance.now(), duration });
-    telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: performance.now() + duration * 0.4 });
+    const duration = 1600;
+    const riseDur = duration * 0.35;   // boom breekt uit de grond
+    const wrapDur = duration * 0.25;   // takken slaan om de bot heen
+    const now0 = performance.now();
+    bot.rootedUntil = now0 + duration; // muurvast tot hij de grond in wordt gesleurd (geen ijs-tint zoals freeze)
+    treeGrabs.push({ x: tx, y: ty, born: now0, duration, riseDur, wrapDur });
+    telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: now0 + riseDur });
+    spawnParticles(tx, ty, '#5c3a1e');
+    spawnParticles(tx, ty, '#3fa34d');
+    setTimeout(() => {
+      if (gameOver || levelTransition) return;
+      spawnParticles(tx, ty, '#c9a96a');
+      spawnParticles(tx, ty, '#baff5c');
+    }, riseDur + wrapDur * 0.3);
     setTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
       spawnParticles(tx, ty, '#5c3a1e');
       spawnParticles(tx, ty, '#3fa34d');
+      spawnParticles(tx, ty, '#2f7d3c');
       bot.dead = true;
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
-    }, duration * 0.55);
+    }, riseDur + wrapDur);
   });
 }
 

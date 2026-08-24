@@ -50,7 +50,7 @@ function update() {
   // Bots move toward player + shoot occasionally
   const now = performance.now();
   bots.forEach(bot => {
-    if (now < bot.frozenUntil) return; // bevroren, geen actie
+    if (now < bot.frozenUntil || now < bot.rootedUntil) return; // bevroren of vastgeworteld, geen actie
     if (bot.poisonUntil && now < bot.poisonUntil) {
       if (!bot.lastPoisonTick || now - bot.lastPoisonTick > 400) {
         bot.lastPoisonTick = now;

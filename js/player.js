@@ -214,6 +214,7 @@ function spawnBot() {
     splitsSelf: type.splitsSelf || 0,
     spiralAngle: 0,
     frozenUntil: 0,
+    rootedUntil: 0,
     slashUntil: 0
   });
 }
@@ -246,6 +247,7 @@ function spawnBoss(type) {
     specialDmg: (type.specialDmg || 30) * hcMult,
     isBoss: true,
     frozenUntil: 0,
+    rootedUntil: 0,
     slashUntil: 0
   });
   bossAlive = true;

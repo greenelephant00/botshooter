@@ -310,23 +310,139 @@ function drawTornadoOverlay() {
 }
 
 function drawTreeGrab(t) {
-  // Wortelgreep-powerup (Wereld 2): een boom die uit de grond schiet, een bot grijpt en weer terugtrekt
+  // Wortelgreep-powerup (Wereld 2): een boom breekt uit de grond, wikkelt zijn takken om de bot en zinkt weer weg
   const age = performance.now() - t.born;
-  const half = t.duration / 2;
-  const h = age < half ? age / half : Math.max(0, 1 - (age - half) / half);
-  if (h <= 0) return;
+  const sinkStart = t.riseDur + t.wrapDur;
+  const sinkDur = t.duration - sinkStart;
+  let phase;
+  if (age < t.riseDur) phase = 'rise';
+  else if (age < sinkStart) phase = 'wrap';
+  else phase = 'sink';
+
+  const riseT = phase === 'rise' ? age / t.riseDur : 1;
+  const wrapT = phase === 'wrap' ? (age - t.riseDur) / t.wrapDur : (phase === 'sink' ? 1 : 0);
+  const sinkT = phase === 'sink' ? Math.min(1, (age - sinkStart) / sinkDur) : 0;
+  if (sinkT >= 1) return;
+
   ctx.save();
-  ctx.translate(t.x, t.y);
-  const trunkH = 46 * h;
-  ctx.fillStyle = '#5c3a1e';
-  ctx.fillRect(-6, -trunkH, 12, trunkH);
-  ctx.fillStyle = '#2f7d3c';
+  ctx.translate(t.x, t.y + sinkT * 60);
+  ctx.globalAlpha = 1 - sinkT;
+
+  // grondscheur / schaduw
+  ctx.save();
+  ctx.globalAlpha *= 0.5 * riseT;
+  ctx.fillStyle = '#1a0f08';
   ctx.beginPath();
-  ctx.moveTo(0, -trunkH - 22 * h);
-  ctx.lineTo(-20 * h, -trunkH + 4);
-  ctx.lineTo(20 * h, -trunkH + 4);
+  ctx.ellipse(0, 6, 22 * riseT, 8 * riseT, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+
+  const trunkH = 50 * riseT;
+
+  // wortels die zijwaarts uit de grond breken
+  ctx.fillStyle = '#4a2f18';
+  for (let i = 0; i < 4; i++) {
+    const a = (Math.PI / 2) * i + 0.4;
+    const len = 16 * riseT;
+    ctx.save();
+    ctx.rotate(a);
+    ctx.beginPath();
+    ctx.moveTo(0, 4);
+    ctx.lineTo(len, 0);
+    ctx.lineTo(0, -4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // stam met schorstextuur
+  const trunkGrad = ctx.createLinearGradient(-8, 0, 8, 0);
+  trunkGrad.addColorStop(0, '#3a2410');
+  trunkGrad.addColorStop(0.5, '#5c3a1e');
+  trunkGrad.addColorStop(1, '#3a2410');
+  ctx.fillStyle = trunkGrad;
+  ctx.beginPath();
+  ctx.moveTo(-8, 6);
+  ctx.lineTo(-5, -trunkH);
+  ctx.lineTo(5, -trunkH);
+  ctx.lineTo(8, 6);
   ctx.closePath();
   ctx.fill();
+  ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+  ctx.lineWidth = 1;
+  for (let i = -1; i <= 1; i += 2) {
+    ctx.beginPath();
+    ctx.moveTo(i * 3, 4);
+    ctx.lineTo(i * 2.4, -trunkH + 4);
+    ctx.stroke();
+  }
+
+  // takken: groeien tijdens rise naar buiten, krullen tijdens wrap om het slachtoffer heen
+  const branchCount = 5;
+  const seedA = (t.x * 0.013 + t.y * 0.017) % (Math.PI * 2); // stabiele, boom-eigen rotatie i.p.v. steeds dezelfde hoek
+  const targetY = -trunkH - 8;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < branchCount; i++) {
+    const growA = (Math.PI * 2 / branchCount) * i + seedA;
+    const growLen = 34 * riseT;
+    const growX = Math.cos(growA) * growLen;
+    const growY = -trunkH * 0.7 + Math.sin(growA) * growLen * 0.5;
+    const wrapA = (Math.PI * 2 / branchCount) * i;
+    const wrapR = 15;
+    const wrapX = Math.cos(wrapA) * wrapR;
+    const wrapY = targetY + Math.sin(wrapA) * wrapR * 0.6;
+    const endX = growX + (wrapX - growX) * wrapT;
+    const endY = growY + (wrapY - growY) * wrapT;
+    const ctrlX = endX * 0.5;
+    const ctrlY = -trunkH + (endY - -trunkH) * 0.5 - 10 * (1 - wrapT);
+    ctx.strokeStyle = '#2f7d3c';
+    ctx.lineWidth = 3.5 - wrapT * 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -trunkH + 4);
+    ctx.quadraticCurveTo(ctrlX, ctrlY, endX, endY);
+    ctx.stroke();
+    ctx.fillStyle = '#3fa34d';
+    ctx.beginPath();
+    ctx.arc(endX, endY, 4 + riseT * 2 - wrapT * 1.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // wortel-tentakels die vanaf de grond direct om het lijf van de bot heen grijpen en dichttrekken
+  const tendrilCount = 6;
+  const tendrilR = phase === 'rise' ? 36 - riseT * 12 : (phase === 'wrap' ? 24 - wrapT * 15 : 9);
+  ctx.strokeStyle = '#3a5a1e';
+  ctx.lineWidth = 3;
+  ctx.lineCap = 'round';
+  for (let i = 0; i < tendrilCount; i++) {
+    const a = (Math.PI * 2 / tendrilCount) * i + seedA * 1.7 + performance.now() / 900;
+    const x1 = Math.cos(a) * (tendrilR + 11);
+    const y1 = Math.sin(a) * (tendrilR + 11) * 0.55;
+    const x2 = Math.cos(a) * tendrilR;
+    const y2 = Math.sin(a) * tendrilR * 0.55;
+    ctx.save();
+    ctx.globalAlpha *= Math.min(1, riseT * 2);
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // magische gloed op het moment dat de wortels zich om het doelwit sluiten
+  if (phase === 'wrap' || phase === 'sink') {
+    const pulse = 0.4 + Math.sin(performance.now() / 60) * 0.25 + 0.25;
+    ctx.save();
+    ctx.globalAlpha *= pulse * (phase === 'sink' ? 0.5 : 1);
+    const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
+    g.addColorStop(0, '#baff5c');
+    g.addColorStop(1, 'rgba(186,255,92,0)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(0, 0, 26, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
   ctx.restore();
 }
 
@@ -2137,6 +2253,7 @@ function drawPlayer() {
 function drawBot(bot) {
   const now = performance.now();
   const frozen = now < bot.frozenUntil;
+  const rooted = now < (bot.rootedUntil || 0);
   const slashing = now < (bot.slashUntil || 0);
   const isMelee = bot.pattern === 'melee';
   const isGhost = bot.pattern === 'teleport';
@@ -2161,7 +2278,7 @@ function drawBot(bot) {
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
   ctx.rotate(angle);
   if (isGhost) ctx.globalAlpha = 0.65;
-  ctx.fillStyle = frozen ? '#9be3ff' : (slashing ? '#fff' : bot.color);
+  ctx.fillStyle = frozen ? '#9be3ff' : rooted ? '#8a6a3a' : (slashing ? '#fff' : bot.color);
   ctx.beginPath();
   if (isSwapper) {
     // ruitvormig lichaam met dubbele contour, duidelijk anders dan gewone bots
