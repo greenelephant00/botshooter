@@ -414,8 +414,8 @@ function update() {
         spawnParticles(b.x, b.y, '#ff8c00');
       } else {
         b.hit = true;
-        if (b.swapOnHit && b.sourceBot && !b.sourceBot.dead) {
-          // Swapper: wissel van plek met de bot en word tijdelijk vertraagd
+        if (b.swapOnHit && b.sourceBot) {
+          // Swapper: wissel altijd van plek met de bot zodra zijn kogel raakt, ook als hij inmiddels dood is
           const bot = b.sourceBot;
           const px = player.x, py = player.y;
           player.x = Math.max(player.r, Math.min(canvas.width - player.r, bot.x));
