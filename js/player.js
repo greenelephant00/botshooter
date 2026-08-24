@@ -40,6 +40,7 @@ const player = {
   curseUntil: 0,
   confuseUntil: 0,
   stoneskinUntil: 0,
+  stoneskinReduction: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -80,6 +81,7 @@ function resetPlayer() {
   player.curseUntil = 0;
   player.confuseUntil = 0;
   player.stoneskinUntil = 0;
+  player.stoneskinReduction = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;

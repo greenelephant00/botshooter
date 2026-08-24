@@ -393,7 +393,7 @@ function fireBotBullet(bot, angle, speedMult = 1) {
 
 function applyDamageToPlayer(amount) {
   if (performance.now() < player.shieldUntil) return false;
-  const stoneskinReduction = performance.now() < player.stoneskinUntil ? 0.6 : 0;
+  const stoneskinReduction = performance.now() < player.stoneskinUntil ? player.stoneskinReduction : 0;
   const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : 0)) * (1 - stoneskinReduction);
   player.hp -= amount * (1 - totalReduction);
   return true;

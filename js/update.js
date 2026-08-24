@@ -928,6 +928,7 @@ function update() {
         spawnParticles(p.x, p.y, '#3fa34d');
       } else if (p.type === 'aardhuid') {
         player.stoneskinUntil = now + info.durations[lvl] * boostDurMult;
+        player.stoneskinReduction = info.reductions[lvl];
         spawnParticles(p.x, p.y, '#8a6a3a');
       } else if (p.type === 'vuurnova') {
         fireNovaAttack(info.dmgs[lvl], info.radii[lvl]);

@@ -157,13 +157,28 @@ function powerupDescForLevel(id) {
   return `${current} Volgend niveau: ${nextParts.join(', ')}.`;
 }
 
+const WORLD2_POWERUP_VALUE_TEXT = {
+  wortelgreep: (info, lvl) => `grijpt ${info.counts[lvl]} bots tegelijk`,
+  aardhuid: (info, lvl) => `${Math.round(info.reductions[lvl] * 100)}% minder schade, ${(info.durations[lvl] / 1000).toFixed(1)} sec`,
+  vuurnova: (info, lvl) => `${info.dmgs[lvl]} schade binnen ${info.radii[lvl]}px`,
+  aardaura: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec duur`,
+  ijsbries: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec bevroren`
+};
+
+function world2PowerupDesc(id) {
+  const info = POWERUP_LEVELS[id];
+  const level = getPuLevel(id);
+  const maxLevel = info.prices.length;
+  const fmt = WORLD2_POWERUP_VALUE_TEXT[id];
+  const current = `${info.desc} Huidig (Lv. ${level}): ${fmt(info, level)}.`;
+  if (level >= maxLevel) return `${current} Max niveau bereikt.`;
+  return `${current} Volgend niveau: ${fmt(info, level + 1)}.`;
+}
+
 function renderPowerupShop() {
   document.getElementById('powerupShopCoins').textContent = coins;
-  if (currentWorld === 2) {
-    document.getElementById('powerupShopList').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
-    return;
-  }
-  document.getElementById('powerupShopList').innerHTML = POWERUP_IDS.map(id => {
+  const ids = currentWorld === 2 ? WORLD2_POWERUP_IDS : POWERUP_IDS;
+  document.getElementById('powerupShopList').innerHTML = ids.map(id => {
     const info = POWERUP_LEVELS[id];
     const level = getPuLevel(id);
     const maxLevel = info.prices.length;
@@ -171,7 +186,8 @@ function renderPowerupShop() {
     const btn = maxed
       ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
       : `<button class="buy" onclick="buyPowerupUpgrade('${id}')" ${coins < info.prices[level] ? 'disabled' : ''}>Koop niveau ${level + 1}/${maxLevel} · 🪙${info.prices[level]}</button>`;
-    return `<div class="shopItem"><div class="info"><div class="name">${info.name} (Lv. ${level}/${maxLevel})</div><div class="desc">${powerupDescForLevel(id)}</div></div>${btn}</div>`;
+    const desc = currentWorld === 2 ? world2PowerupDesc(id) : powerupDescForLevel(id);
+    return `<div class="shopItem"><div class="info"><div class="name">${info.name} (Lv. ${level}/${maxLevel})</div><div class="desc">${desc}</div></div>${btn}</div>`;
   }).join('');
 }
 
@@ -327,6 +343,7 @@ function startPractice(botName) {
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
+  treeGrabs = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -442,6 +459,7 @@ function startDodgePractice() {
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
+  treeGrabs = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
