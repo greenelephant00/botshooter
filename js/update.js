@@ -968,7 +968,7 @@ function update() {
     triggerTsunamiWave();
   }
 
-  // Tsunami: actieve vloedgolven beschadigen en verplaatsen wat ze op hun pad raken
+  // Tsunami: actieve vloedgolven doen geen schade, maar sleuren je een flink stuk mee
   tsunamiWaves.forEach(w => {
     const age = now - w.born;
     const t = Math.min(1, age / w.sweepDuration);
@@ -982,9 +982,8 @@ function update() {
       const playerPos = axisIsX ? player.x : player.y;
       if (Math.abs(playerPos - bandPos) < bandHalfWidth) {
         w.hitPlayer = true;
-        applyDamageToPlayer(12);
-        player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + knockDX * 130));
-        player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + knockDY * 130));
+        player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + knockDX * 260));
+        player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + knockDY * 260));
         spawnParticles(player.x, player.y, '#6ec6ff');
       }
     }
@@ -993,10 +992,9 @@ function update() {
       const botPos = axisIsX ? bot.x : bot.y;
       if (Math.abs(botPos - bandPos) < bandHalfWidth) {
         w.hitBots.add(bot);
-        damageBotSimple(bot, 12, '#6ec6ff');
-        if (bot.dead) return;
-        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + knockDX * 130));
-        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + knockDY * 130));
+        spawnParticles(bot.x, bot.y, '#6ec6ff');
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + knockDX * 260));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + knockDY * 260));
       }
     });
   });
@@ -1025,7 +1023,7 @@ function update() {
       player.y = Math.max(player.r, Math.min(canvas.height - player.r, tornadoY + Math.sin(ang) * pullRadius));
       spawnParticles(player.x, player.y, '#cfe8ee');
     } else if (pdist < pullRadius) {
-      const pull = (1 - pdist / pullRadius) * 2.2;
+      const pull = (1 - pdist / pullRadius) * 5;
       player.x += (pdx / pdist) * pull;
       player.y += (pdy / pdist) * pull;
     }
@@ -1040,7 +1038,7 @@ function update() {
         bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, tornadoX + Math.cos(ang) * pullRadius));
         bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, tornadoY + Math.sin(ang) * pullRadius));
       } else if (bdist < pullRadius) {
-        const pull = (1 - bdist / pullRadius) * 2.2;
+        const pull = (1 - bdist / pullRadius) * 5;
         bot.x += (bdx / bdist) * pull;
         bot.y += (bdy / bdist) * pull;
       }
