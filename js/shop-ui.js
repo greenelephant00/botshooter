@@ -146,7 +146,7 @@ const BOT_PATTERN_INFO = {
   boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
   sentinellaser: 'Geen kogels — houdt afstand en vuurt periodiek een getelegrafeerde, doorlopende laserstraal af.',
   mine:      'Geen kogels — legt elke seconde een mijn neer op jouw positie op dat moment, die na een paar seconden vanzelf afgaat.',
-  shockbolt: 'Geen kogels — telegrafeert kort een inslagpunt op je positie en zapt je daarna met een instant bliksemschicht.'
+  shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',

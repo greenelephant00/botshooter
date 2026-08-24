@@ -805,20 +805,26 @@ function detonateMine(bot, mine) {
 }
 
 function shockBolt(bot) {
-  // arclight: telegrafeert kort een inslagpunt op de speler, en zapt daarna met een instant bliksemschicht
-  const targetX = player.x;
-  const targetY = player.y;
+  // arclight: telegrafeert 3 inslagpunten rond de speler, en zapt daarna elk met een instant bliksemschicht
   const radius = 45;
   const delay = 550;
-  telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
+  const spreadDist = 55;
+  const targets = [{ x: player.x, y: player.y }];
+  for (let i = 0; i < 2; i++) {
+    const a = Math.random() * Math.PI * 2;
+    targets.push({ x: player.x + Math.cos(a) * spreadDist, y: player.y + Math.sin(a) * spreadDist });
+  }
+  targets.forEach(t => telegraphs.push({ x: t.x, y: t.y, radius, warnUntil: performance.now() + delay }));
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
-    lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
-    spawnParticles(targetX, targetY, '#fff066');
-    const dd = Math.hypot(player.x - targetX, player.y - targetY);
-    if (dd < radius + player.r) {
-      applyDamageToPlayer(bot.specialDmg || 18);
-    }
+    targets.forEach(t => {
+      lightningBolts.push({ x1: bot.x, y1: bot.y, x2: t.x, y2: t.y, born: performance.now() });
+      spawnParticles(t.x, t.y, '#fff066');
+      const dd = Math.hypot(player.x - t.x, player.y - t.y);
+      if (dd < radius + player.r) {
+        applyDamageToPlayer(bot.specialDmg || 18);
+      }
+    });
   }, delay);
 }
 
