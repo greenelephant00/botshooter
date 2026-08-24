@@ -396,7 +396,7 @@ const POWERUP_LEVELS = {
   stun:      { name: '⊗ Stun',         prices: [350, 550, 800],   durations: [4000, 5000, 6000, 7000], desc: 'Elke bot die op je schiet wordt na het schot even verlamd en kan tijdelijk niet vuren.' },
   aura:      { name: '💫 Aura',        prices: [400, 650, 950],   durations: [7000, 8000, 9000, 10000], desc: 'Een schadeveld om je heen doet voortdurend schade aan alle bots die dichtbij komen.' },
   overload:  { name: '⚡ Overload',     prices: [500, 800, 1150],  durations: [5000, 6000, 7000, 8000], desc: 'Dubbele schade en veel hogere vuursnelheid tegelijk.' },
-  chaos:     { name: '🌀 Verwarring',   prices: [450, 700, 1000],  durations: [4000, 5000, 6000, 7000], desc: 'Alle bots (ook bosses) schieten op elkaar in plaats van op jou. Hun kogels doen elkaar evenveel schade als aan jou.' }
+  chaos:     { name: '🌀 Verwarring',   prices: [450, 700, 1000],  durations: [7000, 8500, 10000, 12000], desc: 'Alle bots (ook bosses) schieten op elkaar in plaats van op jou. Hun kogels doen elkaar evenveel schade als aan jou.' }
 };
 const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos'];
 
