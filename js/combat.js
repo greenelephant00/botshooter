@@ -783,18 +783,18 @@ function meleeAttack(bot) {
 }
 
 function mineDrop(bot) {
-  // warden: legt een stilstaande mijn neer die afgaat zodra de speler dichtbij komt, of anders na een fuse
-  const mx = bot.x, my = bot.y;
+  // warden: legt een mijn neer op de plek waar de speler op dat moment staat, gaat alleen af na een fuse
+  const mx = player.x, my = player.y;
   const radius = 60;
   const fuse = 3500;
   const armedAt = performance.now();
-  bot.mine = { x: mx, y: my, radius, armedAt, fuse, exploded: false };
+  if (!bot.mines) bot.mines = [];
+  bot.mines.push({ x: mx, y: my, radius, armedAt, fuse, exploded: false });
   telegraphs.push({ x: mx, y: my, radius, warnUntil: armedAt + fuse });
 }
 
-function detonateMine(bot) {
-  const mine = bot.mine;
-  if (!mine || mine.exploded) return;
+function detonateMine(bot, mine) {
+  if (mine.exploded) return;
   mine.exploded = true;
   explosions.push({ x: mine.x, y: mine.y, born: performance.now(), maxR: mine.radius });
   spawnParticles(mine.x, mine.y, '#ff8800');
@@ -802,7 +802,6 @@ function detonateMine(bot) {
   if (dd < mine.radius + player.r) {
     applyDamageToPlayer(bot.specialDmg || 26);
   }
-  bot.mine = null;
 }
 
 function shockBolt(bot) {

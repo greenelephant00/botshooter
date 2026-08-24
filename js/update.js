@@ -123,18 +123,18 @@ function update() {
     }
 
     if (bot.pattern === 'mine') {
-      // warden: legt een stilstaande mijn neer die afgaat bij nadering of na een fuse
-      if (bot.mine && !bot.mine.exploded) {
-        const dd = Math.hypot(player.x - bot.mine.x, player.y - bot.mine.y);
-        if (dd < bot.mine.radius * 0.7 || now - bot.mine.armedAt > bot.mine.fuse) {
-          detonateMine(bot);
-        }
+      // warden: legt elke seconde een mijn neer op de plek van de speler, die alleen na een fuse afgaat
+      if (bot.mines && bot.mines.length) {
+        bot.mines.forEach(mine => {
+          if (!mine.exploded && now - mine.armedAt > mine.fuse) detonateMine(bot, mine);
+        });
+        bot.mines = bot.mines.filter(mine => !mine.exploded);
       }
       if (bdist > 160) {
         bot.x += (bdx/bdist) * bot.speed * speedMult;
         bot.y += (bdy/bdist) * bot.speed * speedMult;
       }
-      if (!bot.mine && now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
         bot.lastShot = now;
         mineDrop(bot);
       }

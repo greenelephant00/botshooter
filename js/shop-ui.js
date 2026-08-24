@@ -145,7 +145,7 @@ const BOT_PATTERN_INFO = {
   spiral:    'Schiet continu kogels in een langzaam roterende spiraal om zich heen.',
   boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
   sentinellaser: 'Geen kogels — houdt afstand en vuurt periodiek een getelegrafeerde, doorlopende laserstraal af.',
-  mine:      'Geen kogels — legt een stilstaande mijn neer die afgaat zodra je dichtbij komt, of anders na een paar seconden.',
+  mine:      'Geen kogels — legt elke seconde een mijn neer op jouw positie op dat moment, die na een paar seconden vanzelf afgaat.',
   shockbolt: 'Geen kogels — telegrafeert kort een inslagpunt op je positie en zapt je daarna met een instant bliksemschicht.'
 };
 const BOSS_SPECIAL_DESC = {
