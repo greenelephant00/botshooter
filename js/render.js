@@ -1534,13 +1534,13 @@ function draw() {
     ctx.globalAlpha = 0.4;
     ctx.fillStyle = 'rgba(127, 255, 0, 0.3)';
     ctx.beginPath();
-    ctx.arc(player.x, player.y, 120, 0, Math.PI * 2);
+    ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 0.7;
     ctx.strokeStyle = 'rgba(127, 255, 0, 0.9)';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(player.x, player.y, 120, 0, Math.PI * 2);
+    ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }

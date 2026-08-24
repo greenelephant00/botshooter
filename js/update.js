@@ -552,7 +552,7 @@ function update() {
       bots.forEach(bot => {
         if (bot.dead) return;
         const d = Math.hypot(bot.x - player.x, bot.y - player.y);
-        if (d < 120) damageBotSimple(bot, 3, '#7fff00');
+        if (d < 190) damageBotSimple(bot, 3, '#7fff00');
       });
     }
   }
