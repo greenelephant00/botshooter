@@ -380,7 +380,7 @@ const POWERUP_LEVELS = {
   nuke:      { name: '💣 Nuke',        prices: [500, 800, 1150],  dmgs: [10, 13, 16, 20] },
   invisible: { name: '👻 Onzichtbaar', prices: [450, 700, 1000],  durations: [5000, 6000, 7000, 9000] },
   timewarp:  { name: '⏳ Timewarp',    prices: [450, 700, 1000],  durations: [5000, 6000, 7000, 8000] },
-  ricochet:  { name: '🔄 Terugkaats',  prices: [400, 650, 950],   durations: [5000, 7000, 9000, 11000], desc: 'Schild: kogels van bots kaatsen terug naar de bot die ze afvuurde in plaats van jou te raken.' },
+  ricochet:  { name: '🔄 Terugkaats',  prices: [400, 650, 950],   durations: [9000, 12000, 15000, 18000], desc: 'Schild: kogels van bots kaatsen terug naar de bot die ze afvuurde in plaats van jou te raken.' },
   homing:    { name: '🎯 Homing',      prices: [450, 700, 1000],  durations: [6000, 8000, 10000, 12000], desc: 'Je kogels buigen automatisch af richting de dichtstbijzijnde bot.' },
   stun:      { name: '⊗ Stun',         prices: [350, 550, 800],   durations: [4000, 5000, 6000, 7000], desc: 'Elke bot die op je schiet wordt na het schot even verlamd en kan tijdelijk niet vuren.' },
   aura:      { name: '💫 Aura',        prices: [400, 650, 950],   durations: [7000, 8000, 9000, 10000], desc: 'Een schadeveld om je heen doet voortdurend schade aan alle bots die dichtbij komen.' },
