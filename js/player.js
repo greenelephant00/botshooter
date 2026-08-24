@@ -290,6 +290,7 @@ function initGame() {
   lightningBolts = [];
   fallingMeteors = [];
   treeGrabs = [];
+  shockRings = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -353,6 +354,7 @@ function setupNextLevel() {
   lightningBolts = [];
   fallingMeteors = [];
   treeGrabs = [];
+  shockRings = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];

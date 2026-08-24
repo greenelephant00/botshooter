@@ -309,6 +309,102 @@ function drawTornadoOverlay() {
   ctx.restore();
 }
 
+function drawShockRing(r) {
+  // Gedeeld: uitdijende, uitdovende schokgolf-ring (Wereld 2 elementale powerups)
+  const age = performance.now() - r.born;
+  if (age < 0) return; // nog niet actief (gebruikt voor gefaseerde, vertraagde ringen)
+  const t = Math.min(1, age / r.duration);
+  if (t >= 1) return;
+  const rad = r.maxR * t;
+  ctx.save();
+  ctx.globalAlpha = (1 - t) * 0.8;
+  ctx.strokeStyle = r.color;
+  ctx.lineWidth = 6 * (1 - t) + 1;
+  ctx.beginPath();
+  ctx.arc(r.x, r.y, rad, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawEarthAuraEffect() {
+  // Aardaura (Wereld 2): een veld van aarde-energie met een gestreepte gloedring en ronddraaiende blad-/steenmotes
+  const now = performance.now();
+  const t = now / 1000;
+  ctx.save();
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = '#7fff00';
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 0.6;
+  ctx.strokeStyle = '#7fff00';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([10, 8]);
+  ctx.lineDashOffset = -t * 40;
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  const moteCount = 8;
+  for (let i = 0; i < moteCount; i++) {
+    const a = t * 0.8 + (Math.PI * 2 / moteCount) * i;
+    const orbitR = 60 + (i % 3) * 40;
+    const mx = player.x + Math.cos(a) * orbitR;
+    const my = player.y + Math.sin(a) * orbitR;
+    ctx.save();
+    ctx.translate(mx, my);
+    ctx.rotate(a);
+    ctx.fillStyle = i % 2 === 0 ? '#3fa34d' : '#8a6a3a';
+    ctx.beginPath();
+    ctx.moveTo(0, -5);
+    ctx.lineTo(3, 0);
+    ctx.lineTo(0, 5);
+    ctx.lineTo(-3, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
+function drawStoneskinEffect() {
+  // Aardhuid (Wereld 2): pulserende gebarsten rotshuid met ronddraaiende rotsscherven
+  const now = performance.now();
+  const t = now / 1000;
+  const pulse = 1 + Math.sin(now / 200) * 0.06;
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  ctx.strokeStyle = '#a08050';
+  ctx.lineWidth = 3;
+  ctx.setLineDash([5, 4]);
+  ctx.beginPath();
+  ctx.arc(player.x, player.y, (player.r + 10) * pulse, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  const shardCount = 5;
+  for (let i = 0; i < shardCount; i++) {
+    const a = t * 1.4 + (Math.PI * 2 / shardCount) * i;
+    const orbitR = player.r + 20;
+    const sx = player.x + Math.cos(a) * orbitR;
+    const sy = player.y + Math.sin(a) * orbitR * 0.75;
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(a + Math.PI / 2);
+    ctx.fillStyle = '#8a6a3a';
+    ctx.beginPath();
+    ctx.moveTo(0, -5);
+    ctx.lineTo(4, 2);
+    ctx.lineTo(-4, 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#5c4526';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function drawTreeGrab(t) {
   // Wortelgreep-powerup (Wereld 2): een boom breekt uit de grond, wikkelt zijn takken om de bot en zinkt weer weg
   const age = performance.now() - t.born;
@@ -2586,6 +2682,7 @@ function draw() {
   fallingMeteors.forEach(drawFallingMeteor);
   tsunamiWaves.forEach(drawTsunamiWave);
   treeGrabs.forEach(drawTreeGrab);
+  shockRings.forEach(drawShockRing);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);
@@ -2705,19 +2802,23 @@ function draw() {
     ctx.restore();
   }
   if (nowDraw < player.auraUntil) {
-    ctx.save();
-    ctx.globalAlpha = 0.4;
-    ctx.fillStyle = 'rgba(127, 255, 0, 0.3)';
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 0.7;
-    ctx.strokeStyle = 'rgba(127, 255, 0, 0.9)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    if (currentWorld === 2) {
+      drawEarthAuraEffect();
+    } else {
+      ctx.save();
+      ctx.globalAlpha = 0.4;
+      ctx.fillStyle = 'rgba(127, 255, 0, 0.3)';
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 0.7;
+      ctx.strokeStyle = 'rgba(127, 255, 0, 0.9)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(player.x, player.y, 190, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
   }
   if (nowDraw < player.overloadUntil) {
     ctx.save();
@@ -2731,14 +2832,7 @@ function draw() {
     ctx.restore();
   }
   if (nowDraw < player.stoneskinUntil) {
-    ctx.save();
-    ctx.globalAlpha = 0.7;
-    ctx.strokeStyle = 'rgba(138, 106, 58, 0.9)';
-    ctx.lineWidth = 4;
-    ctx.beginPath();
-    ctx.arc(player.x, player.y, player.r + 8, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.restore();
+    drawStoneskinEffect();
   }
 
   drawPlayer();

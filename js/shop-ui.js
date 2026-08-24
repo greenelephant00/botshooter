@@ -344,6 +344,7 @@ function startPractice(botName) {
   lightningBolts = [];
   fallingMeteors = [];
   treeGrabs = [];
+  shockRings = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -460,6 +461,7 @@ function startDodgePractice() {
   lightningBolts = [];
   fallingMeteors = [];
   treeGrabs = [];
+  shockRings = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];

@@ -724,6 +724,7 @@ function update() {
   fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);
   tsunamiWaves = tsunamiWaves.filter(w => now0 - w.born < w.totalLife);
   treeGrabs = treeGrabs.filter(t => now0 - t.born < t.duration);
+  shockRings = shockRings.filter(r => now0 - r.born < r.duration);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);
   vampBolts = vampBolts.filter(g => now0 - g.born < g.duration);
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);
@@ -827,6 +828,7 @@ function update() {
   if (now0 < player.auraUntil) {
     if (!player.auraLastTick || now0 - player.auraLastTick > 400) {
       player.auraLastTick = now0;
+      if (currentWorld === 2) shockRings.push({ x: player.x, y: player.y, born: now0, maxR: 190, duration: 350, color: '#7fff00' });
       bots.forEach(bot => {
         if (bot.dead) return;
         const d = Math.hypot(bot.x - player.x, bot.y - player.y);
@@ -929,15 +931,24 @@ function update() {
       } else if (p.type === 'aardhuid') {
         player.stoneskinUntil = now + info.durations[lvl] * boostDurMult;
         player.stoneskinReduction = info.reductions[lvl];
-        spawnParticles(p.x, p.y, '#8a6a3a');
+        shockRings.push({ x: player.x, y: player.y, born: now, maxR: 70, duration: 400, color: '#8a6a3a' });
+        spawnParticles(player.x, player.y, '#8a6a3a');
+        spawnParticles(player.x, player.y, '#5c4526');
+        spawnParticles(player.x, player.y, '#c9a96a');
       } else if (p.type === 'vuurnova') {
         fireNovaAttack(info.dmgs[lvl], info.radii[lvl]);
       } else if (p.type === 'aardaura') {
         player.auraUntil = now + info.durations[lvl] * boostDurMult;
-        spawnParticles(p.x, p.y, '#7fff00');
+        shockRings.push({ x: player.x, y: player.y, born: now, maxR: 90, duration: 450, color: '#7fff00' });
+        spawnParticles(player.x, player.y, '#7fff00');
+        spawnParticles(player.x, player.y, '#3fa34d');
       } else if (p.type === 'ijsbries') {
         bots.forEach(b => { b.frozenUntil = now + info.durations[lvl] * boostDurMult; });
-        spawnParticles(p.x, p.y, '#9be3ff');
+        shockRings.push({ x: player.x, y: player.y, born: now, maxR: Math.max(canvas.width, canvas.height), duration: 700, color: '#9be3ff' });
+        for (let i = 0; i < 10; i++) {
+          spawnParticles(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() < 0.5 ? '#9be3ff' : '#ffffff');
+        }
+        spawnParticles(player.x, player.y, '#9be3ff');
       }
     }
   });

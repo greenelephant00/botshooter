@@ -394,6 +394,7 @@ function fireBotBullet(bot, angle, speedMult = 1) {
 function applyDamageToPlayer(amount) {
   if (performance.now() < player.shieldUntil) return false;
   const stoneskinReduction = performance.now() < player.stoneskinUntil ? player.stoneskinReduction : 0;
+  if (stoneskinReduction > 0) spawnParticles(player.x, player.y, '#a08050'); // rotsscherven vliegen af als de aardhuid een klap opvangt
   const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : 0)) * (1 - stoneskinReduction);
   player.hp -= amount * (1 - totalReduction);
   return true;
@@ -1580,14 +1581,23 @@ function rootGrabAttack(count) {
 }
 
 function fireNovaAttack(dmg, radius) {
-  // Vuurnova (Wereld 2): felle vuurexplosie rond de speler die alle bots dichtbij direct beschadigt
-  explosions.push({ x: player.x, y: player.y, born: performance.now(), maxR: radius });
-  spawnParticles(player.x, player.y, '#ff5a1f');
+  // Vuurnova (Wereld 2): felle, gelaagde vuurexplosie rond de speler die alle bots dichtbij direct beschadigt
+  const now0 = performance.now();
+  explosions.push({ x: player.x, y: player.y, born: now0, maxR: radius });
+  shockRings.push({ x: player.x, y: player.y, born: now0, maxR: radius * 1.5, duration: 550, color: '#ffb703' });
+  shockRings.push({ x: player.x, y: player.y, born: now0 + 90, maxR: radius * 1.1, duration: 400, color: '#fff275' });
+  spawnParticles(player.x, player.y, '#fff275');
   spawnParticles(player.x, player.y, '#ffb703');
+  spawnParticles(player.x, player.y, '#ff5a1f');
+  spawnParticles(player.x, player.y, '#c8102e');
+  spawnParticles(player.x, player.y, '#3a2410');
   bots.forEach(bot => {
     if (bot.dead) return;
     const d = Math.hypot(bot.x - player.x, bot.y - player.y);
-    if (d < radius + bot.r) damageBotSimple(bot, dmg, '#ff5a1f');
+    if (d < radius + bot.r) {
+      damageBotSimple(bot, dmg, '#ff5a1f');
+      spawnParticles(bot.x, bot.y, '#ffb703');
+    }
   });
 }
 

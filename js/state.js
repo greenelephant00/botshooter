@@ -34,6 +34,7 @@ let meteorShowerUntil = 0; // Meteorenregen: periodieke inslagen
 let lastMeteorImpact = 0;
 let fallingMeteors = []; // Meteorenregen: zichtbare meteoren die uit de lucht vallen, blijven liggen en wegtrekken
 let treeGrabs = []; // Wortelgreep-powerup (Wereld 2): bomen die uit de grond komen en een bot mee naar beneden trekken
+let shockRings = []; // Gedeeld: uitdijende schokgolf-ringen voor de Wereld 2 elementale powerup-effecten
 let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
 let lastEarthquakeShake = 0;
 let tornadoUntil = 0; // Tornado: ronddwalende wervelwind die zuigt en wegslingert
