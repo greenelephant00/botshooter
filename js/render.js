@@ -1281,6 +1281,7 @@ function drawBot(bot) {
   const isTurret = bot.pattern === 'turret';
   const isBomber = bot.pattern === 'suicide';
   const isBoss = !!bot.isBoss;
+  const isSwapper = bot.type === 'swapper';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -1288,8 +1289,25 @@ function drawBot(bot) {
   if (isGhost) ctx.globalAlpha = 0.65;
   ctx.fillStyle = frozen ? '#9be3ff' : (slashing ? '#fff' : bot.color);
   ctx.beginPath();
-  ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
-  ctx.fill();
+  if (isSwapper) {
+    // ruitvormig lichaam met dubbele contour, duidelijk anders dan gewone bots
+    ctx.moveTo(bot.r * 1.15, 0);
+    ctx.lineTo(0, bot.r * 0.85);
+    ctx.lineTo(-bot.r * 1.15, 0);
+    ctx.lineTo(0, -bot.r * 0.85);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#faf0ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, bot.r * 0.4, 0, Math.PI * 2);
+    ctx.fillStyle = '#faf0ff';
+    ctx.fill();
+  } else {
+    ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
   if (isMelee) {
     // mes i.p.v. geweer
     const lunge = slashing ? 6 : 0;
@@ -1347,6 +1365,22 @@ function drawBot(bot) {
       ctx.stroke();
       ctx.restore();
     }
+  }
+
+  if (isSwapper) {
+    // draaiende paarse swirl-ring rond de swapper, waarschuwt voor het plek-wissel-effect
+    const spin = (now / 300) % (Math.PI * 2);
+    ctx.save();
+    ctx.globalAlpha = 0.6;
+    ctx.strokeStyle = '#e100ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(bot.x, bot.y, bot.r + 8, spin, spin + Math.PI * 1.3);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(bot.x, bot.y, bot.r + 8, spin + Math.PI, spin + Math.PI * 2.3);
+    ctx.stroke();
+    ctx.restore();
   }
 
   if (frozen) {

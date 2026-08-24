@@ -382,9 +382,10 @@ function fireBotBullet(bot, angle, speedMult = 1) {
     vx: Math.cos(angle) * bot.bulletSpeed * speedMult,
     vy: Math.sin(angle) * bot.bulletSpeed * speedMult,
     r: bot.pattern === 'fast' ? 3 : 4,
-    dmg: (bot.pattern === 'fast' ? 15 : 8) * hcMult,
+    dmg: (bot.bulletDmg || (bot.pattern === 'fast' ? 15 : 8)) * hcMult,
     owner: 'bot',
-    sourceBot: bot
+    sourceBot: bot,
+    swapOnHit: bot.swapOnHit || false
   });
 }
 

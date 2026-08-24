@@ -123,7 +123,7 @@ const BOT_DISPLAY_NAMES = {
   brute: 'Brute (mes)', spinner: 'Spinner', chaser: 'Chaser', shielder: 'Shielder',
   ghost: 'Ghost', turret: 'Turret', bomber: 'Bomber',
   overlord: 'Overlord', phantom: 'Phantom', artillery: 'Artillery',
-  swarmqueen: 'Swarmqueen', vortex: 'Vortex',
+  swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
 };
 const BOT_PATTERN_INFO = {
@@ -163,6 +163,9 @@ function botDamageText(type) {
   }
   if (type.pattern === 'fast') {
     return '15 schade per kogel (precisieschot)';
+  }
+  if (type.bulletDmg) {
+    return `${type.bulletDmg} schade per kogel`;
   }
   return '8 schade per kogel';
 }
@@ -414,7 +417,8 @@ function speedLabel(type) {
 
 function botCardHtml(type) {
   const name = BOT_DISPLAY_NAMES[type.name] || type.name;
-  let patternDesc = (BOT_PATTERN_INFO[type.pattern] || '') + (type.splits ? ' Splitst bij dood in 2 zwakke minions.' : '');
+  let patternDesc = (BOT_PATTERN_INFO[type.pattern] || '') + (type.splits ? ' Splitst bij dood in 2 zwakke minions.' : '')
+    + (type.swapOnHit ? ' Schiet 2x per sec — als een kogel je raakt wissel je van plek met deze bot en word je 3 sec vertraagd (zolang hij nog leeft).' : '');
   if (type.pattern === 'boss' && BOSS_SPECIAL_DESC[type.name]) {
     patternDesc += ' ' + BOSS_SPECIAL_DESC[type.name];
   }

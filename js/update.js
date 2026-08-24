@@ -4,6 +4,7 @@ function update() {
   // Player movement
   const now0 = performance.now();
   player.speed = now0 < player.boostUntil ? player.baseSpeed * 1.8 : player.baseSpeed;
+  if (now0 < player.slowUntil) player.speed *= 0.5;
 
   // Passieve armor-effecten
   const armorNow = getArmorStats();
@@ -413,6 +414,18 @@ function update() {
         spawnParticles(b.x, b.y, '#ff8c00');
       } else {
         b.hit = true;
+        if (b.swapOnHit && b.sourceBot && !b.sourceBot.dead) {
+          // Swapper: wissel van plek met de bot en word tijdelijk vertraagd
+          const bot = b.sourceBot;
+          const px = player.x, py = player.y;
+          player.x = Math.max(player.r, Math.min(canvas.width - player.r, bot.x));
+          player.y = Math.max(player.r, Math.min(canvas.height - player.r, bot.y));
+          bot.x = px;
+          bot.y = py;
+          player.slowUntil = now0 + 3000;
+          spawnParticles(player.x, player.y, '#e100ff');
+          spawnParticles(bot.x, bot.y, '#e100ff');
+        }
         const armor = getArmorStats();
         if (now0 < player.shieldUntil) {
           spawnParticles(b.x, b.y, '#c77dff');
