@@ -5,6 +5,7 @@ function update() {
   const now0 = performance.now();
   player.speed = now0 < player.boostUntil ? player.baseSpeed * 1.8 : player.baseSpeed;
   if (now0 < player.slowUntil) player.speed *= 0.5;
+  if (now0 < sandstormUntil) player.speed *= 0.7;
 
   // Passieve armor-effecten
   const armorNow = getArmorStats();
@@ -26,8 +27,19 @@ function update() {
     if (keys['d'] || keys['arrowright']) dx += 1;
   }
   const len = Math.hypot(dx, dy) || 1;
-  player.x += (dx/len) * player.speed;
-  player.y += (dy/len) * player.speed;
+  const desiredVX = (dx / len) * player.speed;
+  const desiredVY = (dy / len) * player.speed;
+  const onIce = icePatches.some(patch => now0 < patch.until && Math.hypot(player.x - patch.x, player.y - patch.y) < patch.r + player.r);
+  if (onIce) {
+    // IJsvloer: traag reagerende, glijdende beweging i.p.v. direct bijsturen
+    player.slideVX = player.slideVX * 0.94 + desiredVX * 0.06;
+    player.slideVY = player.slideVY * 0.94 + desiredVY * 0.06;
+  } else {
+    player.slideVX = desiredVX;
+    player.slideVY = desiredVY;
+  }
+  player.x += player.slideVX;
+  player.y += player.slideVY;
   player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
   player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
   player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
@@ -927,6 +939,26 @@ function update() {
     }
   });
   coinPickups = coinPickups.filter(c => !c.collected);
+
+  // Natuurrampen: af en toe een willekeurige ramp (niet tijdens oefenen)
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive) {
+    if (!activeDisasterType && nextDisasterAt && now > nextDisasterAt) {
+      startRandomDisaster();
+    }
+    if (activeDisasterType && now >= disasterEndAt) {
+      activeDisasterType = null;
+      nextDisasterAt = now + 30000 + Math.random() * 25000;
+    }
+    if (activeDisasterType === 'lightningStorm' && now - lastLightningStrike > 1300) {
+      lastLightningStrike = now;
+      triggerLightningStrike();
+    }
+    if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 900) {
+      lastMeteorImpact = now;
+      triggerMeteorImpact();
+    }
+  }
+  icePatches = icePatches.filter(patch => now < patch.until);
 
   // Spawn new bots gradually (niet tijdens oefenen — daar is maar 1 bot)
   if (gameMode === 'levels') {

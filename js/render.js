@@ -6,6 +6,46 @@ function lerpColor(hexA, hexB, t) {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
+function drawIcePatch(patch) {
+  // Natuurramp IJsvloer: gladde plek waar de speler op uitglijdt
+  ctx.save();
+  ctx.globalAlpha = 0.4;
+  const grad = ctx.createRadialGradient(patch.x, patch.y, 0, patch.x, patch.y, patch.r);
+  grad.addColorStop(0, '#dff6ff');
+  grad.addColorStop(1, 'rgba(150, 220, 255, 0.08)');
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(patch.x, patch.y, patch.r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 0.6;
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawSandstormOverlay() {
+  // Natuurramp Zandstorm: beperkt zicht rond de speler
+  ctx.save();
+  const grad = ctx.createRadialGradient(player.x, player.y, 60, player.x, player.y, 320);
+  grad.addColorStop(0, 'rgba(196, 164, 92, 0)');
+  grad.addColorStop(1, 'rgba(196, 164, 92, 0.85)');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 0.15;
+  ctx.strokeStyle = '#e8d9b0';
+  ctx.lineWidth = 2;
+  const t = performance.now() / 40;
+  for (let i = 0; i < 12; i++) {
+    const y = (i * 90 + t) % (canvas.height + 60) - 30;
+    ctx.beginPath();
+    ctx.moveTo(-30, y);
+    ctx.lineTo(canvas.width + 30, y - 40);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawPowerup(p) {
   const pulse = 1 + Math.sin(performance.now() / 150) * 0.1;
   const colors = {
@@ -2008,6 +2048,14 @@ function drawBot(bot) {
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  const nowShake = performance.now();
+  ctx.save();
+  if (nowShake < earthquakeShakeUntil) {
+    const shakeT = (earthquakeShakeUntil - nowShake) / 1500;
+    const mag = 8 * shakeT;
+    ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
+  }
+
   // grid background
   ctx.strokeStyle = 'rgba(255,255,255,0.05)';
   ctx.lineWidth = 1;
@@ -2018,6 +2066,8 @@ function draw() {
   for (let y = 0; y < canvas.height; y += gridSize) {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
   }
+
+  icePatches.forEach(drawIcePatch);
 
   // bullets
   bullets.forEach(b => {
@@ -2194,5 +2244,8 @@ function draw() {
   }
 
   drawPlayer();
+  ctx.restore();
+
+  if (nowShake < sandstormUntil) drawSandstormOverlay();
 }
 

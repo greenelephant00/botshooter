@@ -227,6 +227,25 @@ function closeBotsInfo() {
 }
 window.closeBotsInfo = closeBotsInfo;
 
+function renderDisastersInfo() {
+  document.getElementById('disastersInfoList').innerHTML = DISASTER_TYPES.map(d =>
+    `<div class="shopItem"><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div></div>`
+  ).join('');
+}
+
+function openDisastersInfo() {
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('disastersInfoScreen').style.display = 'flex';
+  renderDisastersInfo();
+}
+window.openDisastersInfo = openDisastersInfo;
+
+function closeDisastersInfo() {
+  document.getElementById('disastersInfoScreen').style.display = 'none';
+  document.getElementById('startScreen').style.display = 'flex';
+}
+window.closeDisastersInfo = closeDisastersInfo;
+
 function startPractice(botName) {
   const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES].find(t => t.name === botName);
   if (!type) return;
@@ -261,6 +280,14 @@ function startPractice(botName) {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
+  icePatches = [];
+  sandstormUntil = 0;
+  lightningStormUntil = 0;
+  meteorShowerUntil = 0;
+  earthquakeShakeUntil = 0;
+  activeDisasterType = null;
+  disasterEndAt = 0;
+  nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;
@@ -360,6 +387,14 @@ function startDodgePractice() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
+  icePatches = [];
+  sandstormUntil = 0;
+  lightningStormUntil = 0;
+  meteorShowerUntil = 0;
+  earthquakeShakeUntil = 0;
+  activeDisasterType = null;
+  disasterEndAt = 0;
+  nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;

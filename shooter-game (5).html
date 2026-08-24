@@ -64,6 +64,7 @@
     <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
   </div>
   <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
+  <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
@@ -153,6 +154,15 @@
     <div id="bossInfoList"></div>
   </div>
   <button class="backBtn" onclick="closeBotsInfo()">← Terug</button>
+</div>
+<div id="disastersInfoScreen">
+  <h1>🌪 Natuurrampen</h1>
+  <button class="topBackBtn" onclick="closeDisastersInfo()">← Menu</button>
+  <div class="shopSection">
+    <h3>Rampen die af en toe willekeurig kunnen voorkomen tijdens het spelen</h3>
+    <div id="disastersInfoList"></div>
+  </div>
+  <button class="backBtn" onclick="closeDisastersInfo()">← Terug</button>
 </div>
 <div id="hud">
   Score: <span class="score" id="scoreVal">0</span> &nbsp;|&nbsp;

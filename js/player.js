@@ -43,6 +43,8 @@ const player = {
   killStreakLastKill: 0,
   comboStreak: 0,
   comboLastKill: 0,
+  slideVX: 0,
+  slideVY: 0,
   activeTransform: 'none'
 };
 
@@ -82,6 +84,8 @@ function resetPlayer() {
   player.killStreakLastKill = 0;
   player.comboStreak = 0;
   player.comboLastKill = 0;
+  player.slideVX = 0;
+  player.slideVY = 0;
   player.secondWindUsed = false;
   if (lvlFlyingStart > 0) player.shieldUntil = performance.now() + FLYING_START_DURATIONS[lvlFlyingStart - 1];
 }
@@ -282,6 +286,14 @@ function initGame() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
+  icePatches = [];
+  sandstormUntil = 0;
+  lightningStormUntil = 0;
+  meteorShowerUntil = 0;
+  earthquakeShakeUntil = 0;
+  activeDisasterType = null;
+  disasterEndAt = 0;
+  nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
   chargeTrails = [];
   deployedTurrets = [];
   bossAlive = false;
@@ -331,6 +343,14 @@ function setupNextLevel() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
+  icePatches = [];
+  sandstormUntil = 0;
+  lightningStormUntil = 0;
+  meteorShowerUntil = 0;
+  earthquakeShakeUntil = 0;
+  activeDisasterType = null;
+  disasterEndAt = 0;
+  nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
   chargeTrails = [];
   deployedTurrets = [];
   gameOver = false;

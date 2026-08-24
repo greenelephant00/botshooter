@@ -1050,6 +1050,102 @@ function elementStorm(dmg, count) {
   }
 }
 
+function showDisasterAlert(text) {
+  const el = document.getElementById('bossAlert');
+  if (!el) return;
+  el.textContent = text;
+  el.style.display = 'flex';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+function startRandomDisaster() {
+  const types = ['iceFloor', 'sandstorm', 'lightningStorm', 'earthquake', 'meteorShower'];
+  const type = types[Math.floor(Math.random() * types.length)];
+  activeDisasterType = type;
+  const now = performance.now();
+
+  if (type === 'iceFloor') {
+    disasterEndAt = now + 3000;
+    const count = 2 + Math.floor(Math.random() * 3);
+    for (let i = 0; i < count; i++) {
+      icePatches.push({
+        x: 80 + Math.random() * (canvas.width - 160),
+        y: 80 + Math.random() * (canvas.height - 160),
+        r: 55 + Math.random() * 35,
+        until: now + 25000
+      });
+    }
+    showDisasterAlert('🧊 IJSVLOER — pas op, glad ijs!');
+  } else if (type === 'sandstorm') {
+    disasterEndAt = now + 14000;
+    sandstormUntil = disasterEndAt;
+    showDisasterAlert('🌪 ZANDSTORM — minder zicht en snelheid!');
+  } else if (type === 'lightningStorm') {
+    disasterEndAt = now + 12000;
+    lightningStormUntil = disasterEndAt;
+    lastLightningStrike = now;
+    showDisasterAlert('⛈ BLIKSEMSTORM — blijf in beweging!');
+  } else if (type === 'earthquake') {
+    disasterEndAt = now + 1500;
+    earthquakeShakeUntil = disasterEndAt;
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 50;
+      bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * dist));
+      bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * dist));
+    });
+    showDisasterAlert('🌋 AARDBEVING!');
+  } else if (type === 'meteorShower') {
+    disasterEndAt = now + 10000;
+    meteorShowerUntil = disasterEndAt;
+    lastMeteorImpact = now;
+    showDisasterAlert('☄ METEORENREGEN — zoek dekking!');
+  }
+}
+
+function triggerLightningStrike() {
+  const x = 40 + Math.random() * (canvas.width - 80);
+  const y = 40 + Math.random() * (canvas.height - 80);
+  const radius = 55;
+  const delay = 500;
+  telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    explosions.push({ x, y, born: performance.now(), maxR: radius });
+    spawnParticles(x, y, '#fff066');
+    spawnParticles(x, y, '#c9a3ff');
+    const dd = Math.hypot(player.x - x, player.y - y);
+    if (dd < radius + player.r) applyDamageToPlayer(10);
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const bd = Math.hypot(bot.x - x, bot.y - y);
+      if (bd < radius + bot.r) damageBotSimple(bot, 10, '#fff066');
+    });
+  }, delay);
+}
+
+function triggerMeteorImpact() {
+  const x = 40 + Math.random() * (canvas.width - 80);
+  const y = 40 + Math.random() * (canvas.height - 80);
+  const radius = 65;
+  const delay = 650;
+  telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    explosions.push({ x, y, born: performance.now(), maxR: radius });
+    spawnParticles(x, y, '#ff8800');
+    spawnParticles(x, y, '#ff3838');
+    const dd = Math.hypot(player.x - x, player.y - y);
+    if (dd < radius + player.r) applyDamageToPlayer(14);
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const bd = Math.hypot(bot.x - x, bot.y - y);
+      if (bd < radius + bot.r) damageBotSimple(bot, 14, '#ff8800');
+    });
+  }, delay);
+}
+
 function mortarStrike(bot) {
   // artillery: telegrafeert een inslagpunt, en beschadigt de speler pas na een korte waarschuwing
   const targetX = player.x;

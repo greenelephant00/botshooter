@@ -24,6 +24,25 @@ let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
 let barrageLasers = []; // Elementenstorm-powerup: vuur/ijsstralen vanaf de zijkanten die alleen bots raken
 let barrageTelegraphs = []; // Elementenstorm-powerup: stippellijn-waarschuwing vóór elke straal
+
+// ---- Natuurrampen ----
+let icePatches = []; // IJsvloer: gladde plekken waar de speler op uitglijdt
+let sandstormUntil = 0; // Zandstorm: verminderd zicht en snelheid
+let lightningStormUntil = 0; // Bliksemstorm: periodieke blikseminslagen
+let lastLightningStrike = 0;
+let meteorShowerUntil = 0; // Meteorenregen: periodieke inslagen
+let lastMeteorImpact = 0;
+let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
+let activeDisasterType = null;
+let disasterEndAt = 0;
+let nextDisasterAt = 0;
+const DISASTER_TYPES = [
+  { id: 'iceFloor', name: '🧊 IJsvloer', desc: 'Er verschijnen 2-4 gladde ijsplekken op het veld. Sta je erop, dan reageert je beweging traag en glijd je door in de richting waar je heen ging in plaats van direct te kunnen bijsturen.' },
+  { id: 'sandstorm', name: '🌪 Zandstorm', desc: 'Een zandstorm trekt over het veld: 14 sec lang beperkt zicht (donkere waas rond je) en 30% minder bewegingssnelheid.' },
+  { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaat er om de ~1,3 sec een bliksem in op een willekeurige, kort getelegrafeerde plek op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
+  { id: 'earthquake', name: '🌋 Aardbeving', desc: 'Een korte maar hevige aardbeving: het scherm schudt heftig en alle bots worden abrupt in willekeurige richtingen weggeslingerd.' },
+  { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,9 sec getelegrafeerde meteorieten in op willekeurige plekken. Zowel bots als jijzelf lopen schade op als je erin staat.' }
+];
 let chargeTrails = []; // Juggernaut-transformatie: spoor van de beuk-charge
 let deployedTurrets = []; // Field Engineer-transformatie: neergezette geschutskoepels
 let stickyThrows = [];
