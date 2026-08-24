@@ -830,7 +830,7 @@ function shockBolt(bot) {
 
 function gasCloudDrop(bot) {
   // miasma: laat een gifwolk achter op zijn huidige positie die schade-over-tijd doet aan de speler
-  gasClouds.push({ x: bot.x, y: bot.y, radius: 115, born: performance.now(), duration: 4500, lastTick: 0, tickDmg: bot.specialDmg || 9 });
+  gasClouds.push({ x: bot.x, y: bot.y, radius: 140, born: performance.now(), duration: 4500, lastTick: 0, tickDmg: bot.specialDmg || 9 });
   spawnParticles(bot.x, bot.y, '#7ed957');
 }
 
