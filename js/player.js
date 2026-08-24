@@ -53,7 +53,7 @@ function resetPlayer() {
   player.y = canvas.height / 2;
   const wantedTransform = transformPracticeActive
     ? transformPracticeId
-    : (equippedTransform !== 'none' && !weaponPracticeActive ? equippedTransform : 'none');
+    : (equippedTransform !== 'none' && !weaponPracticeActive && currentWorld !== 2 ? equippedTransform : 'none');
   player.activeTransform = gameMode !== 'practice' ? wantedTransform : 'none';
   const tStats = TRANSFORM_STATS[player.activeTransform] || TRANSFORM_STATS.none;
   const armorSpeed = 1 + getArmorStats().speedBonus;

@@ -836,7 +836,7 @@ function update() {
 
   // Powerups: spawn periodically (niet tijdens oefenen)
   const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && currentWorld !== 2 && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
