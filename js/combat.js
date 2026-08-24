@@ -892,14 +892,14 @@ function freezeTrap(bot) {
   // cryostasis: telegrafeert een ijsval op de speler die hem tijdelijk verlamt als hij er nog in staat
   const targetX = player.x;
   const targetY = player.y;
-  const radius = 50;
+  const radius = 95;
   const delay = 650;
   telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
-      player.rootedUntil = performance.now() + 1500;
+      player.rootedUntil = performance.now() + 3000;
       applyDamageToPlayer(bot.specialDmg || 8);
       spawnParticles(targetX, targetY, '#9be3ff');
     }

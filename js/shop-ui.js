@@ -153,7 +153,7 @@ const BOT_PATTERN_INFO = {
   shieldbash: 'Geen kogels — beukt continu op je af en stoot je bij impact weg met veel schade en een flinke terugstoot.',
   summon:    'Geen kogels — houdt afstand en roept periodiek 7 zwakke broodlings op in een grote cirkel om zich heen, om je te overweldigen.',
   gravitywell: 'Geen kogels — opent periodiek een zwaartekrachtveld dat je naar het middelpunt trekt en na 1,5 sec een schadeburst laat afgaan.',
-  freezetrap: 'Geen kogels — telegrafeert een ijsval op je positie die je bij impact 1,5 sec volledig verlamt.',
+  freezetrap: 'Geen kogels — telegrafeert een grote ijsval op je positie die je bij impact 3 sec volledig verlamt.',
   snipebeam: 'Geen kogels — houdt veel afstand en vuurt na een lange telegraaf een instant, verwoestende precisiestraal.',
   curse:     'Geen kogels — vervloekt je periodiek zodat je 4 sec lang 50% minder schade doet, geen directe schade.',
   clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.'
@@ -194,7 +194,7 @@ function botDamageText(type) {
     return `${type.specialDmg || 24} schade bij het imploderen van het zwaartekrachtveld`;
   }
   if (type.pattern === 'freezetrap') {
-    return `${type.specialDmg || 8} schade + 1,5 sec verlamming bij ijsval`;
+    return `${type.specialDmg || 8} schade + 3 sec verlamming bij ijsval`;
   }
   if (type.pattern === 'snipebeam') {
     return `${type.specialDmg || 42} schade bij precisiestraal`;
