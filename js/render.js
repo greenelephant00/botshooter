@@ -33,7 +33,7 @@ function drawIceFloorOverlay() {
 function drawSandstormOverlay() {
   // Natuurramp Zandstorm: je ziet alleen een klein rondje om jezelf heen, de rest is volledig onzichtbaar
   ctx.save();
-  const visionR = 200;
+  const visionR = 250;
   const grad = ctx.createRadialGradient(player.x, player.y, visionR * 0.5, player.x, player.y, visionR);
   grad.addColorStop(0, 'rgba(60, 48, 28, 0)');
   grad.addColorStop(1, 'rgba(30, 24, 14, 1)');
