@@ -1078,7 +1078,7 @@ function startRandomDisaster() {
     lastLightningStrike = now;
     showDisasterAlert('⛈ BLIKSEMSTORM — blijf in beweging!');
   } else if (type === 'earthquake') {
-    disasterEndAt = now + 1500;
+    disasterEndAt = now + 3500;
     earthquakeShakeUntil = disasterEndAt;
     bots.forEach(bot => {
       if (bot.dead) return;
@@ -1109,9 +1109,9 @@ function sustainDisasterPractice() {
   } else if (disasterPracticeType === 'iceFloor') {
     iceFloorUntil = now + 2000;
   } else if (disasterPracticeType === 'earthquake') {
-    if (now - lastEarthquakeShake > 4000) {
+    if (now - lastEarthquakeShake > 6000) {
       lastEarthquakeShake = now;
-      earthquakeShakeUntil = now + 1500;
+      earthquakeShakeUntil = now + 3500;
       bots.forEach(bot => {
         if (bot.dead) return;
         const ang = Math.random() * Math.PI * 2;
