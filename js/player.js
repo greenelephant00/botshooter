@@ -41,6 +41,8 @@ const player = {
   confuseUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
+  comboStreak: 0,
+  comboLastKill: 0,
   activeTransform: 'none'
 };
 
@@ -78,6 +80,8 @@ function resetPlayer() {
   player.reviveUsed = false;
   player.killStreak = 0;
   player.killStreakLastKill = 0;
+  player.comboStreak = 0;
+  player.comboLastKill = 0;
   player.secondWindUsed = false;
   if (lvlFlyingStart > 0) player.shieldUntil = performance.now() + FLYING_START_DURATIONS[lvlFlyingStart - 1];
 }
@@ -416,6 +420,7 @@ function updateHUD() {
     active.push(`🔧 Field Engineer — koepels ${deployedTurrets.length}/${ENGINEER_MAX_TURRETS}`);
   } else {
     if (getWeapon().effect === 'killstreak' && player.killStreak > 0) active.push(`🗡️ Streak x${player.killStreak}`);
+    if (['combofire', 'combofrost', 'combovolt'].includes(equippedSkin) && player.comboStreak > 0) active.push(`🔥 Combo x${player.comboStreak}`);
     if (getWeapon().id === 'cryorifle') {
       const remain = CRYO_GRENADE_COOLDOWN - (now - cryoGrenadeLastUsed);
       active.push(remain <= 0 ? '❄️ Granaat (E) gereed' : `❄️ Granaat over ${Math.ceil(remain / 1000)}s`);

@@ -1,3 +1,11 @@
+function lerpColor(hexA, hexB, t) {
+  const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
+  const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
+  const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
+  const r = Math.round(ar + (br - ar) * t), g = Math.round(ag + (bg - ag) * t), bl = Math.round(ab + (bb - ab) * t);
+  return `rgb(${r}, ${g}, ${bl})`;
+}
+
 function drawPowerup(p) {
   const pulse = 1 + Math.sin(performance.now() / 150) * 0.1;
   const colors = {
@@ -742,6 +750,36 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fill();
       break;
     }
+    case 'combofire': {
+      // vurige kogel die feller gloeit naarmate de killstreak oploopt
+      const tF = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#3a3a3a', '#ff6a00', tF);
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = lerpColor('#4a4a4a', '#ffe066', tF);
+      ctx.beginPath(); ctx.arc(0, 0, 1.8, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'combofrost': {
+      // ijzige kogel die feller gloeit naarmate de killstreak oploopt
+      const tI = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#3a4a55', '#1c6fd6', tI);
+      ctx.beginPath();
+      ctx.moveTo(0, -4.5); ctx.lineTo(3, 0); ctx.lineTo(0, 4.5); ctx.lineTo(-3, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = lerpColor('#5a6a75', '#dffcff', tI);
+      ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'combovolt': {
+      // elektrische kogel die feller gloeit naarmate de killstreak oploopt
+      const tV = Math.min(1, player.comboStreak / 10);
+      ctx.strokeStyle = lerpColor('#555', '#c9a3ff', tV);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(-5, 0); ctx.lineTo(-1, -2); ctx.lineTo(1, 2); ctx.lineTo(5, 0); ctx.stroke();
+      ctx.fillStyle = lerpColor('#555', '#fff066', tV);
+      ctx.beginPath(); ctx.arc(0, 0, 2.4, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
@@ -1391,6 +1429,74 @@ function drawPlayerSkin(c, skinId, r) {
     for (let i = 0; i < 5; i++) {
       const a = -Math.PI * 0.7 + (Math.PI * 0.9 / 4) * i;
       c.beginPath(); c.arc(Math.cos(a) * r * 0.9, Math.sin(a) * r * 0.9, r * 0.1, 0, Math.PI * 2); c.fill();
+    }
+  } else if (skinId === 'combofire') {
+    // dovende ember die feller ontbrandt en een groeiende vuuraura krijgt naarmate de killstreak oploopt
+    const t = Math.min(1, player.comboStreak / 10);
+    const flicker = 1 + Math.sin(performance.now() / 90) * 0.08 * t;
+    if (t > 0.05) {
+      c.save();
+      c.globalAlpha = 0.25 + t * 0.35;
+      c.fillStyle = lerpColor('#552200', '#ff5500', t);
+      c.beginPath(); c.arc(0, 0, (r + 6 + t * 10) * flicker, 0, Math.PI * 2); c.fill();
+      c.restore();
+    }
+    c.fillStyle = lerpColor('#3a3a3a', '#ff8800', t);
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = lerpColor('#4a4a4a', '#ffe066', t);
+    c.beginPath(); c.arc(0, 0, r * 0.45, 0, Math.PI * 2); c.fill();
+    const flames = Math.round(t * 8);
+    c.fillStyle = lerpColor('#3a3a3a', '#ff3838', t);
+    for (let i = 0; i < flames; i++) {
+      const a = (Math.PI * 2 / 8) * i;
+      c.beginPath();
+      c.arc(Math.cos(a) * r * (0.95 + t * 0.25), Math.sin(a) * r * (0.95 + t * 0.25), r * 0.14 * t, 0, Math.PI * 2);
+      c.fill();
+    }
+  } else if (skinId === 'combofrost') {
+    // dof ijskristal dat feller gaat gloeien en scherpere punten krijgt bij een oplopende killstreak
+    const t = Math.min(1, player.comboStreak / 10);
+    const spikes = 5 + Math.round(t * 4);
+    if (t > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + t * 0.35;
+      c.strokeStyle = lerpColor('#3a4a55', '#8ff0ff', t);
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, r + 6 + t * 9, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    c.fillStyle = lerpColor('#3a4a55', '#1c6fd6', t);
+    c.beginPath();
+    for (let i = 0; i < spikes; i++) {
+      const a = (Math.PI * 2 / spikes) * i;
+      const rad = i % 2 === 0 ? r * (0.7 + t * 0.4) : r * 0.5;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath();
+    c.fill();
+    c.fillStyle = lerpColor('#5a6a75', '#dffcff', t);
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'combovolt') {
+    // gedimde energiekern die steeds meer knetterende bliksemboogjes krijgt bij een oplopende killstreak
+    const t = Math.min(1, player.comboStreak / 10);
+    c.fillStyle = lerpColor('#3a3a3a', '#241a4d', t);
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = lerpColor('#555', '#fff066', t);
+    c.beginPath(); c.arc(0, 0, r * 0.4, 0, Math.PI * 2); c.fill();
+    const bolts = Math.round(t * 6);
+    c.strokeStyle = lerpColor('#555', '#c9a3ff', t);
+    c.lineWidth = 1.5;
+    for (let i = 0; i < bolts; i++) {
+      const a = (Math.PI * 2 / 6) * i + performance.now() / 200;
+      const x1 = Math.cos(a) * r * 0.5, y1 = Math.sin(a) * r * 0.5;
+      const x2 = Math.cos(a) * r * (1.15 + t * 0.3), y2 = Math.sin(a) * r * (1.15 + t * 0.3);
+      const midA = a + 0.3;
+      c.beginPath();
+      c.moveTo(x1, y1);
+      c.lineTo(Math.cos(midA) * r * 0.85, Math.sin(midA) * r * 0.85);
+      c.lineTo(x2, y2);
+      c.stroke();
     }
   } else {
     // standaard

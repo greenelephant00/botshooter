@@ -410,6 +410,8 @@ function damageBotSimple(bot, dmg, color) {
   spawnParticles(bot.x, bot.y, color || bot.color);
   if (bot.hp <= 0 && !bot.immortal) {
     bot.dead = true;
+    player.comboStreak = Math.min(20, player.comboStreak + 1);
+    player.comboLastKill = performance.now();
     score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
     if (gameMode === 'levels') levelKills++;
     if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);

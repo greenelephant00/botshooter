@@ -183,7 +183,10 @@ const SKINS = [
   { id: 'discoball',  name: 'Discobal',      price: 700,             desc: 'Glinsterende spiegelbal die van kleur wisselt op de maat van de muziek.' },
   { id: 'turtle',     name: 'Schildpad',     price: 600,             desc: 'Groene schildpad met een stevig gestreept pantser.' },
   { id: 'jester',     name: 'Hofnar',        price: 650,             desc: 'Kleurrijke hofnar met een bellenmuts in paars en goud.' },
-  { id: 'cyclops',    name: 'Cycloop',       price: 700,             desc: 'Paars eenogig monster met een groot gloeiend oog.' }
+  { id: 'cyclops',    name: 'Cycloop',       price: 700,             desc: 'Paars eenogig monster met een groot gloeiend oog.' },
+  { id: 'combofire',  name: 'Infernische Combo', price: 900,          desc: 'Een dovende ember-kern die feller ontbrandt en een groeiende vuuraura krijgt naarmate je killstreak oploopt.' },
+  { id: 'combofrost', name: 'Vrieskristal Combo', price: 900,         desc: 'Een dof ijskristal dat steeds feller gaat gloeien en scherpere kristalpunten krijgt bij een oplopende killstreak.' },
+  { id: 'combovolt',  name: 'Voltaïsche Combo', price: 900,           desc: 'Een gedimde energiekern die steeds meer knetterende bliksemboogjes om zich heen krijgt naarmate je killstreak stijgt.' }
 ];
 let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';

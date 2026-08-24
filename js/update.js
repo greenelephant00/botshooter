@@ -429,6 +429,8 @@ function update() {
 
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
+          player.comboStreak = Math.min(20, player.comboStreak + 1);
+          player.comboLastKill = performance.now();
           score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
           spawnParticles(bot.x, bot.y, bot.color);
           if (gameMode === 'levels') levelKills++;
@@ -798,6 +800,11 @@ function update() {
   // Momentum Blade: killstreak vervalt als je te lang niet raakt
   if (player.killStreak > 0 && now0 - player.killStreakLastKill > 2500) {
     player.killStreak = 0;
+  }
+
+  // Combo-killstreak (voor combo-skins): telt elke kill, ongeacht wapen, vervalt na 3 sec zonder kill
+  if (player.comboStreak > 0 && now0 - player.comboLastKill > 3000) {
+    player.comboStreak = 0;
   }
 
   // Aura: periodic damage rond speler
