@@ -117,7 +117,7 @@ const SPECIAL_BOT_TYPES = [
   { name: 'vexer',      minScore: 700, minLevel: 9,  r: 17, hp: 9,  speed: [1.0, 1.4], cooldown: [1300, 1300], pattern: 'curse',         bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+320}, 60%, 40%)` },
   { name: 'bombardier', minScore: 700, minLevel: 9,  r: 20, hp: 11, speed: [0.6, 1.0], cooldown: [3800, 4400], pattern: 'clusterbomb',   bulletSpeed: 0, specialDmg: 14, color: () => `hsl(${Math.floor(Math.random()*15)+35}, 75%, 42%)` }
 ];
-const SPECIAL_SPAWN_CHANCE = 0.2; // 20% kans zodra ze ontgrendeld zijn
+const SPECIAL_SPAWN_CHANCE = 0.13; // 13% kans zodra ze ontgrendeld zijn
 
 // De bosses: verschijnen elk precies één keer per potje, enorm, traag en met een verwoestende special attack
 const BOSS_TYPES = [
