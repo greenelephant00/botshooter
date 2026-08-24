@@ -836,7 +836,7 @@ function update() {
 
   // Powerups: spawn periodically (niet tijdens oefenen)
   const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
@@ -927,7 +927,7 @@ function update() {
   powerups = powerups.filter(p => !p.collected);
 
   // Coins: spawn periodically (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
     lastCoinSpawn = now;
     spawnCoinPickup();
   }
@@ -1063,7 +1063,7 @@ function update() {
   }
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !bossAlive && !bossWarningActive) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
     const nextBoss = BOSS_TYPES.find(b => !bossesSpawned[b.name] &&
       (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
     if (nextBoss) triggerBossWarning(nextBoss);

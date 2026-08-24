@@ -28,7 +28,7 @@ function saveShopState() {
   localStorage.setItem('botShooterLvlBloodlust', lvlBloodlust);
   localStorage.setItem('botShooterPowerupLevels', JSON.stringify(powerupLevels));
   localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
-  localStorage.setItem('botShooterEquippedSkin', equippedSkin);
+  localStorage.setItem('botShooterEquippedSkin', skinPracticeActive ? previousEquippedSkin : equippedSkin);
   localStorage.setItem('botShooterOwnedTransforms', JSON.stringify(ownedTransforms));
   localStorage.setItem('botShooterEquippedTransform', equippedTransform);
 }
