@@ -925,7 +925,6 @@ function curseBolt(bot) {
   const targetY = player.y;
   const radius = 45;
   const delay = 500;
-  telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
