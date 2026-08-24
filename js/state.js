@@ -171,7 +171,17 @@ const SKINS = [
   { id: 'mushroom',   name: 'Paddestoel',    price: 550,             desc: 'Grote felgekleurde paddestoel met stippen op het kapje.' },
   { id: 'pumpkin',    name: 'Pompoen',       price: 600,             desc: 'Halloween-pompoen met gloeiende ogen en een grappig gezicht.' },
   { id: 'mummy',      name: 'Momie',         price: 650,             desc: 'Oude momie gewikkeld in crèmekleurig linnen met gloeiende ogen.' },
-  { id: 'werewolf',   name: 'Weerwolf',      price: 700,             desc: 'Behaard beest-karakter met scherpe nagels en gele ogen.' }
+  { id: 'werewolf',   name: 'Weerwolf',      price: 700,             desc: 'Behaard beest-karakter met scherpe nagels en gele ogen.' },
+  { id: 'panda',      name: 'Panda',         price: 550,             desc: 'Schattige panda met zwart-witte vacht en ronde oortjes.' },
+  { id: 'unicorn',    name: 'Eenhoorn',      price: 750,             desc: 'Wit fabeldier met een glinsterende regenboog-hoorn en manen.' },
+  { id: 'shark',      name: 'Haai',          price: 650,             desc: 'Grijze roofvis met een scherpe vin en rijen puntige tanden.' },
+  { id: 'frankenstein', name: 'Frankenstein', price: 650,            desc: 'Groen monster met hechtingen, bouten in de nek en een platte schedel.' },
+  { id: 'cactus',     name: 'Cactus',        price: 550,             desc: 'Vrolijke woestijncactus met stekels en een kleine bloem.' },
+  { id: 'snowman',    name: 'Sneeuwpop',     price: 550,             desc: 'Ronde sneeuwpop met een wortelneus en kolen-ogen.' },
+  { id: 'discoball',  name: 'Discobal',      price: 700,             desc: 'Glinsterende spiegelbal die van kleur wisselt op de maat van de muziek.' },
+  { id: 'turtle',     name: 'Schildpad',     price: 600,             desc: 'Groene schildpad met een stevig gestreept pantser.' },
+  { id: 'jester',     name: 'Hofnar',        price: 650,             desc: 'Kleurrijke hofnar met een bellenmuts in paars en goud.' },
+  { id: 'cyclops',    name: 'Cycloop',       price: 700,             desc: 'Paars eenogig monster met een groot gloeiend oog.' }
 ];
 let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';

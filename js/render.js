@@ -619,6 +619,108 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(2, -3, 1.5, 0, Math.PI * 2); ctx.fill();
       break;
     }
+    case 'panda': {
+      // zwart-wit pootafdruk
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1a1a1a';
+      ctx.beginPath(); ctx.arc(-2.5, -2.5, 1.3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(2.5, -2.5, 1.3, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'unicorn': {
+      // regenboog sterretje
+      const hueB = (performance.now() / 4) % 360;
+      ctx.fillStyle = `hsl(${hueB}, 90%, 65%)`;
+      const s = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -s); ctx.lineTo(s * 0.3, -s * 0.3); ctx.lineTo(s, 0); ctx.lineTo(s * 0.3, s * 0.3);
+      ctx.lineTo(0, s); ctx.lineTo(-s * 0.3, s * 0.3); ctx.lineTo(-s, 0); ctx.lineTo(-s * 0.3, -s * 0.3);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'shark': {
+      // vinvormige kogel
+      ctx.fillStyle = '#6e8ca0';
+      ctx.beginPath();
+      ctx.moveTo(5, 0); ctx.lineTo(-4, -3); ctx.lineTo(-2, 0); ctx.lineTo(-4, 3);
+      ctx.closePath(); ctx.fill();
+      break;
+    }
+    case 'frankenstein': {
+      // groene bout-kogel
+      ctx.fillStyle = '#6ba05a';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#c0c0c0';
+      ctx.fillRect(-5, -1.2, 3, 2.4);
+      ctx.fillRect(2, -1.2, 3, 2.4);
+      break;
+    }
+    case 'cactus': {
+      // groene stekelbal
+      ctx.fillStyle = '#3fa34d';
+      ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 / 6) * i;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * 3.5, Math.sin(a) * 3.5);
+        ctx.lineTo(Math.cos(a) * 6, Math.sin(a) * 6);
+        ctx.stroke();
+      }
+      break;
+    }
+    case 'snowman': {
+      // sneeuwbal
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#c9e6ff';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'discoball': {
+      // kleurwisselend discobolletje
+      const hueD = (performance.now() / 3) % 360;
+      ctx.fillStyle = `hsl(${hueD}, 90%, 70%)`;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(-4, 0); ctx.lineTo(4, 0); ctx.stroke();
+      break;
+    }
+    case 'turtle': {
+      // groen schild-kogeltje
+      ctx.fillStyle = '#4a8c3f';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#2e5c28';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 / 6) * i;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * 4, Math.sin(a) * 4); ctx.stroke();
+      }
+      break;
+    }
+    case 'jester': {
+      // paars-gouden ruit
+      ctx.fillStyle = '#5b2c8f';
+      ctx.beginPath();
+      ctx.moveTo(0, -4.5); ctx.lineTo(3.5, 0); ctx.lineTo(0, 4.5); ctx.lineTo(-3.5, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#ffd700';
+      ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'cyclops': {
+      // gloeiend paars oog
+      const glowB = 0.6 + Math.sin(performance.now() / 100) * 0.4;
+      ctx.fillStyle = '#7d3cff';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `rgba(255, 60, 60, ${glowB})`;
+      ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
@@ -1063,6 +1165,176 @@ function drawPlayerSkin(c, skinId, r) {
     c.fillStyle = '#000';
     c.beginPath(); c.arc(-r * 0.25, -r * 0.25, r * 0.08, 0, Math.PI * 2); c.fill();
     c.beginPath(); c.arc(r * 0.25, -r * 0.25, r * 0.08, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'panda') {
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#1a1a1a';
+    c.beginPath(); c.arc(-r * 0.75, -r * 0.75, r * 0.35, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.75, -r * 0.75, r * 0.35, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(-r * 0.3, -r * 0.1, r * 0.28, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.3, -r * 0.1, r * 0.28, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(-r * 0.3, -r * 0.1, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.3, -r * 0.1, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#1a1a1a';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.06, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.06, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, r * 0.25, r * 0.1, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'unicorn') {
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const hue = (performance.now() / 8) % 360;
+    c.fillStyle = `hsl(${hue}, 90%, 65%)`;
+    c.beginPath();
+    c.moveTo(r * 0.1, -r * 0.2);
+    c.lineTo(r * 1.1, -r * 1.1);
+    c.lineTo(r * 0.35, -r * 0.35);
+    c.closePath();
+    c.fill();
+    for (let i = 0; i < 4; i++) {
+      c.fillStyle = `hsl(${(hue + i * 40) % 360}, 90%, 65%)`;
+      c.beginPath();
+      c.ellipse(-r * 0.3 - i * 4, -r * 0.6 + i * 6, r * 0.35, r * 0.14, -0.4, 0, Math.PI * 2);
+      c.fill();
+    }
+    c.fillStyle = '#222';
+    c.beginPath(); c.arc(r * 0.3, -r * 0.1, r * 0.1, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'shark') {
+    c.fillStyle = '#6e8ca0';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#e8f1f5';
+    c.beginPath(); c.ellipse(r * 0.1, r * 0.3, r * 0.75, r * 0.4, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#6e8ca0';
+    c.beginPath();
+    c.moveTo(-r * 0.1, -r * 0.9);
+    c.lineTo(r * 0.35, -r * 1.6);
+    c.lineTo(r * 0.5, -r * 0.7);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#fff';
+    for (let i = 0; i < 4; i++) {
+      c.beginPath();
+      c.moveTo(r * 0.2 + i * 6, r * 0.15);
+      c.lineTo(r * 0.25 + i * 6, r * 0.35);
+      c.lineTo(r * 0.3 + i * 6, r * 0.15);
+      c.closePath();
+      c.fill();
+    }
+    c.fillStyle = '#111';
+    c.beginPath(); c.arc(-r * 0.3, -r * 0.2, r * 0.12, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'frankenstein') {
+    c.fillStyle = '#6ba05a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(-r * 0.9, -r * 0.15, r * 1.8, r * 0.2);
+    c.fillStyle = '#c0c0c0';
+    c.beginPath(); c.arc(-r * 0.85, 0, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.85, 0, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#333';
+    c.lineWidth = 2;
+    c.beginPath(); c.moveTo(-r * 0.3, -r * 0.6); c.lineTo(r * 0.1, -r * 0.55); c.stroke();
+    c.fillStyle = '#ffe066';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.15, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.15, r * 0.16, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#111';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.15, r * 0.06, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.15, r * 0.06, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'cactus') {
+    c.fillStyle = '#3fa34d';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#2e7d3a';
+    c.beginPath(); c.ellipse(-r * 0.7, -r * 0.1, r * 0.35, r * 0.6, 0.3, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.ellipse(r * 0.7, -r * 0.2, r * 0.32, r * 0.55, -0.3, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#fff';
+    c.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 / 6) * i;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * r * 0.5, Math.sin(a) * r * 0.5);
+      c.lineTo(Math.cos(a) * r * 0.9, Math.sin(a) * r * 0.9);
+      c.stroke();
+    }
+    c.fillStyle = '#ff6fa5';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.7, r * 0.18, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'snowman') {
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, r * 0.25, r * 0.85, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, -r * 0.35, r * 0.6, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ff8c00';
+    c.beginPath();
+    c.moveTo(r * 0.1, -r * 0.35);
+    c.lineTo(r * 0.7, -r * 0.25);
+    c.lineTo(r * 0.1, -r * 0.15);
+    c.closePath();
+    c.fill();
+    c.fillStyle = '#222';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.5, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, -r * 0.55, r * 0.08, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0.15, -r * 0.6, r * 0.08, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'discoball') {
+    const t = performance.now() / 400;
+    c.fillStyle = '#c9c9c9';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    for (let ring = -2; ring <= 2; ring++) {
+      const ry = ring * r * 0.35;
+      const rw = Math.sqrt(Math.max(0, r * r - ry * ry));
+      c.strokeStyle = 'rgba(80,80,80,0.6)';
+      c.lineWidth = 1;
+      c.beginPath(); c.moveTo(-rw, ry); c.lineTo(rw, ry); c.stroke();
+    }
+    for (let i = 0; i < 5; i++) {
+      const hue = (t * 60 + i * 70) % 360;
+      const a = (Math.PI * 2 / 5) * i + t;
+      c.fillStyle = `hsl(${hue}, 90%, 70%)`;
+      c.beginPath(); c.arc(Math.cos(a) * r * 0.5, Math.sin(a) * r * 0.5, r * 0.1, 0, Math.PI * 2); c.fill();
+    }
+  } else if (skinId === 'turtle') {
+    c.fillStyle = '#4a8c3f';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#2e5c28';
+    c.beginPath(); c.arc(0, 0, r * 0.75, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#7fc76a';
+    c.lineWidth = 1.5;
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 / 6) * i;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(Math.cos(a) * r * 0.75, Math.sin(a) * r * 0.75);
+      c.stroke();
+    }
+    c.fillStyle = '#8fce7a';
+    c.beginPath(); c.ellipse(r * 0.85, 0, r * 0.3, r * 0.22, 0, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#111';
+    c.beginPath(); c.arc(r * 0.95, -r * 0.05, r * 0.06, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'jester') {
+    c.fillStyle = '#5b2c8f';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ffd700';
+    c.beginPath(); c.moveTo(-r, -r * 0.3); c.quadraticCurveTo(-r * 0.6, -r * 1.5, -r * 0.2, -r * 0.5); c.closePath(); c.fill();
+    c.beginPath(); c.moveTo(r, -r * 0.3); c.quadraticCurveTo(r * 0.6, -r * 1.5, r * 0.2, -r * 0.5); c.closePath(); c.fill();
+    c.beginPath(); c.arc(-r * 0.6, -r * 1.35, r * 0.13, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.6, -r * 1.35, r * 0.13, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.1, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.1, r * 0.2, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#111';
+    c.beginPath(); c.arc(-r * 0.25, -r * 0.1, r * 0.09, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.25, -r * 0.1, r * 0.09, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'cyclops') {
+    c.fillStyle = '#7d3cff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const glow = 0.7 + Math.sin(performance.now() / 250) * 0.3;
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, r * 0.5, 0, Math.PI * 2); c.fill();
+    c.fillStyle = `rgba(255, 60, 60, ${glow})`;
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#111';
+    c.beginPath(); c.arc(0, 0, r * 0.13, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#5c1fbf';
+    for (let i = 0; i < 5; i++) {
+      const a = -Math.PI * 0.7 + (Math.PI * 0.9 / 4) * i;
+      c.beginPath(); c.arc(Math.cos(a) * r * 0.9, Math.sin(a) * r * 0.9, r * 0.1, 0, Math.PI * 2); c.fill();
+    }
   } else {
     // standaard
     c.fillStyle = '#4cc9f0';
