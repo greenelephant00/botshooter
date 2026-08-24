@@ -74,27 +74,37 @@
   </div>
 </div>
 <div id="world2Screen">
+  <button class="shopOpenBtn" onclick="goToWorld1()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
   <h1>🔥❄️🪨 Wereld 2: Elementen</h1>
   <div class="coinDisplay">🪙 <span id="world2Coins">0</span></div>
-  <p>Een compleet nieuwe wereld — vecht tegen elementale bots</p>
+  <p>Kies een spelmodus</p>
   <div class="modeBtnRow">
-    <button class="modeBtn endless" onclick="startWorld2Game()">▶ Start
-      <small>Vuur-, ijs- en aardbots · endless overleven</small>
+    <button class="modeBtn levels" onclick="selectMode('levels')">Levels
+      <small>Rond golven van bots af · steeds lastiger</small>
+    </button>
+    <button class="modeBtn endless" onclick="selectMode('endless')">Endless
+      <small>Overleef zo lang mogelijk · highscore</small>
+    </button>
+    <button class="modeBtn hardcore" onclick="selectMode('hardcore')">☠️ Hardcore
+      <small>Bots met 2x HP en 2x schade · eigen highscore</small>
     </button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openWorld2Shop()">🛒 Shop</button>
+    <button class="shopOpenBtn" onclick="openShop()">🛒 Shop</button>
+    <button class="shopOpenBtn" onclick="openSkinsShop()">🎨 Skins</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="goToWorld1()" style="border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
+    <button class="shopOpenBtn" onclick="openPowerupShop()">⚡ Powerups</button>
+    <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
   </div>
-</div>
-<div id="world2ShopScreen">
-  <h1>🛒 Wereld 2 Shop</h1>
-  <div class="coinDisplay">🪙 <span id="world2ShopCoins">0</span></div>
-  <button class="topBackBtn" onclick="closeWorld2Shop()">← Menu</button>
-  <p style="margin-top:70px; color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>
-  <button class="backBtn" onclick="closeWorld2Shop()">← Terug</button>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
+    <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
+  </div>
+  <div class="dodgePracticeRow">
+    <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
+    <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
+  </div>
 </div>
 <div id="shopScreen">
   <h1>🛒 Shop</h1>

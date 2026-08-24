@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(git commit *)",
+      "Bash(node --check js/update.js)",
+      "Bash(node --check js/combat.js)",
+      "Bash(node --check js/player.js)",
+      "Bash(node --check js/render.js)",
+      "Bash(node --check js/shop-ui.js)",
+      "PowerShell(node --check js/update.js)",
+      "PowerShell(node --check js/combat.js)",
+      "PowerShell(node --check js/player.js)",
+      "PowerShell(node --check js/render.js)",
+      "PowerShell(node --check js/shop-ui.js)",
+      "Bash(node --check js/state.js)",
+      "PowerShell(node --check \"js/render.js\")",
+      "PowerShell(node --check \"js/state.js\")",
+      "PowerShell(node --check \"js/shop-ui.js\")",
+      "PowerShell(node --check \"js/player.js\")"
     ]
   }
 }

@@ -33,8 +33,15 @@ function saveShopState() {
   localStorage.setItem('botShooterEquippedTransform', equippedTransform);
 }
 
+function menuScreenId() {
+  return currentWorld === 2 ? 'world2Screen' : 'startScreen';
+}
+function menuCoinsId() {
+  return currentWorld === 2 ? 'world2Coins' : 'startCoins';
+}
+
 function openShop() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('shopScreen').style.display = 'flex';
   renderShop();
 }
@@ -70,6 +77,7 @@ window.buyWorld2 = buyWorld2;
 
 function openWorld2() {
   if (!world2Unlocked) return;
+  currentWorld = 2;
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('world2Coins').textContent = coins;
   document.getElementById('world2Screen').style.display = 'flex';
@@ -84,19 +92,6 @@ function goToWorld1() {
 }
 window.goToWorld1 = goToWorld1;
 
-function openWorld2Shop() {
-  document.getElementById('world2Screen').style.display = 'none';
-  document.getElementById('world2ShopCoins').textContent = coins;
-  document.getElementById('world2ShopScreen').style.display = 'flex';
-}
-window.openWorld2Shop = openWorld2Shop;
-
-function closeWorld2Shop() {
-  document.getElementById('world2ShopScreen').style.display = 'none';
-  document.getElementById('world2Screen').style.display = 'flex';
-}
-window.closeWorld2Shop = closeWorld2Shop;
-
 function scrollToShopSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -105,13 +100,13 @@ window.scrollToShopSection = scrollToShopSection;
 
 function closeShop() {
   document.getElementById('shopScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-  document.getElementById('startCoins').textContent = coins;
+  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById(menuCoinsId()).textContent = coins;
 }
 window.closeShop = closeShop;
 
 function openPowerupShop() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('powerupShopScreen').style.display = 'flex';
   renderPowerupShop();
 }
@@ -119,8 +114,8 @@ window.openPowerupShop = openPowerupShop;
 
 function closePowerupShop() {
   document.getElementById('powerupShopScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-  document.getElementById('startCoins').textContent = coins;
+  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById(menuCoinsId()).textContent = coins;
 }
 window.closePowerupShop = closePowerupShop;
 
@@ -272,7 +267,7 @@ function botDamageText(type) {
 }
 
 function openBotsInfo() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('botsInfoScreen').style.display = 'flex';
   renderBotsInfo();
 }
@@ -280,7 +275,7 @@ window.openBotsInfo = openBotsInfo;
 
 function closeBotsInfo() {
   document.getElementById('botsInfoScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
+  document.getElementById(menuScreenId()).style.display = 'flex';
 }
 window.closeBotsInfo = closeBotsInfo;
 
@@ -292,7 +287,7 @@ function renderDisastersInfo() {
 }
 
 function openDisastersInfo() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('disastersInfoScreen').style.display = 'flex';
   renderDisastersInfo();
 }
@@ -300,7 +295,7 @@ window.openDisastersInfo = openDisastersInfo;
 
 function closeDisastersInfo() {
   document.getElementById('disastersInfoScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
+  document.getElementById(menuScreenId()).style.display = 'flex';
 }
 window.closeDisastersInfo = closeDisastersInfo;
 
@@ -430,7 +425,7 @@ function startDodgePractice() {
   disasterPracticeActive = false;
   disasterPracticeType = null;
   exitSkinPractice();
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
 
   resetPlayer();
@@ -795,7 +790,7 @@ function equipSkin(id) {
 window.equipSkin = equipSkin;
 
 function openSkinsShop() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('skinsShopScreen').style.display = 'flex';
   renderSkinsShop();
 }
@@ -803,8 +798,8 @@ window.openSkinsShop = openSkinsShop;
 
 function closeSkinsShop() {
   document.getElementById('skinsShopScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-  document.getElementById('startCoins').textContent = coins;
+  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById(menuCoinsId()).textContent = coins;
 }
 window.closeSkinsShop = closeSkinsShop;
 
@@ -869,7 +864,7 @@ function equipTransform(id) {
 window.equipTransform = equipTransform;
 
 function openTransformShop() {
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('transformShopScreen').style.display = 'flex';
   renderTransformShop();
 }
@@ -877,8 +872,8 @@ window.openTransformShop = openTransformShop;
 
 function closeTransformShop() {
   document.getElementById('transformShopScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-  document.getElementById('startCoins').textContent = coins;
+  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById(menuCoinsId()).textContent = coins;
 }
 window.closeTransformShop = closeTransformShop;
 

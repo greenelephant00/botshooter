@@ -400,7 +400,7 @@ function selectMode(mode) {
   disasterPracticeActive = false;
   disasterPracticeType = null;
   exitSkinPractice();
-  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'none';
   initGame();
   startMusic();
   if (!loopRunning) {
@@ -409,27 +409,6 @@ function selectMode(mode) {
   }
 }
 window.selectMode = selectMode;
-
-function startWorld2Game() {
-  if (!world2Unlocked) return;
-  currentWorld = 2;
-  gameMode = 'endless';
-  currentLevel = 1;
-  practiceWeaponId = null;
-  weaponPracticeActive = false;
-  transformPracticeActive = false;
-  disasterPracticeActive = false;
-  disasterPracticeType = null;
-  exitSkinPractice();
-  document.getElementById('world2Screen').style.display = 'none';
-  initGame();
-  startMusic();
-  if (!loopRunning) {
-    loopRunning = true;
-    loop();
-  }
-}
-window.startWorld2Game = startWorld2Game;
 
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;
