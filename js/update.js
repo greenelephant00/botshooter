@@ -51,6 +51,13 @@ function update() {
   const now = performance.now();
   bots.forEach(bot => {
     if (now < bot.frozenUntil || now < bot.rootedUntil) return; // bevroren of vastgeworteld, geen actie
+    // Elementale Wereld 2-bots: periodiek een sprankje van hun element (vlam/rijp/gruis)
+    if ((bot.type === 'fireling' || bot.type === 'frostling' || bot.type === 'earthling') && (!bot.lastAmbientFx || now - bot.lastAmbientFx > 350)) {
+      bot.lastAmbientFx = now;
+      if (bot.type === 'fireling') spawnParticles(bot.x, bot.y, Math.random() < 0.5 ? '#ff8c42' : '#fff275');
+      else if (bot.type === 'frostling') spawnParticles(bot.x, bot.y, Math.random() < 0.5 ? '#bdf3ff' : '#ffffff');
+      else spawnParticles(bot.x, bot.y, Math.random() < 0.5 ? '#8a6a3a' : '#3fa34d');
+    }
     if (bot.poisonUntil && now < bot.poisonUntil) {
       if (!bot.lastPoisonTick || now - bot.lastPoisonTick > 400) {
         bot.lastPoisonTick = now;

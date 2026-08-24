@@ -763,6 +763,62 @@ function drawTelegraph(t) {
   ctx.restore();
 }
 
+function drawEnemyBullet(b) {
+  const srcType = b.sourceBot && b.sourceBot.type;
+  if (srcType === 'fireling') {
+    // gloeiende vuurbal met een felle witte kern
+    const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r + 3);
+    grad.addColorStop(0, '#fff275');
+    grad.addColorStop(0.5, '#ff8c42');
+    grad.addColorStop(1, 'rgba(200,16,46,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (srcType === 'frostling') {
+    // ronddraaiende ijskristal-splinter
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(performance.now() / 150);
+    ctx.fillStyle = '#bdf3ff';
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 / 6) * i;
+      const rad = i % 2 === 0 ? b.r + 2 : b.r * 0.5;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  } else if (srcType === 'earthling') {
+    // brokje steen met een klein mosplekje
+    ctx.fillStyle = '#8a6a3a';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#5c4526';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.fillStyle = '#3fa34d';
+    ctx.beginPath();
+    ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.3, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = '#ff5c5c';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
 function drawPlayerBullet(b) {
   const angle = Math.atan2(b.vy, b.vx);
   ctx.save();
@@ -2369,6 +2425,9 @@ function drawBot(bot) {
   const isVexer = bot.type === 'vexer';
   const isBombardier = bot.type === 'bombardier';
   const isSplitter = bot.type === 'splitter';
+  const isFireling = bot.type === 'fireling';
+  const isFrostling = bot.type === 'frostling';
+  const isEarthling = bot.type === 'earthling';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -2510,6 +2569,87 @@ function drawBot(bot) {
     ctx.beginPath();
     ctx.moveTo(-bot.r * 0.85, bot.r * 0.35); ctx.lineTo(-bot.r * 0.1, bot.r * 0.05); ctx.lineTo(bot.r * 0.85, bot.r * 0.4);
     ctx.stroke();
+  } else if (isFireling) {
+    // vlammend lichaam: gloeiende kern met flikkerende vlampunten
+    const flicker = 1 + Math.sin(performance.now() / 90) * 0.08;
+    if (!frozen && !rooted && !slashing) {
+      const fgrad = ctx.createRadialGradient(0, 0, 0, 0, 0, bot.r * flicker);
+      fgrad.addColorStop(0, '#fff275');
+      fgrad.addColorStop(0.5, '#ff8c42');
+      fgrad.addColorStop(1, '#c8102e');
+      ctx.fillStyle = fgrad;
+    }
+    ctx.arc(0, 0, bot.r * flicker, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.fillStyle = '#ffb703';
+      const tips = 5;
+      for (let i = 0; i < tips; i++) {
+        const a = (Math.PI * 2 / tips) * i + performance.now() / 400;
+        const flick2 = 1 + Math.sin(performance.now() / 120 + i) * 0.3;
+        const px = Math.cos(a) * bot.r * (0.9 + 0.35 * flick2);
+        const py = Math.sin(a) * bot.r * (0.9 + 0.35 * flick2);
+        ctx.beginPath();
+        ctx.arc(px, py, bot.r * 0.22, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (isFrostling) {
+    // kristallijnen ijslichaam met scherpe facetten en een glinstering
+    const spikes = 6;
+    ctx.beginPath();
+    for (let i = 0; i < spikes; i++) {
+      const a = (Math.PI * 2 / spikes) * i;
+      const rad = i % 2 === 0 ? bot.r * 1.15 : bot.r * 0.65;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#eaffff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      const shine = 0.4 + Math.abs(Math.sin(performance.now() / 200)) * 0.5;
+      ctx.fillStyle = `rgba(255,255,255,${shine})`;
+      ctx.beginPath();
+      ctx.arc(-bot.r * 0.25, -bot.r * 0.25, bot.r * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (isEarthling) {
+    // rotsblok-lichaam met scheuren en kleine uitgroeiende plantjes
+    ctx.beginPath();
+    ctx.moveTo(-bot.r, -bot.r * 0.5);
+    ctx.lineTo(-bot.r * 0.5, -bot.r);
+    ctx.lineTo(bot.r * 0.5, -bot.r * 0.9);
+    ctx.lineTo(bot.r, -bot.r * 0.3);
+    ctx.lineTo(bot.r * 0.9, bot.r * 0.6);
+    ctx.lineTo(bot.r * 0.2, bot.r);
+    ctx.lineTo(-bot.r * 0.6, bot.r * 0.85);
+    ctx.lineTo(-bot.r * 0.95, bot.r * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#3a2410';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.3, -bot.r * 0.5); ctx.lineTo(bot.r * 0.1, 0); ctx.lineTo(-bot.r * 0.1, bot.r * 0.5);
+      ctx.stroke();
+      const sway = Math.sin(performance.now() / 500) * 0.15;
+      ctx.strokeStyle = '#2f7d3c';
+      ctx.lineWidth = 2;
+      for (let i = -1; i <= 1; i++) {
+        const bx = i * bot.r * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(bx, -bot.r * 0.85);
+        ctx.quadraticCurveTo(bx + 4 + sway * 10, -bot.r * 1.1, bx + sway * 14, -bot.r * 1.25);
+        ctx.stroke();
+        ctx.fillStyle = '#3fa34d';
+        ctx.beginPath();
+        ctx.arc(bx + sway * 14, -bot.r * 1.25, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
     ctx.fill();
@@ -2654,10 +2794,7 @@ function draw() {
     if (b.owner === 'player') {
       drawPlayerBullet(b);
     } else {
-      ctx.fillStyle = '#ff5c5c';
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fill();
+      drawEnemyBullet(b);
     }
   });
 
