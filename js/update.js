@@ -121,19 +121,6 @@ function update() {
       return;
     }
 
-    if (bot.pattern === 'sentinellaser') {
-      // sentinel: houdt afstand en vuurt periodiek een dodelijke, getelegrafeerde laserstraal
-      if (bdist > 220) {
-        bot.x += (bdx/bdist) * bot.speed * speedMult;
-        bot.y += (bdy/bdist) * bot.speed * speedMult;
-      }
-      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
-        bot.lastShot = now;
-        bossLaserSweep(bot);
-      }
-      return;
-    }
-
     if (bot.pattern === 'mine') {
       // warden: legt elke seconde een mijn neer op de plek van de speler, die alleen na een fuse afgaat
       if (bot.mines && bot.mines.length) {

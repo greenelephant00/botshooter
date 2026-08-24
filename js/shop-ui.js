@@ -124,7 +124,7 @@ const BOT_DISPLAY_NAMES = {
   ghost: 'Ghost', turret: 'Turret', bomber: 'Bomber',
   overlord: 'Overlord', phantom: 'Phantom', artillery: 'Artillery',
   swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
-  sentinel: 'Sentinel', warden: 'Warden', arclight: 'Arclight',
+  warden: 'Warden', arclight: 'Arclight',
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
   gravitas: 'Gravitas', cryostasis: 'Cryostasis', railgunner: 'Railgunner', vexer: 'Vexer', bombardier: 'Bombardier',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
@@ -146,7 +146,6 @@ const BOT_PATTERN_INFO = {
   mortar:    'Vuurt op afstand een zware, langzame granaat met een korte waarschuwing vooraf.',
   spiral:    'Schiet continu kogels in een langzaam roterende spiraal om zich heen.',
   boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
-  sentinellaser: 'Geen kogels — houdt afstand en vuurt periodiek een getelegrafeerde, doorlopende laserstraal af.',
   mine:      'Geen kogels — legt elke seconde een mijn neer op jouw positie op dat moment, die na een paar seconden vanzelf afgaat.',
   shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.',
   gascloud:  'Geen kogels — laat regelmatig een gifwolk achter op zijn positie die schade-over-tijd doet zolang je erin staat.',
@@ -171,9 +170,6 @@ function botDamageText(type) {
   }
   if (type.pattern === 'mortar') {
     return `${type.meleeDamage || 40} schade per inslag (op afstand)`;
-  }
-  if (type.pattern === 'sentinellaser') {
-    return `${type.specialDmg || 16} schade over tijd bij laserstraal`;
   }
   if (type.pattern === 'mine') {
     return `${type.specialDmg || 26} schade bij mijn-ontploffing`;
