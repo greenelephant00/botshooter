@@ -36,6 +36,8 @@ const player = {
   auraUntil: 0,
   overloadUntil: 0,
   slowUntil: 0,
+  rootedUntil: 0,
+  curseUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   activeTransform: 'none'
@@ -68,6 +70,8 @@ function resetPlayer() {
   player.auraUntil = 0;
   player.overloadUntil = 0;
   player.slowUntil = 0;
+  player.rootedUntil = 0;
+  player.curseUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -104,7 +108,12 @@ const SPECIAL_BOT_TYPES = [
   { name: 'arclight',   minScore: 700, minLevel: 9,  r: 17, hp: 9,  speed: [1.1, 1.6], cooldown: [2200, 2800], pattern: 'shockbolt',     bulletSpeed: 0, specialDmg: 18, color: () => `hsl(${Math.floor(Math.random()*15)+50}, 90%, 55%)` },
   { name: 'miasma',     minScore: 700, minLevel: 9,  r: 18, hp: 10, speed: [0.9, 1.3], cooldown: [1000, 1000], pattern: 'gascloud',      bulletSpeed: 0, specialDmg: 9,  color: () => `hsl(${Math.floor(Math.random()*15)+100}, 65%, 40%)` },
   { name: 'bulwark',    minScore: 700, minLevel: 9,  r: 23, hp: 15, speed: [1.3, 1.8], cooldown: [1800, 2400], pattern: 'shieldbash',    bulletSpeed: 0, specialDmg: 22, color: () => `hsl(${Math.floor(Math.random()*15)+215}, 55%, 40%)` },
-  { name: 'broodmother', minScore: 700, minLevel: 9, r: 21, hp: 13, speed: [0.7, 1.1], cooldown: [4500, 5500], pattern: 'summon',        bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+265}, 65%, 40%)` }
+  { name: 'broodmother', minScore: 700, minLevel: 9, r: 21, hp: 13, speed: [0.7, 1.1], cooldown: [4500, 5500], pattern: 'summon',        bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+265}, 65%, 40%)` },
+  { name: 'gravitas',   minScore: 700, minLevel: 9,  r: 22, hp: 12, speed: [0.6, 1.0], cooldown: [4200, 5000], pattern: 'gravitywell',   bulletSpeed: 0, specialDmg: 24, color: () => `hsl(${Math.floor(Math.random()*15)+250}, 70%, 35%)` },
+  { name: 'cryostasis', minScore: 700, minLevel: 9,  r: 18, hp: 10, speed: [0.9, 1.3], cooldown: [3200, 3800], pattern: 'freezetrap',    bulletSpeed: 0, specialDmg: 8,  color: () => `hsl(${Math.floor(Math.random()*15)+195}, 75%, 60%)` },
+  { name: 'railgunner', minScore: 700, minLevel: 9,  r: 20, hp: 10, speed: [0.5, 0.8], cooldown: [4800, 5600], pattern: 'snipebeam',     bulletSpeed: 0, specialDmg: 42, color: () => `hsl(${Math.floor(Math.random()*15)+5}, 80%, 45%)` },
+  { name: 'vexer',      minScore: 700, minLevel: 9,  r: 17, hp: 9,  speed: [1.0, 1.4], cooldown: [3600, 4200], pattern: 'curse',         bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+320}, 60%, 40%)` },
+  { name: 'bombardier', minScore: 700, minLevel: 9,  r: 20, hp: 11, speed: [0.6, 1.0], cooldown: [3800, 4400], pattern: 'clusterbomb',   bulletSpeed: 0, specialDmg: 14, color: () => `hsl(${Math.floor(Math.random()*15)+35}, 75%, 42%)` }
 ];
 const SPECIAL_SPAWN_CHANCE = 0.3; // 30% kans zodra ze ontgrendeld zijn
 
@@ -366,6 +375,8 @@ function updateHUD() {
   if (now < player.auraUntil) active.push('💫 Aura');
   if (now < player.overloadUntil) active.push('⚡ Overload');
   if (now < player.slowUntil) active.push('🐌 Vertraagd');
+  if (now < player.rootedUntil) active.push('🥶 Bevroren');
+  if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');
   if (player.activeTransform === 'tank') {
     active.push('🚜 Tank — alleen handgranaten');
   } else if (player.activeTransform === 'berserker') {

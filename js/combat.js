@@ -26,7 +26,8 @@ function shoot() {
   const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : 0;
   const isCrit = Math.random() < critChance;
   const critMult = isCrit ? 2 : 1;
-  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult;
+  const curseMult = now < player.curseUntil ? 0.5 : 1;
+  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult;
   const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (lvlSharpshooter > 0 ? SHARPSHOOTER_BONUSES[lvlSharpshooter - 1] : 0));
   const extraPierce = lvlPiercingRounds;
 
@@ -876,6 +877,87 @@ function broodSummon(bot) {
     });
   }
   spawnParticles(bot.x, bot.y, '#8a5cf6');
+}
+
+function gravityWellCast(bot) {
+  // gravitas: opent een zwaartekrachtveld dat de speler naar het middelpunt trekt en dan een burst laat afgaan
+  const wx = bot.x, wy = bot.y;
+  const radius = 140;
+  const duration = 1500;
+  telegraphs.push({ x: wx, y: wy, radius, warnUntil: performance.now() + duration });
+  bot.gravityWell = { x: wx, y: wy, radius, until: performance.now() + duration };
+}
+
+function freezeTrap(bot) {
+  // cryostasis: telegrafeert een ijsval op de speler die hem tijdelijk verlamt als hij er nog in staat
+  const targetX = player.x;
+  const targetY = player.y;
+  const radius = 50;
+  const delay = 650;
+  telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    const dd = Math.hypot(player.x - targetX, player.y - targetY);
+    if (dd < radius + player.r) {
+      player.rootedUntil = performance.now() + 1500;
+      applyDamageToPlayer(bot.specialDmg || 8);
+      spawnParticles(targetX, targetY, '#9be3ff');
+    }
+  }, delay);
+}
+
+function railgunSnipe(bot) {
+  // railgunner: lange telegraaf, daarna een instant maar verwoestende precisiestraal
+  const angle0 = Math.atan2(player.y - bot.y, player.x - bot.x);
+  laserTelegraphs.push({ bot, angle: angle0, warnUntil: performance.now() + 1400 });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x);
+    const beam = { x1: bot.x, y1: bot.y, angle: beamAngle, born: performance.now(), duration: 180 };
+    activeLasers.push(beam);
+    if (isPlayerInBeam(beam)) applyDamageToPlayer(bot.specialDmg || 42);
+  }, 1400);
+}
+
+function curseBolt(bot) {
+  // vexer: zapt de speler met een vloek die zijn schade tijdelijk halveert, geen directe schade
+  const targetX = player.x;
+  const targetY = player.y;
+  const radius = 45;
+  const delay = 500;
+  telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
+    const dd = Math.hypot(player.x - targetX, player.y - targetY);
+    if (dd < radius + player.r) {
+      player.curseUntil = performance.now() + 4000;
+      spawnParticles(targetX, targetY, '#a020f0');
+    }
+  }, delay);
+}
+
+function clusterBombardment(bot) {
+  // bombardier: telegrafeert 4 inslagpunten verspreid rond de speler en laat ze gelijktijdig ontploffen
+  const n = 4;
+  const radius = 45;
+  const delay = 750;
+  const impacts = [];
+  for (let i = 0; i < n; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const d = Math.random() * 90;
+    impacts.push({ x: player.x + Math.cos(a) * d, y: player.y + Math.sin(a) * d });
+  }
+  impacts.forEach(p => telegraphs.push({ x: p.x, y: p.y, radius, warnUntil: performance.now() + delay }));
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    impacts.forEach(p => {
+      explosions.push({ x: p.x, y: p.y, born: performance.now(), maxR: radius });
+      spawnParticles(p.x, p.y, '#ff8800');
+      const dd = Math.hypot(player.x - p.x, player.y - p.y);
+      if (dd < radius + player.r) applyDamageToPlayer(bot.specialDmg || 14);
+    });
+  }, delay);
 }
 
 function mortarStrike(bot) {

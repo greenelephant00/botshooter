@@ -126,6 +126,7 @@ const BOT_DISPLAY_NAMES = {
   swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
   sentinel: 'Sentinel', warden: 'Warden', arclight: 'Arclight',
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
+  gravitas: 'Gravitas', cryostasis: 'Cryostasis', railgunner: 'Railgunner', vexer: 'Vexer', bombardier: 'Bombardier',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
 };
 const BOT_PATTERN_INFO = {
@@ -150,7 +151,12 @@ const BOT_PATTERN_INFO = {
   shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.',
   gascloud:  'Geen kogels — laat regelmatig een gifwolk achter op zijn positie die schade-over-tijd doet zolang je erin staat.',
   shieldbash: 'Geen kogels — beukt continu op je af en stoot je bij impact weg met veel schade en een flinke terugstoot.',
-  summon:    'Geen kogels — houdt afstand en roept periodiek 7 zwakke broodlings op in een grote cirkel om zich heen, om je te overweldigen.'
+  summon:    'Geen kogels — houdt afstand en roept periodiek 7 zwakke broodlings op in een grote cirkel om zich heen, om je te overweldigen.',
+  gravitywell: 'Geen kogels — opent periodiek een zwaartekrachtveld dat je naar het middelpunt trekt en na 1,5 sec een schadeburst laat afgaan.',
+  freezetrap: 'Geen kogels — telegrafeert een ijsval op je positie die je bij impact 1,5 sec volledig verlamt.',
+  snipebeam: 'Geen kogels — houdt veel afstand en vuurt na een lange telegraaf een instant, verwoestende precisiestraal.',
+  curse:     'Geen kogels — vervloekt je periodiek zodat je 4 sec lang 50% minder schade doet, geen directe schade.',
+  clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',
@@ -183,6 +189,21 @@ function botDamageText(type) {
   }
   if (type.pattern === 'summon') {
     return 'Doet zelf geen schade — roept broodlings op';
+  }
+  if (type.pattern === 'gravitywell') {
+    return `${type.specialDmg || 24} schade bij het imploderen van het zwaartekrachtveld`;
+  }
+  if (type.pattern === 'freezetrap') {
+    return `${type.specialDmg || 8} schade + 1,5 sec verlamming bij ijsval`;
+  }
+  if (type.pattern === 'snipebeam') {
+    return `${type.specialDmg || 42} schade bij precisiestraal`;
+  }
+  if (type.pattern === 'curse') {
+    return 'Doet zelf geen schade — halveert je schade 4 sec';
+  }
+  if (type.pattern === 'clusterbomb') {
+    return `${type.specialDmg || 14} schade per inslag (tot 4 tegelijk)`;
   }
   if (type.pattern === 'boss') {
     return `8 schade per kogel + ${type.specialDmg || 30} schade bij schokgolf-aanval`;

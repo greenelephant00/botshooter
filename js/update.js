@@ -19,10 +19,12 @@ function update() {
   }
 
   let dx = 0, dy = 0;
-  if (keys['w'] || keys['arrowup']) dy -= 1;
-  if (keys['s'] || keys['arrowdown']) dy += 1;
-  if (keys['a'] || keys['arrowleft']) dx -= 1;
-  if (keys['d'] || keys['arrowright']) dx += 1;
+  if (now0 >= player.rootedUntil) {
+    if (keys['w'] || keys['arrowup']) dy -= 1;
+    if (keys['s'] || keys['arrowdown']) dy += 1;
+    if (keys['a'] || keys['arrowleft']) dx -= 1;
+    if (keys['d'] || keys['arrowright']) dx += 1;
+  }
   const len = Math.hypot(dx, dy) || 1;
   player.x += (dx/len) * player.speed;
   player.y += (dy/len) * player.speed;
@@ -193,6 +195,87 @@ function update() {
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
         broodSummon(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'gravitywell') {
+      // gravitas: opent periodiek een zwaartekrachtveld dat de speler naar binnen trekt en dan een burst laat afgaan
+      if (bot.gravityWell) {
+        const well = bot.gravityWell;
+        if (now < well.until) {
+          const wd = Math.hypot(player.x - well.x, player.y - well.y);
+          if (wd < well.radius && wd > 4) {
+            player.x += ((well.x - player.x) / wd) * 1.8;
+            player.y += ((well.y - player.y) / wd) * 1.8;
+          }
+        } else {
+          explosions.push({ x: well.x, y: well.y, born: performance.now(), maxR: well.radius });
+          spawnParticles(well.x, well.y, '#9b5de5');
+          const wd = Math.hypot(player.x - well.x, player.y - well.y);
+          if (wd < well.radius) applyDamageToPlayer(bot.specialDmg || 24);
+          bot.gravityWell = null;
+        }
+      }
+      if (bdist > 200) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (!bot.gravityWell && now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
+        bot.lastShot = now;
+        gravityWellCast(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'freezetrap') {
+      // cryostasis: houdt afstand en telegrafeert een ijsval die de speler tijdelijk verlamt
+      if (bdist > 180) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
+        bot.lastShot = now;
+        freezeTrap(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'snipebeam') {
+      // railgunner: houdt veel afstand en vuurt na een lange telegraaf een verwoestende precisiestraal
+      if (bdist > 350) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 750) {
+        bot.lastShot = now;
+        railgunSnipe(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'curse') {
+      // vexer: blijft op afstand en vervloekt de speler periodiek zodat die minder schade doet
+      if (bdist > 220) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
+        bot.lastShot = now;
+        curseBolt(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'clusterbomb') {
+      // bombardier: houdt afstand en bestookt de speler met meerdere gelijktijdige inslagen
+      if (bdist > 220) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
+        bot.lastShot = now;
+        clusterBombardment(bot);
       }
       return;
     }

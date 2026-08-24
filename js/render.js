@@ -1582,6 +1582,11 @@ function drawBot(bot) {
   const isBulwark = bot.type === 'bulwark';
   const isBroodmother = bot.type === 'broodmother';
   const isBroodling = bot.type === 'broodling';
+  const isGravitas = bot.type === 'gravitas';
+  const isCryostasis = bot.type === 'cryostasis';
+  const isRailgunner = bot.type === 'railgunner';
+  const isVexer = bot.type === 'vexer';
+  const isBombardier = bot.type === 'bombardier';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -1673,6 +1678,58 @@ function drawBot(bot) {
       ctx.lineTo(Math.cos(i * 0.5) * bot.r * 1.4, Math.sin(i * 0.5) * bot.r * 1.4);
       ctx.stroke();
     }
+  } else if (isGravitas) {
+    // donker lichaam met kolkende paarse ringen
+    ctx.arc(0, 0, bot.r * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+    const spin = (now / 250) % (Math.PI * 2);
+    ctx.strokeStyle = '#c9a3ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(0, 0, bot.r * 1.05, spin, spin + Math.PI * 1.2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(0, 0, bot.r * 1.05, spin + Math.PI, spin + Math.PI * 2.2); ctx.stroke();
+  } else if (isCryostasis) {
+    // ijskristal-vormig lichaam
+    ctx.moveTo(0, -bot.r * 1.15);
+    ctx.lineTo(bot.r * 0.6, -bot.r * 0.2);
+    ctx.lineTo(bot.r * 0.75, bot.r * 0.65);
+    ctx.lineTo(0, bot.r * 1.1);
+    ctx.lineTo(-bot.r * 0.75, bot.r * 0.65);
+    ctx.lineTo(-bot.r * 0.6, -bot.r * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#eaffff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  } else if (isRailgunner) {
+    // langwerpig, streamlined lichaam met een lange loop
+    ctx.ellipse(0, 0, bot.r * 0.85, bot.r * 1.05, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffb199';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#ffb199';
+    ctx.fillRect(bot.r * 0.5, -3, bot.r * 1.1, 6);
+  } else if (isVexer) {
+    // spitse, hoekige heksvorm
+    ctx.moveTo(bot.r, 0);
+    ctx.lineTo(-bot.r * 0.5, -bot.r * 0.85);
+    ctx.lineTo(-bot.r * 0.2, 0);
+    ctx.lineTo(-bot.r * 0.5, bot.r * 0.85);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ffb3ec';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  } else if (isBombardier) {
+    // ronde, gepantserde mortier-vorm met een koepel
+    ctx.arc(0, 0, bot.r * 0.9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffdca0';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#ffdca0';
+    ctx.beginPath(); ctx.arc(-bot.r * 0.3, -bot.r * 0.3, bot.r * 0.22, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bot.r * 0.3, -bot.r * 0.3, bot.r * 0.22, 0, Math.PI * 2); ctx.fill();
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
     ctx.fill();
