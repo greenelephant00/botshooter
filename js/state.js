@@ -22,8 +22,8 @@ const RIFT_PULSE_COOLDOWN = 12000;
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
-let barrageLasers = []; // Laserbarrage-powerup: lasers vanaf de zijkanten die alleen bots raken
-let barrageTelegraphs = []; // Laserbarrage-powerup: rode stippellijn-waarschuwing vóór elke laser
+let barrageLasers = []; // Elementenstorm-powerup: vuur/ijsstralen vanaf de zijkanten die alleen bots raken
+let barrageTelegraphs = []; // Elementenstorm-powerup: stippellijn-waarschuwing vóór elke straal
 let chargeTrails = []; // Juggernaut-transformatie: spoor van de beuk-charge
 let deployedTurrets = []; // Field Engineer-transformatie: neergezette geschutskoepels
 let stickyThrows = [];
@@ -399,9 +399,9 @@ const POWERUP_LEVELS = {
   aura:      { name: '💫 Aura',        prices: [400, 650, 950],   durations: [7000, 8000, 9000, 10000], desc: 'Een schadeveld om je heen doet voortdurend schade aan alle bots die dichtbij komen.' },
   overload:  { name: '⚡ Overload',     prices: [500, 800, 1150],  durations: [5000, 6000, 7000, 8000], desc: 'Dubbele schade en veel hogere vuursnelheid tegelijk.' },
   chaos:     { name: '🌀 Verwarring',   prices: [450, 700, 1000],  durations: [7000, 8500, 10000, 12000], desc: 'Alle bots (ook bosses) schieten op elkaar in plaats van op jou. Hun kogels doen elkaar evenveel schade als aan jou.' },
-  laserbarrage: { name: '📡 Laserbarrage', prices: [500, 800, 1150], dmgs: [12, 16, 20, 25], counts: [25, 30, 35, 40], desc: 'Laserstralen schieten vanaf de zijkanten het speelveld in, 8 per seconde, elk met een rood stippellijntje als waarschuwing vooraf. Doet alleen schade aan bots.' }
+  elementstorm: { name: '🔥❄ Elementenstorm', prices: [500, 800, 1150], dmgs: [12, 16, 20, 25], counts: [25, 30, 35, 40], desc: 'Afwisselend vuur- en ijsstralen schieten vanaf de zijkanten het speelveld in, 8 per seconde, elk met een stippellijntje als waarschuwing vooraf. Ijsstralen bevriezen bots ook even. Doet alleen schade aan bots.' }
 };
-const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'laserbarrage'];
+const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
 
 function getPuLevel(id) { return powerupLevels[id] || 0; }
 

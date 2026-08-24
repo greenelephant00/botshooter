@@ -959,8 +959,8 @@ function clusterBombardment(bot) {
   }, delay);
 }
 
-function laserBarrage(dmg, count) {
-  // Laserbarrage-powerup: 8 lasers per seconde, elk met een rood stippellijntje als waarschuwing vooraf
+function elementStorm(dmg, count) {
+  // Elementenstorm-powerup: afwisselend vuur- en ijsstralen, 8 per seconde, elk met een stippellijntje als waarschuwing vooraf
   const interval = 125; // 8 per sec
   const warnDelay = 500;
   for (let i = 0; i < count; i++) {
@@ -972,12 +972,13 @@ function laserBarrage(dmg, count) {
       else if (edge === 1) { x1 = Math.random() * canvas.width; y1 = canvas.height; x2 = Math.random() * canvas.width; y2 = 0; }
       else if (edge === 2) { x1 = 0; y1 = Math.random() * canvas.height; x2 = canvas.width; y2 = Math.random() * canvas.height; }
       else { x1 = canvas.width; y1 = Math.random() * canvas.height; x2 = 0; y2 = Math.random() * canvas.height; }
+      const elementType = Math.random() < 0.5 ? 'fire' : 'ice';
 
-      barrageTelegraphs.push({ x1, y1, x2, y2, warnUntil: performance.now() + warnDelay });
+      barrageTelegraphs.push({ x1, y1, x2, y2, elementType, warnUntil: performance.now() + warnDelay });
 
       setTimeout(() => {
         if (gameOver || levelTransition) return;
-        barrageLasers.push({ x1, y1, x2, y2, born: performance.now(), duration: 250 });
+        barrageLasers.push({ x1, y1, x2, y2, elementType, born: performance.now(), duration: 250 });
 
         const dx = x2 - x1, dy = y2 - y1;
         const len = Math.hypot(dx, dy) || 1;
@@ -988,7 +989,10 @@ function laserBarrage(dmg, count) {
           const closestX = x1 + (dx / len) * proj;
           const closestY = y1 + (dy / len) * proj;
           const dist = Math.hypot(bot.x - closestX, bot.y - closestY);
-          if (dist < bot.r + 6) damageBotSimple(bot, dmg, '#ff2965');
+          if (dist < bot.r + 6) {
+            damageBotSimple(bot, dmg, elementType === 'fire' ? '#ff8800' : '#9be3ff');
+            if (elementType === 'ice' && !bot.dead) bot.frozenUntil = Math.max(bot.frozenUntil || 0, performance.now() + 1000);
+          }
         });
       }, warnDelay);
     }, i * interval);
@@ -1324,7 +1328,7 @@ function spawnParticles(x, y, color) {
 
 function spawnPowerup() {
   const margin = 60;
-  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'laserbarrage'];
+  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),

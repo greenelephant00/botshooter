@@ -834,9 +834,10 @@ function update() {
       } else if (p.type === 'chaos') {
         player.confuseUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#c026d3');
-      } else if (p.type === 'laserbarrage') {
-        laserBarrage(info.dmgs[lvl], info.counts[lvl]);
-        spawnParticles(p.x, p.y, '#ff2965');
+      } else if (p.type === 'elementstorm') {
+        elementStorm(info.dmgs[lvl], info.counts[lvl]);
+        spawnParticles(p.x, p.y, '#ff8800');
+        spawnParticles(p.x, p.y, '#9be3ff');
       }
     }
   });

@@ -17,7 +17,7 @@ function drawPowerup(p) {
     aura: '#7fff00',
     overload: '#ff6347',
     chaos: '#c026d3',
-    laserbarrage: '#ff2965'
+    elementstorm: '#ff8800'
   };
   const icons = {
     speed: '⚡',
@@ -36,7 +36,7 @@ function drawPowerup(p) {
     aura: '💫',
     overload: '⚡',
     chaos: '🌀',
-    laserbarrage: '📡'
+    elementstorm: '🔥'
   };
   const col = colors[p.type];
   ctx.save();
@@ -824,10 +824,11 @@ function drawActiveLaser(beam) {
 }
 
 function drawBarrageTelegraph(lt) {
-  // Laserbarrage-powerup: rode stippellijn die exact toont waar de laser zo dood gaat
+  // Elementenstorm-powerup: stippellijn die exact toont waar de vuur- of ijsstraal zo dood gaat
+  const col = lt.elementType === 'ice' ? '#66d9ff' : '#ff8800';
   ctx.save();
   ctx.globalAlpha = 0.55 + Math.sin(performance.now() / 60) * 0.2;
-  ctx.strokeStyle = '#ff3838';
+  ctx.strokeStyle = col;
   ctx.lineWidth = 2;
   ctx.setLineDash([8, 6]);
   ctx.beginPath();
@@ -838,15 +839,16 @@ function drawBarrageTelegraph(lt) {
 }
 
 function drawBarrageLaser(beam) {
-  // Laserbarrage-powerup: rechte straal die het hele veld doorkruist, alleen bots raakt
+  // Elementenstorm-powerup: rechte vuur- of ijsstraal die het hele veld doorkruist, alleen bots raakt
   const age = performance.now() - beam.born;
   const alpha = Math.max(0, 1 - age / beam.duration);
+  const isIce = beam.elementType === 'ice';
   ctx.save();
   ctx.globalAlpha = alpha;
   const grad = ctx.createLinearGradient(beam.x1, beam.y1, beam.x2, beam.y2);
   grad.addColorStop(0, '#ffffff');
-  grad.addColorStop(0.15, '#ff2965');
-  grad.addColorStop(1, '#ff2965');
+  grad.addColorStop(0.15, isIce ? '#66d9ff' : '#ff8800');
+  grad.addColorStop(1, isIce ? '#0d6efd' : '#ff3838');
   ctx.strokeStyle = grad;
   ctx.lineWidth = 10;
   ctx.lineCap = 'round';
