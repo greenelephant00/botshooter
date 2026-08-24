@@ -563,6 +563,22 @@ function update() {
   });
   deployedTurrets = deployedTurrets.filter(t => !t.destroyed);
 
+  // Bullet-bot collisions (Verwarring powerup: bots schieten op elkaar in plaats van op de speler)
+  if (now0 < player.confuseUntil) {
+    bullets.forEach(b => {
+      if (b.owner !== 'bot' || b.hit) return;
+      for (const otherBot of bots) {
+        if (otherBot.dead || otherBot === b.sourceBot) continue;
+        const d = Math.hypot(b.x - otherBot.x, b.y - otherBot.y);
+        if (d < otherBot.r + b.r) {
+          b.hit = true;
+          damageBotSimple(otherBot, b.dmg || 8, '#ff5c5c');
+          break;
+        }
+      }
+    });
+  }
+
   // Bullet-player collisions
   bullets.forEach(b => {
     if (b.owner !== 'bot' || b.hit) return;
@@ -830,6 +846,9 @@ function update() {
         player.overloadUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#ffff00');
         spawnParticles(p.x, p.y, '#ff6347');
+      } else if (p.type === 'chaos') {
+        player.confuseUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#c026d3');
       }
     }
   });

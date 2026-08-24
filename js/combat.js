@@ -1183,11 +1183,20 @@ function botShoot(bot) {
 
   // Field Engineer: als er een koepel dichterbij staat dan de speler, richten bots daarop
   let target = player;
-  let nearestTurretDist = Math.hypot(player.x - bot.x, player.y - bot.y);
-  deployedTurrets.forEach(turret => {
-    const dd = Math.hypot(turret.x - bot.x, turret.y - bot.y);
-    if (dd < nearestTurretDist) { target = turret; nearestTurretDist = dd; }
-  });
+  if (now < player.confuseUntil) {
+    // Verwarring: bots richten zich op elkaar in plaats van op de speler
+    const others = bots.filter(b => b !== bot && !b.dead);
+    if (others.length > 0) {
+      target = others.reduce((a, b) =>
+        Math.hypot(b.x - bot.x, b.y - bot.y) < Math.hypot(a.x - bot.x, a.y - bot.y) ? b : a);
+    }
+  } else {
+    let nearestTurretDist = Math.hypot(player.x - bot.x, player.y - bot.y);
+    deployedTurrets.forEach(turret => {
+      const dd = Math.hypot(turret.x - bot.x, turret.y - bot.y);
+      if (dd < nearestTurretDist) { target = turret; nearestTurretDist = dd; }
+    });
+  }
 
   const dx = target.x - bot.x;
   const dy = target.y - bot.y;
@@ -1279,7 +1288,7 @@ function spawnParticles(x, y, color) {
 
 function spawnPowerup() {
   const margin = 60;
-  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload'];
+  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),

@@ -38,6 +38,7 @@ const player = {
   slowUntil: 0,
   rootedUntil: 0,
   curseUntil: 0,
+  confuseUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   activeTransform: 'none'
@@ -72,6 +73,7 @@ function resetPlayer() {
   player.slowUntil = 0;
   player.rootedUntil = 0;
   player.curseUntil = 0;
+  player.confuseUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -377,6 +379,7 @@ function updateHUD() {
   if (now < player.slowUntil) active.push('🐌 Vertraagd');
   if (now < player.rootedUntil) active.push('🥶 Bevroren');
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');
+  if (now < player.confuseUntil) active.push('🌀 Verwarring');
   if (player.activeTransform === 'tank') {
     active.push('🚜 Tank — alleen handgranaten');
   } else if (player.activeTransform === 'berserker') {

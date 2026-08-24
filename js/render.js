@@ -15,7 +15,8 @@ function drawPowerup(p) {
     homing: '#ff1493',
     stun: '#ffff00',
     aura: '#7fff00',
-    overload: '#ff6347'
+    overload: '#ff6347',
+    chaos: '#c026d3'
   };
   const icons = {
     speed: '⚡',
@@ -32,7 +33,8 @@ function drawPowerup(p) {
     homing: '🎯',
     stun: '⊗',
     aura: '💫',
-    overload: '⚡'
+    overload: '⚡',
+    chaos: '🌀'
   };
   const col = colors[p.type];
   ctx.save();
