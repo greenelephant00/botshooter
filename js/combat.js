@@ -494,6 +494,7 @@ function damageBotSimple(bot, dmg, color) {
             splits: false,
             splitsSelf: 0,
             isSplitChild: true,
+            bornAt: performance.now(),
             invulnUntil: performance.now() + 2000,
             spiralAngle: 0,
             frozenUntil: 0,

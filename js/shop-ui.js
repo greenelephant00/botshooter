@@ -469,7 +469,7 @@ function botCardHtml(type) {
   const name = BOT_DISPLAY_NAMES[type.name] || type.name;
   let patternDesc = (BOT_PATTERN_INFO[type.pattern] || '') + (type.splits ? ' Splitst bij dood in 2 zwakke minions.' : '')
     + (type.swapOnHit ? ' Schiet 2x per sec — als een kogel je raakt wissel je altijd van plek met deze bot en word je 3 sec vertraagd.' : '')
-    + (type.splitsSelf ? ` Splitst bij dood in ${type.splitsSelf} kleinere versies van zichzelf.` : '');
+    + (type.splitsSelf ? ` Splitst 3 sec na zijn dood in ${type.splitsSelf} kleinere versies van zichzelf. Overleven die 8 sec, dan groeien ze weer terug tot een volwaardige Splitter die zelf ook weer kan splitsen.` : '');
   if (type.pattern === 'boss' && BOSS_SPECIAL_DESC[type.name]) {
     patternDesc += ' ' + BOSS_SPECIAL_DESC[type.name];
   }

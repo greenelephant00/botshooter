@@ -45,6 +45,21 @@ function update() {
         if (bot.dead) return;
       }
     }
+    // Splitter-kinderen groeien na 8 sec weer terug tot een volwaardige Splitter
+    if (bot.isSplitChild && bot.type === 'splitter' && bot.bornAt && now - bot.bornAt > 8000) {
+      const base = BOT_TYPES.find(t => t.name === 'splitter');
+      if (base) {
+        const hcMult = gameMode === 'hardcore' ? HARDCORE_MULT : 1;
+        bot.r = base.r;
+        bot.maxHp = base.hp * hcMult;
+        bot.hp = bot.maxHp;
+        bot.speed = base.speed[0] + Math.random() * (base.speed[1] - base.speed[0]);
+        bot.splitsSelf = base.splitsSelf;
+        bot.isSplitChild = false;
+        spawnParticles(bot.x, bot.y, bot.color);
+      }
+    }
+
     if (now < player.invisibleUntil) return; // bots merken de speler niet op
     let bdx = player.x - bot.x;
     let bdy = player.y - bot.y;
@@ -526,6 +541,7 @@ function update() {
                   splits: false,
                   splitsSelf: 0,
                   isSplitChild: true,
+                  bornAt: performance.now(),
                   invulnUntil: performance.now() + 2000,
                   spiralAngle: 0,
                   frozenUntil: 0,
