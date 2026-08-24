@@ -206,8 +206,8 @@ function update() {
         if (now < well.until) {
           const wd = Math.hypot(player.x - well.x, player.y - well.y);
           if (wd < well.radius && wd > 4) {
-            player.x += ((well.x - player.x) / wd) * 8.5;
-            player.y += ((well.y - player.y) / wd) * 8.5;
+            player.x += ((well.x - player.x) / wd) * 5;
+            player.y += ((well.y - player.y) / wd) * 5;
           }
         } else {
           explosions.push({ x: well.x, y: well.y, born: performance.now(), maxR: well.radius });
