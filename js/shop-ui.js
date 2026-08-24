@@ -321,7 +321,7 @@ function closeDisastersInfo() {
 window.closeDisastersInfo = closeDisastersInfo;
 
 function startPractice(botName) {
-  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES].find(t => t.name === botName);
+  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES].find(t => t.name === botName);
   if (!type) return;
 
   gameMode = 'practice';
@@ -701,6 +701,7 @@ function world2BotCardHtml(type) {
       <div class="desc">${BOT_PATTERN_INFO[type.pattern] || ''}</div>
       <div class="desc" style="color:#777;">Verschijnt altijd in Wereld 2</div>
     </div>
+    <button class="equip" onclick="startPractice('${type.name}')">🎯 Oefen</button>
   </div>`;
 }
 
