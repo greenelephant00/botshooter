@@ -781,11 +781,14 @@ function drawPlayerBullet(b) {
       // diamant-achtige kristal
       const ggrad = ctx.createRadialGradient(0, 0, 0, 0, 0, 5);
       ggrad.addColorStop(0, '#fff');
-      ggrad.addColorStop(1, '#4169e1');
+      ggrad.addColorStop(1, '#3d9bff');
       ctx.fillStyle = ggrad;
       ctx.beginPath();
       ctx.moveTo(0, -5); ctx.lineTo(3.5, 0); ctx.lineTo(0, 5); ctx.lineTo(-3.5, 0); ctx.closePath();
       ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
       break;
     }
     case 'mushroom': {
@@ -939,11 +942,14 @@ function drawPlayerBullet(b) {
     case 'combofrost': {
       // ijzige kogel die feller gloeit naarmate de killstreak oploopt
       const tI = Math.min(1, player.comboStreak / 10);
-      ctx.fillStyle = lerpColor('#3a4a55', '#1c6fd6', tI);
+      ctx.fillStyle = lerpColor('#4fc3f7', '#eaffff', tI);
       ctx.beginPath();
       ctx.moveTo(0, -4.5); ctx.lineTo(3, 0); ctx.lineTo(0, 4.5); ctx.lineTo(-3, 0);
       ctx.closePath(); ctx.fill();
-      ctx.fillStyle = lerpColor('#5a6a75', '#dffcff', tI);
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.fillStyle = lerpColor('#bdf3ff', '#ffffff', tI);
       ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
       break;
     }
