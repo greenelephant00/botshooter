@@ -46,11 +46,28 @@ function drawPowerup(p) {
   ctx.beginPath(); ctx.arc(0, 0, p.r + 6, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = col;
   ctx.beginPath(); ctx.arc(0, 0, p.r, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 15px Arial';
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.fillText(icons[p.type], 0, 1);
+  if (p.type === 'elementstorm') {
+    // gekruiste vuur- en ijsstraal i.p.v. een enkel emoji-icoontje
+    const s = p.r * 0.75;
+    ctx.lineCap = 'round';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ff8800';
+    ctx.beginPath();
+    ctx.moveTo(-s, -s);
+    ctx.lineTo(s, s);
+    ctx.stroke();
+    ctx.strokeStyle = '#66d9ff';
+    ctx.beginPath();
+    ctx.moveTo(-s, s);
+    ctx.lineTo(s, -s);
+    ctx.stroke();
+  } else {
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 15px Arial';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(icons[p.type], 0, 1);
+  }
   ctx.restore();
 }
 
