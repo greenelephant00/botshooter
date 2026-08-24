@@ -257,6 +257,7 @@ function startPractice(botName) {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   document.getElementById('botsInfoScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
 
@@ -367,6 +368,7 @@ function startDodgePractice() {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
 
@@ -462,6 +464,15 @@ let transformPracticeActive = false;
 let transformPracticeId = 'none';
 let disasterPracticeActive = false;
 let disasterPracticeType = null;
+let skinPracticeActive = false;
+let skinPracticeId = null;
+let previousEquippedSkin = null;
+
+function exitSkinPractice() {
+  if (skinPracticeActive) equippedSkin = previousEquippedSkin;
+  skinPracticeActive = false;
+  skinPracticeId = null;
+}
 
 function startWeaponPractice(weaponId) {
   practiceWeaponId = weaponId;
@@ -469,6 +480,7 @@ function startWeaponPractice(weaponId) {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   gameMode = 'endless';
   document.getElementById('shopScreen').style.display = 'none';
   initGame();
@@ -491,6 +503,7 @@ function startTransformPractice(id) {
   transformPracticeId = id;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   gameMode = 'endless';
   document.getElementById('transformShopScreen').style.display = 'none';
   initGame();
@@ -506,12 +519,38 @@ function startTransformPractice(id) {
 }
 window.startTransformPractice = startTransformPractice;
 
+function startSkinPractice(skinId) {
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  skinPracticeActive = true;
+  skinPracticeId = skinId;
+  previousEquippedSkin = equippedSkin;
+  equippedSkin = skinId;
+  gameMode = 'endless';
+  document.getElementById('skinsShopScreen').style.display = 'none';
+  initGame();
+  updateHUD();
+  document.getElementById('pauseOverlay').style.display = 'none';
+  document.getElementById('msg').style.display = 'none';
+
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+  startMusic();
+}
+window.startSkinPractice = startSkinPractice;
+
 function startDisasterPractice(disasterId) {
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
   disasterPracticeActive = true;
   disasterPracticeType = disasterId;
+  exitSkinPractice();
   gameMode = 'endless';
   document.getElementById('disastersInfoScreen').style.display = 'none';
   initGame();
@@ -719,7 +758,10 @@ function renderSkinsShop() {
         <div class="name">${s.name}</div>
         <div class="desc">${s.desc}</div>
       </div>
-      ${btn}
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">
+        ${btn}
+        <button class="equip" onclick="startSkinPractice('${s.id}')">🎯 Oefen</button>
+      </div>
     </div>`;
   }).join('');
   SKINS.forEach(s => {

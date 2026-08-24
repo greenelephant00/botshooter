@@ -381,6 +381,7 @@ function selectMode(mode) {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   document.getElementById('startScreen').style.display = 'none';
   initGame();
   startMusic();

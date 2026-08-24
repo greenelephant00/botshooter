@@ -1040,6 +1040,11 @@ function endGame(won) {
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen tegen de natuurramp.</span>`;
     msgBtn.textContent = 'Opnieuw oefenen';
     msgBtn.onclick = () => { startDisasterPractice(disasterPracticeType); };
+  } else if (skinPracticeActive) {
+    document.getElementById('msgText').innerHTML =
+      `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen met deze skin.</span>`;
+    msgBtn.textContent = 'Opnieuw oefenen';
+    msgBtn.onclick = () => { equippedSkin = previousEquippedSkin; startSkinPractice(skinPracticeId); };
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
     const isHardcore = gameMode === 'hardcore';
     let currentHigh = isHardcore ? highScoreHardcore : highScore;
@@ -1107,6 +1112,7 @@ function goToMenu() {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  exitSkinPractice();
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';
   bossWarningActive = false;
