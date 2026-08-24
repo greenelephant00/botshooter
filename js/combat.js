@@ -1065,17 +1065,9 @@ function startRandomDisaster() {
   const now = performance.now();
 
   if (type === 'iceFloor') {
-    disasterEndAt = now + 3000;
-    const count = 2 + Math.floor(Math.random() * 3);
-    for (let i = 0; i < count; i++) {
-      icePatches.push({
-        x: 80 + Math.random() * (canvas.width - 160),
-        y: 80 + Math.random() * (canvas.height - 160),
-        r: 55 + Math.random() * 35,
-        until: now + 25000
-      });
-    }
-    showDisasterAlert('🧊 IJSVLOER — pas op, glad ijs!');
+    disasterEndAt = now + 20000;
+    iceFloorUntil = disasterEndAt;
+    showDisasterAlert('🧊 IJSVLOER — de hele vloer is spekglad!');
   } else if (type === 'sandstorm') {
     disasterEndAt = now + 14000;
     sandstormUntil = disasterEndAt;
@@ -1115,15 +1107,7 @@ function sustainDisasterPractice() {
   } else if (disasterPracticeType === 'meteorShower') {
     meteorShowerUntil = now + 2000;
   } else if (disasterPracticeType === 'iceFloor') {
-    icePatches = icePatches.filter(p => now < p.until);
-    if (icePatches.length < 3) {
-      icePatches.push({
-        x: 80 + Math.random() * (canvas.width - 160),
-        y: 80 + Math.random() * (canvas.height - 160),
-        r: 55 + Math.random() * 35,
-        until: now + 30000
-      });
-    }
+    iceFloorUntil = now + 2000;
   } else if (disasterPracticeType === 'earthquake') {
     if (now - lastEarthquakeShake > 4000) {
       lastEarthquakeShake = now;

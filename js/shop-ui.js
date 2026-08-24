@@ -284,7 +284,7 @@ function startPractice(botName) {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
-  icePatches = [];
+  iceFloorUntil = 0;
   sandstormUntil = 0;
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
@@ -395,7 +395,7 @@ function startDodgePractice() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
-  icePatches = [];
+  iceFloorUntil = 0;
   sandstormUntil = 0;
   lightningStormUntil = 0;
   meteorShowerUntil = 0;

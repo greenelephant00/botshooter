@@ -29,7 +29,7 @@ function update() {
   const len = Math.hypot(dx, dy) || 1;
   const desiredVX = (dx / len) * player.speed;
   const desiredVY = (dy / len) * player.speed;
-  const onIce = icePatches.some(patch => now0 < patch.until && Math.hypot(player.x - patch.x, player.y - patch.y) < patch.r + player.r);
+  const onIce = now0 < iceFloorUntil;
   if (onIce) {
     // IJsvloer: traag reagerende, glijdende beweging i.p.v. direct bijsturen
     player.slideVX = player.slideVX * 0.94 + desiredVX * 0.06;
@@ -960,8 +960,6 @@ function update() {
     lastMeteorImpact = now;
     triggerMeteorImpact();
   }
-  icePatches = icePatches.filter(patch => now < patch.until);
-
   // Spawn new bots gradually (niet tijdens oefenen — daar is maar 1 bot)
   if (gameMode === 'levels') {
     const cfg = levelConfig(currentLevel);

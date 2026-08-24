@@ -6,21 +6,27 @@ function lerpColor(hexA, hexB, t) {
   return `rgb(${r}, ${g}, ${bl})`;
 }
 
-function drawIcePatch(patch) {
-  // Natuurramp IJsvloer: gladde plek waar de speler op uitglijdt
+function drawIceFloorOverlay() {
+  // Natuurramp IJsvloer: de hele vloer is bevroren en glad
   ctx.save();
-  ctx.globalAlpha = 0.4;
-  const grad = ctx.createRadialGradient(patch.x, patch.y, 0, patch.x, patch.y, patch.r);
-  grad.addColorStop(0, '#dff6ff');
-  grad.addColorStop(1, 'rgba(150, 220, 255, 0.08)');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(patch.x, patch.y, patch.r, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.globalAlpha = 0.6;
-  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-  ctx.lineWidth = 2;
-  ctx.stroke();
+  ctx.globalAlpha = 0.22;
+  ctx.fillStyle = '#bfeeff';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 0.35;
+  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+  ctx.lineWidth = 1;
+  const seed = Math.floor(performance.now() / 4000);
+  const rng = n => { const x = Math.sin(n * 12.9898 + seed) * 43758.5453; return x - Math.floor(x); };
+  for (let i = 0; i < 22; i++) {
+    const cx = rng(i) * canvas.width, cy = rng(i + 100) * canvas.height;
+    const len = 18 + rng(i + 200) * 22;
+    const ang = rng(i + 300) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(ang) * len, cy + Math.sin(ang) * len);
+    ctx.lineTo(cx + Math.cos(ang + 1) * len * 0.5, cy + Math.sin(ang + 1) * len * 0.5);
+    ctx.stroke();
+  }
   ctx.restore();
 }
 
@@ -2067,7 +2073,7 @@ function draw() {
     ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
   }
 
-  icePatches.forEach(drawIcePatch);
+  if (nowShake < iceFloorUntil) drawIceFloorOverlay();
 
   // bullets
   bullets.forEach(b => {

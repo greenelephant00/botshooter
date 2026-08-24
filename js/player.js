@@ -286,7 +286,7 @@ function initGame() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
-  icePatches = [];
+  iceFloorUntil = 0;
   sandstormUntil = 0;
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
@@ -344,7 +344,7 @@ function setupNextLevel() {
   gasClouds = [];
   barrageLasers = [];
   barrageTelegraphs = [];
-  icePatches = [];
+  iceFloorUntil = 0;
   sandstormUntil = 0;
   lightningStormUntil = 0;
   meteorShowerUntil = 0;

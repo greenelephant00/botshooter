@@ -26,7 +26,7 @@ let barrageLasers = []; // Elementenstorm-powerup: vuur/ijsstralen vanaf de zijk
 let barrageTelegraphs = []; // Elementenstorm-powerup: stippellijn-waarschuwing vóór elke straal
 
 // ---- Natuurrampen ----
-let icePatches = []; // IJsvloer: gladde plekken waar de speler op uitglijdt
+let iceFloorUntil = 0; // IJsvloer: de hele vloer is bevroren en glad
 let sandstormUntil = 0; // Zandstorm: verminderd zicht en snelheid
 let lightningStormUntil = 0; // Bliksemstorm: periodieke blikseminslagen
 let lastLightningStrike = 0;
@@ -38,7 +38,7 @@ let activeDisasterType = null;
 let disasterEndAt = 0;
 let nextDisasterAt = 0;
 const DISASTER_TYPES = [
-  { id: 'iceFloor', name: '🧊 IJsvloer', desc: 'Er verschijnen 2-4 gladde ijsplekken op het veld. Sta je erop, dan reageert je beweging traag en glijd je door in de richting waar je heen ging in plaats van direct te kunnen bijsturen.' },
+  { id: 'iceFloor', name: '🧊 IJsvloer', desc: 'De hele vloer van het speelveld bevriest en wordt spekglad. Je beweging reageert traag en je glijdt door in de richting waar je heen ging in plaats van direct te kunnen bijsturen.' },
   { id: 'sandstorm', name: '🌪 Zandstorm', desc: 'Een zandstorm trekt over het veld: 14 sec lang beperkt zicht (donkere waas rond je) en 30% minder bewegingssnelheid.' },
   { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaat er om de ~1,3 sec een bliksem in op een willekeurige, kort getelegrafeerde plek op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
   { id: 'earthquake', name: '🌋 Aardbeving', desc: 'Een korte maar hevige aardbeving: het scherm schudt heftig en alle bots worden abrupt in willekeurige richtingen weggeslingerd.' },
