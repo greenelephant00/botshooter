@@ -963,6 +963,63 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(0, 0, 2.4, 0, Math.PI * 2); ctx.fill();
       break;
     }
+    case 'neonpink': {
+      // gloeiende roze neon-bol
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ff2fd6';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'neoncyan': {
+      // gloeiende cyaan neon-bol
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#25e0ff';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'neonlime': {
+      // gloeiende limoen neon-bol
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#baff29';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'comboneonpink': {
+      // roze neon-kogel die feller gloeit naarmate de killstreak oploopt
+      const tNPb = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#1a1a1a', '#3a0030', tNPb);
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = lerpColor('#3a3a3a', '#ff2fd6', tNPb);
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'comboneoncyan': {
+      // cyaan neon-kogel die feller gloeit naarmate de killstreak oploopt
+      const tNCb = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#1a1a1a', '#003a40', tNCb);
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = lerpColor('#3a3a3a', '#25e0ff', tNCb);
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'comboneonlime': {
+      // limoen neon-kogel die feller gloeit naarmate de killstreak oploopt
+      const tNLb = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#1a1a1a', '#1f3a00', tNLb);
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = lerpColor('#3a3a3a', '#baff29', tNLb);
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
@@ -1681,6 +1738,141 @@ function drawPlayerSkin(c, skinId, r) {
       c.lineTo(x2, y2);
       c.stroke();
     }
+  } else if (skinId === 'neonpink') {
+    // roze neon: gloeiende ring met kruisende lijnen op een zwarte kern
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const glowP = 0.6 + Math.sin(performance.now() / 220) * 0.4;
+    c.save();
+    c.globalAlpha = glowP;
+    c.strokeStyle = '#ff2fd6';
+    c.lineWidth = 3;
+    c.beginPath(); c.arc(0, 0, r * 0.85, 0, Math.PI * 2); c.stroke();
+    c.restore();
+    c.strokeStyle = '#ff8ef0';
+    c.lineWidth = 1.5;
+    c.beginPath(); c.moveTo(-r * 0.55, -r * 0.55); c.lineTo(r * 0.55, r * 0.55); c.stroke();
+    c.beginPath(); c.moveTo(r * 0.55, -r * 0.55); c.lineTo(-r * 0.55, r * 0.55); c.stroke();
+    c.fillStyle = '#ff2fd6';
+    c.beginPath(); c.arc(0, 0, r * 0.2, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'neoncyan') {
+    // cyaan neon: gloeiende zeshoek-omtrek op een zwarte kern
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const glowC = 0.6 + Math.sin(performance.now() / 220) * 0.4;
+    c.save();
+    c.globalAlpha = glowC;
+    c.strokeStyle = '#25e0ff';
+    c.lineWidth = 2.5;
+    c.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 / 6) * i - Math.PI / 2;
+      const px = Math.cos(a) * r * 0.85, py = Math.sin(a) * r * 0.85;
+      if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath(); c.stroke();
+    c.restore();
+    c.fillStyle = '#a3f5ff';
+    c.beginPath(); c.arc(0, 0, r * 0.22, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'neonlime') {
+    // limoen neon: gloeiende chevrons op een zwarte kern
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const glowL = 0.6 + Math.sin(performance.now() / 220) * 0.4;
+    c.save();
+    c.globalAlpha = glowL;
+    c.strokeStyle = '#baff29';
+    c.lineWidth = 2.5;
+    for (let i = -1; i <= 1; i++) {
+      const off = i * r * 0.4;
+      c.beginPath();
+      c.moveTo(-r * 0.3, off - r * 0.22);
+      c.lineTo(r * 0.5, off);
+      c.lineTo(-r * 0.3, off + r * 0.22);
+      c.stroke();
+    }
+    c.restore();
+    c.fillStyle = '#e4ffb0';
+    c.beginPath(); c.arc(0, 0, r * 0.2, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'comboneonpink') {
+    // gedimde kern die een felle roze neon-gloed en kruispatroon krijgt bij een oplopende killstreak
+    const tNP = Math.min(1, player.comboStreak / 10);
+    if (tNP > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + tNP * 0.35;
+      c.strokeStyle = lerpColor('#3a3a3a', '#ff2fd6', tNP);
+      c.lineWidth = 2.5;
+      c.beginPath(); c.arc(0, 0, r + 5 + tNP * 9, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    c.fillStyle = '#0a0a0a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = lerpColor('#3a3a3a', '#ff2fd6', tNP);
+    c.lineWidth = 3;
+    c.beginPath(); c.arc(0, 0, r * 0.85, 0, Math.PI * 2); c.stroke();
+    const crosses = 1 + Math.round(tNP * 3);
+    c.strokeStyle = lerpColor('#4a4a4a', '#ff8ef0', tNP);
+    c.lineWidth = 1.5;
+    for (let i = 0; i < crosses; i++) {
+      const a = (Math.PI / crosses) * i;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * r * 0.6, Math.sin(a) * r * 0.6);
+      c.lineTo(-Math.cos(a) * r * 0.6, -Math.sin(a) * r * 0.6);
+      c.stroke();
+    }
+    c.fillStyle = lerpColor('#4a4a4a', '#ff2fd6', tNP);
+    c.beginPath(); c.arc(0, 0, r * 0.2, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'comboneoncyan') {
+    // gedimde kern die een felle cyaan neon-veelhoek krijgt bij een oplopende killstreak
+    const tNC = Math.min(1, player.comboStreak / 10);
+    if (tNC > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + tNC * 0.35;
+      c.strokeStyle = lerpColor('#3a3a3a', '#25e0ff', tNC);
+      c.lineWidth = 2.5;
+      c.beginPath(); c.arc(0, 0, r + 5 + tNC * 9, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    c.fillStyle = '#0a0a0a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const sides = 5 + Math.round(tNC * 3);
+    c.strokeStyle = lerpColor('#3a3a3a', '#25e0ff', tNC);
+    c.lineWidth = 2.5;
+    c.beginPath();
+    for (let i = 0; i < sides; i++) {
+      const a = (Math.PI * 2 / sides) * i - Math.PI / 2;
+      const px = Math.cos(a) * r * 0.85, py = Math.sin(a) * r * 0.85;
+      if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath(); c.stroke();
+    c.fillStyle = lerpColor('#4a4a4a', '#a3f5ff', tNC);
+    c.beginPath(); c.arc(0, 0, r * 0.22, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'comboneonlime') {
+    // gedimde kern die feller limoengroen gaat gloeien met meer chevrons bij een oplopende killstreak
+    const tNL = Math.min(1, player.comboStreak / 10);
+    if (tNL > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + tNL * 0.35;
+      c.strokeStyle = lerpColor('#3a3a3a', '#baff29', tNL);
+      c.lineWidth = 2.5;
+      c.beginPath(); c.arc(0, 0, r + 5 + tNL * 9, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    c.fillStyle = '#0a0a0a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const chevrons = 1 + Math.round(tNL * 3);
+    c.strokeStyle = lerpColor('#3a3a3a', '#baff29', tNL);
+    c.lineWidth = 2.5;
+    for (let i = 0; i < chevrons; i++) {
+      const off = (i - (chevrons - 1) / 2) * r * 0.4;
+      c.beginPath();
+      c.moveTo(-r * 0.3, off - r * 0.22);
+      c.lineTo(r * 0.5, off);
+      c.lineTo(-r * 0.3, off + r * 0.22);
+      c.stroke();
+    }
+    c.fillStyle = lerpColor('#4a4a4a', '#e4ffb0', tNL);
+    c.beginPath(); c.arc(0, 0, r * 0.2, 0, Math.PI * 2); c.fill();
   } else {
     // standaard
     c.fillStyle = '#4cc9f0';

@@ -753,7 +753,7 @@ window.closeSkinsShop = closeSkinsShop;
 
 function renderSkinsShop() {
   document.getElementById('skinsShopCoins').textContent = coins;
-  document.getElementById('skinsShopList').innerHTML = SKINS.map(s => {
+  const renderSkinItem = s => {
     const owned = ownedSkins.includes(s.id);
     const equipped = equippedSkin === s.id;
     let btn;
@@ -771,7 +771,12 @@ function renderSkinsShop() {
         <button class="equip" onclick="startSkinPractice('${s.id}')">🎯 Oefen</button>
       </div>
     </div>`;
-  }).join('');
+  };
+  const killstreakSkins = SKINS.filter(s => s.killstreak);
+  const normalSkins = SKINS.filter(s => !s.killstreak);
+  document.getElementById('skinsShopList').innerHTML =
+    `<div class="shopSection"><h3>🔥 Kill Streak</h3>${killstreakSkins.map(renderSkinItem).join('')}</div>` +
+    normalSkins.map(renderSkinItem).join('');
   SKINS.forEach(s => {
     const canvasEl = document.getElementById(`skinPreview_${s.id}`);
     if (canvasEl) drawSkinPreview(canvasEl, s.id);

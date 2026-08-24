@@ -215,9 +215,15 @@ const SKINS = [
   { id: 'turtle',     name: 'Schildpad',     price: 600,             desc: 'Groene schildpad met een stevig gestreept pantser.' },
   { id: 'jester',     name: 'Hofnar',        price: 650,             desc: 'Kleurrijke hofnar met een bellenmuts in paars en goud.' },
   { id: 'cyclops',    name: 'Cycloop',       price: 700,             desc: 'Paars eenogig monster met een groot gloeiend oog.' },
-  { id: 'combofire',  name: 'Infernische Combo', price: 900,          desc: 'Een dovende ember-kern die feller ontbrandt en een groeiende vuuraura krijgt naarmate je killstreak oploopt.' },
-  { id: 'combofrost', name: 'Vrieskristal Combo', price: 900,         desc: 'Een dof ijskristal dat steeds feller gaat gloeien en scherpere kristalpunten krijgt bij een oplopende killstreak.' },
-  { id: 'combovolt',  name: 'Voltaïsche Combo', price: 900,           desc: 'Een gedimde energiekern die steeds meer knetterende bliksemboogjes om zich heen krijgt naarmate je killstreak stijgt.' }
+  { id: 'combofire',  name: 'Infernische Combo', price: 900,          desc: 'Een dovende ember-kern die feller ontbrandt en een groeiende vuuraura krijgt naarmate je killstreak oploopt.', killstreak: true },
+  { id: 'combofrost', name: 'Vrieskristal Combo', price: 900,         desc: 'Een dof ijskristal dat steeds feller gaat gloeien en scherpere kristalpunten krijgt bij een oplopende killstreak.', killstreak: true },
+  { id: 'combovolt',  name: 'Voltaïsche Combo', price: 900,           desc: 'Een gedimde energiekern die steeds meer knetterende bliksemboogjes om zich heen krijgt naarmate je killstreak stijgt.', killstreak: true },
+  { id: 'neonpink',   name: 'Neon Roze',     price: 650,              desc: 'Zwarte kern met een felle, pulserende roze neonring en kruisende lichtstrepen.' },
+  { id: 'neoncyan',   name: 'Neon Cyaan',    price: 650,              desc: 'Zwarte kern met een gloeiende cyaan neon-zeshoek erop getekend.' },
+  { id: 'neonlime',   name: 'Neon Limoen',   price: 650,              desc: 'Zwarte kern met felgroene, pulserende neon-chevrons.' },
+  { id: 'comboneonpink', name: 'Neon Roze Combo', price: 900,         desc: 'Een gedimde kern die een felle roze neonring en een groeiend kruispatroon krijgt naarmate je killstreak oploopt.', killstreak: true },
+  { id: 'comboneoncyan', name: 'Neon Cyaan Combo', price: 900,        desc: 'Een gedimde kern die een felle cyaan neon-veelhoek krijgt, met steeds meer zijden naarmate je killstreak stijgt.', killstreak: true },
+  { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 900,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true }
 ];
 let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';
