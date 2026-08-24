@@ -1083,7 +1083,7 @@ function startRandomDisaster() {
     bots.forEach(bot => {
       if (bot.dead) return;
       const ang = Math.random() * Math.PI * 2;
-      const dist = 40 + Math.random() * 50;
+      const dist = 150 + Math.random() * 150;
       bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * dist));
       bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * dist));
     });
@@ -1115,7 +1115,7 @@ function sustainDisasterPractice() {
       bots.forEach(bot => {
         if (bot.dead) return;
         const ang = Math.random() * Math.PI * 2;
-        const dist = 40 + Math.random() * 50;
+        const dist = 150 + Math.random() * 150;
         bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * dist));
         bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * dist));
       });

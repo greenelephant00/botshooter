@@ -2048,7 +2048,7 @@ function draw() {
   ctx.save();
   if (nowShake < earthquakeShakeUntil) {
     const shakeT = (earthquakeShakeUntil - nowShake) / 1500;
-    const mag = 8 * shakeT;
+    const mag = 26 * shakeT;
     ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
   }
 
