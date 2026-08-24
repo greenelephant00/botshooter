@@ -201,7 +201,8 @@ const BOT_DISPLAY_NAMES = {
   warden: 'Warden', arclight: 'Arclight',
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
   gravitas: 'Gravitas', cryostasis: 'Cryostasis', railgunner: 'Railgunner', vexer: 'Vexer', bombardier: 'Bombardier',
-  colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
+  colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis',
+  fireling: 'Vuurwicht', frostling: 'IJswicht', earthling: 'Aardwicht'
 };
 const BOT_PATTERN_INFO = {
   single:    'Schiet één kogel recht op je af.',
@@ -685,11 +686,33 @@ function botCardHtml(type) {
   </div>`;
 }
 
+function world2BotCardHtml(type) {
+  const name = BOT_DISPLAY_NAMES[type.name] || type.name;
+  const maxAvgSpeed = 3.6; // snelste bot in het spel (chaser), gebruikt als vaste referentie
+  const avgSpeed = (type.speed[0] + type.speed[1]) / 2;
+  const speedPct = Math.max(3, Math.round((avgSpeed / maxAvgSpeed) * 100));
+  return `<div class="shopItem" style="align-items:flex-start;">
+    <canvas class="botPreview" id="botPreview_${type.name}" width="60" height="60"></canvas>
+    <div class="info">
+      <div class="name">${name}</div>
+      <div class="desc">HP: ${type.hp} &nbsp;·&nbsp; ${botDamageText(type)}</div>
+      <div class="desc">Snelheid: ${speedLabel(type)}</div>
+      <div class="speedBar"><div class="speedBarFill" style="width:${speedPct}%"></div></div>
+      <div class="desc">${BOT_PATTERN_INFO[type.pattern] || ''}</div>
+      <div class="desc" style="color:#777;">Verschijnt altijd in Wereld 2</div>
+    </div>
+  </div>`;
+}
+
 function renderBotsInfo() {
   if (currentWorld === 2) {
-    document.getElementById('botsInfoList').innerHTML = '<p style="color:#999;">Nog niks te zien in deze wereld. Kom later terug!</p>';
-    document.getElementById('specialBotsInfoList').innerHTML = '';
+    document.getElementById('botsInfoList').innerHTML = WORLD2_BOT_TYPES.map(world2BotCardHtml).join('');
+    document.getElementById('specialBotsInfoList').innerHTML = '<p style="color:#999;">Nog niks te zien in deze wereld. Kom later terug!</p>';
     document.getElementById('bossInfoList').innerHTML = '';
+    WORLD2_BOT_TYPES.forEach(type => {
+      const canvasEl = document.getElementById(`botPreview_${type.name}`);
+      if (canvasEl) drawBotPreview(canvasEl, type);
+    });
     return;
   }
   const normalHtml = BOT_TYPES.map(botCardHtml).join('');
