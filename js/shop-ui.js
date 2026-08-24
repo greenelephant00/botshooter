@@ -89,6 +89,7 @@ function powerupDescForLevel(id) {
   if (info.heals) parts.push(`+${info.heals[level]} HP`);
   if (info.dmgs) parts.push(`${info.dmgs[level]} schade aan alle bots`);
   if (info.pellets) parts.push(`${info.pellets[level]} kogels tegelijk`);
+  if (info.counts) parts.push(`${info.counts[level]} lasers`);
   const effectDesc = info.desc ? `${info.desc} ` : '';
   const current = `${effectDesc}Huidig (Lv. ${level}): ${parts.join(', ')}.`;
   if (level >= info.prices.length) return `${current} Max niveau bereikt.`;
@@ -100,6 +101,7 @@ function powerupDescForLevel(id) {
   if (info.heals) nextParts.push(`+${info.heals[level + 1]} HP`);
   if (info.dmgs) nextParts.push(`${info.dmgs[level + 1]} schade aan alle bots`);
   if (info.pellets) nextParts.push(`${info.pellets[level + 1]} kogels tegelijk`);
+  if (info.counts) nextParts.push(`${info.counts[level + 1]} lasers`);
   return `${current} Volgend niveau: ${nextParts.join(', ')}.`;
 }
 

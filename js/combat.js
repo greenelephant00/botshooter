@@ -959,9 +959,8 @@ function clusterBombardment(bot) {
   }, delay);
 }
 
-function laserBarrage(dmg) {
-  // Laserbarrage-powerup: 15 lasers, 5 per seconde, elk met een rood stippellijntje als waarschuwing vooraf
-  const count = 25;
+function laserBarrage(dmg, count) {
+  // Laserbarrage-powerup: 8 lasers per seconde, elk met een rood stippellijntje als waarschuwing vooraf
   const interval = 125; // 8 per sec
   const warnDelay = 500;
   for (let i = 0; i < count; i++) {

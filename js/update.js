@@ -849,7 +849,7 @@ function update() {
         player.confuseUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#c026d3');
       } else if (p.type === 'laserbarrage') {
-        laserBarrage(info.dmgs[lvl]);
+        laserBarrage(info.dmgs[lvl], info.counts[lvl]);
         spawnParticles(p.x, p.y, '#ff2965');
       }
     }
