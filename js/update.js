@@ -1017,7 +1017,7 @@ function update() {
     const pdx = tornadoX - player.x, pdy = tornadoY - player.y;
     const pdist = Math.hypot(pdx, pdy) || 1;
     if (pdist < coreRadius) {
-      applyDamageToPlayer(6);
+      applyDamageToPlayer(1);
       const ang = Math.random() * Math.PI * 2;
       player.x = Math.max(player.r, Math.min(canvas.width - player.r, tornadoX + Math.cos(ang) * pullRadius));
       player.y = Math.max(player.r, Math.min(canvas.height - player.r, tornadoY + Math.sin(ang) * pullRadius));
@@ -1033,7 +1033,7 @@ function update() {
       const bdist = Math.hypot(bdx, bdy) || 1;
       if (bdist < coreRadius) {
         const ang = Math.random() * Math.PI * 2;
-        damageBotSimple(bot, 8, '#cfe8ee');
+        damageBotSimple(bot, 1, '#cfe8ee');
         if (bot.dead) return;
         bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, tornadoX + Math.cos(ang) * pullRadius));
         bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, tornadoY + Math.sin(ang) * pullRadius));
