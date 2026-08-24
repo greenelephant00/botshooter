@@ -1643,6 +1643,7 @@ function drawBot(bot) {
   const isRailgunner = bot.type === 'railgunner';
   const isVexer = bot.type === 'vexer';
   const isBombardier = bot.type === 'bombardier';
+  const isSplitter = bot.type === 'splitter';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -1772,6 +1773,18 @@ function drawBot(bot) {
     ctx.fillStyle = '#ffdca0';
     ctx.beginPath(); ctx.arc(-bot.r * 0.3, -bot.r * 0.3, bot.r * 0.22, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(bot.r * 0.3, -bot.r * 0.3, bot.r * 0.22, 0, Math.PI * 2); ctx.fill();
+  } else if (isSplitter) {
+    // bolvormig lichaam met zichtbare scheuren die de split-gimmick tonen
+    ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -bot.r * 0.9); ctx.lineTo(-bot.r * 0.15, -bot.r * 0.1); ctx.lineTo(bot.r * 0.2, bot.r * 0.15); ctx.lineTo(0, bot.r * 0.9);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-bot.r * 0.85, bot.r * 0.35); ctx.lineTo(-bot.r * 0.1, bot.r * 0.05); ctx.lineTo(bot.r * 0.85, bot.r * 0.4);
+    ctx.stroke();
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
     ctx.fill();

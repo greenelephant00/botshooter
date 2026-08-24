@@ -125,7 +125,7 @@ const BOT_DISPLAY_NAMES = {
   brute: 'Brute (mes)', spinner: 'Spinner', chaser: 'Chaser', shielder: 'Shielder',
   ghost: 'Ghost', turret: 'Turret', bomber: 'Bomber',
   overlord: 'Overlord', artillery: 'Artillery',
-  swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
+  swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper', splitter: 'Splitter',
   warden: 'Warden', arclight: 'Arclight',
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
   gravitas: 'Gravitas', cryostasis: 'Cryostasis', railgunner: 'Railgunner', vexer: 'Vexer', bombardier: 'Bombardier',
@@ -468,7 +468,8 @@ function speedLabel(type) {
 function botCardHtml(type) {
   const name = BOT_DISPLAY_NAMES[type.name] || type.name;
   let patternDesc = (BOT_PATTERN_INFO[type.pattern] || '') + (type.splits ? ' Splitst bij dood in 2 zwakke minions.' : '')
-    + (type.swapOnHit ? ' Schiet 2x per sec — als een kogel je raakt wissel je altijd van plek met deze bot en word je 3 sec vertraagd.' : '');
+    + (type.swapOnHit ? ' Schiet 2x per sec — als een kogel je raakt wissel je altijd van plek met deze bot en word je 3 sec vertraagd.' : '')
+    + (type.splitsSelf ? ` Splitst bij dood in ${type.splitsSelf} kleinere versies van zichzelf.` : '');
   if (type.pattern === 'boss' && BOSS_SPECIAL_DESC[type.name]) {
     patternDesc += ' ' + BOSS_SPECIAL_DESC[type.name];
   }

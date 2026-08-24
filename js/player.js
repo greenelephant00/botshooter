@@ -98,7 +98,8 @@ const BOT_TYPES = [
   { name: 'overlord',   minScore: 700, minLevel: 9,  r: 34, hp: 20, speed: [0.5, 0.8], cooldown: [2600, 3400], pattern: 'megaburst', bulletSpeed: 5,   color: () => `hsl(${Math.floor(Math.random()*15)+290}, 65%, 35%)` },
   { name: 'artillery',  minScore: 700, minLevel: 9,  r: 20, hp: 8,  speed: [0.4, 0.7], cooldown: [3200, 4200], pattern: 'mortar',    bulletSpeed: 0,   meleeDamage: 40, color: () => `hsl(${Math.floor(Math.random()*10)+0}, 70%, 32%)` },
   { name: 'swarmqueen', minScore: 700, minLevel: 9,  r: 22, hp: 10, speed: [0.9, 1.3], cooldown: [1400, 2000], pattern: 'triple',    bulletSpeed: 5,   splits: true, color: () => `hsl(${Math.floor(Math.random()*15)+95}, 70%, 40%)` },
-  { name: 'vortex',     minScore: 700, minLevel: 9,  r: 19, hp: 9,  speed: [0.7, 1.1], cooldown: [180, 180],   pattern: 'spiral',    bulletSpeed: 5,   color: () => `hsl(${Math.floor(Math.random()*15)+195}, 80%, 55%)` }
+  { name: 'vortex',     minScore: 700, minLevel: 9,  r: 19, hp: 9,  speed: [0.7, 1.1], cooldown: [180, 180],   pattern: 'spiral',    bulletSpeed: 5,   color: () => `hsl(${Math.floor(Math.random()*15)+195}, 80%, 55%)` },
+  { name: 'splitter',   minScore: 650, minLevel: 8,  r: 23, hp: 11, speed: [0.9, 1.4], cooldown: [1500, 2200], pattern: 'single',    bulletSpeed: 5.5, splitsSelf: 3, color: () => `hsl(${Math.floor(Math.random()*15)+15}, 65%, 45%)` }
 ];
 
 // Speciale bots: zeldzaam, maar stuk voor stuk zwaar en met een uniek gevecht-gimmick
@@ -182,6 +183,7 @@ function spawnBot() {
     specialDmg: (type.specialDmg || 0) * hcMult,
     specialLastUsed: 0,
     splits: type.splits || false,
+    splitsSelf: type.splitsSelf || 0,
     spiralAngle: 0,
     frozenUntil: 0,
     slashUntil: 0
