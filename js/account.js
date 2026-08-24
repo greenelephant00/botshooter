@@ -15,7 +15,7 @@ const ACCOUNT_KEYS = [
   'botShooterCoinGrant_3500', 'botShooterCoinGrant_500', 'botShooterCoinGrant_600',
   'botShooterCoinGrant_1000', 'botShooterCoinGrant_1000b', 'botShooterCoinGrant_2500',
   'botShooterCoinGrant_200', 'botShooterCoinGrant_10000', 'botShooterCoinGrant_2000_ben',
-  'botShooterCoinGrant_2000b', 'botShooterWorld2Unlocked'
+  'botShooterCoinGrant_2000b', 'botShooterCoinGrant_15000', 'botShooterWorld2Unlocked'
 ];
 
 let currentAccount = null;
@@ -76,6 +76,7 @@ function defaultAccountSnapshot() {
   snap['botShooterCoinGrant_10000'] = 'true';
   snap['botShooterCoinGrant_2000_ben'] = 'true';
   snap['botShooterCoinGrant_2000b'] = 'true';
+  snap['botShooterCoinGrant_15000'] = 'true';
   return snap;
 }
 

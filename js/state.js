@@ -165,6 +165,13 @@ if (!localStorage.getItem('botShooterCoinGrant_2000b')) {
   localStorage.setItem('botShooterCoinGrant_2000b', 'true');
 }
 
+// Eenmalige bonus: +15000 munten, wordt maar één keer uitgekeerd
+if (!localStorage.getItem('botShooterCoinGrant_15000')) {
+  coins += 15000;
+  localStorage.setItem('botShooterCoins', coins);
+  localStorage.setItem('botShooterCoinGrant_15000', 'true');
+}
+
 let ownedWeapons = JSON.parse(localStorage.getItem('botShooterOwnedWeapons') || '["pistol"]');
 let ownedArmor = JSON.parse(localStorage.getItem('botShooterOwnedArmor') || '["none"]');
 let equippedWeapon = localStorage.getItem('botShooterEquippedWeapon') || 'pistol';
