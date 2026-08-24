@@ -61,7 +61,12 @@ function drawPowerup(p) {
     aura: '#7fff00',
     overload: '#ff6347',
     chaos: '#c026d3',
-    elementstorm: '#ff8800'
+    elementstorm: '#ff8800',
+    wortelgreep: '#3fa34d',
+    aardhuid: '#8a6a3a',
+    vuurnova: '#ff5a1f',
+    aardaura: '#7fff00',
+    ijsbries: '#7fd9ff'
   };
   const icons = {
     speed: '⚡',
@@ -80,7 +85,12 @@ function drawPowerup(p) {
     aura: '💫',
     overload: '⚡',
     chaos: '🌀',
-    elementstorm: '🔥'
+    elementstorm: '🔥',
+    wortelgreep: '🌳',
+    aardhuid: '🪨',
+    vuurnova: '🔥',
+    aardaura: '🌱',
+    ijsbries: '❄'
   };
   const col = colors[p.type];
   ctx.save();
@@ -296,6 +306,27 @@ function drawTornadoOverlay() {
     ctx.stroke();
     ctx.restore();
   }
+  ctx.restore();
+}
+
+function drawTreeGrab(t) {
+  // Wortelgreep-powerup (Wereld 2): een boom die uit de grond schiet, een bot grijpt en weer terugtrekt
+  const age = performance.now() - t.born;
+  const half = t.duration / 2;
+  const h = age < half ? age / half : Math.max(0, 1 - (age - half) / half);
+  if (h <= 0) return;
+  ctx.save();
+  ctx.translate(t.x, t.y);
+  const trunkH = 46 * h;
+  ctx.fillStyle = '#5c3a1e';
+  ctx.fillRect(-6, -trunkH, 12, trunkH);
+  ctx.fillStyle = '#2f7d3c';
+  ctx.beginPath();
+  ctx.moveTo(0, -trunkH - 22 * h);
+  ctx.lineTo(-20 * h, -trunkH + 4);
+  ctx.lineTo(20 * h, -trunkH + 4);
+  ctx.closePath();
+  ctx.fill();
   ctx.restore();
 }
 
@@ -2437,6 +2468,7 @@ function draw() {
   lightningBolts.forEach(drawLightningBolt);
   fallingMeteors.forEach(drawFallingMeteor);
   tsunamiWaves.forEach(drawTsunamiWave);
+  treeGrabs.forEach(drawTreeGrab);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);
@@ -2578,6 +2610,16 @@ function draw() {
     ctx.setLineDash([3, 3]);
     ctx.beginPath();
     ctx.arc(player.x, player.y, player.r + 26, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (nowDraw < player.stoneskinUntil) {
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = 'rgba(138, 106, 58, 0.9)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 8, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }

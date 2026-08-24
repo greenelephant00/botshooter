@@ -393,7 +393,8 @@ function fireBotBullet(bot, angle, speedMult = 1) {
 
 function applyDamageToPlayer(amount) {
   if (performance.now() < player.shieldUntil) return false;
-  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : 0));
+  const stoneskinReduction = performance.now() < player.stoneskinUntil ? 0.6 : 0;
+  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : 0)) * (1 - stoneskinReduction);
   player.hp -= amount * (1 - totalReduction);
   return true;
 }
@@ -1529,7 +1530,9 @@ function spawnParticles(x, y, color) {
 
 function spawnPowerup() {
   const margin = 60;
-  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
+  const types = currentWorld === 2
+    ? WORLD2_POWERUP_IDS
+    : ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),
@@ -1538,6 +1541,41 @@ function spawnPowerup() {
     type,
     bornAt: performance.now(),
     life: 9000 // verdwijnt na 9s als niet opgeraapt
+  });
+}
+
+function rootGrabAttack(count) {
+  // Wortelgreep (Wereld 2): bomen schieten uit de grond, grijpen willekeurige bots en trekken ze naar beneden
+  const pool = bots.filter(b => !b.dead);
+  const picks = [];
+  for (let i = 0; i < count && pool.length; i++) {
+    picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  picks.forEach(bot => {
+    const tx = bot.x, ty = bot.y;
+    const duration = 1400;
+    treeGrabs.push({ x: tx, y: ty, born: performance.now(), duration });
+    telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: performance.now() + duration * 0.4 });
+    setTimeout(() => {
+      if (gameOver || levelTransition || bot.dead) return;
+      spawnParticles(tx, ty, '#5c3a1e');
+      spawnParticles(tx, ty, '#3fa34d');
+      bot.dead = true;
+      score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
+      if (gameMode === 'levels') levelKills++;
+    }, duration * 0.55);
+  });
+}
+
+function fireNovaAttack(dmg, radius) {
+  // Vuurnova (Wereld 2): felle vuurexplosie rond de speler die alle bots dichtbij direct beschadigt
+  explosions.push({ x: player.x, y: player.y, born: performance.now(), maxR: radius });
+  spawnParticles(player.x, player.y, '#ff5a1f');
+  spawnParticles(player.x, player.y, '#ffb703');
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    const d = Math.hypot(bot.x - player.x, bot.y - player.y);
+    if (d < radius + bot.r) damageBotSimple(bot, dmg, '#ff5a1f');
   });
 }
 

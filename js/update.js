@@ -723,6 +723,7 @@ function update() {
   lightningBolts = lightningBolts.filter(l => now0 - l.born < 150);
   fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);
   tsunamiWaves = tsunamiWaves.filter(w => now0 - w.born < w.totalLife);
+  treeGrabs = treeGrabs.filter(t => now0 - t.born < t.duration);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);
   vampBolts = vampBolts.filter(g => now0 - g.born < g.duration);
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);
@@ -836,7 +837,7 @@ function update() {
 
   // Powerups: spawn periodically (niet tijdens oefenen)
   const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && currentWorld !== 2 && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
@@ -920,6 +921,21 @@ function update() {
       } else if (p.type === 'elementstorm') {
         elementStorm(info.dmgs[lvl], info.counts[lvl]);
         spawnParticles(p.x, p.y, '#ff8800');
+        spawnParticles(p.x, p.y, '#9be3ff');
+      } else if (p.type === 'wortelgreep') {
+        rootGrabAttack(info.counts[lvl]);
+        spawnParticles(p.x, p.y, '#5c3a1e');
+        spawnParticles(p.x, p.y, '#3fa34d');
+      } else if (p.type === 'aardhuid') {
+        player.stoneskinUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#8a6a3a');
+      } else if (p.type === 'vuurnova') {
+        fireNovaAttack(info.dmgs[lvl], info.radii[lvl]);
+      } else if (p.type === 'aardaura') {
+        player.auraUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#7fff00');
+      } else if (p.type === 'ijsbries') {
+        bots.forEach(b => { b.frozenUntil = now + info.durations[lvl] * boostDurMult; });
         spawnParticles(p.x, p.y, '#9be3ff');
       }
     }

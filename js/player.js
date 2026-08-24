@@ -39,6 +39,7 @@ const player = {
   rootedUntil: 0,
   curseUntil: 0,
   confuseUntil: 0,
+  stoneskinUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -78,6 +79,7 @@ function resetPlayer() {
   player.rootedUntil = 0;
   player.curseUntil = 0;
   player.confuseUntil = 0;
+  player.stoneskinUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -283,6 +285,7 @@ function initGame() {
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
+  treeGrabs = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -345,6 +348,7 @@ function setupNextLevel() {
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
+  treeGrabs = [];
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -435,6 +439,7 @@ function updateHUD() {
   if (now < player.stunUntil) active.push('⊗ Stun');
   if (now < player.auraUntil) active.push('💫 Aura');
   if (now < player.overloadUntil) active.push('⚡ Overload');
+  if (now < player.stoneskinUntil) active.push('🪨 Aardhuid');
   if (now < player.slowUntil) active.push('🐌 Vertraagd');
   if (now < player.rootedUntil) active.push('🥶 Bevroren');
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');

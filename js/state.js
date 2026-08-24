@@ -33,6 +33,7 @@ let lastLightningStrike = 0;
 let meteorShowerUntil = 0; // Meteorenregen: periodieke inslagen
 let lastMeteorImpact = 0;
 let fallingMeteors = []; // Meteorenregen: zichtbare meteoren die uit de lucht vallen, blijven liggen en wegtrekken
+let treeGrabs = []; // Wortelgreep-powerup (Wereld 2): bomen die uit de grond komen en een bot mee naar beneden trekken
 let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
 let lastEarthquakeShake = 0;
 let tornadoUntil = 0; // Tornado: ronddwalende wervelwind die zuigt en wegslingert
@@ -451,9 +452,16 @@ const POWERUP_LEVELS = {
   aura:      { name: '💫 Aura',        prices: [400, 650, 950],   durations: [7000, 8000, 9000, 10000], desc: 'Een schadeveld om je heen doet voortdurend schade aan alle bots die dichtbij komen.' },
   overload:  { name: '⚡ Overload',     prices: [500, 800, 1150],  durations: [5000, 6000, 7000, 8000], desc: 'Dubbele schade en veel hogere vuursnelheid tegelijk.' },
   chaos:     { name: '🌀 Verwarring',   prices: [450, 700, 1000],  durations: [7000, 8500, 10000, 12000], desc: 'Alle bots (ook bosses) schieten op elkaar in plaats van op jou. Hun kogels doen elkaar evenveel schade als aan jou.' },
-  elementstorm: { name: '🔥❄ Elementenstorm', prices: [500, 800, 1150], dmgs: [12, 16, 20, 25], counts: [25, 30, 35, 40], desc: 'Afwisselend vuur- en ijsstralen schieten vanaf de zijkanten het speelveld in, 8 per seconde, elk met een stippellijntje als waarschuwing vooraf. Ijsstralen bevriezen bots ook even. Doet alleen schade aan bots.' }
+  elementstorm: { name: '🔥❄ Elementenstorm', prices: [500, 800, 1150], dmgs: [12, 16, 20, 25], counts: [25, 30, 35, 40], desc: 'Afwisselend vuur- en ijsstralen schieten vanaf de zijkanten het speelveld in, 8 per seconde, elk met een stippellijntje als waarschuwing vooraf. Ijsstralen bevriezen bots ook even. Doet alleen schade aan bots.' },
+  wortelgreep: { name: '🌳 Wortelgreep', counts: [3], desc: 'Drie bomen schieten uit de grond, grijpen elk een willekeurige bot en trekken hem met wortel en tak de grond in.' },
+  aardhuid:    { name: '🪨 Aardhuid',    durations: [7000], desc: 'Een rotshuid om je heen vermindert inkomende schade fors, tijdelijk.' },
+  vuurnova:    { name: '🔥 Vuurnova',    dmgs: [22], radii: [170], desc: 'Een felle vuurexplosie om je heen beschadigt direct alle bots dichtbij.' },
+  aardaura:    { name: '🌱 Aardaura',    durations: [8000], desc: 'Een veld van aarde-energie om je heen doet voortdurend schade aan bots die dichtbij komen.' },
+  ijsbries:    { name: '❄ IJsbries',    durations: [4500], desc: 'Een ijzige windvlaag bevriest alle bots op het scherm tijdelijk.' }
 };
 const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
+// Alleen te vinden als pickup in Wereld 2 — niet in POWERUP_IDS, dus niet upgradebaar/koopbaar in de (lege) powerup-shop
+const WORLD2_POWERUP_IDS = ['wortelgreep', 'aardhuid', 'vuurnova', 'aardaura', 'ijsbries'];
 
 function getPuLevel(id) { return powerupLevels[id] || 0; }
 
