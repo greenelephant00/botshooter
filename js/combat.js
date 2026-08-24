@@ -893,7 +893,7 @@ function freezeTrap(bot) {
   const targetX = player.x;
   const targetY = player.y;
   const radius = 95;
-  const delay = 650;
+  const delay = 1100;
   telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
