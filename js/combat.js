@@ -472,7 +472,7 @@ function damageBotSimple(bot, dmg, color) {
         if (gameOver || levelTransition) return;
         for (let i = 0; i < count; i++) {
           const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
-          const dist = 65 + Math.random() * 35;
+          const dist = 130 + Math.random() * 60;
           bots.push({
             x: Math.max(9, Math.min(canvas.width - 9, deathX + Math.cos(ang) * dist)),
             y: Math.max(9, Math.min(canvas.height - 9, deathY + Math.sin(ang) * dist)),
