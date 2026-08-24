@@ -470,7 +470,9 @@ function damageBotSimple(bot, dmg, color) {
         deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
       setTimeout(() => {
         if (gameOver || levelTransition) return;
-        for (let i = 0; i < count; i++) {
+        const aliveSplitters = bots.filter(b => !b.dead && b.type === 'splitter').length;
+        const spawnCount = Math.min(count, Math.max(0, MAX_SPLITTERS_ALIVE - aliveSplitters));
+        for (let i = 0; i < spawnCount; i++) {
           const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
           const dist = 130 + Math.random() * 60;
           bots.push({

@@ -118,6 +118,7 @@ const SPECIAL_BOT_TYPES = [
 ];
 const SPECIAL_SPAWN_CHANCE = 0.13; // 13% kans zodra ze ontgrendeld zijn
 const MAX_SPECIAL_BOTS_ALIVE = 3; // max aantal special bots tegelijk in het speelveld
+const MAX_SPLITTERS_ALIVE = 15; // max aantal Splitters (groot + klein) tegelijk in het speelveld
 
 // De bosses: verschijnen elk precies één keer per potje, enorm, traag en met een verwoestende special attack
 const BOSS_TYPES = [
@@ -133,9 +134,14 @@ let bossWarningActive = false;
 let bossesSpawned = {}; // per boss-naam: true zodra hij deze sessie al is verschenen
 
 function pickBotType() {
-  const unlocked = gameMode === 'levels'
+  let unlocked = gameMode === 'levels'
     ? BOT_TYPES.filter(t => currentLevel >= t.minLevel)
     : BOT_TYPES.filter(t => score >= t.minScore);
+  const splitterCount = bots.filter(b => !b.dead && b.type === 'splitter').length;
+  if (splitterCount >= MAX_SPLITTERS_ALIVE) {
+    const withoutSplitter = unlocked.filter(t => t.name !== 'splitter');
+    if (withoutSplitter.length) unlocked = withoutSplitter;
+  }
   const specialUnlocked = gameMode === 'levels'
     ? SPECIAL_BOT_TYPES.filter(t => currentLevel >= t.minLevel)
     : SPECIAL_BOT_TYPES.filter(t => score >= t.minScore);
