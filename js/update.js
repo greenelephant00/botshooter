@@ -46,8 +46,18 @@ function update() {
       }
     }
     if (now < player.invisibleUntil) return; // bots merken de speler niet op
-    const bdx = player.x - bot.x;
-    const bdy = player.y - bot.y;
+    let bdx = player.x - bot.x;
+    let bdy = player.y - bot.y;
+    if (now < player.confuseUntil) {
+      // Verwarring: bots bewegen naar en jagen op elkaar in plaats van op de speler
+      const confuseOthers = bots.filter(b => b !== bot && !b.dead);
+      if (confuseOthers.length > 0) {
+        const nearestOther = confuseOthers.reduce((a, b) =>
+          Math.hypot(b.x - bot.x, b.y - bot.y) < Math.hypot(a.x - bot.x, a.y - bot.y) ? b : a);
+        bdx = nearestOther.x - bot.x;
+        bdy = nearestOther.y - bot.y;
+      }
+    }
     const bdist = Math.hypot(bdx, bdy) || 1;
     const timewarped = now < player.timewarpUntil;
     const speedMult = timewarped ? 0.4 : 1;
