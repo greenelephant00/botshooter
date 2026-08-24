@@ -229,7 +229,8 @@ window.closeBotsInfo = closeBotsInfo;
 
 function renderDisastersInfo() {
   document.getElementById('disastersInfoList').innerHTML = DISASTER_TYPES.map(d =>
-    `<div class="shopItem"><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div></div>`
+    `<div class="shopItem"><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
+    <button class="equip" onclick="startDisasterPractice('${d.id}')">🎯 Oefen</button></div>`
   ).join('');
 }
 
@@ -254,6 +255,8 @@ function startPractice(botName) {
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   document.getElementById('botsInfoScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
 
@@ -285,6 +288,7 @@ function startPractice(botName) {
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
+  lastEarthquakeShake = 0;
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
@@ -361,6 +365,8 @@ function startDodgePractice() {
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
 
@@ -392,6 +398,7 @@ function startDodgePractice() {
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
+  lastEarthquakeShake = 0;
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
@@ -453,11 +460,15 @@ window.startDodgePractice = startDodgePractice;
 let weaponPracticeActive = false;
 let transformPracticeActive = false;
 let transformPracticeId = 'none';
+let disasterPracticeActive = false;
+let disasterPracticeType = null;
 
 function startWeaponPractice(weaponId) {
   practiceWeaponId = weaponId;
   weaponPracticeActive = true;
   transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   gameMode = 'endless';
   document.getElementById('shopScreen').style.display = 'none';
   initGame();
@@ -478,6 +489,8 @@ function startTransformPractice(id) {
   weaponPracticeActive = false;
   transformPracticeActive = true;
   transformPracticeId = id;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   gameMode = 'endless';
   document.getElementById('transformShopScreen').style.display = 'none';
   initGame();
@@ -492,6 +505,27 @@ function startTransformPractice(id) {
   startMusic();
 }
 window.startTransformPractice = startTransformPractice;
+
+function startDisasterPractice(disasterId) {
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = true;
+  disasterPracticeType = disasterId;
+  gameMode = 'endless';
+  document.getElementById('disastersInfoScreen').style.display = 'none';
+  initGame();
+  updateHUD();
+  document.getElementById('pauseOverlay').style.display = 'none';
+  document.getElementById('msg').style.display = 'none';
+
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+  startMusic();
+}
+window.startDisasterPractice = startDisasterPractice;
 
 function speedLabel(type) {
   const [min, max] = type.speed;

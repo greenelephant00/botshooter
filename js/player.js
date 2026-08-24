@@ -291,6 +291,7 @@ function initGame() {
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
+  lastEarthquakeShake = 0;
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
@@ -348,6 +349,7 @@ function setupNextLevel() {
   lightningStormUntil = 0;
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
+  lastEarthquakeShake = 0;
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
@@ -377,6 +379,8 @@ function selectMode(mode) {
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   document.getElementById('startScreen').style.display = 'none';
   initGame();
   startMusic();

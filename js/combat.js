@@ -1104,6 +1104,41 @@ function startRandomDisaster() {
   }
 }
 
+function sustainDisasterPractice() {
+  // Natuurramp-oefensessie: houdt de gekozen ramp voortdurend actief
+  const now = performance.now();
+  activeDisasterType = disasterPracticeType;
+  if (disasterPracticeType === 'sandstorm') {
+    sandstormUntil = now + 2000;
+  } else if (disasterPracticeType === 'lightningStorm') {
+    lightningStormUntil = now + 2000;
+  } else if (disasterPracticeType === 'meteorShower') {
+    meteorShowerUntil = now + 2000;
+  } else if (disasterPracticeType === 'iceFloor') {
+    icePatches = icePatches.filter(p => now < p.until);
+    if (icePatches.length < 3) {
+      icePatches.push({
+        x: 80 + Math.random() * (canvas.width - 160),
+        y: 80 + Math.random() * (canvas.height - 160),
+        r: 55 + Math.random() * 35,
+        until: now + 30000
+      });
+    }
+  } else if (disasterPracticeType === 'earthquake') {
+    if (now - lastEarthquakeShake > 4000) {
+      lastEarthquakeShake = now;
+      earthquakeShakeUntil = now + 1500;
+      bots.forEach(bot => {
+        if (bot.dead) return;
+        const ang = Math.random() * Math.PI * 2;
+        const dist = 40 + Math.random() * 50;
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * dist));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * dist));
+      });
+    }
+  }
+}
+
 function triggerLightningStrike() {
   const x = 40 + Math.random() * (canvas.width - 80);
   const y = 40 + Math.random() * (canvas.height - 80);

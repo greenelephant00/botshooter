@@ -833,7 +833,7 @@ function update() {
 
   // Powerups: spawn periodically (niet tijdens oefenen)
   const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
@@ -924,7 +924,7 @@ function update() {
   powerups = powerups.filter(p => !p.collected);
 
   // Coins: spawn periodically (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
     lastCoinSpawn = now;
     spawnCoinPickup();
   }
@@ -941,7 +941,9 @@ function update() {
   coinPickups = coinPickups.filter(c => !c.collected);
 
   // Natuurrampen: af en toe een willekeurige ramp (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive) {
+  if (disasterPracticeActive) {
+    sustainDisasterPractice();
+  } else if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive) {
     if (!activeDisasterType && nextDisasterAt && now > nextDisasterAt) {
       startRandomDisaster();
     }
@@ -949,14 +951,14 @@ function update() {
       activeDisasterType = null;
       nextDisasterAt = now + 30000 + Math.random() * 25000;
     }
-    if (activeDisasterType === 'lightningStorm' && now - lastLightningStrike > 1300) {
-      lastLightningStrike = now;
-      triggerLightningStrike();
-    }
-    if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 900) {
-      lastMeteorImpact = now;
-      triggerMeteorImpact();
-    }
+  }
+  if (activeDisasterType === 'lightningStorm' && now - lastLightningStrike > 1300) {
+    lastLightningStrike = now;
+    triggerLightningStrike();
+  }
+  if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 900) {
+    lastMeteorImpact = now;
+    triggerMeteorImpact();
   }
   icePatches = icePatches.filter(patch => now < patch.until);
 
@@ -979,7 +981,7 @@ function update() {
   }
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !bossAlive && !bossWarningActive) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !bossAlive && !bossWarningActive) {
     const nextBoss = BOSS_TYPES.find(b => !bossesSpawned[b.name] &&
       (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
     if (nextBoss) triggerBossWarning(nextBoss);
@@ -1033,6 +1035,11 @@ function endGame(won) {
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen.</span>`;
     msgBtn.textContent = 'Opnieuw oefenen';
     msgBtn.onclick = () => { startTransformPractice(transformPracticeId); };
+  } else if (disasterPracticeActive) {
+    document.getElementById('msgText').innerHTML =
+      `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen tegen de natuurramp.</span>`;
+    msgBtn.textContent = 'Opnieuw oefenen';
+    msgBtn.onclick = () => { startDisasterPractice(disasterPracticeType); };
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
     const isHardcore = gameMode === 'hardcore';
     let currentHigh = isHardcore ? highScoreHardcore : highScore;
@@ -1098,6 +1105,8 @@ function goToMenu() {
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';
   bossWarningActive = false;

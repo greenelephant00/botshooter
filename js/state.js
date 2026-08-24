@@ -33,6 +33,7 @@ let lastLightningStrike = 0;
 let meteorShowerUntil = 0; // Meteorenregen: periodieke inslagen
 let lastMeteorImpact = 0;
 let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
+let lastEarthquakeShake = 0;
 let activeDisasterType = null;
 let disasterEndAt = 0;
 let nextDisasterAt = 0;
