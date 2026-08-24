@@ -125,6 +125,7 @@ const BOT_DISPLAY_NAMES = {
   overlord: 'Overlord', phantom: 'Phantom', artillery: 'Artillery',
   swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
   sentinel: 'Sentinel', warden: 'Warden', arclight: 'Arclight',
+  miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis'
 };
 const BOT_PATTERN_INFO = {
@@ -146,7 +147,10 @@ const BOT_PATTERN_INFO = {
   boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
   sentinellaser: 'Geen kogels — houdt afstand en vuurt periodiek een getelegrafeerde, doorlopende laserstraal af.',
   mine:      'Geen kogels — legt elke seconde een mijn neer op jouw positie op dat moment, die na een paar seconden vanzelf afgaat.',
-  shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.'
+  shockbolt: 'Geen kogels — telegrafeert kort 3 inslagpunten rond je positie en zapt je daarna met 3 instant bliksemschichten.',
+  gascloud:  'Geen kogels — laat regelmatig een gifwolk achter op zijn positie die schade-over-tijd doet zolang je erin staat.',
+  shieldbash: 'Geen kogels — beukt continu op je af en stoot je bij impact weg met veel schade en een flinke terugstoot.',
+  summon:    'Geen kogels — houdt afstand en roept periodiek 2 zwakke broodlings op om je te overweldigen.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',
@@ -170,6 +174,15 @@ function botDamageText(type) {
   }
   if (type.pattern === 'shockbolt') {
     return `${type.specialDmg || 18} schade per bliksemschicht`;
+  }
+  if (type.pattern === 'gascloud') {
+    return `${type.specialDmg || 4} schade per tik in de gifwolk`;
+  }
+  if (type.pattern === 'shieldbash') {
+    return `${type.specialDmg || 22} schade + terugstoot per beuk`;
+  }
+  if (type.pattern === 'summon') {
+    return 'Doet zelf geen schade — roept broodlings op';
   }
   if (type.pattern === 'boss') {
     return `8 schade per kogel + ${type.specialDmg || 30} schade bij schokgolf-aanval`;
@@ -227,6 +240,7 @@ function startPractice(botName) {
   bladeTrails = [];
   fireballThrows = [];
   fireZones = [];
+  gasClouds = [];
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;
@@ -323,6 +337,7 @@ function startDodgePractice() {
   bladeTrails = [];
   fireballThrows = [];
   fireZones = [];
+  gasClouds = [];
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;

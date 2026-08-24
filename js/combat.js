@@ -828,6 +828,56 @@ function shockBolt(bot) {
   }, delay);
 }
 
+function gasCloudDrop(bot) {
+  // miasma: laat een gifwolk achter op zijn huidige positie die schade-over-tijd doet aan de speler
+  gasClouds.push({ x: bot.x, y: bot.y, radius: 70, born: performance.now(), duration: 4500, lastTick: 0, tickDmg: bot.specialDmg || 4 });
+  spawnParticles(bot.x, bot.y, '#7ed957');
+}
+
+function shieldBash(bot) {
+  // bulwark: beukt naar voren en stoot de speler met veel schade en een flinke terugstoot weg
+  const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
+  applyDamageToPlayer(bot.specialDmg || 22);
+  const pushDist = 130;
+  player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(angle) * pushDist));
+  player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(angle) * pushDist));
+  spawnParticles(player.x, player.y, '#ffcf3f');
+  explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: 50 });
+}
+
+function broodSummon(bot) {
+  // broodmother: roept 2 kleine, zwakke broodlings op naast zichzelf
+  const count = 2;
+  for (let i = 0; i < count; i++) {
+    const angle = (Math.PI * 2 / count) * i + Math.random() * 0.5;
+    const dist = 45;
+    bots.push({
+      x: Math.max(15, Math.min(canvas.width - 15, bot.x + Math.cos(angle) * dist)),
+      y: Math.max(15, Math.min(canvas.height - 15, bot.y + Math.sin(angle) * dist)),
+      r: 11,
+      speed: 2.1,
+      hp: 2,
+      maxHp: 2,
+      lastShot: 0,
+      shootCooldown: 1300,
+      color: '#8a5cf6',
+      type: 'broodling',
+      pattern: 'single',
+      bulletSpeed: 5,
+      bulletDmg: 0,
+      swapOnHit: false,
+      meleeDamage: 0,
+      specialDmg: 0,
+      specialLastUsed: 0,
+      splits: false,
+      spiralAngle: 0,
+      frozenUntil: 0,
+      slashUntil: 0
+    });
+  }
+  spawnParticles(bot.x, bot.y, '#8a5cf6');
+}
+
 function mortarStrike(bot) {
   // artillery: telegrafeert een inslagpunt, en beschadigt de speler pas na een korte waarschuwing
   const targetX = player.x;

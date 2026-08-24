@@ -210,6 +210,27 @@ function drawFireZone(zone) {
   ctx.restore();
 }
 
+function drawGasCloud(cloud) {
+  // Miasma special bot: gifwolk die de speler schade-over-tijd doet
+  const age = performance.now() - cloud.born;
+  const fade = Math.max(0, 1 - age / cloud.duration);
+  const pulse = 1 + Math.sin(performance.now() / 150) * 0.06;
+  ctx.save();
+  ctx.globalAlpha = 0.3 * fade;
+  ctx.fillStyle = '#7ed957';
+  ctx.beginPath();
+  ctx.arc(cloud.x, cloud.y, cloud.radius * pulse, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.globalAlpha = 0.5 * fade;
+  ctx.strokeStyle = '#c3ff5c';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.arc(cloud.x, cloud.y, cloud.radius * pulse, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawBladeTrail(t) {
   // Momentum Blade special: gloeiend spoor van de dash
   const age = performance.now() - t.born;
@@ -1285,6 +1306,10 @@ function drawBot(bot) {
   const isSentinel = bot.type === 'sentinel';
   const isWarden = bot.type === 'warden';
   const isArclight = bot.type === 'arclight';
+  const isMiasma = bot.type === 'miasma';
+  const isBulwark = bot.type === 'bulwark';
+  const isBroodmother = bot.type === 'broodmother';
+  const isBroodling = bot.type === 'broodling';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -1346,6 +1371,36 @@ function drawBot(bot) {
     ctx.strokeStyle = '#fffbd6';
     ctx.lineWidth = 1.5;
     ctx.stroke();
+  } else if (isMiasma) {
+    // druppelvormig, wolkerig lichaam met belletjes
+    ctx.arc(0, 0, bot.r * 0.9, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#c3ff5c';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.fillStyle = '#c3ff5c';
+    ctx.beginPath(); ctx.arc(bot.r * 0.35, -bot.r * 0.3, bot.r * 0.18, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-bot.r * 0.2, bot.r * 0.35, bot.r * 0.14, 0, Math.PI * 2); ctx.fill();
+  } else if (isBulwark) {
+    // brede, plompe rechthoekige schildvorm
+    ctx.rect(-bot.r * 0.9, -bot.r * 1.1, bot.r * 1.8, bot.r * 2.2);
+    ctx.fill();
+    ctx.strokeStyle = '#dfefff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+  } else if (isBroodmother || isBroodling) {
+    // spinachtig lichaam met korte pootjes
+    ctx.arc(0, 0, bot.r * 0.85, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#d9c2ff';
+    ctx.lineWidth = isBroodling ? 1 : 1.5;
+    for (let i = -2; i <= 2; i++) {
+      if (i === 0) continue;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(i * 0.5) * bot.r * 1.4, Math.sin(i * 0.5) * bot.r * 1.4);
+      ctx.stroke();
+    }
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
     ctx.fill();
@@ -1497,6 +1552,7 @@ function draw() {
   stickyThrows.forEach(drawStickyThrow);
   bladeTrails.forEach(drawBladeTrail);
   fireZones.forEach(drawFireZone);
+  gasClouds.forEach(drawGasCloud);
   fireballThrows.forEach(drawFireballThrow);
   chargeTrails.forEach(drawChargeTrail);
   deployedTurrets.forEach(drawTurret);

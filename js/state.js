@@ -21,6 +21,7 @@ let riftPulseLastUsed = 0;
 const RIFT_PULSE_COOLDOWN = 12000;
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
+let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
 let chargeTrails = []; // Juggernaut-transformatie: spoor van de beuk-charge
 let deployedTurrets = []; // Field Engineer-transformatie: neergezette geschutskoepels
 let stickyThrows = [];

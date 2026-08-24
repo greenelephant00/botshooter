@@ -154,6 +154,49 @@ function update() {
       return;
     }
 
+    if (bot.pattern === 'gascloud') {
+      // miasma: blijft in de buurt en laat regelmatig een gifwolk achter die schade-over-tijd doet
+      if (bdist > 100) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
+        bot.lastShot = now;
+        gasCloudDrop(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'shieldbash') {
+      // bulwark: beukt continu op de speler af en stoot bij impact weg met schade en terugstoot
+      if (bdist > bot.r + player.r - 4) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (bdist < bot.r + player.r + 8 && now - bot.lastShot > bot.shootCooldown * cooldownMult) {
+        bot.lastShot = now;
+        if (now < player.stunUntil) {
+          bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
+        } else {
+          shieldBash(bot);
+        }
+      }
+      return;
+    }
+
+    if (bot.pattern === 'summon') {
+      // broodmother: houdt afstand en roept periodiek zwakke broodlings op
+      if (bdist > 220) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
+        bot.lastShot = now;
+        broodSummon(bot);
+      }
+      return;
+    }
+
     if (bot.pattern === 'boss') {
       // boss: enorm, traag, schiet regelmatig een salvo en heeft 2 unieke special attacks
       const standoffB = 170;
@@ -568,6 +611,15 @@ function update() {
     });
   });
   fireZones = fireZones.filter(zone => now0 < zone.until);
+
+  // Miasma: gifwolken doen periodiek schade aan de speler zolang die erin staat
+  gasClouds.forEach(cloud => {
+    if (now0 - cloud.lastTick < 500) return;
+    cloud.lastTick = now0;
+    const dd = Math.hypot(cloud.x - player.x, cloud.y - player.y);
+    if (dd < cloud.radius + player.r) applyDamageToPlayer(cloud.tickDmg);
+  });
+  gasClouds = gasClouds.filter(cloud => now0 - cloud.born < cloud.duration);
 
   // Singularity Gun: zwarte gaten zuigen bots naar binnen en imploderen daarna
   blackHoles.forEach(bh => {
