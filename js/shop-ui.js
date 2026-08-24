@@ -124,7 +124,7 @@ const BOT_DISPLAY_NAMES = {
   grunt: 'Grunt', runner: 'Runner', heavy: 'Heavy', tank: 'Tank', sniper: 'Sniper',
   brute: 'Brute (mes)', spinner: 'Spinner', chaser: 'Chaser', shielder: 'Shielder',
   ghost: 'Ghost', turret: 'Turret', bomber: 'Bomber',
-  overlord: 'Overlord', phantom: 'Phantom', artillery: 'Artillery',
+  overlord: 'Overlord', artillery: 'Artillery',
   swarmqueen: 'Swarmqueen', vortex: 'Vortex', swapper: 'Swapper',
   warden: 'Warden', arclight: 'Arclight',
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
@@ -144,7 +144,6 @@ const BOT_PATTERN_INFO = {
   turret:    'Staat helemaal stil, maar schiet erg snel en precies.',
   suicide:   'Geen vuurwapen — rent op je af en ontploft van dichtbij.',
   megaburst: 'Vuurt 3 golven van 8 kogels in alle richtingen, snel na elkaar (mini-boss).',
-  phantom:   'Geen vuurwapen — teleporteert vlak naast je en valt aan met een mes.',
   mortar:    'Vuurt op afstand een zware, langzame granaat met een korte waarschuwing vooraf.',
   spiral:    'Schiet continu kogels in een langzaam roterende spiraal om zich heen.',
   boss:      'Vuurt regelmatig een breed salvo van 16 kogels en heeft meerdere unieke special attacks.',
@@ -167,7 +166,7 @@ const BOSS_SPECIAL_DESC = {
 };
 
 function botDamageText(type) {
-  if (type.pattern === 'melee' || type.pattern === 'suicide' || type.pattern === 'phantom') {
+  if (type.pattern === 'melee' || type.pattern === 'suicide') {
     return `${type.meleeDamage || 15} schade per aanval (van dichtbij)`;
   }
   if (type.pattern === 'mortar') {

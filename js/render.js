@@ -1607,7 +1607,7 @@ function drawBot(bot) {
   const now = performance.now();
   const frozen = now < bot.frozenUntil;
   const slashing = now < (bot.slashUntil || 0);
-  const isMelee = bot.pattern === 'melee' || bot.pattern === 'phantom';
+  const isMelee = bot.pattern === 'melee';
   const isGhost = bot.pattern === 'teleport';
   const isTurret = bot.pattern === 'turret';
   const isBomber = bot.pattern === 'suicide';

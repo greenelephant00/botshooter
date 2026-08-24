@@ -94,20 +94,6 @@ function update() {
       return;
     }
 
-    if (bot.pattern === 'phantom') {
-      // phantom: teleporteert vlak naast de speler en valt aan met een mes
-      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 700) {
-        bot.lastShot = now;
-        const ang = Math.random() * Math.PI * 2;
-        const dist = bot.r + player.r + 6;
-        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, player.x + Math.cos(ang) * dist));
-        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, player.y + Math.sin(ang) * dist));
-        spawnParticles(bot.x, bot.y, bot.color);
-        meleeAttack(bot);
-      }
-      return;
-    }
-
     if (bot.pattern === 'mortar') {
       // artillery: houdt afstand en vuurt een zware, langzame granaat met waarschuwing vooraf
       if (bdist > 140) {
