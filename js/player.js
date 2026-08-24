@@ -293,6 +293,9 @@ function initGame() {
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
   lastEarthquakeShake = 0;
+  tornadoUntil = 0;
+  tsunamiUntil = 0;
+  tsunamiWaves = [];
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;
@@ -352,6 +355,9 @@ function setupNextLevel() {
   meteorShowerUntil = 0;
   earthquakeShakeUntil = 0;
   lastEarthquakeShake = 0;
+  tornadoUntil = 0;
+  tsunamiUntil = 0;
+  tsunamiWaves = [];
   activeDisasterType = null;
   disasterEndAt = 0;
   nextDisasterAt = performance.now() + 30000 + Math.random() * 25000;

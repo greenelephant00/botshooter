@@ -1059,7 +1059,7 @@ function showDisasterAlert(text) {
 }
 
 function startRandomDisaster() {
-  const types = ['iceFloor', 'sandstorm', 'lightningStorm', 'earthquake', 'meteorShower'];
+  const types = ['iceFloor', 'sandstorm', 'lightningStorm', 'earthquake', 'meteorShower', 'tornado', 'tsunami'];
   const type = types[Math.floor(Math.random() * types.length)];
   activeDisasterType = type;
   const now = performance.now();
@@ -1093,6 +1093,20 @@ function startRandomDisaster() {
     meteorShowerUntil = disasterEndAt;
     lastMeteorImpact = now;
     showDisasterAlert('☄ METEORENREGEN — zoek dekking!');
+  } else if (type === 'tornado') {
+    disasterEndAt = now + 12000;
+    tornadoUntil = disasterEndAt;
+    tornadoX = 100 + Math.random() * (canvas.width - 200);
+    tornadoY = 100 + Math.random() * (canvas.height - 200);
+    const ang = Math.random() * Math.PI * 2;
+    tornadoVX = Math.cos(ang) * 1.3;
+    tornadoVY = Math.sin(ang) * 1.3;
+    showDisasterAlert('🌀 TORNADO — blijf uit de buurt van de wervelwind!');
+  } else if (type === 'tsunami') {
+    disasterEndAt = now + 15000;
+    tsunamiUntil = disasterEndAt;
+    lastTsunamiWave = now;
+    showDisasterAlert('🌊 TSUNAMI — de vloer overstroomt, zoek dekking voor de golven!');
   }
 }
 
@@ -1120,7 +1134,25 @@ function sustainDisasterPractice() {
         bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * dist));
       });
     }
+  } else if (disasterPracticeType === 'tornado') {
+    if (tornadoUntil === 0) {
+      tornadoX = canvas.width / 2;
+      tornadoY = canvas.height / 2;
+      const ang = Math.random() * Math.PI * 2;
+      tornadoVX = Math.cos(ang) * 1.3;
+      tornadoVY = Math.sin(ang) * 1.3;
+    }
+    tornadoUntil = now + 2000;
+  } else if (disasterPracticeType === 'tsunami') {
+    tsunamiUntil = now + 2000;
   }
+}
+
+function triggerTsunamiWave() {
+  const dirs = ['left', 'right', 'top', 'bottom'];
+  const dir = dirs[Math.floor(Math.random() * dirs.length)];
+  showDisasterAlert('🌊 VLOEDGOLF!');
+  tsunamiWaves.push({ dir, born: performance.now(), sweepDuration: 1400, totalLife: 1400, hitPlayer: false, hitBots: new Set() });
 }
 
 function triggerLightningStrike() {

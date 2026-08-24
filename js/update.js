@@ -6,6 +6,7 @@ function update() {
   player.speed = now0 < player.boostUntil ? player.baseSpeed * 1.8 : player.baseSpeed;
   if (now0 < player.slowUntil) player.speed *= 0.5;
   if (now0 < sandstormUntil) player.speed *= 0.7;
+  if (now0 < tsunamiUntil) player.speed *= 0.8;
 
   // Passieve armor-effecten
   const armorNow = getArmorStats();
@@ -721,6 +722,7 @@ function update() {
   telegraphs = telegraphs.filter(t => now0 < t.warnUntil);
   lightningBolts = lightningBolts.filter(l => now0 - l.born < 150);
   fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);
+  tsunamiWaves = tsunamiWaves.filter(w => now0 - w.born < w.totalLife);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);
   vampBolts = vampBolts.filter(g => now0 - g.born < g.duration);
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);
@@ -960,6 +962,89 @@ function update() {
   if (activeDisasterType === 'meteorShower' && now - lastMeteorImpact > 500) {
     lastMeteorImpact = now;
     triggerMeteorImpact();
+  }
+  if (activeDisasterType === 'tsunami' && now - lastTsunamiWave > 3000) {
+    lastTsunamiWave = now;
+    triggerTsunamiWave();
+  }
+
+  // Tsunami: actieve vloedgolven beschadigen en verplaatsen wat ze op hun pad raken
+  tsunamiWaves.forEach(w => {
+    const age = now - w.born;
+    const t = Math.min(1, age / w.sweepDuration);
+    let bandPos, axisIsX, knockDX = 0, knockDY = 0;
+    if (w.dir === 'left') { bandPos = -80 + t * (canvas.width + 160); axisIsX = true; knockDX = 1; }
+    else if (w.dir === 'right') { bandPos = canvas.width + 80 - t * (canvas.width + 160); axisIsX = true; knockDX = -1; }
+    else if (w.dir === 'top') { bandPos = -80 + t * (canvas.height + 160); axisIsX = false; knockDY = 1; }
+    else { bandPos = canvas.height + 80 - t * (canvas.height + 160); axisIsX = false; knockDY = -1; }
+    const bandHalfWidth = 45;
+    if (!w.hitPlayer) {
+      const playerPos = axisIsX ? player.x : player.y;
+      if (Math.abs(playerPos - bandPos) < bandHalfWidth) {
+        w.hitPlayer = true;
+        applyDamageToPlayer(12);
+        player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + knockDX * 130));
+        player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + knockDY * 130));
+        spawnParticles(player.x, player.y, '#6ec6ff');
+      }
+    }
+    bots.forEach(bot => {
+      if (bot.dead || w.hitBots.has(bot)) return;
+      const botPos = axisIsX ? bot.x : bot.y;
+      if (Math.abs(botPos - bandPos) < bandHalfWidth) {
+        w.hitBots.add(bot);
+        damageBotSimple(bot, 12, '#6ec6ff');
+        if (bot.dead) return;
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + knockDX * 130));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + knockDY * 130));
+      }
+    });
+  });
+
+  // Tornado: ronddwalende wervelwind die zuigt en dichtbij wegslingert
+  if (now < tornadoUntil) {
+    tornadoX += tornadoVX;
+    tornadoY += tornadoVY;
+    if (tornadoX < 60 || tornadoX > canvas.width - 60) tornadoVX *= -1;
+    if (tornadoY < 60 || tornadoY > canvas.height - 60) tornadoVY *= -1;
+    tornadoX = Math.max(60, Math.min(canvas.width - 60, tornadoX));
+    tornadoY = Math.max(60, Math.min(canvas.height - 60, tornadoY));
+    tornadoVX += (Math.random() - 0.5) * 0.08;
+    tornadoVY += (Math.random() - 0.5) * 0.08;
+    const tSpd = Math.hypot(tornadoVX, tornadoVY) || 1;
+    tornadoVX = (tornadoVX / tSpd) * 1.3;
+    tornadoVY = (tornadoVY / tSpd) * 1.3;
+
+    const pullRadius = 200, coreRadius = 34;
+    const pdx = tornadoX - player.x, pdy = tornadoY - player.y;
+    const pdist = Math.hypot(pdx, pdy) || 1;
+    if (pdist < coreRadius) {
+      applyDamageToPlayer(6);
+      const ang = Math.random() * Math.PI * 2;
+      player.x = Math.max(player.r, Math.min(canvas.width - player.r, tornadoX + Math.cos(ang) * pullRadius));
+      player.y = Math.max(player.r, Math.min(canvas.height - player.r, tornadoY + Math.sin(ang) * pullRadius));
+      spawnParticles(player.x, player.y, '#cfe8ee');
+    } else if (pdist < pullRadius) {
+      const pull = (1 - pdist / pullRadius) * 2.2;
+      player.x += (pdx / pdist) * pull;
+      player.y += (pdy / pdist) * pull;
+    }
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const bdx = tornadoX - bot.x, bdy = tornadoY - bot.y;
+      const bdist = Math.hypot(bdx, bdy) || 1;
+      if (bdist < coreRadius) {
+        const ang = Math.random() * Math.PI * 2;
+        damageBotSimple(bot, 8, '#cfe8ee');
+        if (bot.dead) return;
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, tornadoX + Math.cos(ang) * pullRadius));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, tornadoY + Math.sin(ang) * pullRadius));
+      } else if (bdist < pullRadius) {
+        const pull = (1 - bdist / pullRadius) * 2.2;
+        bot.x += (bdx / bdist) * pull;
+        bot.y += (bdy / bdist) * pull;
+      }
+    });
   }
   // Spawn new bots gradually (niet tijdens oefenen — daar is maar 1 bot)
   if (gameMode === 'levels') {

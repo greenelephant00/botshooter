@@ -219,6 +219,86 @@ function drawFallingMeteor(m) {
   ctx.restore();
 }
 
+function drawTsunamiFloorOverlay() {
+  // Natuurramp Tsunami: de vloer is nat en glimt, golvende lijnen suggereren stromend water
+  ctx.save();
+  ctx.globalAlpha = 0.16;
+  ctx.fillStyle = '#1f6f8b';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.globalAlpha = 0.12;
+  ctx.strokeStyle = '#8fd8ff';
+  ctx.lineWidth = 2;
+  const t = performance.now() / 500;
+  for (let y = -20; y < canvas.height + 20; y += 40) {
+    ctx.beginPath();
+    for (let x = 0; x <= canvas.width; x += 20) {
+      const yy = y + Math.sin(x * 0.03 + t + y) * 4;
+      if (x === 0) ctx.moveTo(x, yy); else ctx.lineTo(x, yy);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+function drawTsunamiWave(w) {
+  // Natuurramp Tsunami: een levensgrote vloedgolf die over het scherm raast
+  const age = performance.now() - w.born;
+  const t = Math.min(1, age / w.sweepDuration);
+  let bandPos, vertical;
+  if (w.dir === 'left') { bandPos = -80 + t * (canvas.width + 160); vertical = true; }
+  else if (w.dir === 'right') { bandPos = canvas.width + 80 - t * (canvas.width + 160); vertical = true; }
+  else if (w.dir === 'top') { bandPos = -80 + t * (canvas.height + 160); vertical = false; }
+  else { bandPos = canvas.height + 80 - t * (canvas.height + 160); vertical = false; }
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  const grad = vertical
+    ? ctx.createLinearGradient(bandPos - 60, 0, bandPos + 60, 0)
+    : ctx.createLinearGradient(0, bandPos - 60, 0, bandPos + 60);
+  grad.addColorStop(0, 'rgba(30,120,160,0)');
+  grad.addColorStop(0.5, 'rgba(90,200,255,0.85)');
+  grad.addColorStop(1, 'rgba(30,120,160,0)');
+  ctx.fillStyle = grad;
+  if (vertical) ctx.fillRect(bandPos - 60, 0, 120, canvas.height);
+  else ctx.fillRect(0, bandPos - 60, canvas.width, 120);
+  ctx.strokeStyle = 'rgba(255,255,255,0.85)';
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  if (vertical) { ctx.moveTo(bandPos, 0); ctx.lineTo(bandPos, canvas.height); }
+  else { ctx.moveTo(0, bandPos); ctx.lineTo(canvas.width, bandPos); }
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawTornadoOverlay() {
+  // Natuurramp Tornado: een ronddwalende, roterende wervelwind
+  const t = performance.now() / 1000;
+  ctx.save();
+  ctx.globalAlpha = 0.15;
+  ctx.strokeStyle = '#cfe8ee';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([4, 6]);
+  ctx.beginPath();
+  ctx.arc(tornadoX, tornadoY, 200, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+  for (let ring = 0; ring < 4; ring++) {
+    const rr = 14 + ring * 9;
+    const rot = t * (2.5 + ring * 0.6) * (ring % 2 === 0 ? 1 : -1);
+    ctx.save();
+    ctx.translate(tornadoX, tornadoY);
+    ctx.rotate(rot);
+    ctx.globalAlpha = 0.55 - ring * 0.1;
+    ctx.strokeStyle = '#dff3f7';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, 0.3, Math.PI * 1.5);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function drawIceGrenade(g) {
   // Cryo Rifle special: ijsgranaat die richting het doelwit vliegt
   const age = performance.now() - g.born;
@@ -2125,6 +2205,7 @@ function draw() {
   }
 
   if (nowShake < iceFloorUntil) drawIceFloorOverlay();
+  if (nowShake < tsunamiUntil) drawTsunamiFloorOverlay();
 
   // bullets
   bullets.forEach(b => {
@@ -2157,6 +2238,7 @@ function draw() {
   explosions.forEach(drawExplosion);
   lightningBolts.forEach(drawLightningBolt);
   fallingMeteors.forEach(drawFallingMeteor);
+  tsunamiWaves.forEach(drawTsunamiWave);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);
@@ -2169,6 +2251,7 @@ function draw() {
   fireballThrows.forEach(drawFireballThrow);
   chargeTrails.forEach(drawChargeTrail);
   deployedTurrets.forEach(drawTurret);
+  if (nowShake < tornadoUntil) drawTornadoOverlay();
 
   // boost glow rond speler
   const nowDraw = performance.now();

@@ -35,6 +35,14 @@ let lastMeteorImpact = 0;
 let fallingMeteors = []; // Meteorenregen: zichtbare meteoren die uit de lucht vallen, blijven liggen en wegtrekken
 let earthquakeShakeUntil = 0; // Aardbeving: schermschudding + bots verstrooid
 let lastEarthquakeShake = 0;
+let tornadoUntil = 0; // Tornado: ronddwalende wervelwind die zuigt en wegslingert
+let tornadoX = 0;
+let tornadoY = 0;
+let tornadoVX = 0;
+let tornadoVY = 0;
+let tsunamiUntil = 0; // Tsunami: natte, gladde vloer + periodieke vloedgolven
+let lastTsunamiWave = 0;
+let tsunamiWaves = []; // actieve vloedgolven die over het scherm razen
 let activeDisasterType = null;
 let disasterEndAt = 0;
 let nextDisasterAt = 0;
@@ -43,7 +51,9 @@ const DISASTER_TYPES = [
   { id: 'sandstorm', name: '🌪 Zandstorm', desc: 'Een zandstorm trekt over het veld: 14 sec lang beperkt zicht (donkere waas rond je) en 30% minder bewegingssnelheid.' },
   { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaan er om de ~0,35 sec razendsnel echte bliksemschichten in op willekeurige, kort getelegrafeerde plekken op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
   { id: 'earthquake', name: '🌋 Aardbeving', desc: 'Een korte maar zeer hevige aardbeving: het scherm schudt keihard en alle bots worden abrupt en ver weg in willekeurige richtingen weggeslingerd.' },
-  { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,5 sec getelegrafeerde meteorieten uit de lucht op willekeurige plekken. Je ziet ze echt naar beneden vallen, ze blijven even gloeiend liggen en trekken daarna langzaam weer weg. Zowel bots als jijzelf lopen schade op als je erin staat.' }
+  { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,5 sec getelegrafeerde meteorieten uit de lucht op willekeurige plekken. Je ziet ze echt naar beneden vallen, ze blijven even gloeiend liggen en trekken daarna langzaam weer weg. Zowel bots als jijzelf lopen schade op als je erin staat.' },
+  { id: 'tornado', name: '🌀 Tornado', desc: '12 sec lang trekt een ronddwalende wervelwind grillig over het veld. Kom je in de buurt, dan word je naar binnen gezogen; kom je te dichtbij, dan word je met schade keihard weggeslingerd.' },
+  { id: 'tsunami', name: '🌊 Tsunami', desc: '15 sec lang overstroomt het veld: de vloer wordt nat en 20% glibberiger, en om de ~3 sec raast er een levensgrote vloedgolf over het scherm die iedereen op zijn pad beschadigt en wegslingert.' }
 ];
 let chargeTrails = []; // Juggernaut-transformatie: spoor van de beuk-charge
 let deployedTurrets = []; // Field Engineer-transformatie: neergezette geschutskoepels
