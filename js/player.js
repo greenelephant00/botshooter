@@ -268,6 +268,7 @@ function initGame() {
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
+  barrageTelegraphs = [];
   chargeTrails = [];
   deployedTurrets = [];
   bossAlive = false;
@@ -316,6 +317,7 @@ function setupNextLevel() {
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
+  barrageTelegraphs = [];
   chargeTrails = [];
   deployedTurrets = [];
   gameOver = false;

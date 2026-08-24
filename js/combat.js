@@ -960,29 +960,39 @@ function clusterBombardment(bot) {
 }
 
 function laserBarrage(dmg) {
-  // Laserbarrage-powerup: 15 lasers schieten vanaf de zijkanten het veld in, alleen bots worden geraakt
+  // Laserbarrage-powerup: 15 lasers, 5 per seconde, elk met een rood stippellijntje als waarschuwing vooraf
   const count = 15;
+  const interval = 200; // 5 per sec
+  const warnDelay = 500;
   for (let i = 0; i < count; i++) {
-    const edge = Math.floor(Math.random() * 4);
-    let x1, y1, x2, y2;
-    if (edge === 0) { x1 = Math.random() * canvas.width; y1 = 0; x2 = Math.random() * canvas.width; y2 = canvas.height; }
-    else if (edge === 1) { x1 = Math.random() * canvas.width; y1 = canvas.height; x2 = Math.random() * canvas.width; y2 = 0; }
-    else if (edge === 2) { x1 = 0; y1 = Math.random() * canvas.height; x2 = canvas.width; y2 = Math.random() * canvas.height; }
-    else { x1 = canvas.width; y1 = Math.random() * canvas.height; x2 = 0; y2 = Math.random() * canvas.height; }
+    setTimeout(() => {
+      if (gameOver || levelTransition) return;
+      const edge = Math.floor(Math.random() * 4);
+      let x1, y1, x2, y2;
+      if (edge === 0) { x1 = Math.random() * canvas.width; y1 = 0; x2 = Math.random() * canvas.width; y2 = canvas.height; }
+      else if (edge === 1) { x1 = Math.random() * canvas.width; y1 = canvas.height; x2 = Math.random() * canvas.width; y2 = 0; }
+      else if (edge === 2) { x1 = 0; y1 = Math.random() * canvas.height; x2 = canvas.width; y2 = Math.random() * canvas.height; }
+      else { x1 = canvas.width; y1 = Math.random() * canvas.height; x2 = 0; y2 = Math.random() * canvas.height; }
 
-    barrageLasers.push({ x1, y1, x2, y2, born: performance.now(), duration: 400 });
+      barrageTelegraphs.push({ x1, y1, x2, y2, warnUntil: performance.now() + warnDelay });
 
-    const dx = x2 - x1, dy = y2 - y1;
-    const len = Math.hypot(dx, dy) || 1;
-    bots.forEach(bot => {
-      if (bot.dead) return;
-      const px = bot.x - x1, py = bot.y - y1;
-      const proj = Math.max(0, Math.min(len, (px * dx + py * dy) / len));
-      const closestX = x1 + (dx / len) * proj;
-      const closestY = y1 + (dy / len) * proj;
-      const dist = Math.hypot(bot.x - closestX, bot.y - closestY);
-      if (dist < bot.r + 6) damageBotSimple(bot, dmg, '#ff2965');
-    });
+      setTimeout(() => {
+        if (gameOver || levelTransition) return;
+        barrageLasers.push({ x1, y1, x2, y2, born: performance.now(), duration: 250 });
+
+        const dx = x2 - x1, dy = y2 - y1;
+        const len = Math.hypot(dx, dy) || 1;
+        bots.forEach(bot => {
+          if (bot.dead) return;
+          const px = bot.x - x1, py = bot.y - y1;
+          const proj = Math.max(0, Math.min(len, (px * dx + py * dy) / len));
+          const closestX = x1 + (dx / len) * proj;
+          const closestY = y1 + (dy / len) * proj;
+          const dist = Math.hypot(bot.x - closestX, bot.y - closestY);
+          if (dist < bot.r + 6) damageBotSimple(bot, dmg, '#ff2965');
+        });
+      }, warnDelay);
+    }, i * interval);
   }
 }
 

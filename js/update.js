@@ -746,6 +746,7 @@ function update() {
   laserTelegraphs = laserTelegraphs.filter(lt => now0 < lt.warnUntil);
   activeLasers = activeLasers.filter(beam => now0 - beam.born < beam.duration);
   barrageLasers = barrageLasers.filter(beam => now0 - beam.born < beam.duration);
+  barrageTelegraphs = barrageTelegraphs.filter(lt => now0 < lt.warnUntil);
 
   // Momentum Blade: killstreak vervalt als je te lang niet raakt
   if (player.killStreak > 0 && now0 - player.killStreakLastKill > 2500) {

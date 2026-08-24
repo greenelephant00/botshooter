@@ -823,6 +823,20 @@ function drawActiveLaser(beam) {
   ctx.restore();
 }
 
+function drawBarrageTelegraph(lt) {
+  // Laserbarrage-powerup: rode stippellijn die exact toont waar de laser zo dood gaat
+  ctx.save();
+  ctx.globalAlpha = 0.55 + Math.sin(performance.now() / 60) * 0.2;
+  ctx.strokeStyle = '#ff3838';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8, 6]);
+  ctx.beginPath();
+  ctx.moveTo(lt.x1, lt.y1);
+  ctx.lineTo(lt.x2, lt.y2);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawBarrageLaser(beam) {
   // Laserbarrage-powerup: rechte straal die het hele veld doorkruist, alleen bots raakt
   const age = performance.now() - beam.born;
@@ -1885,6 +1899,7 @@ function draw() {
   explosions.forEach(drawExplosion);
   lightningBolts.forEach(drawLightningBolt);
   activeLasers.forEach(drawActiveLaser);
+  barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);
   iceGrenades.forEach(drawIceGrenade);
   vampBolts.forEach(drawVampBolt);
