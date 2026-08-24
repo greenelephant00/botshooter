@@ -462,40 +462,46 @@ function damageBotSimple(bot, dmg, color) {
       explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
     }
 
-    // Splitter: splitst bij dood in kleinere versies van zichzelf
+    // Splitter: splitst 3 sec na zijn dood in kleinere versies van zichzelf
     if (bot.splitsSelf && !bot.isSplitChild) {
       const count = bot.splitsSelf;
-      for (let i = 0; i < count; i++) {
-        const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
-        const dist = 20 + Math.random() * 15;
-        bots.push({
-          x: Math.max(9, Math.min(canvas.width - 9, bot.x + Math.cos(ang) * dist)),
-          y: Math.max(9, Math.min(canvas.height - 9, bot.y + Math.sin(ang) * dist)),
-          r: Math.max(9, Math.round(bot.r * 0.55)),
-          speed: bot.speed * 1.25,
-          hp: Math.max(2, Math.round(bot.maxHp * 0.35)),
-          maxHp: Math.max(2, Math.round(bot.maxHp * 0.35)),
-          lastShot: 0,
-          shootCooldown: bot.shootCooldown,
-          color: bot.color,
-          type: bot.type,
-          pattern: bot.pattern,
-          bulletSpeed: bot.bulletSpeed,
-          bulletDmg: bot.bulletDmg || 0,
-          swapOnHit: false,
-          meleeDamage: 0,
-          specialDmg: 0,
-          specialLastUsed: 0,
-          splits: false,
-          splitsSelf: 0,
-          isSplitChild: true,
-          invulnUntil: performance.now() + 2000,
-          spiralAngle: 0,
-          frozenUntil: 0,
-          slashUntil: 0
-        });
-      }
-      spawnParticles(bot.x, bot.y, bot.color);
+      const deathX = bot.x, deathY = bot.y, deathR = bot.r, deathSpeed = bot.speed, deathMaxHp = bot.maxHp,
+        deathCooldown = bot.shootCooldown, deathColor = bot.color, deathType = bot.type, deathPattern = bot.pattern,
+        deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
+      setTimeout(() => {
+        if (gameOver || levelTransition) return;
+        for (let i = 0; i < count; i++) {
+          const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
+          const dist = 20 + Math.random() * 15;
+          bots.push({
+            x: Math.max(9, Math.min(canvas.width - 9, deathX + Math.cos(ang) * dist)),
+            y: Math.max(9, Math.min(canvas.height - 9, deathY + Math.sin(ang) * dist)),
+            r: Math.max(9, Math.round(deathR * 0.55)),
+            speed: deathSpeed * 1.25,
+            hp: Math.max(2, Math.round(deathMaxHp * 0.35)),
+            maxHp: Math.max(2, Math.round(deathMaxHp * 0.35)),
+            lastShot: 0,
+            shootCooldown: deathCooldown,
+            color: deathColor,
+            type: deathType,
+            pattern: deathPattern,
+            bulletSpeed: deathBulletSpeed,
+            bulletDmg: deathBulletDmg,
+            swapOnHit: false,
+            meleeDamage: 0,
+            specialDmg: 0,
+            specialLastUsed: 0,
+            splits: false,
+            splitsSelf: 0,
+            isSplitChild: true,
+            invulnUntil: performance.now() + 2000,
+            spiralAngle: 0,
+            frozenUntil: 0,
+            slashUntil: 0
+          });
+        }
+        spawnParticles(deathX, deathY, deathColor);
+      }, 3000);
     }
   }
 }
