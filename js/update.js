@@ -352,6 +352,7 @@ function update() {
     if (b.owner !== 'player') return;
     bots.forEach(bot => {
       if (bot.dead) return;
+      if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // tijdelijk onsterfelijk (bv. net gespawnde Splitter-kinderen)
       if (b.hitBots && b.hitBots.includes(bot)) return; // al geraakt door deze doorborende kogel
       const d = Math.hypot(b.x - bot.x, b.y - bot.y);
       if (d < bot.r + b.r) {

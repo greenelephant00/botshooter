@@ -402,6 +402,10 @@ function applyDamageToPlayer(amount) {
 // effecten die buiten de normale kogel-botsing om schade doen (gif, zwart gat, enz.)
 function damageBotSimple(bot, dmg, color) {
   if (bot.dead) return;
+  if (bot.invulnUntil && performance.now() < bot.invulnUntil) {
+    spawnParticles(bot.x, bot.y, '#8ecbff');
+    return;
+  }
   bot.hp -= dmg;
   spawnParticles(bot.x, bot.y, color || bot.color);
   if (bot.hp <= 0 && !bot.immortal) {
@@ -485,6 +489,7 @@ function damageBotSimple(bot, dmg, color) {
           splits: false,
           splitsSelf: 0,
           isSplitChild: true,
+          invulnUntil: performance.now() + 2000,
           spiralAngle: 0,
           frozenUntil: 0,
           slashUntil: 0

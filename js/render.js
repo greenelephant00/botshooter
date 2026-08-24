@@ -1848,6 +1848,19 @@ function drawBot(bot) {
     }
   }
 
+  if (bot.invulnUntil && now < bot.invulnUntil) {
+    // lichtblauwe schild-ring: bot is tijdelijk onkwetsbaar (bv. net gespawnde Splitter-kinderen)
+    const pulse = 1 + Math.sin(now / 90) * 0.08;
+    ctx.save();
+    ctx.globalAlpha = 0.7;
+    ctx.strokeStyle = '#8ecbff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(bot.x, bot.y, (bot.r + 5) * pulse, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   if (isSwapper) {
     // draaiende paarse swirl-ring rond de swapper, waarschuwt voor het plek-wissel-effect
     const spin = (now / 300) % (Math.PI * 2);
