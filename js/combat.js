@@ -931,7 +931,7 @@ function curseBolt(bot) {
     lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
-      player.curseUntil = performance.now() + 4000;
+      player.curseUntil = performance.now() + 7000;
       spawnParticles(targetX, targetY, '#a020f0');
     }
   }, delay);

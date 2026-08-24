@@ -155,7 +155,7 @@ const BOT_PATTERN_INFO = {
   gravitywell: 'Geen kogels — opent periodiek een zwaartekrachtveld dat je naar het middelpunt trekt en na 1,5 sec een schadeburst laat afgaan.',
   freezetrap: 'Geen kogels — telegrafeert een grote ijsval op je positie die je bij impact 2,2 sec volledig verlamt.',
   snipebeam: 'Geen kogels — houdt veel afstand en vuurt na een lange telegraaf een instant, verwoestende precisiestraal.',
-  curse:     'Geen kogels — vervloekt je periodiek zodat je 4 sec lang 50% minder schade doet, geen directe schade.',
+  curse:     'Geen kogels — vervloekt je periodiek zodat je 7 sec lang 50% minder schade doet, geen directe schade.',
   clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.'
 };
 const BOSS_SPECIAL_DESC = {
