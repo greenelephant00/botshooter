@@ -116,6 +116,7 @@ const SPECIAL_BOT_TYPES = [
   { name: 'bombardier', minScore: 700, minLevel: 9,  r: 20, hp: 11, speed: [0.6, 1.0], cooldown: [3800, 4400], pattern: 'clusterbomb',   bulletSpeed: 0, specialDmg: 14, color: () => `hsl(${Math.floor(Math.random()*15)+35}, 75%, 42%)` }
 ];
 const SPECIAL_SPAWN_CHANCE = 0.13; // 13% kans zodra ze ontgrendeld zijn
+const MAX_SPECIAL_BOTS_ALIVE = 3; // max aantal special bots tegelijk in het speelveld
 
 // De bosses: verschijnen elk precies één keer per potje, enorm, traag en met een verwoestende special attack
 const BOSS_TYPES = [
@@ -137,7 +138,8 @@ function pickBotType() {
   const specialUnlocked = gameMode === 'levels'
     ? SPECIAL_BOT_TYPES.filter(t => currentLevel >= t.minLevel)
     : SPECIAL_BOT_TYPES.filter(t => score >= t.minScore);
-  if (specialUnlocked.length && Math.random() < SPECIAL_SPAWN_CHANCE) {
+  const specialAliveCount = bots.filter(b => !b.dead && SPECIAL_BOT_TYPES.some(t => t.name === b.type)).length;
+  if (specialUnlocked.length && specialAliveCount < MAX_SPECIAL_BOTS_ALIVE && Math.random() < SPECIAL_SPAWN_CHANCE) {
     return specialUnlocked[Math.floor(Math.random() * specialUnlocked.length)];
   }
   return unlocked[Math.floor(Math.random() * unlocked.length)];
