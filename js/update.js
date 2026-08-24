@@ -952,7 +952,7 @@ function update() {
       nextDisasterAt = now + 30000 + Math.random() * 25000;
     }
   }
-  if (activeDisasterType === 'lightningStorm' && now - lastLightningStrike > 1300) {
+  if (activeDisasterType === 'lightningStorm' && now - lastLightningStrike > 350) {
     lastLightningStrike = now;
     triggerLightningStrike();
   }

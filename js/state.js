@@ -40,7 +40,7 @@ let nextDisasterAt = 0;
 const DISASTER_TYPES = [
   { id: 'iceFloor', name: '🧊 IJsvloer', desc: 'De hele vloer van het speelveld bevriest en wordt spekglad. Je beweging reageert traag en je glijdt door in de richting waar je heen ging in plaats van direct te kunnen bijsturen.' },
   { id: 'sandstorm', name: '🌪 Zandstorm', desc: 'Een zandstorm trekt over het veld: 14 sec lang beperkt zicht (donkere waas rond je) en 30% minder bewegingssnelheid.' },
-  { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaat er om de ~1,3 sec een bliksem in op een willekeurige, kort getelegrafeerde plek op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
+  { id: 'lightningStorm', name: '⛈ Bliksemstorm', desc: '12 sec lang slaan er om de ~0,35 sec razendsnel echte bliksemschichten in op willekeurige, kort getelegrafeerde plekken op het veld. Zowel bots als jijzelf lopen schade op als je erin staat.' },
   { id: 'earthquake', name: '🌋 Aardbeving', desc: 'Een korte maar hevige aardbeving: het scherm schudt heftig en alle bots worden abrupt in willekeurige richtingen weggeslingerd.' },
   { id: 'meteorShower', name: '☄ Meteorenregen', desc: '10 sec lang vallen er om de ~0,9 sec getelegrafeerde meteorieten in op willekeurige plekken. Zowel bots als jijzelf lopen schade op als je erin staat.' }
 ];

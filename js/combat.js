@@ -1131,9 +1131,11 @@ function triggerLightningStrike() {
   telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
   setTimeout(() => {
     if (gameOver || levelTransition) return;
+    lightningBolts.push({ x1: x + (Math.random() - 0.5) * 30, y1: -40, x2: x, y2: y, born: performance.now() });
     explosions.push({ x, y, born: performance.now(), maxR: radius });
     spawnParticles(x, y, '#fff066');
     spawnParticles(x, y, '#c9a3ff');
+    spawnParticles(x, y, '#ffffff');
     const dd = Math.hypot(player.x - x, player.y - y);
     if (dd < radius + player.r) applyDamageToPlayer(10);
     bots.forEach(bot => {
