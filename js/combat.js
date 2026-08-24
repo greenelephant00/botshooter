@@ -959,6 +959,33 @@ function clusterBombardment(bot) {
   }, delay);
 }
 
+function laserBarrage(dmg) {
+  // Laserbarrage-powerup: 15 lasers schieten vanaf de zijkanten het veld in, alleen bots worden geraakt
+  const count = 15;
+  for (let i = 0; i < count; i++) {
+    const edge = Math.floor(Math.random() * 4);
+    let x1, y1, x2, y2;
+    if (edge === 0) { x1 = Math.random() * canvas.width; y1 = 0; x2 = Math.random() * canvas.width; y2 = canvas.height; }
+    else if (edge === 1) { x1 = Math.random() * canvas.width; y1 = canvas.height; x2 = Math.random() * canvas.width; y2 = 0; }
+    else if (edge === 2) { x1 = 0; y1 = Math.random() * canvas.height; x2 = canvas.width; y2 = Math.random() * canvas.height; }
+    else { x1 = canvas.width; y1 = Math.random() * canvas.height; x2 = 0; y2 = Math.random() * canvas.height; }
+
+    barrageLasers.push({ x1, y1, x2, y2, born: performance.now(), duration: 400 });
+
+    const dx = x2 - x1, dy = y2 - y1;
+    const len = Math.hypot(dx, dy) || 1;
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const px = bot.x - x1, py = bot.y - y1;
+      const proj = Math.max(0, Math.min(len, (px * dx + py * dy) / len));
+      const closestX = x1 + (dx / len) * proj;
+      const closestY = y1 + (dy / len) * proj;
+      const dist = Math.hypot(bot.x - closestX, bot.y - closestY);
+      if (dist < bot.r + 6) damageBotSimple(bot, dmg, '#ff2965');
+    });
+  }
+}
+
 function mortarStrike(bot) {
   // artillery: telegrafeert een inslagpunt, en beschadigt de speler pas na een korte waarschuwing
   const targetX = player.x;
@@ -1288,7 +1315,7 @@ function spawnParticles(x, y, color) {
 
 function spawnPowerup() {
   const margin = 60;
-  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos'];
+  const types = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'laserbarrage'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),

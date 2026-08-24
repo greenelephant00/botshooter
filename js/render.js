@@ -16,7 +16,8 @@ function drawPowerup(p) {
     stun: '#ffff00',
     aura: '#7fff00',
     overload: '#ff6347',
-    chaos: '#c026d3'
+    chaos: '#c026d3',
+    laserbarrage: '#ff2965'
   };
   const icons = {
     speed: '⚡',
@@ -34,7 +35,8 @@ function drawPowerup(p) {
     stun: '⊗',
     aura: '💫',
     overload: '⚡',
-    chaos: '🌀'
+    chaos: '🌀',
+    laserbarrage: '📡'
   };
   const col = colors[p.type];
   ctx.save();
@@ -817,6 +819,26 @@ function drawActiveLaser(beam) {
   ctx.beginPath();
   ctx.moveTo(beam.x1, beam.y1);
   ctx.lineTo(beam.x1 + dx, beam.y1 + dy);
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawBarrageLaser(beam) {
+  // Laserbarrage-powerup: rechte straal die het hele veld doorkruist, alleen bots raakt
+  const age = performance.now() - beam.born;
+  const alpha = Math.max(0, 1 - age / beam.duration);
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  const grad = ctx.createLinearGradient(beam.x1, beam.y1, beam.x2, beam.y2);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(0.15, '#ff2965');
+  grad.addColorStop(1, '#ff2965');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 10;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(beam.x1, beam.y1);
+  ctx.lineTo(beam.x2, beam.y2);
   ctx.stroke();
   ctx.restore();
 }
@@ -1863,6 +1885,7 @@ function draw() {
   explosions.forEach(drawExplosion);
   lightningBolts.forEach(drawLightningBolt);
   activeLasers.forEach(drawActiveLaser);
+  barrageLasers.forEach(drawBarrageLaser);
   iceGrenades.forEach(drawIceGrenade);
   vampBolts.forEach(drawVampBolt);
   stickyThrows.forEach(drawStickyThrow);

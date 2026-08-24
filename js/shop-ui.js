@@ -258,6 +258,7 @@ function startPractice(botName) {
   fireballThrows = [];
   fireZones = [];
   gasClouds = [];
+  barrageLasers = [];
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;
@@ -355,6 +356,7 @@ function startDodgePractice() {
   fireballThrows = [];
   fireZones = [];
   gasClouds = [];
+  barrageLasers = [];
   chargeTrails = [];
   deployedTurrets = [];
   score = 0;

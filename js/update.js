@@ -745,6 +745,7 @@ function update() {
   blackHoles = blackHoles.filter(bh => now0 - bh.born < bh.duration + 300);
   laserTelegraphs = laserTelegraphs.filter(lt => now0 < lt.warnUntil);
   activeLasers = activeLasers.filter(beam => now0 - beam.born < beam.duration);
+  barrageLasers = barrageLasers.filter(beam => now0 - beam.born < beam.duration);
 
   // Momentum Blade: killstreak vervalt als je te lang niet raakt
   if (player.killStreak > 0 && now0 - player.killStreakLastKill > 2500) {
@@ -846,6 +847,9 @@ function update() {
       } else if (p.type === 'chaos') {
         player.confuseUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#c026d3');
+      } else if (p.type === 'laserbarrage') {
+        laserBarrage(info.dmgs[lvl]);
+        spawnParticles(p.x, p.y, '#ff2965');
       }
     }
   });
