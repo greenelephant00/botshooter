@@ -1063,7 +1063,7 @@ function update() {
   }
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && currentWorld !== 2 && !bossAlive && !bossWarningActive) {
     const nextBoss = BOSS_TYPES.find(b => !bossesSpawned[b.name] &&
       (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
     if (nextBoss) triggerBossWarning(nextBoss);
@@ -1201,8 +1201,13 @@ function goToMenu() {
   const alertEl = document.getElementById('bossAlert');
   if (alertEl) alertEl.style.display = 'none';
   document.getElementById('msg').style.display = 'none';
-  document.getElementById('startCoins').textContent = coins;
-  document.getElementById('startScreen').style.display = 'flex';
+  if (currentWorld === 2) {
+    document.getElementById('world2Coins').textContent = coins;
+    document.getElementById('world2Screen').style.display = 'flex';
+  } else {
+    document.getElementById('startCoins').textContent = coins;
+    document.getElementById('startScreen').style.display = 'flex';
+  }
 }
 window.goToMenu = goToMenu;
 

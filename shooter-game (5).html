@@ -67,10 +67,36 @@
     <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
     <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
   </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" id="world2Btn" onclick="handleWorld2Click()" style="border-color:#ff8800; color:#ff8800;">🔥❄️🪨 Wereld 2</button>
+  </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
   </div>
+</div>
+<div id="world2Screen">
+  <h1>🔥❄️🪨 Wereld 2: Elementen</h1>
+  <div class="coinDisplay">🪙 <span id="world2Coins">0</span></div>
+  <p>Een compleet nieuwe wereld — vecht tegen elementale bots</p>
+  <div class="modeBtnRow">
+    <button class="modeBtn endless" onclick="startWorld2Game()">▶ Start
+      <small>Vuur-, ijs- en aardbots · endless overleven</small>
+    </button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openWorld2Shop()">🛒 Shop</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="goToWorld1()" style="border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
+  </div>
+</div>
+<div id="world2ShopScreen">
+  <h1>🛒 Wereld 2 Shop</h1>
+  <div class="coinDisplay">🪙 <span id="world2ShopCoins">0</span></div>
+  <button class="topBackBtn" onclick="closeWorld2Shop()">← Menu</button>
+  <p style="margin-top:70px; color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>
+  <button class="backBtn" onclick="closeWorld2Shop()">← Terug</button>
 </div>
 <div id="shopScreen">
   <h1>🛒 Shop</h1>

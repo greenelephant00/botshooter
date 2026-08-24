@@ -141,7 +141,17 @@ let bossAlive = false;
 let bossWarningActive = false;
 let bossesSpawned = {}; // per boss-naam: true zodra hij deze sessie al is verschenen
 
+// Wereld 2 (Elementen): nog maar 3 simpele bots, los van het level/score-systeem van wereld 1
+const WORLD2_BOT_TYPES = [
+  { name: 'fireling',  r: 16, hp: 4, speed: [1.4, 2.2], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#ff5a1f' },
+  { name: 'frostling', r: 16, hp: 4, speed: [1.2, 2.0], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#7fd9ff' },
+  { name: 'earthling', r: 18, hp: 6, speed: [0.9, 1.5], cooldown: [1300, 2100], pattern: 'single', bulletSpeed: 5,   color: () => '#8a6a3a' }
+];
+
 function pickBotType() {
+  if (currentWorld === 2) {
+    return WORLD2_BOT_TYPES[Math.floor(Math.random() * WORLD2_BOT_TYPES.length)];
+  }
   let unlocked = gameMode === 'levels'
     ? BOT_TYPES.filter(t => currentLevel >= t.minLevel)
     : BOT_TYPES.filter(t => score >= t.minScore);
@@ -399,6 +409,27 @@ function selectMode(mode) {
   }
 }
 window.selectMode = selectMode;
+
+function startWorld2Game() {
+  if (!world2Unlocked) return;
+  currentWorld = 2;
+  gameMode = 'endless';
+  currentLevel = 1;
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  exitSkinPractice();
+  document.getElementById('world2Screen').style.display = 'none';
+  initGame();
+  startMusic();
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+}
+window.startWorld2Game = startWorld2Game;
 
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;

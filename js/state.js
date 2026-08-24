@@ -225,6 +225,11 @@ const SKINS = [
   { id: 'comboneoncyan', name: 'Neon Cyaan Combo', price: 900,        desc: 'Een gedimde kern die een felle cyaan neon-veelhoek krijgt, met steeds meer zijden naarmate je killstreak stijgt.', killstreak: true },
   { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 900,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true }
 ];
+
+// ---- Wereld 2: Elementen ----
+let world2Unlocked = localStorage.getItem('botShooterWorld2Unlocked') === 'true';
+let currentWorld = 1; // 1 = normale wereld, 2 = Elementen-wereld — reset altijd naar 1 bij herladen
+const WORLD2_PRICE = 15000;
 let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';
 // Gedeeld door alle transformaties: sterf je in een transformatie, dan word je één keer

@@ -15,7 +15,7 @@ const ACCOUNT_KEYS = [
   'botShooterCoinGrant_3500', 'botShooterCoinGrant_500', 'botShooterCoinGrant_600',
   'botShooterCoinGrant_1000', 'botShooterCoinGrant_1000b', 'botShooterCoinGrant_2500',
   'botShooterCoinGrant_200', 'botShooterCoinGrant_10000', 'botShooterCoinGrant_2000_ben',
-  'botShooterCoinGrant_2000b'
+  'botShooterCoinGrant_2000b', 'botShooterWorld2Unlocked'
 ];
 
 let currentAccount = null;
@@ -35,14 +35,14 @@ function saveAccounts(accounts) {
   const snapshot = {};
   ACCOUNT_KEYS.forEach(k => { snapshot[k] = localStorage.getItem(k); });
   localStorage.setItem('botShooterAccount_ben', JSON.stringify(snapshot));
-  accounts['ben'] = 'boenenmeloen';
+  accounts['ben'] = '123';
   saveAccounts(accounts);
 })();
 
 // Eenmalige wachtwoord-migratie voor account ben
 (function migrateBenPassword() {
   const accounts = loadAccounts();
-  if (accounts['ben'] === 'boenenmeloen') {
+  if (accounts['ben'] === '123') {
     accounts['ben'] = '123';
     saveAccounts(accounts);
   }

@@ -243,7 +243,7 @@
     min-height: 18px;
     margin: 4px 0 10px;
   }
-  #startScreen {
+  #startScreen, #world2Screen {
     position: absolute;
     inset: 0;
     background: rgba(10, 10, 20, 0.92);
@@ -255,12 +255,13 @@
     text-align: center;
     z-index: 10;
   }
-  #startScreen h1 {
+  #world2Screen { display: none; }
+  #startScreen h1, #world2Screen h1 {
     font-size: 36px;
     margin-bottom: 4px;
     text-shadow: 0 3px 8px rgba(0,0,0,0.7);
   }
-  #startScreen p {
+  #startScreen p, #world2Screen p {
     color: #999;
     margin-bottom: 28px;
   }
@@ -359,7 +360,7 @@
     font-weight: bold;
     margin-bottom: 6px;
   }
-  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen {
+  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #world2ShopScreen {
     position: absolute;
     inset: 0;
     background: rgba(10, 10, 20, 0.96);
@@ -372,7 +373,7 @@
     overflow-y: auto;
     padding: 30px 0 50px;
   }
-  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1 {
+  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1, #world2ShopScreen h1 {
     margin: 0 0 4px;
     font-size: 30px;
   }

@@ -40,6 +40,63 @@ function openShop() {
 }
 window.openShop = openShop;
 
+function updateWorld2Button() {
+  const btn = document.getElementById('world2Btn');
+  if (!btn) return;
+  btn.textContent = world2Unlocked ? '🔥❄️🪨 Wereld 2: Elementen' : `🔥❄️🪨 Wereld 2: Elementen · Koop 🪙${WORLD2_PRICE}`;
+}
+window.updateWorld2Button = updateWorld2Button;
+
+function handleWorld2Click() {
+  if (world2Unlocked) {
+    openWorld2();
+  } else {
+    buyWorld2();
+  }
+}
+window.handleWorld2Click = handleWorld2Click;
+
+function buyWorld2() {
+  if (world2Unlocked || coins < WORLD2_PRICE) return;
+  coins -= WORLD2_PRICE;
+  world2Unlocked = true;
+  localStorage.setItem('botShooterWorld2Unlocked', 'true');
+  saveShopState();
+  document.getElementById('startCoins').textContent = coins;
+  updateWorld2Button();
+  openWorld2();
+}
+window.buyWorld2 = buyWorld2;
+
+function openWorld2() {
+  if (!world2Unlocked) return;
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('world2Coins').textContent = coins;
+  document.getElementById('world2Screen').style.display = 'flex';
+}
+window.openWorld2 = openWorld2;
+
+function goToWorld1() {
+  currentWorld = 1;
+  document.getElementById('world2Screen').style.display = 'none';
+  document.getElementById('startCoins').textContent = coins;
+  document.getElementById('startScreen').style.display = 'flex';
+}
+window.goToWorld1 = goToWorld1;
+
+function openWorld2Shop() {
+  document.getElementById('world2Screen').style.display = 'none';
+  document.getElementById('world2ShopCoins').textContent = coins;
+  document.getElementById('world2ShopScreen').style.display = 'flex';
+}
+window.openWorld2Shop = openWorld2Shop;
+
+function closeWorld2Shop() {
+  document.getElementById('world2ShopScreen').style.display = 'none';
+  document.getElementById('world2Screen').style.display = 'flex';
+}
+window.closeWorld2Shop = closeWorld2Shop;
+
 function scrollToShopSection(id) {
   const el = document.getElementById(id);
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
