@@ -106,7 +106,7 @@ const SPECIAL_BOT_TYPES = [
   { name: 'bulwark',    minScore: 700, minLevel: 9,  r: 23, hp: 15, speed: [1.3, 1.8], cooldown: [1800, 2400], pattern: 'shieldbash',    bulletSpeed: 0, specialDmg: 22, color: () => `hsl(${Math.floor(Math.random()*15)+215}, 55%, 40%)` },
   { name: 'broodmother', minScore: 700, minLevel: 9, r: 21, hp: 13, speed: [0.7, 1.1], cooldown: [4500, 5500], pattern: 'summon',        bulletSpeed: 0, specialDmg: 0,  color: () => `hsl(${Math.floor(Math.random()*15)+265}, 65%, 40%)` }
 ];
-const SPECIAL_SPAWN_CHANCE = 0.08; // 8% kans zodra ze ontgrendeld zijn
+const SPECIAL_SPAWN_CHANCE = 0.3; // 30% kans zodra ze ontgrendeld zijn
 
 // De bosses: verschijnen elk precies één keer per potje, enorm, traag en met een verwoestende special attack
 const BOSS_TYPES = [
