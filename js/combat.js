@@ -961,8 +961,8 @@ function clusterBombardment(bot) {
 
 function laserBarrage(dmg) {
   // Laserbarrage-powerup: 15 lasers, 5 per seconde, elk met een rood stippellijntje als waarschuwing vooraf
-  const count = 15;
-  const interval = 200; // 5 per sec
+  const count = 25;
+  const interval = 125; // 8 per sec
   const warnDelay = 500;
   for (let i = 0; i < count; i++) {
     setTimeout(() => {
