@@ -405,6 +405,65 @@ function drawStoneskinEffect() {
   ctx.restore();
 }
 
+function drawLavaPool(pool) {
+  // Lavagolem (Wereld 2): een klodder lava valt zichtbaar uit de lucht en blijft daarna gloeiend liggen
+  const age = performance.now() - pool.born;
+  ctx.save();
+  if (age < pool.fallDelay) {
+    const t = age / pool.fallDelay;
+    const startX = pool.x - 160;
+    const startY = pool.y - 380;
+    const curX = startX + (pool.x - startX) * t;
+    const curY = startY + (pool.y - startY) * t;
+    const tailX = startX + (pool.x - startX) * Math.max(0, t - 0.2);
+    const tailY = startY + (pool.y - startY) * Math.max(0, t - 0.2);
+    const grad = ctx.createLinearGradient(tailX, tailY, curX, curY);
+    grad.addColorStop(0, 'rgba(255,140,0,0)');
+    grad.addColorStop(1, 'rgba(255,180,40,0.9)');
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 9;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(curX, curY);
+    ctx.stroke();
+    ctx.fillStyle = '#fff3c4';
+    ctx.beginPath();
+    ctx.arc(curX, curY, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,100,0,0.6)';
+    ctx.beginPath();
+    ctx.arc(curX, curY, 17, 0, Math.PI * 2);
+    ctx.fill();
+  } else {
+    const poolAge = age - pool.fallDelay;
+    let alpha = 1;
+    if (poolAge > pool.lingerDuration) {
+      alpha = 1 - Math.min(1, (poolAge - pool.lingerDuration) / pool.fadeDuration);
+    }
+    ctx.globalAlpha = alpha;
+    const pulse = 0.85 + Math.sin(performance.now() / 200) * 0.15;
+    const grad = ctx.createRadialGradient(pool.x, pool.y, 0, pool.x, pool.y, pool.radius);
+    grad.addColorStop(0, `rgba(255, 220, 100, ${pulse})`);
+    grad.addColorStop(0.5, '#ff6a1f');
+    grad.addColorStop(1, '#3a1f12');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(pool.x, pool.y, pool.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(30,15,8,0.5)';
+    const seed = Math.floor(performance.now() / 500);
+    for (let i = 0; i < 5; i++) {
+      const a = (i / 5) * Math.PI * 2 + seed * 0.3;
+      const rr = pool.radius * (0.3 + (i % 3) * 0.2);
+      ctx.beginPath();
+      ctx.arc(pool.x + Math.cos(a) * rr, pool.y + Math.sin(a) * rr, pool.radius * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.restore();
+}
+
 function drawTreeGrab(t) {
   // Wortelgreep-powerup (Wereld 2): een boom breekt uit de grond, wikkelt zijn takken om de bot en zinkt weer weg
   const age = performance.now() - t.born;
@@ -2927,6 +2986,10 @@ function draw() {
     const shakeT = (earthquakeShakeUntil - nowShake) / 3500;
     const mag = 26 * shakeT;
     ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
+  } else if (nowShake < staticShockUntil) {
+    // Donderknaap (Wereld 2): korte, scherpe schok-jolt bij een treffer
+    const mag = 6;
+    ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
   }
 
   // grid background
@@ -2942,6 +3005,7 @@ function draw() {
 
   if (nowShake < iceFloorUntil) drawIceFloorOverlay();
   if (nowShake < tsunamiUntil) drawTsunamiFloorOverlay();
+  lavaPools.forEach(drawLavaPool);
 
   // bullets
   bullets.forEach(b => {
@@ -3124,6 +3188,24 @@ function draw() {
   }
   if (nowDraw < player.stoneskinUntil) {
     drawStoneskinEffect();
+  }
+  if (nowDraw < player.burnUntil) {
+    const flick = 0.6 + Math.sin(performance.now() / 70) * 0.3;
+    ctx.save();
+    ctx.globalAlpha = flick;
+    ctx.strokeStyle = '#ff5a1f';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(player.x, player.y, player.r + 6, 0, Math.PI * 2);
+    ctx.stroke();
+    for (let i = 0; i < 4; i++) {
+      const a = (Math.PI * 2 / 4) * i + performance.now() / 150;
+      ctx.fillStyle = '#ffb703';
+      ctx.beginPath();
+      ctx.arc(player.x + Math.cos(a) * (player.r + 4), player.y + Math.sin(a) * (player.r + 4) - 6, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.restore();
   }
 
   drawPlayer();

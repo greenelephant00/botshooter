@@ -686,6 +686,30 @@ function update() {
           applyDamageToPlayer(dmg);
           spawnParticles(b.x, b.y, '#ff5c5c');
 
+          // Elementale Wereld 2-bots: elk een eigen extra effect bovenop de schade
+          const srcType = b.sourceBot && b.sourceBot.type;
+          if (srcType === 'windwicht') {
+            // Windloper: blaast je een stuk naar achteren
+            const kAng = Math.atan2(player.y - b.sourceBot.y, player.x - b.sourceBot.x);
+            player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(kAng) * 70));
+            player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(kAng) * 70));
+            spawnParticles(player.x, player.y, '#eaffff');
+          } else if (srcType === 'bliksemwicht') {
+            // Donderknaap: korte schok-jolt van het scherm en een lichtflits
+            staticShockUntil = now0 + 150;
+            spawnParticles(player.x, player.y, '#fff066');
+            spawnParticles(player.x, player.y, '#f5e642');
+          } else if (srcType === 'stormwicht') {
+            // Onweersgeest: een echte bliksemboog van de bot naar jou
+            lightningBolts.push({ x1: b.sourceBot.x, y1: b.sourceBot.y, x2: player.x, y2: player.y, born: now0 });
+            spawnParticles(player.x, player.y, '#8ecbff');
+          } else if (srcType === 'kristalwicht') {
+            // Kristalreus: een korte bevriezende vertraging
+            player.slowUntil = Math.max(player.slowUntil, now0 + 800);
+            spawnParticles(player.x, player.y, '#9ef7ff');
+            spawnParticles(player.x, player.y, '#ffffff');
+          }
+
           // Reflection: kaats schade terug
           if (armor.reflection > 0) {
             const botsAtLocation = bots.filter(bot => !bot.dead && Math.hypot(bot.x - b.x, bot.y - b.y) < 60);
@@ -829,6 +853,28 @@ function update() {
   if (player.comboStreak > 0 && now0 - player.comboLastKill > 3000) {
     player.comboStreak = 0;
   }
+
+  // In brand (Lavagolem): 3 sec lang elke sec 4 schade
+  if (now0 < player.burnUntil) {
+    if (!player.burnLastTick || now0 - player.burnLastTick > 1000) {
+      player.burnLastTick = now0;
+      applyDamageToPlayer(4);
+      spawnParticles(player.x, player.y, '#ff5a1f');
+    }
+  }
+
+  // Lavagolem: lopen door de nog liggende lavaplas zet je opnieuw in brand
+  lavaPools.forEach(pool => {
+    const age = now0 - pool.born;
+    if (age < pool.fallDelay || age >= pool.fallDelay + pool.lingerDuration) return;
+    const dd = Math.hypot(pool.x - player.x, pool.y - player.y);
+    if (dd < pool.radius + player.r && (!pool.lastIgniteTick || now0 - pool.lastIgniteTick > 600)) {
+      pool.lastIgniteTick = now0;
+      player.burnUntil = Math.max(player.burnUntil, now0 + 3000);
+      spawnParticles(player.x, player.y, '#ff5a1f');
+    }
+  });
+  lavaPools = lavaPools.filter(pool => now0 - pool.born < pool.totalLife);
 
   // Aura: periodic damage rond speler
   if (now0 < player.auraUntil) {

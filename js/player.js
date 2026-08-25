@@ -41,6 +41,8 @@ const player = {
   confuseUntil: 0,
   stoneskinUntil: 0,
   stoneskinReduction: 0,
+  burnUntil: 0,
+  burnLastTick: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -82,6 +84,8 @@ function resetPlayer() {
   player.confuseUntil = 0;
   player.stoneskinUntil = 0;
   player.stoneskinReduction = 0;
+  player.burnUntil = 0;
+  player.burnLastTick = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -150,11 +154,11 @@ const WORLD2_BOT_TYPES = [
   { name: 'fireling',     r: 16, hp: 4, speed: [1.4, 2.2], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#ff5a1f' },
   { name: 'frostling',    r: 16, hp: 4, speed: [1.2, 2.0], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#7fd9ff' },
   { name: 'earthling',    r: 18, hp: 6, speed: [0.9, 1.5], cooldown: [1300, 2100], pattern: 'single', bulletSpeed: 5,   color: () => '#8a6a3a' },
-  { name: 'bliksemwicht', r: 15, hp: 5, speed: [1.6, 2.4], cooldown: [900, 1500],  pattern: 'fast',   bulletSpeed: 7.5, color: () => '#f5e642' },
-  { name: 'windwicht',    r: 15, hp: 4, speed: [2.1, 3.1], cooldown: [1300, 2000], pattern: 'triple', bulletSpeed: 5,   color: () => '#cfe8ee' },
-  { name: 'magmawicht',   r: 19, hp: 8, speed: [0.7, 1.1], cooldown: [2600, 3400], pattern: 'mortar', bulletSpeed: 0,   meleeDamage: 20, color: () => '#3a1f12' },
-  { name: 'stormwicht',   r: 16, hp: 6, speed: [1.1, 1.6], cooldown: [2400, 3000], pattern: 'burst',  bulletSpeed: 6.5, color: () => '#8ecbff' },
-  { name: 'kristalwicht', r: 17, hp: 7, speed: [0.8, 1.3], cooldown: [200, 200],   pattern: 'spiral', bulletSpeed: 4.5, color: () => '#9ef7ff' }
+  { name: 'bliksemwicht', r: 15, hp: 5, speed: [1.6, 2.4], cooldown: [900, 1500],  pattern: 'fast',   bulletSpeed: 7.5, bulletDmg: 20, color: () => '#f5e642' },
+  { name: 'windwicht',    r: 15, hp: 4, speed: [2.1, 3.1], cooldown: [1300, 2000], pattern: 'triple', bulletSpeed: 5,   bulletDmg: 11, color: () => '#cfe8ee' },
+  { name: 'magmawicht',   r: 19, hp: 8, speed: [0.7, 1.1], cooldown: [2600, 3400], pattern: 'mortar', bulletSpeed: 0,   meleeDamage: 28, color: () => '#3a1f12' },
+  { name: 'stormwicht',   r: 16, hp: 6, speed: [1.1, 1.6], cooldown: [2400, 3000], pattern: 'burst',  bulletSpeed: 6.5, bulletDmg: 11, color: () => '#8ecbff' },
+  { name: 'kristalwicht', r: 17, hp: 7, speed: [0.8, 1.3], cooldown: [200, 200],   pattern: 'spiral', bulletSpeed: 4.5, bulletDmg: 11, color: () => '#9ef7ff' }
 ];
 // Periodieke ambient-deeltjes per Wereld 2-bot, zie de sprankje-check in update()
 const WORLD2_AMBIENT_FX = {
@@ -307,6 +311,8 @@ function initGame() {
   fallingMeteors = [];
   treeGrabs = [];
   shockRings = [];
+  lavaPools = [];
+  staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -371,6 +377,8 @@ function setupNextLevel() {
   fallingMeteors = [];
   treeGrabs = [];
   shockRings = [];
+  lavaPools = [];
+  staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -462,6 +470,7 @@ function updateHUD() {
   if (now < player.auraUntil) active.push('💫 Aura');
   if (now < player.overloadUntil) active.push('⚡ Overload');
   if (now < player.stoneskinUntil) active.push('🪨 Aardhuid');
+  if (now < player.burnUntil) active.push('🔥 In brand');
   if (now < player.slowUntil) active.push('🐌 Vertraagd');
   if (now < player.rootedUntil) active.push('🥶 Bevroren');
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');

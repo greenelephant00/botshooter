@@ -348,6 +348,8 @@ function startPractice(botName) {
   fallingMeteors = [];
   treeGrabs = [];
   shockRings = [];
+  lavaPools = [];
+  staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];
@@ -465,6 +467,8 @@ function startDodgePractice() {
   fallingMeteors = [];
   treeGrabs = [];
   shockRings = [];
+  lavaPools = [];
+  staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
   activeLasers = [];

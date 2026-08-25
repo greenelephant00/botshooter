@@ -1209,6 +1209,11 @@ function mortarStrike(bot) {
   const radius = 55;
   const delay = 700;
   telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
+  if (bot.type === 'magmawicht') {
+    // Lavagolem: er valt echt lava naar beneden, die daarna nog even als brandende plas blijft liggen
+    const born = performance.now();
+    lavaPools.push({ x: targetX, y: targetY, born, fallDelay: delay, lingerDuration: 3500, fadeDuration: 900, totalLife: delay + 3500 + 900, radius, lastIgniteTick: 0 });
+  }
   setTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x: targetX, y: targetY, born: performance.now(), maxR: radius });
@@ -1223,6 +1228,11 @@ function mortarStrike(bot) {
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
       applyDamageToPlayer(bot.meleeDamage || 40);
+      if (bot.type === 'magmawicht') {
+        // door de lava geraakt: 3 sec lang in brand, elke sec 4 schade
+        player.burnUntil = performance.now() + 3000;
+        spawnParticles(player.x, player.y, '#ff5a1f');
+      }
     }
   }, delay);
 }
