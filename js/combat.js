@@ -1600,6 +1600,13 @@ function rootGrabAttack(count) {
   });
 }
 
+function dropLavaTrail(bot) {
+  // Vulkaanheer (Wereld 2): laat continu een spoor van kleine lavaplasjes achter zich terwijl hij loopt
+  const born = performance.now();
+  const radius = 24;
+  lavaPools.push({ x: bot.x, y: bot.y, born, fallDelay: 0, lingerDuration: 2000, fadeDuration: 500, totalLife: 2500, radius, lastIgniteTick: 0 });
+}
+
 function lavaRainAttack(bot) {
   // Vulkaanheer (Wereld 2, special): laat 3 lavaklodders na elkaar rond de speler neerkomen
   const count = 3;

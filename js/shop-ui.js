@@ -235,7 +235,7 @@ const BOT_PATTERN_INFO = {
   snipebeam: 'Geen kogels — houdt veel afstand en vuurt na een lange telegraaf een instant, verwoestende precisiestraal.',
   curse:     'Geen kogels — vervloekt je zonder waarschuwing vooraf zodat je 7 sec lang 50% minder schade doet, geen directe schade.',
   clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.',
-  lavarain: 'Geen kogels — houdt afstand en laat 3 klodders lava na elkaar vlak bij je neerkomen die blijven liggen en je in brand zetten.',
+  lavarain: 'Geen kogels — laat constant een spoor van lava achter zich terwijl hij loopt, en laat af en toe ook nog 3 klodders lava vlak bij je neerkomen. De lava blijft liggen en zet je in brand.',
   frostnova: 'Geen kogels — laat een uitdijende ijsring om zich heen ontstaan die je bevriest zodra hij je bereikt.',
   chainbolt: 'Geen kogels — blijft ver weg en zapt je op afstand met felle bliksemschichten.',
   rootsnare: 'Geen kogels — laat een boom uit de grond komen op jouw positie die je vastgrijpt en vasthoudt.'

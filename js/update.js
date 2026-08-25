@@ -259,10 +259,14 @@ function update() {
     }
 
     if (bot.pattern === 'lavarain') {
-      // vulkaanheer (Wereld 2, special): houdt afstand en laat lava rond de speler neerkomen
+      // vulkaanheer (Wereld 2, special): houdt afstand, laat continu een spoor van lava achter zich en laat af en toe lava rond de speler neerkomen
       if (bdist > 220) {
         bot.x += (bdx/bdist) * bot.speed * speedMult;
         bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (!bot.lastLavaTrail || now - bot.lastLavaTrail > 300) {
+        bot.lastLavaTrail = now;
+        dropLavaTrail(bot);
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
         bot.lastShot = now;
