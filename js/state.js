@@ -104,6 +104,7 @@ let activeLasers = [];
 let score = 0;
 let highScore = Number(localStorage.getItem('botShooterHighScore')) || 0;
 let highScoreHardcore = Number(localStorage.getItem('botShooterHighScoreHardcore')) || 0;
+let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) || 0;
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 let gameOver = false;

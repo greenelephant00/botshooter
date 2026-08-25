@@ -1408,10 +1408,13 @@ function endGame(won) {
     msgBtn.onclick = () => { equippedSkin = previousEquippedSkin; startSkinPractice(skinPracticeId); };
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
     const isHardcore = gameMode === 'hardcore';
-    let currentHigh = isHardcore ? highScoreHardcore : highScore;
+    let currentHigh = currentWorld === 2 ? highScoreWorld2 : (isHardcore ? highScoreHardcore : highScore);
     if (score > currentHigh) {
       currentHigh = score;
-      if (isHardcore) {
+      if (currentWorld === 2) {
+        highScoreWorld2 = score;
+        localStorage.setItem('botShooterHighScoreWorld2', highScoreWorld2);
+      } else if (isHardcore) {
         highScoreHardcore = score;
         localStorage.setItem('botShooterHighScoreHardcore', highScoreHardcore);
       } else {

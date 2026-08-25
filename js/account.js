@@ -11,7 +11,7 @@ const ACCOUNT_KEYS = [
   'botShooterLvlSharpshooter', 'botShooterLvlFlyingStart', 'botShooterPowerupLevels',
   'botShooterOwnedSkins', 'botShooterEquippedSkin',
   'botShooterOwnedTransforms', 'botShooterEquippedTransform',
-  'botShooterHighScore', 'botShooterHighScoreHardcore', 'botShooterHighLevel',
+  'botShooterHighScore', 'botShooterHighScoreHardcore', 'botShooterHighScoreWorld2', 'botShooterHighLevel',
   'botShooterCoinGrant_3500', 'botShooterCoinGrant_500', 'botShooterCoinGrant_600',
   'botShooterCoinGrant_1000', 'botShooterCoinGrant_1000b', 'botShooterCoinGrant_2500',
   'botShooterCoinGrant_200', 'botShooterCoinGrant_10000', 'botShooterCoinGrant_2000_ben',
@@ -63,6 +63,7 @@ function defaultAccountSnapshot() {
   snap['botShooterEquippedTransform'] = 'none';
   snap['botShooterHighScore'] = '0';
   snap['botShooterHighScoreHardcore'] = '0';
+  snap['botShooterHighScoreWorld2'] = '0';
   snap['botShooterHighLevel'] = '1';
   snap['botShooterPowerupLevels'] = '{}';
   // munten-bonussen tellen als al opgehaald, zodat nieuwe accounts echt bij 0 beginnen
