@@ -67,11 +67,14 @@ const player = {
 function resetPlayer() {
   player.x = canvas.width / 2;
   player.y = canvas.height / 2;
+  const isWorld2Transform = WORLD2_TRANSFORM_STATS.hasOwnProperty(equippedTransform);
   const wantedTransform = transformPracticeActive
     ? transformPracticeId
-    : (equippedTransform !== 'none' && !weaponPracticeActive && currentWorld !== 2 ? equippedTransform : 'none');
+    : (equippedTransform !== 'none' && !weaponPracticeActive &&
+       ((currentWorld === 2 && isWorld2Transform) || (currentWorld !== 2 && !isWorld2Transform))
+       ? equippedTransform : 'none');
   player.activeTransform = gameMode !== 'practice' ? wantedTransform : 'none';
-  const tStats = TRANSFORM_STATS[player.activeTransform] || TRANSFORM_STATS.none;
+  const tStats = TRANSFORM_STATS[player.activeTransform] || WORLD2_TRANSFORM_STATS[player.activeTransform] || TRANSFORM_STATS.none;
   const armorSpeed = 1 + getArmorStats().speedBonus;
   player.baseSpeed = 4 * (1 + lvlSprint * SPRINT_PER_LEVEL) * tStats.speedMult * armorSpeed;
   player.r = PLAYER_BASE_R * tStats.rMult;
@@ -394,6 +397,7 @@ function initGame() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
+  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -465,6 +469,7 @@ function setupNextLevel() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
+  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -577,6 +582,16 @@ function updateHUD() {
     active.push('🐗 Juggernaut — alleen beuk-charge');
   } else if (player.activeTransform === 'engineer') {
     active.push(`🔧 Field Engineer — koepels ${deployedTurrets.length}/${ENGINEER_MAX_TURRETS}`);
+  } else if (player.activeTransform === 'fireform') {
+    active.push('🔥 Vuurgestalte — alleen vlammenboog');
+  } else if (player.activeTransform === 'iceform') {
+    active.push('❄ IJsgestalte — alleen vriesstraal');
+  } else if (player.activeTransform === 'earthform') {
+    active.push('🪨 Aardgestalte — alleen rotsworp');
+  } else if (player.activeTransform === 'windform') {
+    active.push('💨 Windgestalte — alleen windsnede');
+  } else if (player.activeTransform === 'waterform') {
+    active.push('🌊 Watergestalte — alleen vloedgolf');
   } else {
     if (getWeapon().effect === 'killstreak' && player.killStreak > 0) active.push(`🗡️ Streak x${player.killStreak}`);
     if (['combofire', 'combofrost', 'combovolt', 'comboneonpink', 'comboneoncyan', 'comboneonlime'].includes(equippedSkin) && player.comboStreak > 0) active.push(`🔥 Combo x${player.comboStreak}`);

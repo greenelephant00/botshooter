@@ -13,6 +13,11 @@ function shoot() {
   if (player.activeTransform === 'stormcaller') { stormCallerBolt(); return; }
   if (player.activeTransform === 'juggernaut') { juggernautCharge(); return; }
   if (player.activeTransform === 'engineer') { engineerDeployTurret(); return; }
+  if (player.activeTransform === 'fireform') { fireFormSlash(); return; }
+  if (player.activeTransform === 'iceform') { iceFormBeam(); return; }
+  if (player.activeTransform === 'earthform') { earthFormThrow(); return; }
+  if (player.activeTransform === 'windform') { windFormDash(); return; }
+  if (player.activeTransform === 'waterform') { waterFormWave(); return; }
   const now = performance.now();
   const weapon = getWeapon();
   const fireRateMult = (now < player.fireBoostUntil || now < player.overloadUntil) ? 0.4 : 1;
@@ -396,6 +401,158 @@ function engineerDeployTurret() {
   if (deployedTurrets.length >= ENGINEER_MAX_TURRETS) deployedTurrets.shift(); // oudste koepel maakt plaats voor de nieuwe
   deployedTurrets.push({ x: tx, y: ty, deployedAt: now, lastShot: 0, hp: ENGINEER_TURRET_HP, maxHp: ENGINEER_TURRET_HP });
   spawnParticles(tx, ty, '#4cc9f0');
+}
+
+function fireFormSlash() {
+  // Vuurgestalte (Wereld 2-transformatie): geen wapens, slaat een brandende vlammenboog vlak voor je uit die bots ontsteekt
+  const now = performance.now();
+  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const activeCooldown = FIREFORM_COOLDOWN * fireRateMult * reloadMult;
+  if (now - lastShot < activeCooldown) return;
+  lastShot = now;
+  const dmgMult = now < player.damageBoostUntil ? 2 : 1;
+  const facing = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  player.angle = facing;
+  spawnParticles(player.x + Math.cos(facing) * player.r, player.y + Math.sin(facing) * player.r, '#ff5a1f');
+  spawnParticles(player.x + Math.cos(facing) * player.r, player.y + Math.sin(facing) * player.r, '#fff275');
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    const dx = bot.x - player.x, dy = bot.y - player.y;
+    const dist = Math.hypot(dx, dy);
+    if (dist > FIREFORM_RANGE + bot.r) return;
+    let diff = Math.atan2(dy, dx) - facing;
+    while (diff > Math.PI) diff -= Math.PI * 2;
+    while (diff < -Math.PI) diff += Math.PI * 2;
+    if (Math.abs(diff) > FIREFORM_ARC / 2) return;
+    damageBotSimple(bot, FIREFORM_DMG * dmgMult, '#ff5a1f');
+    if (!bot.dead) fireZones.push({ x: bot.x, y: bot.y, radius: FIREFORM_IGNITE_RADIUS, until: now + FIREFORM_IGNITE_DURATION, tickDmg: FIREFORM_IGNITE_TICK * dmgMult, lastTick: 0 });
+  });
+}
+
+function iceFormBeam() {
+  // IJsgestalte (Wereld 2-transformatie): geen wapens, schiet een doorborende vriesstraal die alle bots op de lijn bevriest
+  const now = performance.now();
+  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const activeCooldown = ICEFORM_COOLDOWN * fireRateMult * reloadMult;
+  if (now - lastShot < activeCooldown) return;
+  lastShot = now;
+  const dmgMult = now < player.damageBoostUntil ? 2 : 1;
+  const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  player.angle = angle;
+  const endX = player.x + Math.cos(angle) * ICEFORM_RANGE;
+  const endY = player.y + Math.sin(angle) * ICEFORM_RANGE;
+  iceLances.push({ x1: player.x, y1: player.y, x2: endX, y2: endY, born: now });
+  spawnParticles(player.x, player.y, '#9ef7ff');
+  const dx = endX - player.x, dy = endY - player.y;
+  const len2 = dx * dx + dy * dy;
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    let t = ((bot.x - player.x) * dx + (bot.y - player.y) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const px = player.x + dx * t, py = player.y + dy * t;
+    const dd = Math.hypot(bot.x - px, bot.y - py);
+    if (dd < bot.r + 14) {
+      damageBotSimple(bot, ICEFORM_DMG * dmgMult, '#9ef7ff');
+      if (!bot.dead) bot.frozenUntil = Math.max(bot.frozenUntil || 0, now + ICEFORM_FREEZE_DURATION);
+    }
+  });
+}
+
+function earthFormThrow() {
+  // Aardgestalte (Wereld 2-transformatie): geen wapens, smijt een zwaar rotsblok dat bij inslag ontploft en bots wegstoot
+  const now = performance.now();
+  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const activeCooldown = EARTHFORM_COOLDOWN * fireRateMult * reloadMult;
+  if (now - lastShot < activeCooldown) return;
+  lastShot = now;
+  const dmgMult = now < player.damageBoostUntil ? 2 : 1;
+  const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  player.angle = angle;
+  const tx = Math.max(20, Math.min(canvas.width - 20, player.x + Math.cos(angle) * EARTHFORM_RANGE));
+  const ty = Math.max(20, Math.min(canvas.height - 20, player.y + Math.sin(angle) * EARTHFORM_RANGE));
+  rockThrows.push({ startX: player.x, startY: player.y, tx, ty, born: now, duration: EARTHFORM_TRAVEL_TIME });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    explosions.push({ x: tx, y: ty, born: performance.now(), maxR: EARTHFORM_SPLASH_RADIUS });
+    spawnParticles(tx, ty, '#8a6a3a');
+    spawnParticles(tx, ty, '#5c3a1e');
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const dd = Math.hypot(tx - bot.x, ty - bot.y);
+      if (dd < EARTHFORM_SPLASH_RADIUS + bot.r) {
+        damageBotSimple(bot, EARTHFORM_DMG * dmgMult, '#8a6a3a');
+        if (!bot.dead) {
+          const kdx = bot.x - tx, kdy = bot.y - ty;
+          const klen = Math.hypot(kdx, kdy) || 1;
+          bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + (kdx / klen) * EARTHFORM_KNOCKBACK));
+          bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + (kdy / klen) * EARTHFORM_KNOCKBACK));
+        }
+      }
+    });
+  }, EARTHFORM_TRAVEL_TIME);
+}
+
+function windFormDash() {
+  // Windgestalte (Wereld 2-transformatie): geen wapens, schiet als een vlaag naar de muispositie en blaast bots op de route weg
+  const now = performance.now();
+  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const activeCooldown = WINDFORM_COOLDOWN * fireRateMult * reloadMult;
+  if (now - lastShot < activeCooldown) return;
+  lastShot = now;
+  const dmgMult = now < player.damageBoostUntil ? 2 : 1;
+  const ang = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  const startX = player.x, startY = player.y;
+  const endX = Math.max(player.r, Math.min(canvas.width - player.r, startX + Math.cos(ang) * WINDFORM_DASH_DIST));
+  const endY = Math.max(player.r, Math.min(canvas.height - player.r, startY + Math.sin(ang) * WINDFORM_DASH_DIST));
+  bladeTrails.push({ x1: startX, y1: startY, x2: endX, y2: endY, born: now });
+  player.x = endX;
+  player.y = endY;
+  spawnParticles(startX, startY, '#eaffff');
+  spawnParticles(endX, endY, '#eaffff');
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    if (pointSegmentDist(bot.x, bot.y, startX, startY, endX, endY) < bot.r + 40) {
+      damageBotSimple(bot, WINDFORM_DMG * dmgMult, '#eaffff');
+      if (!bot.dead) {
+        const kdx = bot.x - endX, kdy = bot.y - endY;
+        const klen = Math.hypot(kdx, kdy) || 1;
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + (kdx / klen) * WINDFORM_KNOCKBACK));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + (kdy / klen) * WINDFORM_KNOCKBACK));
+      }
+    }
+  });
+}
+
+function waterFormWave() {
+  // Watergestalte (Wereld 2-transformatie): geen wapens, laat een vloedgolf om je heen losbarsten die bots wegstoot en jezelf een kort schild geeft
+  const now = performance.now();
+  const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
+  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const activeCooldown = WATERFORM_COOLDOWN * fireRateMult * reloadMult;
+  if (now - lastShot < activeCooldown) return;
+  lastShot = now;
+  const dmgMult = now < player.damageBoostUntil ? 2 : 1;
+  shockRings.push({ x: player.x, y: player.y, born: now, maxR: WATERFORM_RADIUS, duration: 450, color: '#2a7fba' });
+  explosions.push({ x: player.x, y: player.y, born: now, maxR: WATERFORM_RADIUS * 0.6 });
+  spawnParticles(player.x, player.y, '#2a7fba');
+  spawnParticles(player.x, player.y, '#eaffff');
+  player.shieldUntil = Math.max(player.shieldUntil, now + WATERFORM_SHIELD_DURATION);
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    const dd = Math.hypot(bot.x - player.x, bot.y - player.y);
+    if (dd < WATERFORM_RADIUS + bot.r) {
+      damageBotSimple(bot, WATERFORM_DMG * dmgMult, '#2a7fba');
+      if (!bot.dead) {
+        const ang2 = Math.atan2(bot.y - player.y, bot.x - player.x);
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang2) * 70));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang2) * 70));
+      }
+    }
+  });
 }
 
 function fireBotBullet(bot, angle, speedMult = 1) {

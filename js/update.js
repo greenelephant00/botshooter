@@ -940,6 +940,7 @@ function update() {
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);
   bladeTrails = bladeTrails.filter(t => now0 - t.born < 250);
   fireballThrows = fireballThrows.filter(g => now0 - g.born < g.duration);
+  rockThrows = rockThrows.filter(g => now0 - g.born < g.duration);
   chargeTrails = chargeTrails.filter(t => now0 - t.born < 300);
 
   // Field Engineer: neergezette koepels zoeken zelfstandig een doelwit en vuren erop

@@ -396,6 +396,7 @@ function startPractice(botName) {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
+  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -526,6 +527,7 @@ function startDodgePractice() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
+  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -953,7 +955,7 @@ function drawSkinPreview(canvasEl, skinId) {
 }
 
 function buyTransform(id) {
-  const t = TRANSFORMS.find(x => x.id === id);
+  const t = TRANSFORMS.find(x => x.id === id) || WORLD2_TRANSFORMS.find(x => x.id === id);
   if (!t || ownedTransforms.includes(id) || coins < t.price) return;
   coins -= t.price;
   ownedTransforms.push(id);
@@ -984,31 +986,37 @@ function closeTransformShop() {
 }
 window.closeTransformShop = closeTransformShop;
 
+function transformCardHtml(t) {
+  const owned = ownedTransforms.includes(t.id);
+  const equipped = equippedTransform === t.id;
+  let btn;
+  if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
+  else if (owned) btn = `<button class="equip" onclick="equipTransform('${t.id}')">Uitrusten</button>`;
+  else btn = `<button class="buy" onclick="buyTransform('${t.id}')" ${coins < t.price ? 'disabled' : ''}>Koop · 🪙${t.price}</button>`;
+  const practiceBtn = t.id !== 'none'
+    ? `<button class="equip" onclick="startTransformPractice('${t.id}')">🎯 Oefen</button>`
+    : '';
+  return `<div class="shopItem">
+    <canvas class="botPreview" id="transformPreview_${t.id}" width="60" height="60"></canvas>
+    <div class="info">
+      <div class="name">${t.name}</div>
+      <div class="desc">${t.desc}</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}${practiceBtn}</div>
+  </div>`;
+}
+
 function renderTransformShop() {
   document.getElementById('transformShopCoins').textContent = coins;
   if (currentWorld === 2) {
-    document.getElementById('transformShopList').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    document.getElementById('transformShopList').innerHTML = WORLD2_TRANSFORMS.map(transformCardHtml).join('');
+    WORLD2_TRANSFORMS.forEach(t => {
+      const canvasEl = document.getElementById(`transformPreview_${t.id}`);
+      if (canvasEl) drawTransformPreview(canvasEl, t.id);
+    });
     return;
   }
-  document.getElementById('transformShopList').innerHTML = TRANSFORMS.map(t => {
-    const owned = ownedTransforms.includes(t.id);
-    const equipped = equippedTransform === t.id;
-    let btn;
-    if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
-    else if (owned) btn = `<button class="equip" onclick="equipTransform('${t.id}')">Uitrusten</button>`;
-    else btn = `<button class="buy" onclick="buyTransform('${t.id}')" ${coins < t.price ? 'disabled' : ''}>Koop · 🪙${t.price}</button>`;
-    const practiceBtn = t.id !== 'none'
-      ? `<button class="equip" onclick="startTransformPractice('${t.id}')">🎯 Oefen</button>`
-      : '';
-    return `<div class="shopItem">
-      <canvas class="botPreview" id="transformPreview_${t.id}" width="60" height="60"></canvas>
-      <div class="info">
-        <div class="name">${t.name}</div>
-        <div class="desc">${t.desc}</div>
-      </div>
-      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}${practiceBtn}</div>
-    </div>`;
-  }).join('');
+  document.getElementById('transformShopList').innerHTML = TRANSFORMS.map(transformCardHtml).join('');
   TRANSFORMS.forEach(t => {
     const canvasEl = document.getElementById(`transformPreview_${t.id}`);
     if (canvasEl) drawTransformPreview(canvasEl, t.id);
@@ -1032,6 +1040,11 @@ function drawTransformPreview(canvasEl, transformId) {
   else if (transformId === 'stormcaller') drawPlayerStormCaller(c, 20);
   else if (transformId === 'juggernaut') drawPlayerJuggernaut(c, 20);
   else if (transformId === 'engineer') drawPlayerEngineer(c, 20);
+  else if (transformId === 'fireform') drawPlayerFireForm(c, 20);
+  else if (transformId === 'iceform') drawPlayerIceForm(c, 20);
+  else if (transformId === 'earthform') drawPlayerEarthForm(c, 20);
+  else if (transformId === 'windform') drawPlayerWindForm(c, 20);
+  else if (transformId === 'waterform') drawPlayerWaterForm(c, 20);
   else drawPlayerSkin(c, equippedSkin, 20);
   c.restore();
 }

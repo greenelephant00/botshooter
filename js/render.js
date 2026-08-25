@@ -930,6 +930,29 @@ function drawFireballThrow(g) {
   ctx.restore();
 }
 
+function drawRockThrow(g) {
+  // Aardgestalte-transformatie (Wereld 2): rotsblok dat naar de inslagplek vliegt
+  const age = performance.now() - g.born;
+  const t = Math.min(1, age / g.duration);
+  const x = g.startX + (g.tx - g.startX) * t;
+  const arc = Math.sin(t * Math.PI) * 26;
+  const y = g.startY + (g.ty - g.startY) * t - arc;
+  const spin = t * Math.PI * 4;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(spin);
+  ctx.fillStyle = '#5c3a1e';
+  ctx.beginPath();
+  ctx.moveTo(-7, -5); ctx.lineTo(6, -7); ctx.lineTo(8, 4); ctx.lineTo(-3, 8); ctx.lineTo(-8, 2);
+  ctx.closePath();
+  ctx.fill();
+  ctx.fillStyle = '#8a6a3a';
+  ctx.beginPath();
+  ctx.arc(-1, -1, 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawFireZone(zone) {
   // Pyromancer-transformatie: brandende grond die bots gedurende een tijdje schade doet
   const pulse = 1 + Math.sin(performance.now() / 100) * 0.08;
@@ -2973,6 +2996,100 @@ function drawPlayerEngineer(c, r) {
   c.fillRect(-4, r * 0.3, 8, 5);
 }
 
+function drawPlayerFireForm(c, r) {
+  // Vuurgestalte (Wereld 2): gloeiend, brokkelig lichaam van gestold vuur met een felle kern
+  c.fillStyle = '#5c2410';
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#ff5a1f';
+  c.beginPath();
+  c.arc(0, 0, r * 0.7, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#fff275';
+  c.beginPath();
+  c.arc(0, 0, r * 0.35, 0, Math.PI * 2);
+  c.fill();
+  const flick = 0.7 + Math.sin(performance.now() / 90) * 0.3;
+  c.strokeStyle = `rgba(255,138,0,${flick.toFixed(2)})`;
+  c.lineWidth = 2;
+  c.beginPath();
+  c.arc(0, 0, r + 4, 0, Math.PI * 2);
+  c.stroke();
+}
+
+function drawPlayerIceForm(c, r) {
+  // IJsgestalte (Wereld 2): kristallijnen lichaam van blauwig ijs
+  c.fillStyle = '#1c4a5c';
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#9ef7ff';
+  c.beginPath();
+  c.moveTo(0, -r * 0.85); c.lineTo(r * 0.75, 0); c.lineTo(0, r * 0.85); c.lineTo(-r * 0.75, 0);
+  c.closePath();
+  c.fill();
+  c.strokeStyle = '#eaffff';
+  c.lineWidth = 1.5;
+  c.stroke();
+}
+
+function drawPlayerEarthForm(c, r) {
+  // Aardgestalte (Wereld 2): zwaar, brok-vormig lichaam van steen met mosplekjes
+  c.fillStyle = '#5c3a1e';
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = '#8a6a3a';
+  c.beginPath();
+  c.arc(-r * 0.2, -r * 0.15, r * 0.6, 0, Math.PI * 2);
+  c.fill();
+  c.strokeStyle = '#3a2410';
+  c.lineWidth = 2;
+  c.stroke();
+  c.fillStyle = '#3fa34d';
+  c.beginPath();
+  c.arc(r * 0.3, r * 0.3, r * 0.18, 0, Math.PI * 2);
+  c.fill();
+}
+
+function drawPlayerWindForm(c, r) {
+  // Windgestalte (Wereld 2): ijl, doorschijnend lichaam van kolkende luchtstromen
+  c.save();
+  c.globalAlpha = 0.55;
+  c.fillStyle = '#eaffff';
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+  c.strokeStyle = '#c9f7ff';
+  c.lineWidth = 2;
+  const spin = performance.now() / 130;
+  for (let i = 0; i < 3; i++) {
+    const a = spin + (Math.PI * 2 / 3) * i;
+    c.beginPath();
+    c.arc(0, 0, r * 0.65, a, a + 1.8);
+    c.stroke();
+  }
+}
+
+function drawPlayerWaterForm(c, r) {
+  // Watergestalte (Wereld 2): druppelvormig, doorschijnend lichaam van kolkend water
+  c.fillStyle = 'rgba(42, 127, 186, 0.9)';
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.fill();
+  c.fillStyle = 'rgba(234, 255, 255, 0.6)';
+  c.beginPath();
+  c.arc(-r * 0.3, -r * 0.3, r * 0.35, 0, Math.PI * 2);
+  c.fill();
+  c.strokeStyle = '#eaffff';
+  c.lineWidth = 1.5;
+  c.beginPath();
+  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.stroke();
+}
+
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x, player.y);
@@ -2988,6 +3105,11 @@ function drawPlayer() {
   else if (player.activeTransform === 'stormcaller') drawPlayerStormCaller(ctx, player.r);
   else if (player.activeTransform === 'juggernaut') drawPlayerJuggernaut(ctx, player.r);
   else if (player.activeTransform === 'engineer') drawPlayerEngineer(ctx, player.r);
+  else if (player.activeTransform === 'fireform') drawPlayerFireForm(ctx, player.r);
+  else if (player.activeTransform === 'iceform') drawPlayerIceForm(ctx, player.r);
+  else if (player.activeTransform === 'earthform') drawPlayerEarthForm(ctx, player.r);
+  else if (player.activeTransform === 'windform') drawPlayerWindForm(ctx, player.r);
+  else if (player.activeTransform === 'waterform') drawPlayerWaterForm(ctx, player.r);
   else drawPlayerSkin(ctx, equippedSkin, player.r);
   ctx.restore();
 }
@@ -3730,6 +3852,7 @@ function draw() {
   fireZones.forEach(drawFireZone);
   gasClouds.forEach(drawGasCloud);
   fireballThrows.forEach(drawFireballThrow);
+  rockThrows.forEach(drawRockThrow);
   chargeTrails.forEach(drawChargeTrail);
   deployedTurrets.forEach(drawTurret);
   if (nowShake < tornadoUntil) drawTornadoOverlay();

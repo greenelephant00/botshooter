@@ -42,6 +42,7 @@ let rootDrags = []; // Wortelgeweer: dunne boomwortel die uit een scheur in de a
 let fireRings = []; // Vuurtitaan-boss: statische vuurring om de speler, bots door ongehinderd, speler vat vlam bij oversteken
 let chasingCracks = []; // Aardkoning-boss: achtervolgende scheur die de speler blijft opjagen
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
+let rockThrows = []; // Aardgestalte-transformatie (Wereld 2): vliegende rotsblokken
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
 let barrageLasers = []; // Elementenstorm-powerup: vuur/ijsstralen vanaf de zijkanten die alleen bots raken
@@ -399,6 +400,68 @@ const TRANSFORMS = [
   { id: 'stormcaller', name: 'Storm Caller', price: 5600, desc: `Je volgende potje begin je als storm caller: +${STORM_BONUS_HP} max HP, maar geen wapens — je slingert in plaats daarvan een bliksemschicht die overspringt tussen tot ${STORM_MAX_JUMPS} nabije bots. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
   { id: 'juggernaut', name: 'Juggernaut', price: 5900, desc: `Je volgende potje begin je als juggernaut: +${JUGGERNAUT_BONUS_HP} max HP en een 40% grotere hitbox, maar 15% minder snelheid. Geen wapens — je beukt in plaats daarvan naar voren en ramt alle bots op je pad omver met zware schade en flinke terugstoot. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
   { id: 'engineer', name: 'Field Engineer', price: 5700, desc: `Je volgende potje begin je als field engineer: +${ENGINEER_BONUS_HP} max HP, maar geen wapens — je zet in plaats daarvan automatische geschutskoepels neer (max ${ENGINEER_MAX_TURRETS} tegelijk) die zelfstandig op nabije bots vuren. Bots schieten op hun beurt terug op de koepels (${ENGINEER_TURRET_HP} HP) tot ze kapot gaan, of ze verdwijnen vanzelf na een tijdje. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` }
+];
+
+// ---- Wereld 2-exclusieve transformaties: Elementgestaltes ----
+const FIREFORM_BONUS_HP = 20;
+const FIREFORM_R_MULT = 1.05;
+const FIREFORM_SPEED_MULT = 1;
+const FIREFORM_COOLDOWN = 450;
+const FIREFORM_RANGE = 110;
+const FIREFORM_ARC = Math.PI * 0.6;
+const FIREFORM_DMG = 7;
+const FIREFORM_IGNITE_RADIUS = 30;
+const FIREFORM_IGNITE_DURATION = 2000;
+const FIREFORM_IGNITE_TICK = 2;
+
+const ICEFORM_BONUS_HP = 15;
+const ICEFORM_R_MULT = 1;
+const ICEFORM_SPEED_MULT = 0.9;
+const ICEFORM_COOLDOWN = 950;
+const ICEFORM_RANGE = 620;
+const ICEFORM_DMG = 10;
+const ICEFORM_FREEZE_DURATION = 1300;
+
+const EARTHFORM_BONUS_HP = 60;
+const EARTHFORM_R_MULT = 1.3;
+const EARTHFORM_SPEED_MULT = 0.8;
+const EARTHFORM_COOLDOWN = 900;
+const EARTHFORM_RANGE = 260;
+const EARTHFORM_TRAVEL_TIME = 380;
+const EARTHFORM_DMG = 16;
+const EARTHFORM_SPLASH_RADIUS = 65;
+const EARTHFORM_KNOCKBACK = 60;
+
+const WINDFORM_BONUS_HP = 0;
+const WINDFORM_R_MULT = 0.9;
+const WINDFORM_SPEED_MULT = 1.6;
+const WINDFORM_COOLDOWN = 600;
+const WINDFORM_DASH_DIST = 170;
+const WINDFORM_DMG = 6;
+const WINDFORM_KNOCKBACK = 90;
+
+const WATERFORM_BONUS_HP = 15;
+const WATERFORM_R_MULT = 1;
+const WATERFORM_SPEED_MULT = 1.05;
+const WATERFORM_COOLDOWN = 1400;
+const WATERFORM_RADIUS = 150;
+const WATERFORM_DMG = 9;
+const WATERFORM_SHIELD_DURATION = 900;
+
+const WORLD2_TRANSFORM_STATS = {
+  fireform:  { hpBonus: FIREFORM_BONUS_HP,  rMult: FIREFORM_R_MULT,  speedMult: FIREFORM_SPEED_MULT },
+  iceform:   { hpBonus: ICEFORM_BONUS_HP,   rMult: ICEFORM_R_MULT,   speedMult: ICEFORM_SPEED_MULT },
+  earthform: { hpBonus: EARTHFORM_BONUS_HP, rMult: EARTHFORM_R_MULT, speedMult: EARTHFORM_SPEED_MULT },
+  windform:  { hpBonus: WINDFORM_BONUS_HP,  rMult: WINDFORM_R_MULT,  speedMult: WINDFORM_SPEED_MULT },
+  waterform: { hpBonus: WATERFORM_BONUS_HP, rMult: WATERFORM_R_MULT, speedMult: WATERFORM_SPEED_MULT }
+};
+
+const WORLD2_TRANSFORMS = [
+  { id: 'fireform', name: 'Vuurgestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als vuurelementaal: +${FIREFORM_BONUS_HP} max HP, maar geen wapens — je slaat in plaats daarvan een brandende vlammenboog vlak voor je uit die bots ontsteekt zodat ze nog even doorbranden. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
+  { id: 'iceform', name: 'IJsgestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als ijselementaal: +${ICEFORM_BONUS_HP} max HP maar 10% minder snelheid. Geen wapens — je schiet in plaats daarvan een doorborende vriesstraal af die alle bots op een lijn raakt en bevriest. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
+  { id: 'earthform', name: 'Aardgestalte', price: 6200, desc: `Wereld 2-exclusief. Je volgende potje begin je als aardelementaal: +${EARTHFORM_BONUS_HP} max HP en een 30% grotere hitbox, maar 20% minder snelheid. Geen wapens — je smijt in plaats daarvan een zwaar rotsblok dat bij inslag ontploft en bots wegstoot. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
+  { id: 'windform', name: 'Windgestalte', price: 6100, desc: `Wereld 2-exclusief. Je volgende potje begin je als windelementaal: 60% meer snelheid en een kleinere hitbox, maar geen extra HP. Geen wapens — je schiet in plaats daarvan als een vlaag naar je muispositie en blaast alle bots op de route weg. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
+  { id: 'waterform', name: 'Watergestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als waterelementaal: +${WATERFORM_BONUS_HP} max HP. Geen wapens — je laat in plaats daarvan een vloedgolf om je heen losbarsten die bots wegstoot en beschadigt, en geeft jezelf daarbij een kort schild. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` }
 ];
 let hasDualArmor = localStorage.getItem('botShooterHasDualArmor') === 'true';
 const DUAL_ARMOR_PRICE = 2000;
