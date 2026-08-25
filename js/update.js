@@ -420,6 +420,22 @@ function update() {
         bot.specialDLastUsed = now;
         if (bot.type === 'vuurtitaan') bossFireRing(bot);
       }
+      // Special 5 - unieke 2e extra aanval per Wereld 2-boss
+      if (bot.specialECooldown && now - (bot.specialELastUsed || 0) > bot.specialECooldown) {
+        bot.specialELastUsed = now;
+        if (bot.type === 'vuurtitaan') bossFireLine(bot);
+        else if (bot.type === 'vriesreus') bossIceFan(bot);
+        else if (bot.type === 'aardkoning') bossGroundSpike(bot);
+        else if (bot.type === 'stormvorst') bossLightningCluster(bot);
+      }
+      // Special 6 - unieke 3e extra aanval per Wereld 2-boss
+      if (bot.specialFCooldown && now - (bot.specialFLastUsed || 0) > bot.specialFCooldown) {
+        bot.specialFLastUsed = now;
+        if (bot.type === 'vuurtitaan') bossPhoenixDive(bot);
+        else if (bot.type === 'vriesreus') bossIceField(bot);
+        else if (bot.type === 'aardkoning') bossChasingCrack(bot);
+        else if (bot.type === 'stormvorst') bossEmpJam(bot);
+      }
       return;
     }
 
@@ -1094,6 +1110,24 @@ function update() {
     }
   });
   lavaPools = lavaPools.filter(pool => now0 - pool.born < pool.totalLife);
+
+  // Aardkoning: achtervolgende scheur die de speler blijft opjagen tot hij dooft
+  chasingCracks.forEach(c => {
+    const age = now0 - c.born;
+    if (age >= c.duration) return;
+    const cdx = player.x - c.x, cdy = player.y - c.y;
+    const clen = Math.hypot(cdx, cdy) || 1;
+    c.x += (cdx / clen) * c.speed;
+    c.y += (cdy / clen) * c.speed;
+    const cdd = Math.hypot(player.x - c.x, player.y - c.y);
+    if (cdd < 30 + player.r && now0 - c.lastHit > 500) {
+      c.lastHit = now0;
+      applyDamageToPlayer(c.dmg);
+      player.rootedUntil = Math.max(player.rootedUntil, now0 + 500);
+      spawnParticles(player.x, player.y, '#5c3a1e');
+    }
+  });
+  chasingCracks = chasingCracks.filter(c => now0 - c.born < c.duration);
 
   // Aura: periodic damage rond speler
   if (now0 < player.auraUntil) {

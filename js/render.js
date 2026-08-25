@@ -600,6 +600,35 @@ function drawLavaPool(pool) {
   ctx.restore();
 }
 
+function drawChasingCrack(c) {
+  // Aardkoning special: een scheur in de grond die de speler blijft achtervolgen tot hij dooft
+  const age = performance.now() - c.born;
+  const fadeOut = Math.min(1, (c.duration - age) / 400);
+  if (fadeOut <= 0) return;
+  const now = performance.now();
+  const wob = Math.sin(now / 90) * 3;
+  ctx.save();
+  ctx.translate(c.x, c.y);
+  ctx.globalAlpha = fadeOut;
+  ctx.strokeStyle = '#1a0f08';
+  ctx.lineWidth = 5;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(-22, 5 + wob); ctx.lineTo(-8, -3); ctx.lineTo(6, 4 - wob); ctx.lineTo(20, -2);
+  ctx.stroke();
+  ctx.strokeStyle = '#8a6a3a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(-22, 5 + wob); ctx.lineTo(-8, -3); ctx.lineTo(6, 4 - wob); ctx.lineTo(20, -2);
+  ctx.stroke();
+  const pulse = 0.6 + Math.sin(now / 130) * 0.3;
+  ctx.fillStyle = `rgba(255,138,0,${(0.5 * pulse).toFixed(2)})`;
+  ctx.beginPath();
+  ctx.arc(0, 0, 10, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
 function drawRootDrag(r) {
   // Wortelgeweer (Wereld 2): een dunne, lange boomwortel die uit een scheur in de aarde komt en een bot naar beneden trekt
   const age = performance.now() - r.born;
@@ -3686,6 +3715,7 @@ function draw() {
   tsunamiWaves.forEach(drawTsunamiWave);
   treeGrabs.forEach(drawTreeGrab);
   rootDrags.forEach(drawRootDrag);
+  chasingCracks.forEach(drawChasingCrack);
   fireRings.forEach(drawFireRing);
   shockRings.forEach(drawShockRing);
   iceLances.forEach(drawIceLance);

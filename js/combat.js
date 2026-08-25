@@ -1,6 +1,7 @@
 function shoot() {
   if (gameOver || isPaused) return;
   if (performance.now() < player.rootedUntil || performance.now() < player.mireUntil) return; // bevroren of vastgezogen, kan niet schieten
+  if (performance.now() < player.jammedUntil) return; // Stormvorst EMP: wapen tijdelijk uitgeschakeld
   if (player.activeTransform === 'tank') { shootTankGrenade(); return; }
   if (player.activeTransform === 'berserker') { berserkerSlash(); return; }
   if (player.activeTransform === 'sniper') { sniperMechShot(); return; }
@@ -1660,6 +1661,189 @@ function bossHurricane(bot) {
       spawnParticles(player.x, player.y, '#c9a3ff');
     }
   }, 250);
+}
+
+function bossFireLine(bot) {
+  // Vuurtitaan special 5 - Vuurlijn: een reeks vuurzuilen die na elkaar ontploffen langs een rechte lijn vanaf de boss richting jou
+  const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
+  const count = 5;
+  const spacing = 70;
+  const pillarRadius = 42;
+  const delay = 750;
+  const dmg = Math.round((bot.specialDmg || 22) * 0.6);
+  for (let i = 1; i <= count; i++) {
+    const px = bot.x + Math.cos(angle) * spacing * i;
+    const py = bot.y + Math.sin(angle) * spacing * i;
+    if (px < -50 || px > canvas.width + 50 || py < -50 || py > canvas.height + 50) continue;
+    const fireDelay = delay + i * 90;
+    telegraphs.push({ x: px, y: py, radius: pillarRadius, warnUntil: performance.now() + fireDelay });
+    setTimeout(() => {
+      if (gameOver || levelTransition) return;
+      explosions.push({ x: px, y: py, born: performance.now(), maxR: pillarRadius });
+      spawnParticles(px, py, '#ff5a1f');
+      spawnParticles(px, py, '#fff275');
+      const dd = Math.hypot(player.x - px, player.y - py);
+      if (dd < pillarRadius + player.r) {
+        applyDamageToPlayer(dmg);
+        player.burnUntil = performance.now() + 2000 * (1 - getArmorStats().fireResist);
+      }
+    }, fireDelay);
+  }
+}
+
+function bossPhoenixDive(bot) {
+  // Vuurtitaan special 6 - Feniksduik: de boss duikt neer op je vastgelegde positie met een zware inslag en laat er blijvend vuur achter
+  const tx = player.x, ty = player.y;
+  const radius = 100;
+  const delay = 1100;
+  const dmg = Math.round((bot.specialDmg || 22) * 1.4);
+  telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+  spawnParticles(bot.x, bot.y, '#ff5a1f');
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    const impactNow = performance.now();
+    explosions.push({ x: tx, y: ty, born: impactNow, maxR: radius });
+    shockRings.push({ x: tx, y: ty, born: impactNow, maxR: radius * 1.4, duration: 500, color: '#ffb703' });
+    spawnParticles(tx, ty, '#fff275');
+    spawnParticles(tx, ty, '#ff5a1f');
+    lavaPools.push({ x: tx, y: ty, born: impactNow, fallDelay: 0, lingerDuration: 3000, fadeDuration: 600, totalLife: 3600, radius: radius * 0.6, lastIgniteTick: 0 });
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(dmg);
+      player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
+    }
+  }, delay);
+}
+
+function bossIceFan(bot) {
+  // Vriesreus special 5 - IJswaaier: 3 gelijktijdige vriesstralen in een waaier, elk apart ontwijkbaar door tussen de lijnen te bewegen
+  const now0 = performance.now();
+  const delay = 900;
+  const baseAngle = Math.atan2(player.y - bot.y, player.x - bot.x);
+  const offsets = [-0.4, 0, 0.4];
+  offsets.forEach(off => {
+    laserTelegraphs.push({ bot, angle: baseAngle + off, warnUntil: now0 + delay });
+  });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    spawnParticles(bot.x, bot.y, '#9ef7ff');
+    offsets.forEach(off => {
+      const angle = baseAngle + off;
+      const endX = bot.x + Math.cos(angle) * 900;
+      const endY = bot.y + Math.sin(angle) * 900;
+      iceLances.push({ x1: bot.x, y1: bot.y, x2: endX, y2: endY, born: performance.now() });
+      const dx = endX - bot.x, dy = endY - bot.y;
+      const len2 = dx * dx + dy * dy;
+      let t = ((player.x - bot.x) * dx + (player.y - bot.y) * dy) / len2;
+      t = Math.max(0, Math.min(1, t));
+      const px = bot.x + dx * t, py = bot.y + dy * t;
+      const dd = Math.hypot(player.x - px, player.y - py);
+      if (dd < player.r + 14) {
+        applyDamageToPlayer(Math.round((bot.specialDmg || 24) * 0.7));
+        player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 900 * (1 - getArmorStats().iceResist));
+      }
+    });
+  }, delay);
+}
+
+function bossIceField(bot) {
+  // Vriesreus special 6 - Vriesveld: verspreide ijspieken ontstaan na elkaar willekeurig over de hele arena, los van je eigen positie
+  const count = 6;
+  const radius = 55;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      if (gameOver || levelTransition || bot.dead) return;
+      const tx = 60 + Math.random() * (canvas.width - 120);
+      const ty = 60 + Math.random() * (canvas.height - 120);
+      telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + 600 });
+      setTimeout(() => {
+        if (gameOver || levelTransition) return;
+        explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
+        spawnParticles(tx, ty, '#9ef7ff');
+        spawnParticles(tx, ty, '#eaffff');
+        const dd = Math.hypot(player.x - tx, player.y - ty);
+        if (dd < radius + player.r) {
+          applyDamageToPlayer(Math.round((bot.specialDmg || 24) * 0.5));
+          player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 700 * (1 - getArmorStats().iceResist));
+        }
+      }, 600);
+    }, i * 420);
+  }
+}
+
+function bossGroundSpike(bot) {
+  // Aardkoning special 5 - Aardpiek: een zware aardpiek schiet omhoog op je vastgelegde positie
+  const tx = player.x, ty = player.y;
+  const radius = 95;
+  const delay = 750;
+  const dmg = Math.round((bot.specialDmg || 26) * 1.1);
+  telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
+    spawnParticles(tx, ty, '#8a6a3a');
+    spawnParticles(tx, ty, '#5c3a1e');
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(dmg);
+      const ang = dd > 0 ? Math.atan2(player.y - ty, player.x - tx) : Math.random() * Math.PI * 2;
+      player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(ang) * 100));
+      player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(ang) * 100));
+    }
+  }, delay);
+}
+
+function bossChasingCrack(bot) {
+  // Aardkoning special 6 - Achtervolgende scheur: een scheur in de grond die je een tijd lang blijft opjagen, iets langzamer dan je basissnelheid
+  chasingCracks.push({
+    x: bot.x, y: bot.y,
+    speed: 2.6,
+    born: performance.now(),
+    duration: 4000,
+    dmg: Math.round((bot.specialDmg || 26) * 0.5),
+    lastHit: 0
+  });
+  spawnParticles(bot.x, bot.y, '#5c3a1e');
+}
+
+function bossLightningCluster(bot) {
+  // Stormvorst special 5 - Blikseminslag-cluster: 4 bliksems in een kruispatroon rond je vastgelegde positie, kort na elkaar
+  const cx = player.x, cy = player.y;
+  const offsets = [[0, -70], [70, 0], [0, 70], [-70, 0]];
+  const radius = 45;
+  const dmg = Math.round((bot.specialDmg || 28) * 0.55);
+  offsets.forEach((off, i) => {
+    const tx = cx + off[0], ty = cy + off[1];
+    const delay = 500 + i * 220;
+    telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+    setTimeout(() => {
+      if (gameOver || levelTransition || bot.dead) return;
+      lightningBolts.push({ x1: tx + (Math.random() - 0.5) * 40, y1: -40, x2: tx, y2: ty, born: performance.now() });
+      spawnParticles(tx, ty, '#fff066');
+      spawnParticles(tx, ty, '#8ecbff');
+      const dd = Math.hypot(player.x - tx, player.y - ty);
+      if (dd < radius + player.r) applyDamageToPlayer(dmg);
+    }, delay);
+  });
+}
+
+function bossEmpJam(bot) {
+  // Stormvorst special 6 - Stroomstoot: een EMP-golf die je wapen 2 sec uitschakelt als je erin staat wanneer hij afgaat
+  const tx = player.x, ty = player.y;
+  const radius = 90;
+  const delay = 700;
+  telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    shockRings.push({ x: tx, y: ty, born: performance.now(), maxR: radius, duration: 400, color: '#c9a3ff' });
+    spawnParticles(tx, ty, '#c9a3ff');
+    spawnParticles(tx, ty, '#8ecbff');
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < radius + player.r) {
+      player.jammedUntil = performance.now() + 2000;
+      staticShockUntil = performance.now() + 250;
+    }
+  }, delay);
 }
 
 function botShoot(bot) {

@@ -40,6 +40,7 @@ let iceLances = []; // Rijmlans-special: korte, gloeiende ijslijn-visual
 let tornadoShots = []; // Tornado-schot powerup: ronddwalend projectiel dat bots meesleurt en van de kaart slingert
 let rootDrags = []; // Wortelgeweer: dunne boomwortel die uit een scheur in de aarde komt en een bot mee naar beneden trekt
 let fireRings = []; // Vuurtitaan-boss: statische vuurring om de speler, bots door ongehinderd, speler vat vlam bij oversteken
+let chasingCracks = []; // Aardkoning-boss: achtervolgende scheur die de speler blijft opjagen
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler

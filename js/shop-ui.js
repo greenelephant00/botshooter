@@ -253,10 +253,10 @@ const BOSS_SPECIAL_DESC = {
   titan:    'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Meteorregen: 4 getelegrafeerde inslagen rond je positie, kort na elkaar.',
   behemoth: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Laserstraal: een gerichte, doorlopende straal met een korte waarschuwing vooraf.',
   nemesis:  'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Doemspiraal: meerdere snelle golven roterende kogels die de hele arena vullen. Special 3 — Kruislaser: twee gelijktijdige, doorlopende laserstralen in een kruispatroon met een korte waarschuwing vooraf. De sterkste en taaiste boss in het spel.',
-  vuurtitaan: 'Vuur-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Lavaregen: 3 getelegrafeerde lavaklodders vlak bij je die je in brand zetten. Special 3 — Vuurnova: een felle vuurexplosie rond zichzelf die je verbrandt als je te dichtbij staat. Special 4 — Vuurring: een vurige kooi om jezelf voor 5 sec — bots lopen er ongehinderd doorheen, maar jij kunt er niet uit, en tegen de vlammen aan duwen zet je in brand.',
-  vriesreus: 'IJs-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — IJsring: een uitdijende ijsring die je bevriest zodra hij je bereikt. Special 3 — Rijmlans: telegrafeert 1 sec een stippellijn en schiet daarna exact langs die lijn — ontwijkbaar door weg te stappen.',
-  aardkoning: 'Aarde-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Wortelgreep: een extra grote, verwoestende boom uit de grond die je vastgrijpt en vasthoudt. Special 3 — Aardbeving: een verwoestende schok rond zichzelf die je wegstoot en even verlamt.',
-  stormvorst: 'Storm-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Bliksemschicht: telegrafeert kort een inslagcirkel op je positie voordat de bliksem inslaat — ontwijkbaar door weg te lopen. Special 3 — Orkaan: een kolkende windvlaag die je herhaaldelijk raakt en naar de boss toe trekt.'
+  vuurtitaan: 'Vuur-boss (Wereld 2), 6 unieke attacks. Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Lavaregen: 3 getelegrafeerde lavaklodders vlak bij je die je in brand zetten. Special 3 — Vuurnova: een felle vuurexplosie rond zichzelf die je verbrandt als je te dichtbij staat. Special 4 — Vuurring: een vurige kooi om jezelf voor 5 sec — bots lopen er ongehinderd doorheen, maar jij kunt er niet uit, en tegen de vlammen aan duwen zet je in brand. Special 5 — Vuurlijn: een reeks vuurzuilen die na elkaar afgaan langs een rechte lijn vanaf de boss naar je toe. Special 6 — Feniksduik: duikt neer op je vastgelegde positie met een zware inslag en laat er blijvend vuur achter.',
+  vriesreus: 'IJs-boss (Wereld 2), 6 unieke attacks. Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — IJsring: een uitdijende ijsring die je bevriest zodra hij je bereikt. Special 3 — Rijmlans: telegrafeert 1 sec een stippellijn en schiet daarna exact langs die lijn — ontwijkbaar door weg te stappen. Special 4 — IJswaaier: 3 gelijktijdige vriesstralen in een waaier. Special 5 — Vriesveld: verspreide ijspieken ontstaan willekeurig over de hele arena.',
+  aardkoning: 'Aarde-boss (Wereld 2), 6 unieke attacks. Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Wortelgreep: een extra grote, verwoestende boom uit de grond die je vastgrijpt en vasthoudt. Special 3 — Aardbeving: een verwoestende schok rond zichzelf die je wegstoot en even verlamt. Special 4 — Aardpiek: een zware aardpiek schiet omhoog op je vastgelegde positie. Special 5 — Achtervolgende scheur: een scheur in de grond die je een tijd lang blijft opjagen.',
+  stormvorst: 'Storm-boss (Wereld 2), 6 unieke attacks. Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Bliksemschicht: telegrafeert kort een inslagcirkel op je positie voordat de bliksem inslaat — ontwijkbaar door weg te lopen. Special 3 — Orkaan: een kolkende windvlaag die je herhaaldelijk raakt en naar de boss toe trekt. Special 4 — Blikseminslag-cluster: 4 bliksems in een kruispatroon rond je vastgelegde positie. Special 5 — Stroomstoot: een EMP-golf die je wapen 2 sec uitschakelt als je erin staat wanneer hij afgaat.'
 };
 
 function botDamageText(type) {
@@ -384,6 +384,7 @@ function startPractice(botName) {
   tornadoShots = [];
   rootDrags = [];
   fireRings = [];
+  chasingCracks = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -507,6 +508,7 @@ function startDodgePractice() {
   tornadoShots = [];
   rootDrags = [];
   fireRings = [];
+  chasingCracks = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

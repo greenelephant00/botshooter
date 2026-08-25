@@ -54,6 +54,7 @@ const player = {
   fireCageX: 0,
   fireCageY: 0,
   fireCageRadius: 0,
+  jammedUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -108,6 +109,7 @@ function resetPlayer() {
   player.fireCageX = 0;
   player.fireCageY = 0;
   player.fireCageRadius = 0;
+  player.jammedUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -170,10 +172,10 @@ const BOSS_TYPES = [
 
 // Wereld 2 (Elementen): eigen bosses, elk met 4 verschillende aanvallen (salvo + schokgolf + 2 unieke elementale specials)
 const WORLD2_BOSS_TYPES = [
-  { name: 'vuurtitaan', displayName: 'Vuurtitaan', minScore: 1500,  minLevel: 9,  r: 60, hp: 180, speed: [0.3, 0.45],  cooldown: [1700, 2100], pattern: 'boss', bulletSpeed: 5,   specialACooldown: 6000, specialBCooldown: 5000, specialCCooldown: 8000, specialDCooldown: 9000, specialDmg: 22, color: () => '#8a3a1f' },
-  { name: 'vriesreus',  displayName: 'Vriesreus',  minScore: 4000,  minLevel: 16, r: 68, hp: 260, speed: [0.28, 0.4], cooldown: [1600, 2000], pattern: 'boss', bulletSpeed: 5.5, specialACooldown: 5800, specialBCooldown: 5200, specialCCooldown: 7500, specialDmg: 24, color: () => '#bdf3ff' },
-  { name: 'aardkoning', displayName: 'Aardkoning', minScore: 7000,  minLevel: 22, r: 76, hp: 340, speed: [0.25, 0.35], cooldown: [1500, 1900], pattern: 'boss', bulletSpeed: 6,   specialACooldown: 5600, specialBCooldown: 5000, specialCCooldown: 7200, specialDmg: 26, color: () => '#4a3018' },
-  { name: 'stormvorst', displayName: 'Stormvorst', minScore: 10000, minLevel: 28, r: 82, hp: 420, speed: [0.3, 0.42], cooldown: [1300, 1700], pattern: 'boss', bulletSpeed: 6.5, specialACooldown: 5400, specialBCooldown: 4600, specialCCooldown: 6800, specialDmg: 28, color: () => '#c9a3ff' }
+  { name: 'vuurtitaan', displayName: 'Vuurtitaan', minScore: 1500,  minLevel: 9,  r: 60, hp: 180, speed: [0.3, 0.45],  cooldown: [1700, 2100], pattern: 'boss', bulletSpeed: 5,   specialACooldown: 6000, specialBCooldown: 5000, specialCCooldown: 8000, specialDCooldown: 9000, specialECooldown: 7000, specialFCooldown: 11000, specialDmg: 22, color: () => '#8a3a1f' },
+  { name: 'vriesreus',  displayName: 'Vriesreus',  minScore: 4000,  minLevel: 16, r: 68, hp: 260, speed: [0.28, 0.4], cooldown: [1600, 2000], pattern: 'boss', bulletSpeed: 5.5, specialACooldown: 5800, specialBCooldown: 5200, specialCCooldown: 7500, specialECooldown: 6800, specialFCooldown: 10500, specialDmg: 24, color: () => '#bdf3ff' },
+  { name: 'aardkoning', displayName: 'Aardkoning', minScore: 7000,  minLevel: 22, r: 76, hp: 340, speed: [0.25, 0.35], cooldown: [1500, 1900], pattern: 'boss', bulletSpeed: 6,   specialACooldown: 5600, specialBCooldown: 5000, specialCCooldown: 7200, specialECooldown: 6500, specialFCooldown: 10000, specialDmg: 26, color: () => '#4a3018' },
+  { name: 'stormvorst', displayName: 'Stormvorst', minScore: 10000, minLevel: 28, r: 82, hp: 420, speed: [0.3, 0.42], cooldown: [1300, 1700], pattern: 'boss', bulletSpeed: 6.5, specialACooldown: 5400, specialBCooldown: 4600, specialCCooldown: 6800, specialECooldown: 6200, specialFCooldown: 9500, specialDmg: 28, color: () => '#c9a3ff' }
 ];
 let bossAlive = false;
 let bossWarningActive = false;
@@ -374,6 +376,7 @@ function initGame() {
   tornadoShots = [];
   rootDrags = [];
   fireRings = [];
+  chasingCracks = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -444,6 +447,7 @@ function setupNextLevel() {
   tornadoShots = [];
   rootDrags = [];
   fireRings = [];
+  chasingCracks = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -544,6 +548,7 @@ function updateHUD() {
   if (now < player.rootedUntil) active.push('🥶 Bevroren');
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');
   if (now < player.confuseUntil) active.push('🌀 Verwarring');
+  if (now < player.jammedUntil) active.push('📡 EMP — wapen uitgeschakeld');
   if (player.activeTransform === 'tank') {
     active.push('🚜 Tank — alleen handgranaten');
   } else if (player.activeTransform === 'berserker') {
