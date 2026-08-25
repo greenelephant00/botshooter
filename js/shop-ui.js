@@ -204,7 +204,9 @@ const BOT_DISPLAY_NAMES = {
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis',
   fireling: 'Vlamgeest', frostling: 'Rijmgeest', earthling: 'Rotsgolem',
   bliksemwicht: 'Donderknaap', windwicht: 'Windloper', magmawicht: 'Lavagolem',
-  stormwicht: 'Onweersgeest', kristalwicht: 'Kristalreus'
+  stormwicht: 'Onweersgeest', kristalwicht: 'Kristalreus',
+  zandworm: 'Zandworm', doornrank: 'Doornrank', getijgeest: 'Getijgeest',
+  aswervelaar: 'Aswervelaar', sneeuwjager: 'Sneeuwjager'
 };
 const BOT_PATTERN_INFO = {
   single:    'Schiet één kogel recht op je af.',

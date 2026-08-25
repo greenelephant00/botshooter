@@ -43,6 +43,10 @@ const player = {
   stoneskinReduction: 0,
   burnUntil: 0,
   burnLastTick: 0,
+  mireUntil: 0,
+  bleedUntil: 0,
+  bleedLastTick: 0,
+  ashBlindUntil: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -86,6 +90,10 @@ function resetPlayer() {
   player.stoneskinReduction = 0;
   player.burnUntil = 0;
   player.burnLastTick = 0;
+  player.mireUntil = 0;
+  player.bleedUntil = 0;
+  player.bleedLastTick = 0;
+  player.ashBlindUntil = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -158,7 +166,12 @@ const WORLD2_BOT_TYPES = [
   { name: 'windwicht',    r: 15, hp: 4, speed: [2.1, 3.1], cooldown: [1300, 2000], pattern: 'triple', bulletSpeed: 5,   bulletDmg: 11, color: () => '#cfe8ee' },
   { name: 'magmawicht',   r: 19, hp: 8, speed: [0.7, 1.1], cooldown: [2600, 3400], pattern: 'mortar', bulletSpeed: 0,   meleeDamage: 28, color: () => '#3a1f12' },
   { name: 'stormwicht',   r: 16, hp: 6, speed: [1.1, 1.6], cooldown: [2400, 3000], pattern: 'burst',  bulletSpeed: 6.5, bulletDmg: 11, color: () => '#8ecbff' },
-  { name: 'kristalwicht', r: 17, hp: 7, speed: [0.8, 1.3], cooldown: [200, 200],   pattern: 'spiral', bulletSpeed: 4.5, bulletDmg: 11, color: () => '#9ef7ff' }
+  { name: 'kristalwicht', r: 17, hp: 7, speed: [0.8, 1.3], cooldown: [200, 200],   pattern: 'spiral', bulletSpeed: 4.5, bulletDmg: 11, color: () => '#9ef7ff' },
+  { name: 'zandworm',    r: 17, hp: 7,  speed: [1.0, 1.6], cooldown: [1800, 2600], pattern: 'teleport',  bulletSpeed: 6,   bulletDmg: 10, color: () => '#c9a96a' },
+  { name: 'doornrank',   r: 17, hp: 8,  speed: [0.8, 1.2], cooldown: [1900, 2600], pattern: 'wide',      bulletSpeed: 4.5, bulletDmg: 9,  color: () => '#2f7d3c' },
+  { name: 'getijgeest',  r: 16, hp: 6,  speed: [1.3, 1.9], cooldown: [1200, 1800], pattern: 'double',    bulletSpeed: 6,   bulletDmg: 9,  color: () => '#2a7fba' },
+  { name: 'aswervelaar', r: 16, hp: 6,  speed: [1.4, 2.0], cooldown: [2200, 3000], pattern: 'circle',    bulletSpeed: 4.5, bulletDmg: 9,  color: () => '#6b6b6b' },
+  { name: 'sneeuwjager', r: 20, hp: 10, speed: [0.6, 1.0], cooldown: [2800, 3600], pattern: 'megaburst', bulletSpeed: 5,   bulletDmg: 9,  color: () => '#eaffff' }
 ];
 // Periodieke ambient-deeltjes per Wereld 2-bot, zie de sprankje-check in update()
 const WORLD2_AMBIENT_FX = {
@@ -169,7 +182,12 @@ const WORLD2_AMBIENT_FX = {
   windwicht: ['#eaffff', '#cfe8ee'],
   magmawicht: ['#ff8c00', '#3a1f12'],
   stormwicht: ['#8ecbff', '#fff066'],
-  kristalwicht: ['#9ef7ff', '#ffffff']
+  kristalwicht: ['#9ef7ff', '#ffffff'],
+  zandworm: ['#c9a96a', '#8a6a3a'],
+  doornrank: ['#2f7d3c', '#3fa34d'],
+  getijgeest: ['#2a7fba', '#8ecbff'],
+  aswervelaar: ['#6b6b6b', '#c9c9c9'],
+  sneeuwjager: ['#eaffff', '#bdf3ff']
 };
 
 function pickBotType() {
@@ -471,6 +489,9 @@ function updateHUD() {
   if (now < player.overloadUntil) active.push('⚡ Overload');
   if (now < player.stoneskinUntil) active.push('🪨 Aardhuid');
   if (now < player.burnUntil) active.push('🔥 In brand');
+  if (now < player.mireUntil) active.push('🏜 Vastgezogen');
+  if (now < player.bleedUntil) active.push('🩸 Bloedend');
+  if (now < player.ashBlindUntil) active.push('💨 Verblind');
   if (now < player.slowUntil) active.push('🐌 Vertraagd');
   if (now < player.rootedUntil) active.push('🥶 Bevroren');
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');

@@ -1,6 +1,6 @@
 function shoot() {
   if (gameOver || isPaused) return;
-  if (performance.now() < player.rootedUntil) return; // bevroren, kan niet schieten
+  if (performance.now() < player.rootedUntil || performance.now() < player.mireUntil) return; // bevroren of vastgezogen, kan niet schieten
   if (player.activeTransform === 'tank') { shootTankGrenade(); return; }
   if (player.activeTransform === 'berserker') { berserkerSlash(); return; }
   if (player.activeTransform === 'sniper') { sniperMechShot(); return; }

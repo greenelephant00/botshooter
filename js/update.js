@@ -21,7 +21,7 @@ function update() {
   }
 
   let dx = 0, dy = 0;
-  if (now0 >= player.rootedUntil) {
+  if (now0 >= player.rootedUntil && now0 >= player.mireUntil) {
     if (keys['w'] || keys['arrowup']) dy -= 1;
     if (keys['s'] || keys['arrowdown']) dy += 1;
     if (keys['a'] || keys['arrowleft']) dx -= 1;
@@ -708,6 +708,30 @@ function update() {
             player.slowUntil = Math.max(player.slowUntil, now0 + 1700);
             spawnParticles(player.x, player.y, '#9ef7ff');
             spawnParticles(player.x, player.y, '#ffffff');
+          } else if (srcType === 'zandworm') {
+            // Zandworm: zuigt je heel even vast in het zand
+            player.mireUntil = now0 + 700;
+            spawnParticles(player.x, player.y, '#c9a96a');
+            spawnParticles(player.x, player.y, '#8a6a3a');
+          } else if (srcType === 'doornrank') {
+            // Doornrank: doornen laten je een tijdje bloeden
+            player.bleedUntil = now0 + 4000;
+            spawnParticles(player.x, player.y, '#2f7d3c');
+          } else if (srcType === 'getijgeest') {
+            // Getijgeest: doorweekt je wapen, tijdelijk minder schade
+            player.curseUntil = now0 + 4000;
+            spawnParticles(player.x, player.y, '#2a7fba');
+            spawnParticles(player.x, player.y, '#8ecbff');
+          } else if (srcType === 'aswervelaar') {
+            // Aswervelaar: een askolk verblindt je kort
+            player.ashBlindUntil = now0 + 1200;
+            spawnParticles(player.x, player.y, '#6b6b6b');
+            spawnParticles(player.x, player.y, '#c9c9c9');
+          } else if (srcType === 'sneeuwjager') {
+            // Sneeuwjager: een korte, harde bevriezing
+            player.rootedUntil = Math.max(player.rootedUntil, now0 + 500);
+            spawnParticles(player.x, player.y, '#eaffff');
+            spawnParticles(player.x, player.y, '#bdf3ff');
           }
 
           // Reflection: kaats schade terug
@@ -860,6 +884,15 @@ function update() {
       player.burnLastTick = now0;
       applyDamageToPlayer(4);
       spawnParticles(player.x, player.y, '#ff5a1f');
+    }
+  }
+
+  // Bloedend (Doornrank): periodiek wat schade zolang de wond bloedt
+  if (now0 < player.bleedUntil) {
+    if (!player.bleedLastTick || now0 - player.bleedLastTick > 1000) {
+      player.bleedLastTick = now0;
+      applyDamageToPlayer(2);
+      spawnParticles(player.x, player.y, '#8b0000');
     }
   }
 

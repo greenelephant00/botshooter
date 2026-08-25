@@ -42,6 +42,20 @@ function drawSandstormOverlay() {
   ctx.restore();
 }
 
+function drawAshBlindOverlay() {
+  // Aswervelaar (Wereld 2): een askolk verblindt je kort met een donkere waas rond je heen
+  const remain = Math.max(0, player.ashBlindUntil - performance.now());
+  const fade = Math.min(1, remain / 1200);
+  ctx.save();
+  const visionR = 170;
+  const grad = ctx.createRadialGradient(player.x, player.y, visionR * 0.4, player.x, player.y, visionR);
+  grad.addColorStop(0, 'rgba(90, 90, 90, 0)');
+  grad.addColorStop(1, `rgba(50, 50, 50, ${0.85 * fade})`);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+}
+
 function drawPowerup(p) {
   const pulse = 1 + Math.sin(performance.now() / 150) * 0.1;
   const colors = {
@@ -917,6 +931,61 @@ function drawEnemyBullet(b) {
     ctx.fillStyle = '#9ef7ff';
     ctx.beginPath();
     ctx.moveTo(0, -(b.r + 2)); ctx.lineTo(b.r + 2, 0); ctx.lineTo(0, b.r + 2); ctx.lineTo(-(b.r + 2), 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+  } else if (srcType === 'zandworm') {
+    // klompje zand met stofwolkje
+    ctx.fillStyle = '#c9a96a';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#8a6a3a';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  } else if (srcType === 'doornrank') {
+    // ronddraaiend doornscherfje
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(performance.now() / 130);
+    ctx.fillStyle = '#2f7d3c';
+    ctx.beginPath();
+    ctx.moveTo(0, -(b.r + 3)); ctx.lineTo(b.r * 0.6, 0); ctx.lineTo(0, b.r + 3); ctx.lineTo(-b.r * 0.6, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  } else if (srcType === 'getijgeest') {
+    // druppelvormige waterbel
+    ctx.fillStyle = 'rgba(42, 127, 186, 0.85)';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 1, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.beginPath();
+    ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.25, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (srcType === 'aswervelaar') {
+    // grijs askorreltje met een gloeiend sintelpuntje
+    ctx.fillStyle = 'rgba(150,150,150,0.85)';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff8c42';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (srcType === 'sneeuwjager') {
+    // scherpe ijspegel-punt
+    const ang = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(ang);
+    ctx.fillStyle = '#eaffff';
+    ctx.beginPath();
+    ctx.moveTo(b.r + 4, 0); ctx.lineTo(-b.r, -b.r * 0.6); ctx.lineTo(-b.r, b.r * 0.6);
     ctx.closePath();
     ctx.fill();
     ctx.strokeStyle = '#fff';
@@ -2545,6 +2614,11 @@ function drawBot(bot) {
   const isMagmawicht = bot.type === 'magmawicht';
   const isStormwicht = bot.type === 'stormwicht';
   const isKristalwicht = bot.type === 'kristalwicht';
+  const isZandworm = bot.type === 'zandworm';
+  const isDoornrank = bot.type === 'doornrank';
+  const isGetijgeest = bot.type === 'getijgeest';
+  const isAswervelaar = bot.type === 'aswervelaar';
+  const isSneeuwjager = bot.type === 'sneeuwjager';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -2862,6 +2936,105 @@ function drawBot(bot) {
         ctx.arc(ox, oy, bot.r * 0.15, 0, Math.PI * 2);
         ctx.fill();
       }
+    }
+  } else if (isZandworm) {
+    // gesegmenteerd wormlichaam, past bij zijn opduik-uit-het-zand aanval
+    for (let i = 0; i < 3; i++) {
+      const off = (i - 1) * bot.r * 0.8;
+      ctx.beginPath();
+      ctx.arc(off, 0, bot.r * (1 - i * 0.18), 0, Math.PI * 2);
+      ctx.fill();
+    }
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#5c4526';
+      ctx.lineWidth = 1.5;
+      for (let i = 0; i < 3; i++) {
+        const off = (i - 1) * bot.r * 0.8;
+        ctx.beginPath();
+        ctx.arc(off, 0, bot.r * (1 - i * 0.18) * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+  } else if (isDoornrank) {
+    // knoestige rankbal met stekelige doornen eromheen
+    ctx.arc(0, 0, bot.r * 0.8, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#1f5a2a';
+      ctx.lineWidth = 1.5;
+      const thorns = 7;
+      for (let i = 0; i < thorns; i++) {
+        const a = (Math.PI * 2 / thorns) * i;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * bot.r * 0.75, Math.sin(a) * bot.r * 0.75);
+        ctx.lineTo(Math.cos(a) * bot.r * 1.35, Math.sin(a) * bot.r * 1.35);
+        ctx.stroke();
+      }
+      ctx.strokeStyle = '#6b3f1f';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.4, -bot.r * 0.3);
+      ctx.quadraticCurveTo(0, bot.r * 0.2, bot.r * 0.4, -bot.r * 0.2);
+      ctx.stroke();
+    }
+  } else if (isGetijgeest) {
+    // doorschijnend golf-/druppellichaam met een rimpelende waterlijn
+    if (!frozen && !rooted && !slashing) ctx.globalAlpha *= 0.85;
+    ctx.moveTo(0, -bot.r);
+    ctx.quadraticCurveTo(bot.r, -bot.r * 0.2, 0, bot.r);
+    ctx.quadraticCurveTo(-bot.r, -bot.r * 0.2, 0, -bot.r);
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+      ctx.lineWidth = 1.5;
+      const wave = Math.sin(performance.now() / 200) * 3;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.6, wave * 0.3);
+      ctx.quadraticCurveTo(0, -wave, bot.r * 0.6, wave * 0.3);
+      ctx.stroke();
+    }
+  } else if (isAswervelaar) {
+    // grijze aswervel met kolkende askringen en gloeiende sintels
+    if (!frozen && !rooted && !slashing) ctx.globalAlpha *= 0.8;
+    ctx.arc(0, 0, bot.r * 0.75, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = 'rgba(180,180,180,0.7)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const rot = -performance.now() / 180 + (Math.PI * 2 / 3) * i;
+        ctx.beginPath();
+        ctx.arc(0, 0, bot.r * (0.9 + i * 0.3), rot, rot + 1.4);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ff8c42';
+      for (let i = 0; i < 2; i++) {
+        const a = performance.now() / 250 + i * Math.PI;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * bot.r * 0.5, Math.sin(a) * bot.r * 0.5, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (isSneeuwjager) {
+    // grote, hoekige ijspantser-vorm
+    ctx.moveTo(0, -bot.r * 1.1);
+    ctx.lineTo(bot.r * 0.7, -bot.r * 0.5);
+    ctx.lineTo(bot.r * 0.9, bot.r * 0.4);
+    ctx.lineTo(bot.r * 0.3, bot.r * 1.1);
+    ctx.lineTo(-bot.r * 0.3, bot.r * 1.1);
+    ctx.lineTo(-bot.r * 0.9, bot.r * 0.4);
+    ctx.lineTo(-bot.r * 0.7, -bot.r * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.beginPath();
+      ctx.arc(-bot.r * 0.2, -bot.r * 0.3, bot.r * 0.2, 0, Math.PI * 2);
+      ctx.fill();
     }
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
@@ -3212,5 +3385,6 @@ function draw() {
   ctx.restore();
 
   if (nowShake < sandstormUntil) drawSandstormOverlay();
+  if (nowShake < player.ashBlindUntil) drawAshBlindOverlay();
 }
 
