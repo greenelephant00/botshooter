@@ -1117,6 +1117,58 @@ function drawEnemyBullet(b) {
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.restore();
+  } else if (srcType === 'vuurtitaan') {
+    // Vuurtitaan-boss: gloeiende vuurbol, iets groter en feller dan een gewone fireling
+    ctx.fillStyle = '#ff5a1f';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff275';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (srcType === 'vriesreus') {
+    // Vriesreus-boss: draaiende ijskristal, groter dan de gewone kristalwicht-splinter
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(performance.now() / 140);
+    ctx.fillStyle = '#bdf3ff';
+    ctx.beginPath();
+    ctx.moveTo(0, -(b.r + 5)); ctx.lineTo(b.r + 5, 0); ctx.lineTo(0, b.r + 5); ctx.lineTo(-(b.r + 5), 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.restore();
+  } else if (srcType === 'aardkoning') {
+    // Aardkoning-boss: zware brok gesteente met mosplekjes
+    ctx.fillStyle = '#6b4a24';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 4, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#3a2812';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = '#3fa34d';
+    ctx.beginPath();
+    ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.35, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (srcType === 'stormvorst') {
+    // Stormvorst-boss: knetterende elektrische bol met meerdere vonken
+    ctx.fillStyle = '#8ecbff';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#c9a3ff';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 4; i++) {
+      const a = performance.now() / 55 + (Math.PI * 2 / 4) * i;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x + Math.cos(a) * (b.r + 5), b.y + Math.sin(a) * (b.r + 5));
+      ctx.stroke();
+    }
   } else {
     ctx.fillStyle = '#ff5c5c';
     ctx.beginPath();
@@ -3422,17 +3474,24 @@ function drawBot(bot) {
   ctx.restore();
 
   if (isBoss) {
-    // colossus: constante dreigende pulserende gloed, altijd zichtbaar
+    // constante dreigende pulserende gloed, altijd zichtbaar; Wereld 2-bosses krijgen hun eigen elementkleur
     const pulse = 1 + Math.sin(now / 220) * 0.08;
+    const glowColors = {
+      vuurtitaan: ['#ff3838', '#ffaa00'],
+      vriesreus: ['#9ef7ff', '#eaffff'],
+      aardkoning: ['#8a6a3a', '#3fa34d'],
+      stormvorst: ['#c9a3ff', '#8ecbff']
+    };
+    const [glowOuter, glowInner] = glowColors[bot.type] || ['#ff3838', '#ffaa00'];
     ctx.save();
     ctx.globalAlpha = 0.55;
-    ctx.strokeStyle = '#ff3838';
+    ctx.strokeStyle = glowOuter;
     ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(bot.x, bot.y, (bot.r + 12) * pulse, 0, Math.PI * 2);
     ctx.stroke();
     ctx.globalAlpha = 0.3;
-    ctx.strokeStyle = '#ffaa00';
+    ctx.strokeStyle = glowInner;
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(bot.x, bot.y, (bot.r + 20) * pulse, 0, Math.PI * 2);
