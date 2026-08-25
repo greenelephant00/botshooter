@@ -648,8 +648,19 @@ function getWeapon() {
   if (currentWorld !== 2 && WORLD2_SPECIAL_WEAPONS.some(sw => sw.id === w.id)) return WEAPONS[0];
   return w;
 }
-function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
-function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || WORLD2_ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
+function getArmor() {
+  const a = ARMOR.find(a => a.id === equippedArmor) || WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0];
+  // Pantsers van de ene wereld werken niet in de andere wereld, net als speciale wapens — val dan terug op geen pantser
+  if (currentWorld === 2 && a.id !== 'none' && ARMOR.some(x => x.id === a.id)) return ARMOR[0];
+  if (currentWorld !== 2 && WORLD2_ARMOR.some(x => x.id === a.id)) return ARMOR[0];
+  return a;
+}
+function getArmor2() {
+  const a = ARMOR.find(a => a.id === equippedArmor2) || WORLD2_ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0];
+  if (currentWorld === 2 && a.id !== 'none' && ARMOR.some(x => x.id === a.id)) return ARMOR[0];
+  if (currentWorld !== 2 && WORLD2_ARMOR.some(x => x.id === a.id)) return ARMOR[0];
+  return a;
+}
 
 // Gecombineerde stats van beide pantser-slots (2e slot telt alleen mee als hasDualArmor is gekocht)
 function getArmorStats() {
