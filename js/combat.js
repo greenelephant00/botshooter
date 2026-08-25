@@ -475,6 +475,26 @@ function earthFormSpikeWallAttack() {
   const baseY = player.y + Math.sin(angle) * EARTHFORM_WALL_DIST;
   const perpX = -Math.sin(angle), perpY = Math.cos(angle);
   const mid = (EARTHFORM_WALL_COUNT - 1) / 2;
+
+  // Pad van kleine bommetjes tussen jezelf en de middelste piek van de muur
+  for (let i = 1; i <= EARTHFORM_PATH_COUNT; i++) {
+    const t = i / (EARTHFORM_PATH_COUNT + 1);
+    const px = player.x + (baseX - player.x) * t;
+    const py = player.y + (baseY - player.y) * t;
+    const pathRadius = EARTHFORM_SPIKE_RADIUS * EARTHFORM_PATH_RADIUS_MULT;
+    explosions.push({ x: px, y: py, born: now, maxR: pathRadius });
+    spawnParticles(px, py, '#8a6a3a');
+    bots.forEach(target => {
+      if (target.dead) return;
+      const dd = Math.hypot(px - target.x, py - target.y);
+      if (dd < pathRadius + target.r) {
+        damageBotSimple(target, EARTHFORM_DMG * EARTHFORM_PATH_DMG_MULT * dmgMult, '#8a6a3a');
+        if (!target.dead) target.rootedUntil = Math.max(target.rootedUntil || 0, now + EARTHFORM_ROOT_DURATION);
+      }
+    });
+  }
+
+  // De muur van rotspieken zelf, met de middelste piek precies op de aim-lijn
   for (let i = 0; i < EARTHFORM_WALL_COUNT; i++) {
     const offset = (i - mid) * EARTHFORM_WALL_SPACING;
     const sx = Math.max(20, Math.min(canvas.width - 20, baseX + perpX * offset));

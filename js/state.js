@@ -431,6 +431,9 @@ const EARTHFORM_WALL_SPACING = 30;
 const EARTHFORM_SPIKE_RADIUS = 24;
 const EARTHFORM_DMG = 12;
 const EARTHFORM_ROOT_DURATION = 700;
+const EARTHFORM_PATH_COUNT = 4; // kleine bommetjes die een pad vormen van de speler naar de middelste piek van de muur
+const EARTHFORM_PATH_RADIUS_MULT = 0.6;
+const EARTHFORM_PATH_DMG_MULT = 0.6;
 
 const WINDFORM_BONUS_HP = 0;
 const WINDFORM_R_MULT = 0.9;
@@ -459,7 +462,7 @@ const WORLD2_TRANSFORM_STATS = {
 const WORLD2_TRANSFORMS = [
   { id: 'fireform', name: 'Vuurgestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als vuurelementaal: +${FIREFORM_BONUS_HP} max HP, maar geen wapens — je slaat in plaats daarvan een brandende vlammenboog vlak voor je uit die bots ontsteekt zodat ze nog even doorbranden. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
   { id: 'iceform', name: 'IJsgestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als ijselementaal: +${ICEFORM_BONUS_HP} max HP maar 10% minder snelheid. Geen wapens — je schiet in plaats daarvan een doorborende vriesstraal af die alle bots op een lijn raakt en bevriest. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
-  { id: 'earthform', name: 'Aardgestalte', price: 6200, desc: `Wereld 2-exclusief. Je volgende potje begin je als aardelementaal: +${EARTHFORM_BONUS_HP} max HP en een 25% grotere hitbox, maar 15% minder snelheid. Geen wapens — je laat in plaats daarvan een muur van ${EARTHFORM_WALL_COUNT} rotspieken vlak voor je uit de grond schieten die bots beschadigt en heel even vastzet. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
+  { id: 'earthform', name: 'Aardgestalte', price: 6200, desc: `Wereld 2-exclusief. Je volgende potje begin je als aardelementaal: +${EARTHFORM_BONUS_HP} max HP en een 25% grotere hitbox, maar 15% minder snelheid. Geen wapens — je laat in plaats daarvan een pad van kleine bommetjes vanaf jezelf ontstaan die uitkomt bij een muur van ${EARTHFORM_WALL_COUNT} rotspieken verderop, allemaal bots beschadigend en heel even vastzettend. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
   { id: 'windform', name: 'Windgestalte', price: 6100, desc: `Wereld 2-exclusief. Je volgende potje begin je als windelementaal: 60% meer snelheid en een kleinere hitbox, maar geen extra HP. Geen wapens — je schiet in plaats daarvan als een vlaag naar je muispositie en blaast alle bots op de route weg. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` },
   { id: 'waterform', name: 'Watergestalte', price: 6000, desc: `Wereld 2-exclusief. Je volgende potje begin je als waterelementaal: +${WATERFORM_BONUS_HP} max HP. Geen wapens — je laat in plaats daarvan een vloedgolf om je heen losbarsten die bots wegstoot en beschadigt, en geeft jezelf daarbij een kort schild. Bij overlijden word je teruggevormd tot je normale poppetje met ${TRANSFORM_REVIVE_HP} HP en je uitgeruste wapen.` }
 ];
