@@ -387,13 +387,21 @@ function update() {
         else if (bot.type === 'nemesis') bossDoomSpiral(bot);
         else if (bot.type === 'leviathan') bossWaterStrike(bot);
         else if (bot.type === 'abomination') bossChaosBurst(bot);
+        else if (bot.type === 'vuurtitaan') lavaRainAttack(bot);
+        else if (bot.type === 'vriesreus') frostNovaAttack(bot);
+        else if (bot.type === 'aardkoning') rootSnareAttack(bot);
+        else if (bot.type === 'stormvorst') stormChainBolt(bot);
       }
-      // Special 3 - Nemesis, Leviathan, Abomination
+      // Special 3 - Nemesis, Leviathan, Abomination, en alle Wereld 2-bosses
       if (bot.specialCCooldown && now - (bot.specialCLastUsed || 0) > bot.specialCCooldown) {
         bot.specialCLastUsed = now;
         if (bot.type === 'nemesis') bossCrossLaser(bot);
         else if (bot.type === 'leviathan') bossWaterStrike(bot);
         else if (bot.type === 'abomination') bossSpawnMinions(bot);
+        else if (bot.type === 'vuurtitaan') bossFireNova(bot);
+        else if (bot.type === 'vriesreus') bossFrostLance(bot);
+        else if (bot.type === 'aardkoning') bossEarthSlam(bot);
+        else if (bot.type === 'stormvorst') bossHurricane(bot);
       }
       return;
     }
@@ -1348,8 +1356,9 @@ function update() {
   }
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && currentWorld !== 2 && !bossAlive && !bossWarningActive) {
-    const nextBoss = BOSS_TYPES.find(b => !bossesSpawned[b.name] &&
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
+    const bossPool = currentWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
+    const nextBoss = bossPool.find(b => !bossesSpawned[b.name] &&
       (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
     if (nextBoss) triggerBossWarning(nextBoss);
   }

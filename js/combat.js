@@ -1545,6 +1545,96 @@ function bossSpawnMinions(bot) {
   }
 }
 
+function bossFireNova(bot) {
+  // Vuurtitaan special 3 - Vuurnova: een felle vuurexplosie rond de boss zelf die de speler verbrandt als hij dichtbij is
+  const cx = bot.x, cy = bot.y;
+  const radius = 190;
+  const delay = 700;
+  telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
+    shockRings.push({ x: cx, y: cy, born: performance.now(), maxR: radius * 1.3, duration: 500, color: '#ffb703' });
+    spawnParticles(cx, cy, '#fff275');
+    spawnParticles(cx, cy, '#ff5a1f');
+    const dd = Math.hypot(player.x - cx, player.y - cy);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(bot.specialDmg || 22);
+      player.burnUntil = performance.now() + 3500 * (1 - getArmorStats().fireResist);
+    }
+  }, delay);
+}
+
+function bossFrostLance(bot) {
+  // Vriesreus special 3 - Rijmlans: een doorborende vriesstraal recht op de speler af
+  const now0 = performance.now();
+  const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
+  laserTelegraphs.push({ bot, angle, warnUntil: now0 + 700 });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x);
+    const endX = bot.x + Math.cos(beamAngle) * 900;
+    const endY = bot.y + Math.sin(beamAngle) * 900;
+    iceLances.push({ x1: bot.x, y1: bot.y, x2: endX, y2: endY, born: performance.now() });
+    spawnParticles(bot.x, bot.y, '#9ef7ff');
+    const dx = endX - bot.x, dy = endY - bot.y;
+    const len2 = dx * dx + dy * dy;
+    let t = ((player.x - bot.x) * dx + (player.y - bot.y) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const px = bot.x + dx * t, py = bot.y + dy * t;
+    const dd = Math.hypot(player.x - px, player.y - py);
+    if (dd < player.r + 16) {
+      applyDamageToPlayer(bot.specialDmg || 24);
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1400 * (1 - getArmorStats().iceResist));
+    }
+  }, 700);
+}
+
+function bossEarthSlam(bot) {
+  // Aardkoning special 3 - Aardbeving: een verwoestende aardschok rond de boss die wegstoot en verlamt
+  const cx = bot.x, cy = bot.y;
+  const radius = 210;
+  const delay = 800;
+  telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
+    spawnParticles(cx, cy, '#8a6a3a');
+    spawnParticles(cx, cy, '#5c3a1e');
+    const dd = Math.hypot(player.x - cx, player.y - cy);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(bot.specialDmg || 26);
+      const ang = Math.atan2(player.y - cy, player.x - cx);
+      player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(ang) * 80));
+      player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(ang) * 80));
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 800);
+    }
+  }, delay);
+}
+
+function bossHurricane(bot) {
+  // Stormvorst special 3 - Orkaan: een kolkende windvlaag die de speler herhaaldelijk raakt en naar de boss toe trekt
+  const cx = bot.x, cy = bot.y;
+  const duration = 1400;
+  const dmgPerTick = Math.round((bot.specialDmg || 28) * 0.35);
+  const startTime = performance.now();
+  shockRings.push({ x: cx, y: cy, born: startTime, maxR: 260, duration: 700, color: '#c9a3ff' });
+  const tickInterval = setInterval(() => {
+    if (gameOver || levelTransition || bot.dead || performance.now() - startTime > duration) {
+      clearInterval(tickInterval);
+      return;
+    }
+    const dd = Math.hypot(player.x - bot.x, player.y - bot.y);
+    if (dd < 260) {
+      applyDamageToPlayer(dmgPerTick);
+      const ang = Math.atan2(bot.y - player.y, bot.x - player.x);
+      player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(ang) * 10));
+      player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(ang) * 10));
+      spawnParticles(player.x, player.y, '#c9a3ff');
+    }
+  }, 250);
+}
+
 function botShoot(bot) {
   // Stun: bots kunnen niet schieten als stunned
   const now = performance.now();

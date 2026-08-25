@@ -159,6 +159,14 @@ const BOSS_TYPES = [
   { name: 'leviathan', displayName: 'Leviathan', minScore: 10000, minLevel: 30, r: 90, hp: 500, speed: [0.24, 0.36], cooldown: [1200, 1600], pattern: 'boss', bulletSpeed: 7, specialACooldown: 3000, specialBCooldown: 4500, specialCCooldown: 6000, specialDmg: 55, color: () => `hsl(${Math.floor(Math.random()*15)+200}, 80%, 35%)` },
   { name: 'abomination', displayName: 'Abomination', minScore: 13000, minLevel: 35, r: 95, hp: 600, speed: [0.22, 0.34], cooldown: [1100, 1500], pattern: 'boss', bulletSpeed: 7.5, specialACooldown: 2800, specialBCooldown: 4200, specialCCooldown: 5500, specialDmg: 60, color: () => `hsl(${Math.floor(Math.random()*15)+280}, 75%, 38%)` }
 ];
+
+// Wereld 2 (Elementen): eigen bosses, elk met 4 verschillende aanvallen (salvo + schokgolf + 2 unieke elementale specials)
+const WORLD2_BOSS_TYPES = [
+  { name: 'vuurtitaan', displayName: 'Vuurtitaan', minScore: 1500,  minLevel: 9,  r: 60, hp: 180, speed: [0.3, 0.45],  cooldown: [1700, 2100], pattern: 'boss', bulletSpeed: 5,   specialACooldown: 6000, specialBCooldown: 5000, specialCCooldown: 8000, specialDmg: 22, color: () => '#8a3a1f' },
+  { name: 'vriesreus',  displayName: 'Vriesreus',  minScore: 4000,  minLevel: 16, r: 68, hp: 260, speed: [0.28, 0.4], cooldown: [1600, 2000], pattern: 'boss', bulletSpeed: 5.5, specialACooldown: 5800, specialBCooldown: 5200, specialCCooldown: 7500, specialDmg: 24, color: () => '#bdf3ff' },
+  { name: 'aardkoning', displayName: 'Aardkoning', minScore: 7000,  minLevel: 22, r: 76, hp: 340, speed: [0.25, 0.35], cooldown: [1500, 1900], pattern: 'boss', bulletSpeed: 6,   specialACooldown: 5600, specialBCooldown: 5000, specialCCooldown: 7200, specialDmg: 26, color: () => '#4a3018' },
+  { name: 'stormvorst', displayName: 'Stormvorst', minScore: 10000, minLevel: 28, r: 82, hp: 420, speed: [0.3, 0.42], cooldown: [1300, 1700], pattern: 'boss', bulletSpeed: 6.5, specialACooldown: 5400, specialBCooldown: 4600, specialCCooldown: 6800, specialDmg: 28, color: () => '#c9a3ff' }
+];
 let bossAlive = false;
 let bossWarningActive = false;
 let bossesSpawned = {}; // per boss-naam: true zodra hij deze sessie al is verschenen
