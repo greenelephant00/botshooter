@@ -1157,6 +1157,9 @@ function update() {
     const d = Math.hypot(player.x - p.x, player.y - p.y);
     if (d < player.r + p.r + pickupBonus) {
       p.collected = true;
+      // Powerups van de verkeerde wereld doen niks, net als speciale wapens/pantsers die niet in de andere wereld werken
+      const belongsToWorld2 = WORLD2_POWERUP_IDS.includes(p.type);
+      if ((currentWorld === 2) !== belongsToWorld2) return;
       const lvl = getPuLevel(p.type);
       const info = POWERUP_LEVELS[p.type];
       if (p.type === 'speed') {
