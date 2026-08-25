@@ -541,10 +541,10 @@ const WORLD2_WEAPONS = [
 
 // Elementale speciale wapens: alleen te koop in de Wereld 2-shop, elk met een eigen E-ability
 const WORLD2_SPECIAL_WEAPONS = [
-  { id: 'magmacannon',    name: 'Magma Kanon',   price: 2600, cooldownMult: 1.2, dmg: 3, pellets: 1, spread: 0, desc: 'Zwaar vuurwapen. Druk op E om een brandend lavaveld op je richtpunt neer te leggen dat bots daarin voortdurend schade geeft.' },
-  { id: 'hurricanestaff', name: 'Orkaanstaf',    price: 2600, cooldownMult: 1.0, dmg: 2, pellets: 1, spread: 0, desc: 'Wind-staf. Druk op E voor een windvlaag om je heen die alle bots dichtbij beschadigt en wegblaast.' },
-  { id: 'frostlance',     name: 'Rijmlans',      price: 2700, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, desc: 'IJzige lans. Druk op E voor een doorborende vriesstraal die alle bots op een lijn beschadigt en bevriest.' },
-  { id: 'earthhammer',    name: 'Aardhamer',     price: 2700, cooldownMult: 1.3, dmg: 3, pellets: 1, spread: 0, desc: 'Zware aardstaf. Druk op E voor een aardschok om je heen die bots beschadigt, wegstoot en heel even verlamt.' }
+  { id: 'magmacannon',    name: 'Magma Kanon',   price: 2600, cooldownMult: 1.2, dmg: 3, pellets: 1, spread: 0, effect: 'igniteHit',   desc: 'Zwaar vuurwapen. Elke kogel zet de bot in brand. Druk op E om een brandend lavaveld op je richtpunt neer te leggen dat bots daarin voortdurend schade geeft.' },
+  { id: 'hurricanestaff', name: 'Orkaanstaf',    price: 2600, cooldownMult: 1.0, dmg: 2, pellets: 1, spread: 0, effect: 'gustPush',    desc: 'Wind-staf. Elke kogel blaast de geraakte bot en iedereen dichtbij een stuk weg. Druk op E voor een windvlaag om je heen die alle bots dichtbij beschadigt en wegblaast.' },
+  { id: 'frostlance',     name: 'Rijmlans',      price: 2700, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, effect: 'shatterHit',  desc: 'IJzige lans. Elke kogel spat uiteen in ijsscherven die bots dichtbij ook raken en even bevriezen. Druk op E voor een doorborende vriesstraal die alle bots op een lijn beschadigt en bevriest.' },
+  { id: 'earthhammer',    name: 'Aardhamer',     price: 2700, cooldownMult: 1.3, dmg: 3, pellets: 1, spread: 0, effect: 'knockbackHit', desc: 'Zware aardstaf. Elke kogel stampt de geraakte bot naar achteren. Druk op E voor een aardschok om je heen die bots beschadigt, wegstoot en heel even verlamt.' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
