@@ -1726,7 +1726,7 @@ function rootDragNearest(x, y, maxRange) {
   const wrapDur = duration * 0.25;
   const now0 = performance.now();
   bot.rootedUntil = now0 + duration;
-  treeGrabs.push({ x: tx, y: ty, born: now0, duration, riseDur, wrapDur });
+  rootDrags.push({ x: tx, y: ty, born: now0, duration, riseDur, wrapDur });
   telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: now0 + riseDur });
   spawnParticles(tx, ty, '#5c3a1e');
   spawnParticles(tx, ty, '#3fa34d');

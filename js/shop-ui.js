@@ -377,6 +377,7 @@ function startPractice(botName) {
   lavaPools = [];
   iceLances = [];
   tornadoShots = [];
+  rootDrags = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -498,6 +499,7 @@ function startDodgePractice() {
   lavaPools = [];
   iceLances = [];
   tornadoShots = [];
+  rootDrags = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

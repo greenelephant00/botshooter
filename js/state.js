@@ -38,6 +38,7 @@ const EARTH_SLAM_RADIUS = 170;
 const EARTH_SLAM_DMG = 10;
 let iceLances = []; // Rijmlans-special: korte, gloeiende ijslijn-visual
 let tornadoShots = []; // Tornado-schot powerup: ronddwalend projectiel dat bots meesleurt en van de kaart slingert
+let rootDrags = []; // Wortelgeweer: dunne boomwortel die uit een scheur in de aarde komt en een bot mee naar beneden trekt
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler

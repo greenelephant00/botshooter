@@ -356,6 +356,7 @@ function initGame() {
   lavaPools = [];
   iceLances = [];
   tornadoShots = [];
+  rootDrags = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -424,6 +425,7 @@ function setupNextLevel() {
   lavaPools = [];
   iceLances = [];
   tornadoShots = [];
+  rootDrags = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

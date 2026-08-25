@@ -542,6 +542,71 @@ function drawLavaPool(pool) {
   ctx.restore();
 }
 
+function drawRootDrag(r) {
+  // Wortelgeweer (Wereld 2): een dunne, lange boomwortel die uit een scheur in de aarde komt en een bot naar beneden trekt
+  const age = performance.now() - r.born;
+  const sinkStart = r.riseDur + r.wrapDur;
+  const sinkDur = r.duration - sinkStart;
+  let phase;
+  if (age < r.riseDur) phase = 'rise';
+  else if (age < sinkStart) phase = 'wrap';
+  else phase = 'sink';
+
+  const riseT = phase === 'rise' ? age / r.riseDur : 1;
+  const wrapT = phase === 'wrap' ? (age - r.riseDur) / r.wrapDur : (phase === 'sink' ? 1 : 0);
+  const sinkT = phase === 'sink' ? Math.min(1, (age - sinkStart) / sinkDur) : 0;
+  if (sinkT >= 1) return;
+
+  ctx.save();
+  ctx.translate(r.x, r.y + sinkT * 50);
+  ctx.globalAlpha = 1 - sinkT;
+
+  // scheur in de aarde
+  ctx.save();
+  ctx.globalAlpha *= 0.7 * riseT;
+  ctx.strokeStyle = '#1a0f08';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(-14, 4); ctx.lineTo(-4, 0); ctx.lineTo(4, 3); ctx.lineTo(14, -1);
+  ctx.stroke();
+  ctx.restore();
+
+  const h = 62 * riseT; // hoogte van de wortel
+  const hook = wrapT * 20; // buigt naar het midden toe tijdens het omklemmen
+
+  // hoofdwortel: dun en taps toelopend, met een lichte kromming
+  ctx.lineCap = 'round';
+  ctx.strokeStyle = '#4a2f18';
+  ctx.lineWidth = 5;
+  ctx.beginPath();
+  ctx.moveTo(0, 4);
+  ctx.quadraticCurveTo(-6 + hook * 0.3, -h * 0.5, hook, -h);
+  ctx.stroke();
+  ctx.strokeStyle = '#3a2410';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  ctx.moveTo(0, 4);
+  ctx.quadraticCurveTo(-6 + hook * 0.3, -h * 0.5, hook, -h);
+  ctx.stroke();
+
+  // twee dunnere zij-wortels die mee omhoog kronkelen
+  if (riseT > 0.2) {
+    const h2 = h * 0.7;
+    ctx.strokeStyle = '#5c3a1e';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-4, 3);
+    ctx.quadraticCurveTo(-14 - hook * 0.4, -h2 * 0.5, -6 - hook * 0.6, -h2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(4, 3);
+    ctx.quadraticCurveTo(14 - hook * 0.2, -h2 * 0.5, 8 + hook * 0.5, -h2);
+    ctx.stroke();
+  }
+
+  ctx.restore();
+}
+
 function drawTreeGrab(t) {
   // Wortelgreep-powerup (Wereld 2): een boom breekt uit de grond, wikkelt zijn takken om de bot en zinkt weer weg
   const age = performance.now() - t.born;
@@ -3502,6 +3567,7 @@ function draw() {
   fallingMeteors.forEach(drawFallingMeteor);
   tsunamiWaves.forEach(drawTsunamiWave);
   treeGrabs.forEach(drawTreeGrab);
+  rootDrags.forEach(drawRootDrag);
   shockRings.forEach(drawShockRing);
   iceLances.forEach(drawIceLance);
   tornadoShots.forEach(drawTornadoShot);
