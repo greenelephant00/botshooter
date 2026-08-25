@@ -202,9 +202,9 @@ const BOT_DISPLAY_NAMES = {
   miasma: 'Miasma', bulwark: 'Bulwark', broodmother: 'Broodmother',
   gravitas: 'Gravitas', cryostasis: 'Cryostasis', railgunner: 'Railgunner', vexer: 'Vexer', bombardier: 'Bombardier',
   colossus: 'Colossus', titan: 'Titan', behemoth: 'Behemoth', nemesis: 'Nemesis',
-  fireling: 'Vuurwicht', frostling: 'IJswicht', earthling: 'Aardwicht',
-  bliksemwicht: 'Bliksemwicht', windwicht: 'Windwicht', magmawicht: 'Magmawicht',
-  stormwicht: 'Stormwicht', kristalwicht: 'Kristalwicht'
+  fireling: 'Vlamgeest', frostling: 'Rijmgeest', earthling: 'Rotsgolem',
+  bliksemwicht: 'Donderknaap', windwicht: 'Windloper', magmawicht: 'Lavagolem',
+  stormwicht: 'Onweersgeest', kristalwicht: 'Kristalreus'
 };
 const BOT_PATTERN_INFO = {
   single:    'Schiet één kogel recht op je af.',
