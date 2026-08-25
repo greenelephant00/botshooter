@@ -67,7 +67,7 @@ function shoot() {
       bornY: spawnY,
       vx: Math.cos(angle) * 9 * speedMult,
       vy: Math.sin(angle) * 9 * speedMult,
-      r: 4,
+      r: weapon.bulletR || 4,
       owner: 'player',
       dmg,
       pierce: (weapon.pierce || 0) + extraPierce,
@@ -77,7 +77,8 @@ function shoot() {
       effect: weapon.effect || null,
       homingTarget: target,
       maxRange: weapon.maxRange || 0,
-      isFlame: weapon.id === 'flamethrower'
+      isFlame: weapon.id === 'flamethrower',
+      isGust: weapon.id === 'windrifle'
     });
   });
 }

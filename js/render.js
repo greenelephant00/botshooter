@@ -1063,6 +1063,27 @@ function drawPlayerBullet(b) {
     ctx.restore();
     return;
   }
+  if (b.isGust) {
+    // Windgeweer: een kolkende, doorschijnende windstoot i.p.v. een kogel
+    ctx.globalAlpha = 0.8;
+    const spin = performance.now() / 90;
+    ctx.strokeStyle = 'rgba(234, 255, 255, 0.9)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 3; i++) {
+      const rot = spin + (Math.PI * 2 / 3) * i;
+      ctx.beginPath();
+      ctx.arc(0, 0, b.r * (0.6 + i * 0.35), rot, rot + 1.7);
+      ctx.stroke();
+    }
+    ctx.strokeStyle = 'rgba(207, 232, 238, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-b.r * 1.6, -3); ctx.quadraticCurveTo(-b.r * 0.6, 4, 2, -1);
+    ctx.moveTo(-b.r * 1.4, 4); ctx.quadraticCurveTo(-b.r * 0.5, -3, 3, 2);
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
   switch (equippedSkin) {
     case 'muncher': {
       // knabbelpelletje: geel bolletje met hapje eruit

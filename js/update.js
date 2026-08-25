@@ -490,6 +490,20 @@ function update() {
           spawnParticles(bot.x, bot.y, '#9ef7ff');
         }
 
+        // Windgeweer: blaast de geraakte bot en iedereen dichtbij een flink stuk weg
+        if (b.effect === 'gustPush') {
+          const gustAng = Math.atan2(b.vy, b.vx);
+          bots.forEach(other => {
+            if (other.dead) return;
+            const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+            if (other === bot || dd < 90) {
+              other.x = Math.max(other.r, Math.min(canvas.width - other.r, other.x + Math.cos(gustAng) * 55));
+              other.y = Math.max(other.r, Math.min(canvas.height - other.r, other.y + Math.sin(gustAng) * 55));
+            }
+          });
+          spawnParticles(bot.x, bot.y, '#eaffff');
+        }
+
         // Executioner Rifle: maakt verzwakte bots altijd direct af
         if (b.effect === 'execute' && !bot.immortal && bot.hp > 0 && bot.hp / bot.maxHp < 0.25) {
           bot.hp = 0;
