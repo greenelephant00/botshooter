@@ -216,7 +216,15 @@ function previewPowerup(id) {
 
   initGame(); // volledige reset + 4 gewone bots, net als een echt potje
 
-  powerups.push({ x: player.x, y: player.y, r: 14, type: id, bornAt: performance.now(), life: 9000 });
+  const spawnPreviewPowerup = () => {
+    if (!powerupPreviewActive || powerupPreviewId !== id || gameOver || levelTransition) return;
+    powerups.push({ x: player.x, y: player.y, r: 14, type: id, bornAt: performance.now(), life: 9000 });
+  };
+  if (POWERUP_PREVIEW_DELAY_IDS.includes(id)) {
+    setTimeout(spawnPreviewPowerup, POWERUP_PREVIEW_DELAY);
+  } else {
+    spawnPreviewPowerup();
+  }
 
   updateHUD();
   document.getElementById('pauseOverlay').style.display = 'none';
@@ -644,6 +652,11 @@ let previousEquippedSkin = null;
 let powerupPreviewActive = false;
 let powerupPreviewId = null;
 const POWERUP_PREVIEW_DURATION = 6000;
+// Powerups die maar één keer meteen iets doen met de bots die er op dat moment staan (bom, boomwortels, ...):
+// die laten we iets later spawnen zodat de bots eerst het beeld in kunnen lopen. Powerups die een tijdje
+// duren (aura, verwarring, snelvuur, ...) blijven toch actief terwijl de bots binnenkomen, dus die spawnen meteen.
+const POWERUP_PREVIEW_DELAY_IDS = ['freeze', 'nuke', 'elementstorm', 'wortelgreep', 'vuurnova', 'ijsbries', 'strike', 'lightningbarrage'];
+const POWERUP_PREVIEW_DELAY = 1200;
 
 function exitSkinPractice() {
   if (skinPracticeActive) equippedSkin = previousEquippedSkin;
