@@ -139,10 +139,12 @@ function powerupDescForLevel(id) {
     parts.push(`${sec} sec duur`);
   }
   if (info.heals) parts.push(`+${info.heals[level]} HP`);
-  if (info.dmgs) parts.push(`${info.dmgs[level]} schade aan alle bots`);
+  if (info.dmgs) parts.push(`${info.dmgs[level]} schade`);
   if (info.pellets) parts.push(`${info.pellets[level]} kogels tegelijk`);
   if (info.counts) parts.push(`${info.counts[level]} lasers`);
+  if (info.radii) parts.push(`${info.radii[level]}px straal`);
   const effectDesc = info.desc ? `${info.desc} ` : '';
+  if (parts.length === 0) return effectDesc.trim();
   const current = `${effectDesc}Huidig (Lv. ${level}): ${parts.join(', ')}.`;
   if (level >= info.prices.length) return `${current} Max niveau bereikt.`;
   const nextParts = [];
@@ -151,9 +153,10 @@ function powerupDescForLevel(id) {
     nextParts.push(`${sec} sec duur`);
   }
   if (info.heals) nextParts.push(`+${info.heals[level + 1]} HP`);
-  if (info.dmgs) nextParts.push(`${info.dmgs[level + 1]} schade aan alle bots`);
+  if (info.dmgs) nextParts.push(`${info.dmgs[level + 1]} schade`);
   if (info.pellets) nextParts.push(`${info.pellets[level + 1]} kogels tegelijk`);
   if (info.counts) nextParts.push(`${info.counts[level + 1]} lasers`);
+  if (info.radii) nextParts.push(`${info.radii[level + 1]}px straal`);
   return `${current} Volgend niveau: ${nextParts.join(', ')}.`;
 }
 
@@ -369,6 +372,7 @@ function startPractice(botName) {
   shockRings = [];
   lavaPools = [];
   iceLances = [];
+  tornadoShots = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -489,6 +493,7 @@ function startDodgePractice() {
   shockRings = [];
   lavaPools = [];
   iceLances = [];
+  tornadoShots = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

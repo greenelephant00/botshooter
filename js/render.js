@@ -323,6 +323,36 @@ function drawTornadoOverlay() {
   ctx.restore();
 }
 
+function drawTornadoShot(t) {
+  // Tornado-schot powerup: een klein, ronddwalend wervelwind-projectiel dat bots meesleurt
+  const now = performance.now() / 1000;
+  ctx.save();
+  ctx.globalAlpha = 0.2;
+  ctx.strokeStyle = '#cfe8ee';
+  ctx.lineWidth = 2;
+  ctx.setLineDash([3, 5]);
+  ctx.beginPath();
+  ctx.arc(t.x, t.y, t.r, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.globalAlpha = 1;
+  for (let ring = 0; ring < 3; ring++) {
+    const rr = 8 + ring * 7;
+    const rot = now * (3 + ring * 0.7) * (ring % 2 === 0 ? 1 : -1);
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    ctx.rotate(rot);
+    ctx.globalAlpha = 0.6 - ring * 0.12;
+    ctx.strokeStyle = '#dff3f7';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(0, 0, rr, 0.3, Math.PI * 1.5);
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}
+
 function drawIceLance(l) {
   // Rijmlans-special: een korte, felle rechte ijsstraal die snel uitdooft
   const age = performance.now() - l.born;
@@ -3466,6 +3496,7 @@ function draw() {
   treeGrabs.forEach(drawTreeGrab);
   shockRings.forEach(drawShockRing);
   iceLances.forEach(drawIceLance);
+  tornadoShots.forEach(drawTornadoShot);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);

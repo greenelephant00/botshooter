@@ -22,6 +22,14 @@ function shoot() {
   const dx = mouse.x - player.x;
   const dy = mouse.y - player.y;
   const baseAngle = Math.atan2(dy, dx);
+  if (player.nextShotTornado) {
+    // Tornado-schot powerup: dit schot is geen kogel maar een kleine, ronddwalende tornado
+    const tornadoR = player.nextShotTornado;
+    player.nextShotTornado = false;
+    tornadoShots.push({ x: player.x, y: player.y, vx: Math.cos(baseAngle) * 6, vy: Math.sin(baseAngle) * 6, r: tornadoR, captured: [], born: now });
+    spawnParticles(player.x, player.y, '#cfe8ee');
+    return;
+  }
   const streakMult = (weapon.effect === 'killstreak') ? 1 + Math.min(player.killStreak, 10) * 0.15 : 1;
   const bloodlustBonus = lvlBloodlust > 0 && player.killStreak > 0 ? 1 + BLOODLUST_BONUSES[lvlBloodlust - 1] * player.killStreak : 1;
   const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : 0;
@@ -1655,7 +1663,7 @@ function spawnPowerup() {
   const margin = 60;
   const types = currentWorld === 2
     ? WORLD2_POWERUP_IDS
-    : ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
+    : ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm', 'firetrail', 'strike', 'tornadoshot', 'lightningbarrage'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),
@@ -1795,6 +1803,43 @@ function rootSnareAttack(bot) {
       spawnParticles(player.x, player.y, '#3fa34d');
     }
   }, riseDur + wrapDur);
+}
+
+function triggerCenterLightningStrike(dmg) {
+  // Inslag-powerup: een enorme blikseminslag treft het midden van het speelveld
+  const cx = canvas.width / 2, cy = canvas.height / 2;
+  const radius = 150;
+  const delay = 500;
+  telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    lightningBolts.push({ x1: cx + (Math.random() - 0.5) * 40, y1: -40, x2: cx, y2: cy, born: performance.now() });
+    explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
+    spawnParticles(cx, cy, '#fff066');
+    spawnParticles(cx, cy, '#9be8ff');
+    bots.forEach(bot => {
+      if (bot.dead) return;
+      const dd = Math.hypot(bot.x - cx, bot.y - cy);
+      if (dd < radius + bot.r) damageBotSimple(bot, dmg, '#fff066');
+    });
+  }, delay);
+}
+
+function triggerTopHpLightningBarrage(dmg) {
+  // Bliksemschichten-powerup: 4 bliksemschichten treffen de 3 bots met de meeste HP
+  const targets = bots.filter(b => !b.dead).sort((a, c) => c.hp - a.hp).slice(0, 3);
+  if (targets.length === 0) return;
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      if (gameOver || levelTransition) return;
+      const target = targets[i % targets.length];
+      if (target.dead) return;
+      lightningBolts.push({ x1: target.x + (Math.random() - 0.5) * 40, y1: -40, x2: target.x, y2: target.y, born: performance.now() });
+      spawnParticles(target.x, target.y, '#fff066');
+      spawnParticles(target.x, target.y, '#9be8ff');
+      damageBotSimple(target, dmg, '#fff066');
+    }, i * 180);
+  }
 }
 
 function fireNovaAttack(dmg, radius) {

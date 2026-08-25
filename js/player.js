@@ -47,6 +47,9 @@ const player = {
   bleedUntil: 0,
   bleedLastTick: 0,
   ashBlindUntil: 0,
+  fireTrailUntil: 0,
+  lastFireTrailDrop: 0,
+  nextShotTornado: false,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -94,6 +97,9 @@ function resetPlayer() {
   player.bleedUntil = 0;
   player.bleedLastTick = 0;
   player.ashBlindUntil = 0;
+  player.fireTrailUntil = 0;
+  player.lastFireTrailDrop = 0;
+  player.nextShotTornado = false;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -349,6 +355,7 @@ function initGame() {
   shockRings = [];
   lavaPools = [];
   iceLances = [];
+  tornadoShots = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -416,6 +423,7 @@ function setupNextLevel() {
   shockRings = [];
   lavaPools = [];
   iceLances = [];
+  tornadoShots = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

@@ -37,6 +37,7 @@ const EARTH_SLAM_COOLDOWN = 10000;
 const EARTH_SLAM_RADIUS = 170;
 const EARTH_SLAM_DMG = 10;
 let iceLances = []; // Rijmlans-special: korte, gloeiende ijslijn-visual
+let tornadoShots = []; // Tornado-schot powerup: ronddwalend projectiel dat bots meesleurt en van de kaart slingert
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
@@ -474,13 +475,17 @@ const POWERUP_LEVELS = {
   overload:  { name: '⚡ Overload',     prices: [500, 800, 1150],  durations: [5000, 6000, 7000, 8000], desc: 'Dubbele schade en veel hogere vuursnelheid tegelijk.' },
   chaos:     { name: '🌀 Verwarring',   prices: [450, 700, 1000],  durations: [7000, 8500, 10000, 12000], desc: 'Alle bots (ook bosses) schieten op elkaar in plaats van op jou. Hun kogels doen elkaar evenveel schade als aan jou.' },
   elementstorm: { name: '🔥❄ Elementenstorm', prices: [500, 800, 1150], dmgs: [12, 16, 20, 25], counts: [25, 30, 35, 40], desc: 'Afwisselend vuur- en ijsstralen schieten vanaf de zijkanten het speelveld in, 8 per seconde, elk met een stippellijntje als waarschuwing vooraf. Ijsstralen bevriezen bots ook even. Doet alleen schade aan bots.' },
+  firetrail: { name: '🔥 Vuurspoor', prices: [400, 650, 950], durations: [6000, 7000, 8000, 9000], desc: 'Laat een tijdlang een brandend spoor achter je aan dat bots beschadigt die erin lopen.' },
+  strike: { name: '⚡ Inslag', prices: [400, 650, 950], dmgs: [35, 45, 55, 65], desc: 'Een enorme blikseminslag treft het midden van het speelveld en beschadigt alle bots die daar staan.' },
+  tornadoshot: { name: '🌪 Tornado-schot', prices: [450, 700, 1000], radii: [45, 60, 75], desc: 'Je volgende schot is geen kogel maar een kleine tornado. Bots die hij raakt worden meegesleurd; zodra hij de rand van het veld bereikt worden ze eraf geslingerd en sterven (werkt niet op bosses).' },
+  lightningbarrage: { name: '⚡ Bliksemschichten', prices: [450, 700, 1000], dmgs: [30, 36, 42, 48], desc: '4 bliksemschichten treffen de 3 bots met de meeste HP, elk voor forse schade.' },
   wortelgreep: { name: '🌳 Wortelgreep', prices: [400, 650, 950], counts: [3, 4, 5], desc: 'Bomen schieten uit de grond, grijpen elk een willekeurige bot en trekken hem met wortel en tak de grond in.' },
   aardhuid:    { name: '🪨 Aardhuid',    prices: [350, 550, 800], durations: [7000, 8500, 10000], reductions: [0.6, 0.7, 0.8], desc: 'Een rotshuid om je heen vermindert inkomende schade fors, tijdelijk.' },
   vuurnova:    { name: '🔥 Vuurnova',    prices: [400, 650, 950], dmgs: [22, 28, 34], radii: [170, 190, 210], desc: 'Een felle vuurexplosie om je heen beschadigt direct alle bots dichtbij.' },
   aardaura:    { name: '🌱 Aardaura',    prices: [350, 550, 800], durations: [8000, 9500, 11000], desc: 'Een veld van aarde-energie om je heen doet voortdurend schade aan bots die dichtbij komen.' },
   ijsbries:    { name: '❄ IJsbries',    prices: [300, 500, 750], durations: [4500, 5500, 6500], desc: 'Een ijzige windvlaag bevriest alle bots op het scherm tijdelijk.' }
 };
-const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
+const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm', 'firetrail', 'strike', 'tornadoshot', 'lightningbarrage'];
 // Alleen te vinden als pickup in Wereld 2 — niet in POWERUP_IDS, dus niet upgradebaar/koopbaar in de (lege) powerup-shop
 const WORLD2_POWERUP_IDS = ['wortelgreep', 'aardhuid', 'vuurnova', 'aardaura', 'ijsbries'];
 

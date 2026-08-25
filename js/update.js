@@ -51,6 +51,7 @@ function update() {
   const now = performance.now();
   bots.forEach(bot => {
     if (now < bot.frozenUntil || now < bot.rootedUntil) return; // bevroren of vastgeworteld, geen actie
+    if (bot.tornadoCaptured) return; // meegesleurd door een Tornado-schot, geen eigen actie
     // Elementale Wereld 2-bots: periodiek een sprankje van hun element
     const ambientColors = WORLD2_AMBIENT_FX[bot.type];
     if (ambientColors && (!bot.lastAmbientFx || now - bot.lastAmbientFx > 700)) {
@@ -1003,6 +1004,52 @@ function update() {
     }
   }
 
+  // Tornado-schot powerup: het projectiel sleurt bots mee en slingert ze van de kaart af bij het bereiken van de rand
+  tornadoShots.forEach(t => {
+    const age = now0 - t.born;
+    t.x += t.vx;
+    t.y += t.vy;
+    bots.forEach(bot => {
+      if (bot.dead || bot.isBoss || bot.tornadoCaptured) return;
+      const dd = Math.hypot(bot.x - t.x, bot.y - t.y);
+      if (dd < t.r + bot.r) {
+        bot.tornadoCaptured = true;
+        t.captured.push(bot);
+        spawnParticles(bot.x, bot.y, '#cfe8ee');
+      }
+    });
+    t.captured.forEach((bot, i) => {
+      if (bot.dead) return;
+      const orbitA = now0 / 150 + i * (Math.PI * 2 / Math.max(1, t.captured.length));
+      bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, t.x + Math.cos(orbitA) * 20));
+      bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, t.y + Math.sin(orbitA) * 20));
+    });
+    const outOfBounds = t.x < -10 || t.x > canvas.width + 10 || t.y < -10 || t.y > canvas.height + 10;
+    if (outOfBounds || age > 6000) {
+      if (outOfBounds) {
+        t.captured.forEach(bot => {
+          if (bot.dead) return;
+          bot.dead = true;
+          score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
+          if (gameMode === 'levels') levelKills++;
+          spawnParticles(bot.x, bot.y, '#cfe8ee');
+        });
+      } else {
+        t.captured.forEach(bot => { if (!bot.dead) bot.tornadoCaptured = false; });
+      }
+      t.expired = true;
+    }
+  });
+  tornadoShots = tornadoShots.filter(t => !t.expired);
+
+  // Vuurspoor-powerup: laat continu een klein brandend plekje achter zolang het actief is
+  if (now0 < player.fireTrailUntil) {
+    if (!player.lastFireTrailDrop || now0 - player.lastFireTrailDrop > 200) {
+      player.lastFireTrailDrop = now0;
+      fireZones.push({ x: player.x, y: player.y, radius: 36, until: now0 + 1500, tickDmg: 4, lastTick: 0 });
+    }
+  }
+
   // Lavagolem: lopen door de nog liggende lavaplas zet je opnieuw in brand
   lavaPools.forEach(pool => {
     const age = now0 - pool.born;
@@ -1141,6 +1188,18 @@ function update() {
           spawnParticles(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() < 0.5 ? '#9be3ff' : '#ffffff');
         }
         spawnParticles(player.x, player.y, '#9be3ff');
+      } else if (p.type === 'firetrail') {
+        player.fireTrailUntil = now + info.durations[lvl] * boostDurMult;
+        spawnParticles(p.x, p.y, '#ff5a1f');
+      } else if (p.type === 'strike') {
+        triggerCenterLightningStrike(info.dmgs[lvl]);
+        spawnParticles(p.x, p.y, '#fff066');
+      } else if (p.type === 'tornadoshot') {
+        player.nextShotTornado = info.radii[lvl];
+        spawnParticles(p.x, p.y, '#cfe8ee');
+      } else if (p.type === 'lightningbarrage') {
+        triggerTopHpLightningBarrage(info.dmgs[lvl]);
+        spawnParticles(p.x, p.y, '#fff066');
       }
     }
   });
