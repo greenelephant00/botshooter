@@ -396,7 +396,6 @@ function startPractice(botName) {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
-  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -527,7 +526,6 @@ function startDodgePractice() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
-  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];

@@ -930,29 +930,6 @@ function drawFireballThrow(g) {
   ctx.restore();
 }
 
-function drawRockThrow(g) {
-  // Aardgestalte-transformatie (Wereld 2): rotsblok dat naar de inslagplek vliegt
-  const age = performance.now() - g.born;
-  const t = Math.min(1, age / g.duration);
-  const x = g.startX + (g.tx - g.startX) * t;
-  const arc = Math.sin(t * Math.PI) * 26;
-  const y = g.startY + (g.ty - g.startY) * t - arc;
-  const spin = t * Math.PI * 4;
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.rotate(spin);
-  ctx.fillStyle = '#5c3a1e';
-  ctx.beginPath();
-  ctx.moveTo(-7, -5); ctx.lineTo(6, -7); ctx.lineTo(8, 4); ctx.lineTo(-3, 8); ctx.lineTo(-8, 2);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = '#8a6a3a';
-  ctx.beginPath();
-  ctx.arc(-1, -1, 3, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
 function drawFireZone(zone) {
   // Pyromancer-transformatie: brandende grond die bots gedurende een tijdje schade doet
   const pulse = 1 + Math.sin(performance.now() / 100) * 0.08;
@@ -3035,22 +3012,28 @@ function drawPlayerIceForm(c, r) {
 }
 
 function drawPlayerEarthForm(c, r) {
-  // Aardgestalte (Wereld 2): zwaar, brok-vormig lichaam van steen met mosplekjes
+  // Aardgestalte (Wereld 2): zwaar rotslichaam met stekelige piek-uitsteeksels rondom
+  c.fillStyle = '#3a2410';
+  c.beginPath();
+  for (let i = 0; i < 7; i++) {
+    const a = (Math.PI * 2 / 7) * i;
+    const spikeR = r * (i % 2 === 0 ? 1.3 : 0.95);
+    const px = Math.cos(a) * spikeR, py = Math.sin(a) * spikeR;
+    if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+  }
+  c.closePath();
+  c.fill();
   c.fillStyle = '#5c3a1e';
   c.beginPath();
-  c.arc(0, 0, r, 0, Math.PI * 2);
+  c.arc(0, 0, r * 0.8, 0, Math.PI * 2);
   c.fill();
   c.fillStyle = '#8a6a3a';
   c.beginPath();
-  c.arc(-r * 0.2, -r * 0.15, r * 0.6, 0, Math.PI * 2);
+  c.arc(-r * 0.2, -r * 0.15, r * 0.5, 0, Math.PI * 2);
   c.fill();
-  c.strokeStyle = '#3a2410';
-  c.lineWidth = 2;
+  c.strokeStyle = '#2a1a0c';
+  c.lineWidth = 1.5;
   c.stroke();
-  c.fillStyle = '#3fa34d';
-  c.beginPath();
-  c.arc(r * 0.3, r * 0.3, r * 0.18, 0, Math.PI * 2);
-  c.fill();
 }
 
 function drawPlayerWindForm(c, r) {
@@ -3852,7 +3835,6 @@ function draw() {
   fireZones.forEach(drawFireZone);
   gasClouds.forEach(drawGasCloud);
   fireballThrows.forEach(drawFireballThrow);
-  rockThrows.forEach(drawRockThrow);
   chargeTrails.forEach(drawChargeTrail);
   deployedTurrets.forEach(drawTurret);
   if (nowShake < tornadoUntil) drawTornadoOverlay();

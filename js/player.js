@@ -397,7 +397,6 @@ function initGame() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
-  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -469,7 +468,6 @@ function setupNextLevel() {
   stickyThrows = [];
   bladeTrails = [];
   fireballThrows = [];
-  rockThrows = [];
   fireZones = [];
   gasClouds = [];
   barrageLasers = [];
@@ -587,7 +585,7 @@ function updateHUD() {
   } else if (player.activeTransform === 'iceform') {
     active.push('❄ IJsgestalte — alleen vriesstraal');
   } else if (player.activeTransform === 'earthform') {
-    active.push('🪨 Aardgestalte — alleen rotsworp');
+    active.push('🪨 Aardgestalte — alleen stekelmuur');
   } else if (player.activeTransform === 'windform') {
     active.push('💨 Windgestalte — alleen windsnede');
   } else if (player.activeTransform === 'waterform') {

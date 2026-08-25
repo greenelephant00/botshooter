@@ -15,7 +15,7 @@ function shoot() {
   if (player.activeTransform === 'engineer') { engineerDeployTurret(); return; }
   if (player.activeTransform === 'fireform') { fireFormSlash(); return; }
   if (player.activeTransform === 'iceform') { iceFormBeam(); return; }
-  if (player.activeTransform === 'earthform') { earthFormThrow(); return; }
+  if (player.activeTransform === 'earthform') { earthFormSpikeWallAttack(); return; }
   if (player.activeTransform === 'windform') { windFormDash(); return; }
   if (player.activeTransform === 'waterform') { waterFormWave(); return; }
   const now = performance.now();
@@ -460,8 +460,8 @@ function iceFormBeam() {
   });
 }
 
-function earthFormThrow() {
-  // Aardgestalte (Wereld 2-transformatie): geen wapens, smijt een zwaar rotsblok dat bij inslag ontploft en bots wegstoot
+function earthFormSpikeWallAttack() {
+  // Aardgestalte (Wereld 2-transformatie): geen wapens, laat een muur van rotspieken vlak voor je uit de grond schieten
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
   const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
@@ -471,28 +471,26 @@ function earthFormThrow() {
   const dmgMult = now < player.damageBoostUntil ? 2 : 1;
   const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
   player.angle = angle;
-  const tx = Math.max(20, Math.min(canvas.width - 20, player.x + Math.cos(angle) * EARTHFORM_RANGE));
-  const ty = Math.max(20, Math.min(canvas.height - 20, player.y + Math.sin(angle) * EARTHFORM_RANGE));
-  rockThrows.push({ startX: player.x, startY: player.y, tx, ty, born: now, duration: EARTHFORM_TRAVEL_TIME });
-  setTimeout(() => {
-    if (gameOver || levelTransition) return;
-    explosions.push({ x: tx, y: ty, born: performance.now(), maxR: EARTHFORM_SPLASH_RADIUS });
-    spawnParticles(tx, ty, '#8a6a3a');
-    spawnParticles(tx, ty, '#5c3a1e');
-    bots.forEach(bot => {
-      if (bot.dead) return;
-      const dd = Math.hypot(tx - bot.x, ty - bot.y);
-      if (dd < EARTHFORM_SPLASH_RADIUS + bot.r) {
-        damageBotSimple(bot, EARTHFORM_DMG * dmgMult, '#8a6a3a');
-        if (!bot.dead) {
-          const kdx = bot.x - tx, kdy = bot.y - ty;
-          const klen = Math.hypot(kdx, kdy) || 1;
-          bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + (kdx / klen) * EARTHFORM_KNOCKBACK));
-          bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + (kdy / klen) * EARTHFORM_KNOCKBACK));
-        }
+  const baseX = player.x + Math.cos(angle) * EARTHFORM_WALL_DIST;
+  const baseY = player.y + Math.sin(angle) * EARTHFORM_WALL_DIST;
+  const perpX = -Math.sin(angle), perpY = Math.cos(angle);
+  const mid = (EARTHFORM_WALL_COUNT - 1) / 2;
+  for (let i = 0; i < EARTHFORM_WALL_COUNT; i++) {
+    const offset = (i - mid) * EARTHFORM_WALL_SPACING;
+    const sx = Math.max(20, Math.min(canvas.width - 20, baseX + perpX * offset));
+    const sy = Math.max(20, Math.min(canvas.height - 20, baseY + perpY * offset));
+    explosions.push({ x: sx, y: sy, born: now, maxR: EARTHFORM_SPIKE_RADIUS });
+    spawnParticles(sx, sy, '#8a6a3a');
+    spawnParticles(sx, sy, '#5c3a1e');
+    bots.forEach(target => {
+      if (target.dead) return;
+      const dd = Math.hypot(sx - target.x, sy - target.y);
+      if (dd < EARTHFORM_SPIKE_RADIUS + target.r) {
+        damageBotSimple(target, EARTHFORM_DMG * dmgMult, '#8a6a3a');
+        if (!target.dead) target.rootedUntil = Math.max(target.rootedUntil || 0, now + EARTHFORM_ROOT_DURATION);
       }
     });
-  }, EARTHFORM_TRAVEL_TIME);
+  }
 }
 
 function windFormDash() {
