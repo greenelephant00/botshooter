@@ -478,13 +478,18 @@ function drawLavaPool(pool) {
     }
     ctx.globalAlpha = alpha;
     const pulse = 0.85 + Math.sin(performance.now() / 200) * 0.15;
-    const grad = ctx.createRadialGradient(pool.x, pool.y, 0, pool.x, pool.y, pool.radius);
-    grad.addColorStop(0, `rgba(255, 220, 100, ${pulse})`);
-    grad.addColorStop(0.5, '#ff6a1f');
-    grad.addColorStop(1, '#3a1f12');
-    ctx.fillStyle = grad;
+    // Platte, gelaagde cirkels i.p.v. een radial gradient — veel goedkoper om te tekenen, vooral met meerdere plassen tegelijk
+    ctx.fillStyle = '#3a1f12';
     ctx.beginPath();
     ctx.arc(pool.x, pool.y, pool.radius, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff6a1f';
+    ctx.beginPath();
+    ctx.arc(pool.x, pool.y, pool.radius * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = `rgba(255, 220, 100, ${pulse})`;
+    ctx.beginPath();
+    ctx.arc(pool.x, pool.y, pool.radius * 0.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = 'rgba(30,15,8,0.5)';
     const seed = Math.floor(performance.now() / 500);
@@ -860,12 +865,8 @@ function drawTelegraph(t) {
 function drawEnemyBullet(b) {
   const srcType = b.sourceBot && b.sourceBot.type;
   if (srcType === 'fireling') {
-    // gloeiende vuurbal met een felle witte kern
-    const grad = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r + 3);
-    grad.addColorStop(0, '#fff275');
-    grad.addColorStop(0.5, '#ff8c42');
-    grad.addColorStop(1, 'rgba(200,16,46,0)');
-    ctx.fillStyle = grad;
+    // gloeiende vuurbal met een felle witte kern (platte kleuren i.p.v. gradient — goedkoper om te tekenen)
+    ctx.fillStyle = '#ff8c42';
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r + 3, 0, Math.PI * 2);
     ctx.fill();
@@ -1069,17 +1070,17 @@ function drawPlayerBullet(b) {
     const wob = Math.sin(performance.now() / 40 + b.x) * 2;
     ctx.globalAlpha = Math.max(0.15, fade);
     const len = 16 + wob;
-    const grad = ctx.createLinearGradient(-len, 0, 6, 0);
-    grad.addColorStop(0, 'rgba(200, 16, 46, 0)');
-    grad.addColorStop(0.5, '#ff5a1f');
-    grad.addColorStop(0.85, '#ffb703');
-    grad.addColorStop(1, '#fff9c4');
-    ctx.fillStyle = grad;
+    // Platte vlamvorm i.p.v. een gradient — goedkoper om te tekenen, vooral bij hoog vuurtempo
+    ctx.fillStyle = '#ff5a1f';
     ctx.beginPath();
     ctx.moveTo(6, 0);
     ctx.quadraticCurveTo(-len * 0.4, -6 + wob * 0.5, -len, 0);
     ctx.quadraticCurveTo(-len * 0.4, 6 - wob * 0.5, 6, 0);
     ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#ffe066';
+    ctx.beginPath();
+    ctx.arc(2, 0, 4, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
     return;
@@ -1108,11 +1109,8 @@ function drawPlayerBullet(b) {
   if (b.isCrystal) {
     // Kristalgeweer: een echte, goed zichtbare ronddraaiende ijsscherf i.p.v. een kogel
     ctx.rotate(performance.now() / 90);
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.r + 3);
-    grad.addColorStop(0, '#ffffff');
-    grad.addColorStop(0.55, '#9ef7ff');
-    grad.addColorStop(1, '#1c6fd6');
-    ctx.fillStyle = grad;
+    // Platte kleur i.p.v. een gradient — goedkoper om te tekenen
+    ctx.fillStyle = '#9ef7ff';
     ctx.beginPath();
     ctx.moveTo(0, -(b.r + 3));
     ctx.lineTo(b.r * 0.6, -b.r * 0.2);
@@ -1133,13 +1131,18 @@ function drawPlayerBullet(b) {
   if (b.isMagmaOrb) {
     // Magma Kanon: een gloeiende, druipende lavabol
     const flicker = 1 + Math.sin(performance.now() / 80) * 0.1;
-    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, (b.r + 2) * flicker);
-    grad.addColorStop(0, '#fff9c4');
-    grad.addColorStop(0.5, '#ff8c00');
-    grad.addColorStop(1, '#3a1f12');
-    ctx.fillStyle = grad;
+    // Platte, gelaagde cirkels i.p.v. een gradient — goedkoper om te tekenen
+    ctx.fillStyle = '#3a1f12';
     ctx.beginPath();
     ctx.arc(0, 0, (b.r + 2) * flicker, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#ff8c00';
+    ctx.beginPath();
+    ctx.arc(0, 0, (b.r + 2) * flicker * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = '#fff9c4';
+    ctx.beginPath();
+    ctx.arc(0, 0, (b.r + 2) * flicker * 0.3, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = 'rgba(255, 140, 0, 0.6)';
     ctx.beginPath();
@@ -1170,11 +1173,8 @@ function drawPlayerBullet(b) {
     return;
   }
   if (b.isIceLanceBolt) {
-    // Rijmlans: een scherpe, langwerpige ijspegel
-    const grad = ctx.createLinearGradient(-b.r - 6, 0, b.r + 6, 0);
-    grad.addColorStop(0, 'rgba(158, 247, 255, 0)');
-    grad.addColorStop(1, '#eaffff');
-    ctx.fillStyle = grad;
+    // Rijmlans: een scherpe, langwerpige ijspegel (platte kleur i.p.v. gradient — goedkoper om te tekenen)
+    ctx.fillStyle = '#eaffff';
     ctx.beginPath();
     ctx.moveTo(b.r + 6, 0);
     ctx.lineTo(-b.r, -3);
@@ -2933,16 +2933,15 @@ function drawBot(bot) {
   } else if (isFireling) {
     // vlammend lichaam: gloeiende kern met flikkerende vlampunten
     const flicker = 1 + Math.sin(performance.now() / 90) * 0.08;
-    if (!frozen && !rooted && !slashing) {
-      const fgrad = ctx.createRadialGradient(0, 0, 0, 0, 0, bot.r * flicker);
-      fgrad.addColorStop(0, '#fff275');
-      fgrad.addColorStop(0.5, '#ff8c42');
-      fgrad.addColorStop(1, '#c8102e');
-      ctx.fillStyle = fgrad;
-    }
+    // Platte kleur i.p.v. een gradient — goedkoper om te tekenen
+    if (!frozen && !rooted && !slashing) ctx.fillStyle = '#ff8c42';
     ctx.arc(0, 0, bot.r * flicker, 0, Math.PI * 2);
     ctx.fill();
     if (!frozen && !rooted && !slashing) {
+      ctx.fillStyle = '#fff275';
+      ctx.beginPath();
+      ctx.arc(0, 0, bot.r * flicker * 0.5, 0, Math.PI * 2);
+      ctx.fill();
       ctx.fillStyle = '#ffb703';
       const tips = 5;
       for (let i = 0; i < tips; i++) {
