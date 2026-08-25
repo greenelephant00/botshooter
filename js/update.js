@@ -1543,6 +1543,8 @@ function goToMenu() {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  powerupPreviewActive = false;
+  powerupPreviewId = null;
   exitSkinPractice();
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';

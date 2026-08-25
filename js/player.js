@@ -536,6 +536,7 @@ function updateHUD() {
   }
   const now = performance.now();
   const active = [];
+  if (powerupPreviewActive) active.push('🎬 Voorbeeld — keert vanzelf terug naar het menu');
   if (now < player.boostUntil) active.push('⚡ Speed');
   if (now < player.fireBoostUntil) active.push('🔥 Snelvuur');
   if (now < player.shieldUntil) active.push('🛡 Schild');

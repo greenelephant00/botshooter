@@ -194,9 +194,45 @@ function renderPowerupShop() {
       ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
       : `<button class="buy" onclick="buyPowerupUpgrade('${id}')" ${coins < info.prices[level] ? 'disabled' : ''}>Koop niveau ${level + 1}/${maxLevel} · 🪙${info.prices[level]}</button>`;
     const desc = currentWorld === 2 ? world2PowerupDesc(id) : powerupDescForLevel(id);
-    return `<div class="shopItem"><div class="info"><div class="name">${info.name} (Lv. ${level}/${maxLevel})</div><div class="desc">${desc}</div></div>${btn}</div>`;
+    return `<div class="shopItem"><div class="info"><div class="name">${info.name} (Lv. ${level}/${maxLevel})</div><div class="desc">${desc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewPowerup('${id}')">🎬 Bekijk</button></div>
+    </div>`;
   }).join('');
 }
+
+function previewPowerup(id) {
+  // Toont een kort, echt speelmoment (in de echte engine, geen nepvideo) van wat er gebeurt als je deze powerup oppakt
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  exitSkinPractice();
+  powerupPreviewActive = true;
+  powerupPreviewId = id;
+  gameMode = 'practice';
+  document.getElementById('powerupShopScreen').style.display = 'none';
+  document.getElementById('levelHud').style.display = 'none';
+
+  initGame(); // volledige reset + 4 gewone bots, net als een echt potje
+
+  powerups.push({ x: player.x, y: player.y, r: 14, type: id, bornAt: performance.now(), life: 9000 });
+
+  updateHUD();
+  document.getElementById('pauseOverlay').style.display = 'none';
+  document.getElementById('msg').style.display = 'none';
+
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+  startMusic();
+
+  setTimeout(() => {
+    if (powerupPreviewActive && powerupPreviewId === id) goToMenu();
+  }, POWERUP_PREVIEW_DURATION);
+}
+window.previewPowerup = previewPowerup;
 
 // ---- Bot info scherm ----
 const BOT_DISPLAY_NAMES = {
@@ -605,6 +641,9 @@ let disasterPracticeType = null;
 let skinPracticeActive = false;
 let skinPracticeId = null;
 let previousEquippedSkin = null;
+let powerupPreviewActive = false;
+let powerupPreviewId = null;
+const POWERUP_PREVIEW_DURATION = 6000;
 
 function exitSkinPractice() {
   if (skinPracticeActive) equippedSkin = previousEquippedSkin;
