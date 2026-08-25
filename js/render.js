@@ -80,7 +80,11 @@ function drawPowerup(p) {
     aardhuid: '#8a6a3a',
     vuurnova: '#ff5a1f',
     aardaura: '#7fff00',
-    ijsbries: '#7fd9ff'
+    ijsbries: '#7fd9ff',
+    firetrail: '#ff5a1f',
+    strike: '#fff066',
+    tornadoshot: '#cfe8ee',
+    lightningbarrage: '#f5e642'
   };
   const icons = {
     speed: '⚡',
@@ -104,7 +108,11 @@ function drawPowerup(p) {
     aardhuid: '🪨',
     vuurnova: '🔥',
     aardaura: '🌱',
-    ijsbries: '❄'
+    ijsbries: '❄',
+    firetrail: '🔥',
+    strike: '⚡',
+    tornadoshot: '🌪',
+    lightningbarrage: '⚡'
   };
   const col = colors[p.type];
   ctx.save();
