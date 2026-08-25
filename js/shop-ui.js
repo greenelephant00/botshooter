@@ -798,7 +798,7 @@ function drawBotPreview(canvasEl, type) {
 }
 
 function buyWeapon(id) {
-  const w = WEAPONS.find(x => x.id === id) || SPECIAL_WEAPONS.find(x => x.id === id);
+  const w = WEAPONS.find(x => x.id === id) || SPECIAL_WEAPONS.find(x => x.id === id) || WORLD2_WEAPONS.find(x => x.id === id);
   if (!w || ownedWeapons.includes(id) || coins < w.price) return;
   coins -= w.price;
   ownedWeapons.push(id);
@@ -1253,9 +1253,11 @@ function leveledUpgradeItemHtml(name, desc, levels, currentLevel, buyFnName) {
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   if (currentWorld === 2) {
-    document.getElementById('shopWeapons').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    document.getElementById('shopWeapons').innerHTML = WORLD2_WEAPONS.map(w =>
+      weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
+    ).join('');
     document.getElementById('shopSpecialWeapons').innerHTML = '';
-    document.getElementById('shopArmor').innerHTML = '';
+    document.getElementById('shopArmor').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
     document.getElementById('shopUpgrades').innerHTML = '';
     const section2 = document.getElementById('shopArmor2Section');
     if (section2) section2.style.display = 'none';

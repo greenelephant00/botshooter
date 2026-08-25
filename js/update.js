@@ -57,6 +57,14 @@ function update() {
       bot.lastAmbientFx = now;
       spawnParticles(bot.x, bot.y, ambientColors[Math.floor(Math.random() * ambientColors.length)]);
     }
+    if (bot.igniteUntil && now < bot.igniteUntil) {
+      // Vlammenwerper: apart van gif, brandwond-schade-over-tijd
+      if (!bot.lastIgniteTick || now - bot.lastIgniteTick > 400) {
+        bot.lastIgniteTick = now;
+        damageBotSimple(bot, 2, '#ff8c42');
+        if (bot.dead) return;
+      }
+    }
     if (bot.poisonUntil && now < bot.poisonUntil) {
       if (!bot.lastPoisonTick || now - bot.lastPoisonTick > 400) {
         bot.lastPoisonTick = now;
@@ -453,6 +461,32 @@ function update() {
         if (b.effect === 'poison') {
           bot.poisonUntil = Math.max(bot.poisonUntil || 0, performance.now() + 3000);
           bot.poisonSpread = true;
+        }
+
+        // Vlammenwerper: zet de bot in brand voor schade-over-tijd
+        if (b.effect === 'igniteHit') {
+          bot.igniteUntil = Math.max(bot.igniteUntil || 0, performance.now() + 2500);
+        }
+
+        // Aardstamper: stampt de bot een flink stuk naar achteren
+        if (b.effect === 'knockbackHit') {
+          const kAng = Math.atan2(bot.y - player.y, bot.x - player.x);
+          bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(kAng) * 45));
+          bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(kAng) * 45));
+          spawnParticles(bot.x, bot.y, '#8a6a3a');
+        }
+
+        // Kristalgeweer: spat uiteen in ijsscherven die bots dichtbij ook raken en even bevriezen
+        if (b.effect === 'shatterHit') {
+          bots.forEach(other => {
+            if (other === bot || other.dead) return;
+            const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+            if (dd < 70) {
+              damageBotSimple(other, Math.max(1, Math.round((b.dmg || 1) * 0.5)), '#9ef7ff');
+              other.frozenUntil = Math.max(other.frozenUntil || 0, performance.now() + 400);
+            }
+          });
+          spawnParticles(bot.x, bot.y, '#9ef7ff');
         }
 
         // Executioner Rifle: maakt verzwakte bots altijd direct af

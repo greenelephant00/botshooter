@@ -513,11 +513,19 @@ const ARMOR = [
   { id: 'ice',        name: 'Ijs-pantser',         price: 650,  hpBonus: 30,  reduction: 0.15, freezeReflect: true, desc: '+30 max HP, -15% schade. Bots die je raken, bevriezen voor 3 sec.' }
 ];
 
+// Elementale wapens: alleen te koop in de Wereld 2-shop
+const WORLD2_WEAPONS = [
+  { id: 'flamethrower', name: 'Vlammenwerper', price: 1200, cooldownMult: 0.5, dmg: 1, pellets: 1, spread: 0.05, effect: 'igniteHit',   desc: 'Elke kogel zet de geraakte bot 2,5 sec in brand voor schade-over-tijd.' },
+  { id: 'earthpounder',  name: 'Aardstamper',   price: 1300, cooldownMult: 1.6, dmg: 3, pellets: 1, spread: 0,    effect: 'knockbackHit', desc: 'Elke kogel stampt de geraakte bot een flink stuk naar achteren.' },
+  { id: 'windrifle',     name: 'Windgeweer',    price: 1400, cooldownMult: 0.9, dmg: 2, pellets: 1, spread: 0,    pierce: 3, bulletSpeedMult: 1.3, desc: 'Een vlaag wind blaast de kogel dwars door tot 4 bots op een rechte lijn.' },
+  { id: 'crystalgun',    name: 'Kristalgeweer', price: 1500, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0,    effect: 'shatterHit',   desc: 'Elke kogel spat uiteen in ijsscherven die bots dichtbij ook raken en even bevriezen.' }
+];
+
 let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oefensessie
 
 function getWeapon() {
   const id = practiceWeaponId || equippedWeapon;
-  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
+  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WEAPONS[0];
 }
 function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
 function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
