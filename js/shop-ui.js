@@ -816,7 +816,7 @@ function equipWeapon(id) {
 window.equipWeapon = equipWeapon;
 
 function buyArmor(id) {
-  const a = ARMOR.find(x => x.id === id);
+  const a = ARMOR.find(x => x.id === id) || WORLD2_ARMOR.find(x => x.id === id);
   if (!a || ownedArmor.includes(id) || coins < a.price) return;
   coins -= a.price;
   ownedArmor.push(id);
@@ -1257,7 +1257,9 @@ function renderShop() {
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
     document.getElementById('shopSpecialWeapons').innerHTML = '';
-    document.getElementById('shopArmor').innerHTML = '<p style="color:#999;">Nog niks te koop in deze wereld. Kom later terug!</p>';
+    document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.map(a =>
+      shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor === a.id, 'buyArmor', 'equipArmor')
+    ).join('');
     document.getElementById('shopUpgrades').innerHTML = '';
     const section2 = document.getElementById('shopArmor2Section');
     if (section2) section2.style.display = 'none';

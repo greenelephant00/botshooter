@@ -794,10 +794,11 @@ function update() {
           // Elementale Wereld 2-bots: elk een eigen extra effect bovenop de schade
           const srcType = b.sourceBot && b.sourceBot.type;
           if (srcType === 'windwicht') {
-            // Windloper: blaast je een stuk naar achteren
+            // Windloper: blaast je een stuk naar achteren (minder ver met knockbackResist-pantser)
             const kAng = Math.atan2(player.y - b.sourceBot.y, player.x - b.sourceBot.x);
-            player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(kAng) * 70));
-            player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(kAng) * 70));
+            const kbDist = 70 * (1 - getArmorStats().knockbackResist);
+            player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x + Math.cos(kAng) * kbDist));
+            player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y + Math.sin(kAng) * kbDist));
             spawnParticles(player.x, player.y, '#eaffff');
           } else if (srcType === 'bliksemwicht') {
             // Donderknaap: korte schok-jolt van het scherm en een lichtflits
@@ -809,8 +810,8 @@ function update() {
             lightningBolts.push({ x1: b.sourceBot.x, y1: b.sourceBot.y, x2: player.x, y2: player.y, born: now0 });
             spawnParticles(player.x, player.y, '#8ecbff');
           } else if (srcType === 'kristalwicht') {
-            // Kristalreus: een bevriezende vertraging
-            player.slowUntil = Math.max(player.slowUntil, now0 + 1700);
+            // Kristalreus: een bevriezende vertraging (korter met iceResist-pantser)
+            player.slowUntil = Math.max(player.slowUntil, now0 + 1700 * (1 - getArmorStats().iceResist));
             spawnParticles(player.x, player.y, '#9ef7ff');
             spawnParticles(player.x, player.y, '#ffffff');
           } else if (srcType === 'zandworm') {
@@ -833,8 +834,8 @@ function update() {
             spawnParticles(player.x, player.y, '#6b6b6b');
             spawnParticles(player.x, player.y, '#c9c9c9');
           } else if (srcType === 'sneeuwjager') {
-            // Sneeuwjager: een korte, harde bevriezing
-            player.rootedUntil = Math.max(player.rootedUntil, now0 + 500);
+            // Sneeuwjager: een korte, harde bevriezing (korter met iceResist-pantser)
+            player.rootedUntil = Math.max(player.rootedUntil, now0 + 500 * (1 - getArmorStats().iceResist));
             spawnParticles(player.x, player.y, '#eaffff');
             spawnParticles(player.x, player.y, '#bdf3ff');
           }
@@ -1008,7 +1009,7 @@ function update() {
     const dd = Math.hypot(pool.x - player.x, pool.y - player.y);
     if (dd < pool.radius + player.r && (!pool.lastIgniteTick || now0 - pool.lastIgniteTick > 600)) {
       pool.lastIgniteTick = now0;
-      player.burnUntil = Math.max(player.burnUntil, now0 + 3000);
+      player.burnUntil = Math.max(player.burnUntil, now0 + 3000 * (1 - getArmorStats().fireResist));
       spawnParticles(player.x, player.y, '#ff5a1f');
     }
   });

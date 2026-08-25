@@ -28,7 +28,8 @@ function shoot() {
   const isCrit = Math.random() < critChance;
   const critMult = isCrit ? 2 : 1;
   const curseMult = now < player.curseUntil ? 0.5 : 1;
-  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult;
+  const elementalMult = weapon.effect === 'igniteHit' ? getArmorStats().fireDmgMult : weapon.effect === 'shatterHit' ? getArmorStats().iceDmgMult : 1;
+  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult * elementalMult;
   const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (lvlSharpshooter > 0 ? SHARPSHOOTER_BONUSES[lvlSharpshooter - 1] : 0));
   const extraPierce = lvlPiercingRounds;
 
@@ -1237,8 +1238,8 @@ function mortarStrike(bot) {
     if (dd < radius + player.r) {
       applyDamageToPlayer(bot.meleeDamage || 40);
       if (bot.type === 'magmawicht') {
-        // door de lava geraakt: 3 sec lang in brand, elke sec 4 schade
-        player.burnUntil = performance.now() + 3000;
+        // door de lava geraakt: 3 sec lang in brand, elke sec 4 schade (korter met fireResist-pantser)
+        player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
         spawnParticles(player.x, player.y, '#ff5a1f');
       }
     }
@@ -1638,7 +1639,7 @@ function lavaRainAttack(bot) {
         const dd = Math.hypot(player.x - tx, player.y - ty);
         if (dd < radius + player.r) {
           applyDamageToPlayer(bot.specialDmg || 16);
-          player.burnUntil = performance.now() + 3000;
+          player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
         }
       }, delay);
     }, i * 500);
@@ -1662,7 +1663,7 @@ function frostNovaAttack(bot) {
     if (!hit && Math.abs(dd - r) < 24) {
       hit = true;
       applyDamageToPlayer(bot.specialDmg || 14);
-      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1000);
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1000 * (1 - getArmorStats().iceResist));
       spawnParticles(player.x, player.y, '#9ef7ff');
       spawnParticles(player.x, player.y, '#ffffff');
     }

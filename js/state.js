@@ -521,14 +521,28 @@ const WORLD2_WEAPONS = [
   { id: 'crystalgun',    name: 'Kristalgeweer', price: 1500, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, bulletR: 7, effect: 'shatterHit', desc: 'Schiet echte, zichtbare ijsscherven i.p.v. kogels. Elke scherf spat uiteen in ijsschilfers die bots dichtbij ook raken en even bevriezen.' }
 ];
 
+// Elementale pantsers: alleen te koop in de Wereld 2-shop
+const WORLD2_ARMOR = [
+  { id: 'fireshield',   name: 'Vuurschild',            price: 700,  hpBonus: 30, reduction: 0, fireResist: 0.6, desc: '+30 max HP. Brandwonden (bv. van Lavagolem/Vulkaanheer) duren 60% korter.' },
+  { id: 'iceshield',    name: 'IJsschild',             price: 700,  hpBonus: 30, reduction: 0, iceResist: 0.6, desc: '+30 max HP. Bevriezingen en vertragingen door ijs (Sneeuwjager, Vriesvorst, Kristalreus) duren 60% korter.' },
+  { id: 'earthplate',   name: 'Aardharnas',            price: 800,  hpBonus: 80, reduction: 0.3, desc: '+80 max HP, -30% inkomende schade. Zwaar en degelijk, net als de aarde zelf.' },
+  { id: 'windcloak',    name: 'Windmantel',            price: 750,  hpBonus: 15, reduction: 0, speedBonus: 0.2, knockbackResist: 0.6, desc: '+15 max HP, +20% snelheid. Wegblaas-effecten (Windloper, Windgeweer-terugslag) zijn 60% zwakker.' },
+  { id: 'fireaffinity', name: 'Vuuraffiniteit-pantser', price: 900,  hpBonus: 15, reduction: 0, fireDmgMult: 1.35, iceDmgMult: 0.7, desc: '+15 max HP. Je vuurwapens (Vlammenwerper) doen 35% meer schade, maar je ijswapens (Kristalgeweer) doen 30% minder.' },
+  { id: 'iceaffinity',  name: 'IJsaffiniteit-pantser', price: 900,  hpBonus: 15, reduction: 0, iceDmgMult: 1.35, fireDmgMult: 0.7, desc: '+15 max HP. Je ijswapens (Kristalgeweer) doen 35% meer schade, maar je vuurwapens (Vlammenwerper) doen 30% minder.' },
+  { id: 'meltarmor',    name: 'Smeltpantser',          price: 850,  hpBonus: 25, reduction: 0, fireResist: 0.3, iceResist: 0.3, desc: '+25 max HP. Zowel brand- als ijs-effecten duren 30% korter.' },
+  { id: 'magmaskin',    name: 'Magmahuid',             price: 950,  hpBonus: 20, reduction: 0, fireResist: 0.7, regen: 2, desc: '+20 max HP. Brand-effecten duren 70% korter en je geneest passief 2 HP/sec.' },
+  { id: 'permafrost',   name: 'Permafrosthuid',        price: 950,  hpBonus: 20, reduction: 0.15, iceResist: 0.7, desc: '+20 max HP, -15% schade. IJs-effecten duren 70% korter.' },
+  { id: 'elementguard', name: 'Elementenwacht',        price: 1400, hpBonus: 60, reduction: 0, fireResist: 0.3, iceResist: 0.3, knockbackResist: 0.3, desc: '+60 max HP. Een beetje bestand tegen alles: vuur, ijs én wegblaas-effecten.' }
+];
+
 let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oefensessie
 
 function getWeapon() {
   const id = practiceWeaponId || equippedWeapon;
   return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WEAPONS[0];
 }
-function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
-function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
+function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
+function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || WORLD2_ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
 
 // Gecombineerde stats van beide pantser-slots (2e slot telt alleen mee als hasDualArmor is gekocht)
 function getArmorStats() {
@@ -545,7 +559,12 @@ function getArmorStats() {
     reflection: (a1.reflection || 0) + (a2.reflection || 0),
     speedBonus: (a1.speedBonus || 0) + (a2.speedBonus || 0),
     poisonReflect: !!(a1.poisonReflect || a2.poisonReflect),
-    freezeReflect: !!(a1.freezeReflect || a2.freezeReflect)
+    freezeReflect: !!(a1.freezeReflect || a2.freezeReflect),
+    fireResist: 1 - (1 - (a1.fireResist || 0)) * (1 - (a2.fireResist || 0)),
+    iceResist: 1 - (1 - (a1.iceResist || 0)) * (1 - (a2.iceResist || 0)),
+    fireDmgMult: (a1.fireDmgMult || 1) * (a2.fireDmgMult || 1),
+    iceDmgMult: (a1.iceDmgMult || 1) * (a2.iceDmgMult || 1),
+    knockbackResist: 1 - (1 - (a1.knockbackResist || 0)) * (1 - (a2.knockbackResist || 0))
   };
 }
 
