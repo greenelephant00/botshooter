@@ -1663,7 +1663,7 @@ function spawnPowerup() {
   const margin = 60;
   const types = currentWorld === 2
     ? WORLD2_POWERUP_IDS
-    : ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm', 'firetrail', 'strike', 'tornadoshot', 'lightningbarrage'];
+    : ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
   const type = types[Math.floor(Math.random() * types.length)];
   powerups.push({
     x: margin + Math.random() * (canvas.width - margin * 2),

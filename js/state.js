@@ -485,9 +485,9 @@ const POWERUP_LEVELS = {
   aardaura:    { name: '🌱 Aardaura',    prices: [350, 550, 800], durations: [8000, 9500, 11000], desc: 'Een veld van aarde-energie om je heen doet voortdurend schade aan bots die dichtbij komen.' },
   ijsbries:    { name: '❄ IJsbries',    prices: [300, 500, 750], durations: [4500, 5500, 6500], desc: 'Een ijzige windvlaag bevriest alle bots op het scherm tijdelijk.' }
 };
-const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm', 'firetrail', 'strike', 'tornadoshot', 'lightningbarrage'];
+const POWERUP_IDS = ['speed', 'heal', 'fire', 'shield', 'damage', 'multishot', 'freeze', 'nuke', 'invisible', 'timewarp', 'ricochet', 'homing', 'stun', 'aura', 'overload', 'chaos', 'elementstorm'];
 // Alleen te vinden als pickup in Wereld 2 — niet in POWERUP_IDS, dus niet upgradebaar/koopbaar in de (lege) powerup-shop
-const WORLD2_POWERUP_IDS = ['wortelgreep', 'aardhuid', 'vuurnova', 'aardaura', 'ijsbries'];
+const WORLD2_POWERUP_IDS = ['wortelgreep', 'aardhuid', 'vuurnova', 'aardaura', 'ijsbries', 'firetrail', 'strike', 'tornadoshot', 'lightningbarrage'];
 
 function getPuLevel(id) { return powerupLevels[id] || 0; }
 

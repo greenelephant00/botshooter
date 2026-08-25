@@ -165,7 +165,11 @@ const WORLD2_POWERUP_VALUE_TEXT = {
   aardhuid: (info, lvl) => `${Math.round(info.reductions[lvl] * 100)}% minder schade, ${(info.durations[lvl] / 1000).toFixed(1)} sec`,
   vuurnova: (info, lvl) => `${info.dmgs[lvl]} schade binnen ${info.radii[lvl]}px`,
   aardaura: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec duur`,
-  ijsbries: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec bevroren`
+  ijsbries: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec bevroren`,
+  firetrail: (info, lvl) => `${(info.durations[lvl] / 1000).toFixed(1)} sec spoor`,
+  strike: (info, lvl) => `${info.dmgs[lvl]} schade in het midden`,
+  tornadoshot: (info, lvl) => `${info.radii[lvl]}px straal`,
+  lightningbarrage: (info, lvl) => `${info.dmgs[lvl]} schade per schicht`
 };
 
 function world2PowerupDesc(id) {
