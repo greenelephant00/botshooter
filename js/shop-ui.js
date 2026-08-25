@@ -449,6 +449,12 @@ function startPractice(botName) {
     specialBCooldown: type.specialBCooldown,
     specialCLastUsed: performance.now() + 4000,
     specialCCooldown: type.specialCCooldown,
+    specialDLastUsed: performance.now() + 6000,
+    specialDCooldown: type.specialDCooldown,
+    specialELastUsed: performance.now() + 3000,
+    specialECooldown: type.specialECooldown,
+    specialFLastUsed: performance.now() + 5000,
+    specialFCooldown: type.specialFCooldown,
     specialDmg: type.specialDmg || 30,
     isBoss: false, // telt niet als echte boss-kill/overlay in de oefenruimte
     immortal: true,
