@@ -389,8 +389,8 @@ function update() {
         else if (bot.type === 'abomination') bossChaosBurst(bot);
         else if (bot.type === 'vuurtitaan') lavaRainAttack(bot);
         else if (bot.type === 'vriesreus') frostNovaAttack(bot);
-        else if (bot.type === 'aardkoning') rootSnareAttack(bot);
-        else if (bot.type === 'stormvorst') stormChainBolt(bot);
+        else if (bot.type === 'aardkoning') bossRootSnare(bot);
+        else if (bot.type === 'stormvorst') bossLightningStrike(bot);
       }
       // Special 3 - Nemesis, Leviathan, Abomination, en alle Wereld 2-bosses
       if (bot.specialCCooldown && now - (bot.specialCLastUsed || 0) > bot.specialCCooldown) {

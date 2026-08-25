@@ -647,6 +647,7 @@ function drawTreeGrab(t) {
 
   ctx.save();
   ctx.translate(t.x, t.y + sinkT * 60);
+  ctx.scale(t.scale || 1, t.scale || 1);
   ctx.globalAlpha = 1 - sinkT;
 
   // grondscheur / schaduw

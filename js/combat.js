@@ -1593,15 +1593,15 @@ function bossFireRing(bot) {
 }
 
 function bossFrostLance(bot) {
-  // Vriesreus special 3 - Rijmlans: een doorborende vriesstraal recht op de speler af
+  // Vriesreus special 3 - Rijmlans: schiet exact langs het stippellijntje dat 1 sec eerder werd getelegrafeerd (dus ontwijkbaar door weg te stappen van de lijn)
   const now0 = performance.now();
+  const delay = 1000;
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
-  laserTelegraphs.push({ bot, angle, warnUntil: now0 + 700 });
+  laserTelegraphs.push({ bot, angle, warnUntil: now0 + delay });
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
-    const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x);
-    const endX = bot.x + Math.cos(beamAngle) * 900;
-    const endY = bot.y + Math.sin(beamAngle) * 900;
+    const endX = bot.x + Math.cos(angle) * 900;
+    const endY = bot.y + Math.sin(angle) * 900;
     iceLances.push({ x1: bot.x, y1: bot.y, x2: endX, y2: endY, born: performance.now() });
     spawnParticles(bot.x, bot.y, '#9ef7ff');
     const dx = endX - bot.x, dy = endY - bot.y;
@@ -1614,7 +1614,7 @@ function bossFrostLance(bot) {
       applyDamageToPlayer(bot.specialDmg || 24);
       player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1400 * (1 - getArmorStats().iceResist));
     }
-  }, 700);
+  }, delay);
 }
 
 function bossEarthSlam(bot) {
@@ -1932,6 +1932,26 @@ function stormChainBolt(bot) {
   }
 }
 
+function bossLightningStrike(bot) {
+  // Stormvorst special 2: net als stormChainBolt, maar met een getelegrafeerde inslagcirkel op je huidige positie —
+  // zo kun je de bliksemschicht ontwijken door weg te lopen voordat hij inslaat
+  const tx = player.x, ty = player.y;
+  const radius = 55;
+  const delay = 650;
+  telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    lightningBolts.push({ x1: bot.x, y1: bot.y, x2: tx, y2: ty, born: performance.now() });
+    spawnParticles(tx, ty, '#fff066');
+    spawnParticles(tx, ty, '#8ecbff');
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < radius + player.r) {
+      applyDamageToPlayer(bot.specialDmg || 28);
+      staticShockUntil = performance.now() + 180;
+    }
+  }, delay);
+}
+
 function rootSnareAttack(bot) {
   // Wortelheer (Wereld 2, special): laat een boom uit de grond komen die de speler vastgrijpt
   const tx = player.x, ty = player.y;
@@ -1947,6 +1967,29 @@ function rootSnareAttack(bot) {
     if (dd < 40) {
       applyDamageToPlayer(bot.specialDmg || 14);
       player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1200);
+      spawnParticles(player.x, player.y, '#5c3a1e');
+      spawnParticles(player.x, player.y, '#3fa34d');
+    }
+  }, riseDur + wrapDur);
+}
+
+function bossRootSnare(bot) {
+  // Aardkoning special 2: net als rootSnareAttack, maar de boom is fors groter en doet meer schade
+  const tx = player.x, ty = player.y;
+  const duration = 1500;
+  const riseDur = duration * 0.35;
+  const wrapDur = duration * 0.25;
+  const born = performance.now();
+  const scale = 1.7;
+  const grabRadius = 62;
+  treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur, scale });
+  telegraphs.push({ x: tx, y: ty, radius: 46, warnUntil: born + riseDur });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < grabRadius) {
+      applyDamageToPlayer(bot.specialDmg || 26);
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1300);
       spawnParticles(player.x, player.y, '#5c3a1e');
       spawnParticles(player.x, player.y, '#3fa34d');
     }
