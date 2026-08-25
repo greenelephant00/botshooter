@@ -565,7 +565,11 @@ let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oe
 
 function getWeapon() {
   const id = practiceWeaponId || equippedWeapon;
-  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WORLD2_SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
+  const w = WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WORLD2_SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
+  // Speciale wapens van de ene wereld werken niet in de andere wereld — val dan terug op het standaard pistool
+  if (currentWorld === 2 && SPECIAL_WEAPONS.some(sw => sw.id === w.id)) return WEAPONS[0];
+  if (currentWorld !== 2 && WORLD2_SPECIAL_WEAPONS.some(sw => sw.id === w.id)) return WEAPONS[0];
+  return w;
 }
 function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
 function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || WORLD2_ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
