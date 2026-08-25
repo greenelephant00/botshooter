@@ -1212,7 +1212,14 @@ function mortarStrike(bot) {
   setTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x: targetX, y: targetY, born: performance.now(), maxR: radius });
-    spawnParticles(targetX, targetY, '#ff3838');
+    if (bot.type === 'magmawicht') {
+      // gesmolten lava-inslag i.p.v. de standaard rode explosie
+      spawnParticles(targetX, targetY, '#ff8c00');
+      spawnParticles(targetX, targetY, '#8a6a3a');
+      spawnParticles(targetX, targetY, '#3a1f12');
+    } else {
+      spawnParticles(targetX, targetY, '#ff3838');
+    }
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
       applyDamageToPlayer(bot.meleeDamage || 40);

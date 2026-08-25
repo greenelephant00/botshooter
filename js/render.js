@@ -811,6 +811,59 @@ function drawEnemyBullet(b) {
     ctx.beginPath();
     ctx.arc(b.x - b.r * 0.3, b.y - b.r * 0.3, b.r * 0.3, 0, Math.PI * 2);
     ctx.fill();
+  } else if (srcType === 'bliksemwicht') {
+    // zigzaggend bliksemschichtje i.p.v. een ronde kogel
+    const ang = Math.atan2(b.vy, b.vx);
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(ang);
+    ctx.strokeStyle = '#fff066';
+    ctx.lineWidth = 2.5;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-7, 0); ctx.lineTo(-2, -3); ctx.lineTo(1, 2); ctx.lineTo(7, 0);
+    ctx.stroke();
+    ctx.restore();
+  } else if (srcType === 'windwicht') {
+    // doorschijnende, ronddraaiende windswirl
+    ctx.save();
+    ctx.globalAlpha = 0.75;
+    ctx.strokeStyle = '#eaffff';
+    ctx.lineWidth = 2;
+    const spin = performance.now() / 150;
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r + 1, spin, spin + 4);
+    ctx.stroke();
+    ctx.restore();
+  } else if (srcType === 'stormwicht') {
+    // knetterende elektrische bol
+    ctx.fillStyle = '#8ecbff';
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#fff066';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 3; i++) {
+      const a = performance.now() / 60 + (Math.PI * 2 / 3) * i;
+      ctx.beginPath();
+      ctx.moveTo(b.x, b.y);
+      ctx.lineTo(b.x + Math.cos(a) * (b.r + 3), b.y + Math.sin(a) * (b.r + 3));
+      ctx.stroke();
+    }
+  } else if (srcType === 'kristalwicht') {
+    // ronddraaiende ijsdiamant
+    ctx.save();
+    ctx.translate(b.x, b.y);
+    ctx.rotate(performance.now() / 120);
+    ctx.fillStyle = '#9ef7ff';
+    ctx.beginPath();
+    ctx.moveTo(0, -(b.r + 2)); ctx.lineTo(b.r + 2, 0); ctx.lineTo(0, b.r + 2); ctx.lineTo(-(b.r + 2), 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
   } else {
     ctx.fillStyle = '#ff5c5c';
     ctx.beginPath();
@@ -2428,6 +2481,11 @@ function drawBot(bot) {
   const isFireling = bot.type === 'fireling';
   const isFrostling = bot.type === 'frostling';
   const isEarthling = bot.type === 'earthling';
+  const isBliksemwicht = bot.type === 'bliksemwicht';
+  const isWindwicht = bot.type === 'windwicht';
+  const isMagmawicht = bot.type === 'magmawicht';
+  const isStormwicht = bot.type === 'stormwicht';
+  const isKristalwicht = bot.type === 'kristalwicht';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -2647,6 +2705,102 @@ function drawBot(bot) {
         ctx.fillStyle = '#3fa34d';
         ctx.beginPath();
         ctx.arc(bx + sway * 14, -bot.r * 1.25, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (isBliksemwicht) {
+    // bliksemschicht-vormig lichaam dat felheid pulseert, met knetterende sprankjes
+    const glow = 0.6 + Math.sin(performance.now() / 80) * 0.4;
+    if (!frozen && !rooted && !slashing) ctx.fillStyle = `rgba(245, 230, 66, ${glow})`;
+    ctx.moveTo(-bot.r * 0.3, -bot.r);
+    ctx.lineTo(bot.r * 0.5, -bot.r * 0.15);
+    ctx.lineTo(0, -bot.r * 0.05);
+    ctx.lineTo(bot.r * 0.6, bot.r);
+    ctx.lineTo(-bot.r * 0.35, bot.r * 0.15);
+    ctx.lineTo(bot.r * 0.1, 0);
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      for (let i = 0; i < 3; i++) {
+        const a = performance.now() / 90 + (Math.PI * 2 / 3) * i;
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(a) * bot.r * 1.1, Math.sin(a) * bot.r * 1.1);
+        ctx.lineTo(Math.cos(a) * bot.r * 1.5, Math.sin(a) * bot.r * 1.5);
+        ctx.stroke();
+      }
+    }
+  } else if (isWindwicht) {
+    // doorschijnend, ijl lichaam met ronddraaiende windstrepen
+    if (!frozen && !rooted && !slashing) ctx.globalAlpha *= 0.85;
+    ctx.arc(0, 0, bot.r * 0.7, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const rot = performance.now() / 200 + (Math.PI * 2 / 3) * i;
+        ctx.beginPath();
+        ctx.arc(0, 0, bot.r * (0.9 + i * 0.35), rot, rot + 1.6);
+        ctx.stroke();
+      }
+    }
+  } else if (isMagmawicht) {
+    // verkoolde rotskorst met gloeiende lavascheuren
+    ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      const glow = 0.5 + Math.sin(performance.now() / 150) * 0.4;
+      ctx.strokeStyle = `rgba(255, 140, 0, ${glow})`;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.6, -bot.r * 0.3); ctx.lineTo(0, 0); ctx.lineTo(-bot.r * 0.2, bot.r * 0.6);
+      ctx.moveTo(bot.r * 0.5, -bot.r * 0.5); ctx.lineTo(bot.r * 0.1, 0); ctx.lineTo(bot.r * 0.6, bot.r * 0.4);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(255, 180, 0, ${glow})`;
+      ctx.beginPath(); ctx.arc(0, 0, bot.r * 0.15, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (isStormwicht) {
+    // wolkachtig lichaam van overlappende bollen met een flitsende bliksemschicht erin
+    ctx.arc(-bot.r * 0.35, 0, bot.r * 0.6, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(bot.r * 0.35, -bot.r * 0.15, bot.r * 0.65, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bot.r * 0.15, bot.r * 0.25, bot.r * 0.55, 0, Math.PI * 2); ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      const flash = Math.sin(performance.now() / 120) > 0.7;
+      ctx.fillStyle = flash ? '#fff066' : 'rgba(255, 240, 102, 0.35)';
+      ctx.beginPath();
+      ctx.moveTo(0, -bot.r * 0.1); ctx.lineTo(bot.r * 0.25, bot.r * 0.1); ctx.lineTo(0, bot.r * 0.15);
+      ctx.lineTo(bot.r * 0.3, bot.r * 0.6); ctx.lineTo(-bot.r * 0.05, bot.r * 0.2);
+      ctx.closePath();
+      ctx.fill();
+    }
+  } else if (isKristalwicht) {
+    // grote ijskristalster met ronddraaiende splinters, past bij zijn spiraalvormige beschietingen
+    const spikes = 8;
+    ctx.beginPath();
+    for (let i = 0; i < spikes; i++) {
+      const a = (Math.PI * 2 / spikes) * i;
+      const rad = i % 2 === 0 ? bot.r * 1.2 : bot.r * 0.55;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      for (let i = 0; i < 3; i++) {
+        const a = performance.now() / 300 + (Math.PI * 2 / 3) * i;
+        const ox = Math.cos(a) * bot.r * 1.7, oy = Math.sin(a) * bot.r * 1.7;
+        ctx.fillStyle = '#9ef7ff';
+        ctx.beginPath();
+        ctx.arc(ox, oy, bot.r * 0.15, 0, Math.PI * 2);
         ctx.fill();
       }
     }

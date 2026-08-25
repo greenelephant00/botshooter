@@ -145,12 +145,28 @@ let bossAlive = false;
 let bossWarningActive = false;
 let bossesSpawned = {}; // per boss-naam: true zodra hij deze sessie al is verschenen
 
-// Wereld 2 (Elementen): nog maar 3 simpele bots, los van het level/score-systeem van wereld 1
+// Wereld 2 (Elementen): elementale bots, los van het level/score-systeem van wereld 1 — schieten allemaal anders
 const WORLD2_BOT_TYPES = [
-  { name: 'fireling',  r: 16, hp: 4, speed: [1.4, 2.2], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#ff5a1f' },
-  { name: 'frostling', r: 16, hp: 4, speed: [1.2, 2.0], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#7fd9ff' },
-  { name: 'earthling', r: 18, hp: 6, speed: [0.9, 1.5], cooldown: [1300, 2100], pattern: 'single', bulletSpeed: 5,   color: () => '#8a6a3a' }
+  { name: 'fireling',     r: 16, hp: 4, speed: [1.4, 2.2], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#ff5a1f' },
+  { name: 'frostling',    r: 16, hp: 4, speed: [1.2, 2.0], cooldown: [1100, 1900], pattern: 'single', bulletSpeed: 5.5, color: () => '#7fd9ff' },
+  { name: 'earthling',    r: 18, hp: 6, speed: [0.9, 1.5], cooldown: [1300, 2100], pattern: 'single', bulletSpeed: 5,   color: () => '#8a6a3a' },
+  { name: 'bliksemwicht', r: 15, hp: 5, speed: [1.6, 2.4], cooldown: [900, 1500],  pattern: 'fast',   bulletSpeed: 7.5, color: () => '#f5e642' },
+  { name: 'windwicht',    r: 15, hp: 4, speed: [2.1, 3.1], cooldown: [1300, 2000], pattern: 'triple', bulletSpeed: 5,   color: () => '#cfe8ee' },
+  { name: 'magmawicht',   r: 19, hp: 8, speed: [0.7, 1.1], cooldown: [2600, 3400], pattern: 'mortar', bulletSpeed: 0,   meleeDamage: 20, color: () => '#3a1f12' },
+  { name: 'stormwicht',   r: 16, hp: 6, speed: [1.1, 1.6], cooldown: [2400, 3000], pattern: 'burst',  bulletSpeed: 6.5, color: () => '#8ecbff' },
+  { name: 'kristalwicht', r: 17, hp: 7, speed: [0.8, 1.3], cooldown: [200, 200],   pattern: 'spiral', bulletSpeed: 4.5, color: () => '#9ef7ff' }
 ];
+// Periodieke ambient-deeltjes per Wereld 2-bot, zie de sprankje-check in update()
+const WORLD2_AMBIENT_FX = {
+  fireling: ['#ff8c42', '#fff275'],
+  frostling: ['#bdf3ff', '#ffffff'],
+  earthling: ['#8a6a3a', '#3fa34d'],
+  bliksemwicht: ['#f5e642', '#ffffff'],
+  windwicht: ['#eaffff', '#cfe8ee'],
+  magmawicht: ['#ff8c00', '#3a1f12'],
+  stormwicht: ['#8ecbff', '#fff066'],
+  kristalwicht: ['#9ef7ff', '#ffffff']
+};
 
 function pickBotType() {
   if (currentWorld === 2) {
