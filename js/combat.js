@@ -80,7 +80,11 @@ function shoot() {
       maxRange: weapon.maxRange || 0,
       isFlame: weapon.id === 'flamethrower',
       isGust: weapon.id === 'windrifle',
-      isCrystal: weapon.id === 'crystalgun'
+      isCrystal: weapon.id === 'crystalgun',
+      isMagmaOrb: weapon.id === 'magmacannon',
+      isWindVortex: weapon.id === 'hurricanestaff',
+      isIceLanceBolt: weapon.id === 'frostlance',
+      isRockChunk: weapon.id === 'earthhammer'
     });
   });
 }

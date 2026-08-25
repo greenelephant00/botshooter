@@ -1130,6 +1130,83 @@ function drawPlayerBullet(b) {
     ctx.restore();
     return;
   }
+  if (b.isMagmaOrb) {
+    // Magma Kanon: een gloeiende, druipende lavabol
+    const flicker = 1 + Math.sin(performance.now() / 80) * 0.1;
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, (b.r + 2) * flicker);
+    grad.addColorStop(0, '#fff9c4');
+    grad.addColorStop(0.5, '#ff8c00');
+    grad.addColorStop(1, '#3a1f12');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(0, 0, (b.r + 2) * flicker, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255, 140, 0, 0.6)';
+    ctx.beginPath();
+    ctx.moveTo(-b.r - 6, -2);
+    ctx.lineTo(-b.r - 2, 0);
+    ctx.lineTo(-b.r - 6, 2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+  if (b.isWindVortex) {
+    // Orkaanstaf: een compacte, snel ronddraaiende windvortex
+    const spin = performance.now() / 70;
+    ctx.strokeStyle = 'rgba(234, 255, 255, 0.9)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 2; i++) {
+      const rot = spin + Math.PI * i;
+      ctx.beginPath();
+      ctx.arc(0, 0, b.r + 1, rot, rot + 2.2);
+      ctx.stroke();
+    }
+    ctx.fillStyle = 'rgba(207, 232, 238, 0.5)';
+    ctx.beginPath();
+    ctx.arc(0, 0, b.r * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
+  if (b.isIceLanceBolt) {
+    // Rijmlans: een scherpe, langwerpige ijspegel
+    const grad = ctx.createLinearGradient(-b.r - 6, 0, b.r + 6, 0);
+    grad.addColorStop(0, 'rgba(158, 247, 255, 0)');
+    grad.addColorStop(1, '#eaffff');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(b.r + 6, 0);
+    ctx.lineTo(-b.r, -3);
+    ctx.lineTo(-b.r - 6, 0);
+    ctx.lineTo(-b.r, 3);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
+  if (b.isRockChunk) {
+    // Aardhamer: een tuimelend brok steen
+    ctx.rotate(performance.now() / 110);
+    ctx.fillStyle = '#8a6a3a';
+    ctx.beginPath();
+    ctx.moveTo(-b.r, -b.r * 0.5);
+    ctx.lineTo(-b.r * 0.3, -b.r - 1);
+    ctx.lineTo(b.r * 0.7, -b.r * 0.4);
+    ctx.lineTo(b.r + 1, b.r * 0.3);
+    ctx.lineTo(b.r * 0.1, b.r + 1);
+    ctx.lineTo(-b.r * 0.8, b.r * 0.6);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#5c3a1e';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
   switch (equippedSkin) {
     case 'muncher': {
       // knabbelpelletje: geel bolletje met hapje eruit
