@@ -162,7 +162,7 @@ const BOSS_TYPES = [
 
 // Wereld 2 (Elementen): eigen bosses, elk met 4 verschillende aanvallen (salvo + schokgolf + 2 unieke elementale specials)
 const WORLD2_BOSS_TYPES = [
-  { name: 'vuurtitaan', displayName: 'Vuurtitaan', minScore: 1500,  minLevel: 9,  r: 60, hp: 180, speed: [0.3, 0.45],  cooldown: [1700, 2100], pattern: 'boss', bulletSpeed: 5,   specialACooldown: 6000, specialBCooldown: 5000, specialCCooldown: 8000, specialDmg: 22, color: () => '#8a3a1f' },
+  { name: 'vuurtitaan', displayName: 'Vuurtitaan', minScore: 1500,  minLevel: 9,  r: 60, hp: 180, speed: [0.3, 0.45],  cooldown: [1700, 2100], pattern: 'boss', bulletSpeed: 5,   specialACooldown: 6000, specialBCooldown: 5000, specialCCooldown: 8000, specialDCooldown: 9000, specialDmg: 22, color: () => '#8a3a1f' },
   { name: 'vriesreus',  displayName: 'Vriesreus',  minScore: 4000,  minLevel: 16, r: 68, hp: 260, speed: [0.28, 0.4], cooldown: [1600, 2000], pattern: 'boss', bulletSpeed: 5.5, specialACooldown: 5800, specialBCooldown: 5200, specialCCooldown: 7500, specialDmg: 24, color: () => '#bdf3ff' },
   { name: 'aardkoning', displayName: 'Aardkoning', minScore: 7000,  minLevel: 22, r: 76, hp: 340, speed: [0.25, 0.35], cooldown: [1500, 1900], pattern: 'boss', bulletSpeed: 6,   specialACooldown: 5600, specialBCooldown: 5000, specialCCooldown: 7200, specialDmg: 26, color: () => '#4a3018' },
   { name: 'stormvorst', displayName: 'Stormvorst', minScore: 10000, minLevel: 28, r: 82, hp: 420, speed: [0.3, 0.42], cooldown: [1300, 1700], pattern: 'boss', bulletSpeed: 6.5, specialACooldown: 5400, specialBCooldown: 4600, specialCCooldown: 6800, specialDmg: 28, color: () => '#c9a3ff' }
@@ -365,6 +365,7 @@ function initGame() {
   iceLances = [];
   tornadoShots = [];
   rootDrags = [];
+  fireRings = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -434,6 +435,7 @@ function setupNextLevel() {
   iceLances = [];
   tornadoShots = [];
   rootDrags = [];
+  fireRings = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

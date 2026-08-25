@@ -253,7 +253,7 @@ const BOSS_SPECIAL_DESC = {
   titan:    'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Meteorregen: 4 getelegrafeerde inslagen rond je positie, kort na elkaar.',
   behemoth: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Laserstraal: een gerichte, doorlopende straal met een korte waarschuwing vooraf.',
   nemesis:  'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Doemspiraal: meerdere snelle golven roterende kogels die de hele arena vullen. Special 3 — Kruislaser: twee gelijktijdige, doorlopende laserstralen in een kruispatroon met een korte waarschuwing vooraf. De sterkste en taaiste boss in het spel.',
-  vuurtitaan: 'Vuur-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Lavaregen: 3 getelegrafeerde lavaklodders vlak bij je die je in brand zetten. Special 3 — Vuurnova: een felle vuurexplosie rond zichzelf die je verbrandt als je te dichtbij staat.',
+  vuurtitaan: 'Vuur-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Lavaregen: 3 getelegrafeerde lavaklodders vlak bij je die je in brand zetten. Special 3 — Vuurnova: een felle vuurexplosie rond zichzelf die je verbrandt als je te dichtbij staat. Special 4 — Vuurring: een statische vuurring om je heen waar bots ongehinderd doorheen lopen, maar als jij zelf de ring passeert vat je 5 sec vlam.',
   vriesreus: 'IJs-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — IJsring: een uitdijende ijsring die je bevriest zodra hij je bereikt. Special 3 — Rijmlans: een doorborende vriesstraal recht op je af die je verlamt bij een treffer.',
   aardkoning: 'Aarde-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Wortelgreep: een boom uit de grond die je vastgrijpt en vasthoudt. Special 3 — Aardbeving: een verwoestende schok rond zichzelf die je wegstoot en even verlamt.',
   stormvorst: 'Storm-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Bliksemschicht: een felle bliksemschicht recht naar je toe. Special 3 — Orkaan: een kolkende windvlaag die je herhaaldelijk raakt en naar de boss toe trekt.'
@@ -383,6 +383,7 @@ function startPractice(botName) {
   iceLances = [];
   tornadoShots = [];
   rootDrags = [];
+  fireRings = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -505,6 +506,7 @@ function startDodgePractice() {
   iceLances = [];
   tornadoShots = [];
   rootDrags = [];
+  fireRings = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];

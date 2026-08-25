@@ -403,6 +403,11 @@ function update() {
         else if (bot.type === 'aardkoning') bossEarthSlam(bot);
         else if (bot.type === 'stormvorst') bossHurricane(bot);
       }
+      // Special 4 - alleen Vuurtitaan: vuurring
+      if (bot.specialDCooldown && now - (bot.specialDLastUsed || 0) > bot.specialDCooldown) {
+        bot.specialDLastUsed = now;
+        if (bot.type === 'vuurtitaan') bossFireRing(bot);
+      }
       return;
     }
 
@@ -899,6 +904,7 @@ function update() {
   tsunamiWaves = tsunamiWaves.filter(w => now0 - w.born < w.totalLife);
   treeGrabs = treeGrabs.filter(t => now0 - t.born < t.duration);
   rootDrags = rootDrags.filter(r => now0 - r.born < r.duration);
+  fireRings = fireRings.filter(r => now0 - r.born < r.duration);
   shockRings = shockRings.filter(r => now0 - r.born < r.duration);
   iceLances = iceLances.filter(l => now0 - l.born < 250);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);

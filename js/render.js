@@ -399,6 +399,29 @@ function drawShockRing(r) {
   ctx.restore();
 }
 
+function drawFireRing(r) {
+  // Vuurtitaan special: statische, flikkerende vuurring. Blijft op vaste straal staan tot hij dooft.
+  const age = performance.now() - r.born;
+  if (age < 0 || age > r.duration) return;
+  const fadeIn = Math.min(1, age / 300);
+  const fadeOut = Math.min(1, (r.duration - age) / 500);
+  const flicker = 0.75 + Math.sin(performance.now() / 70) * 0.15;
+  ctx.save();
+  ctx.globalAlpha = Math.min(fadeIn, fadeOut) * 0.85;
+  ctx.strokeStyle = '#ff5a1f';
+  ctx.lineWidth = 10 * flicker;
+  ctx.beginPath();
+  ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = Math.min(fadeIn, fadeOut) * 0.9;
+  ctx.strokeStyle = '#fff275';
+  ctx.lineWidth = 3 * flicker;
+  ctx.beginPath();
+  ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawEarthAuraEffect() {
   // Aardaura (Wereld 2): een veld van aarde-energie met een gestreepte gloedring en ronddraaiende blad-/steenmotes
   const now = performance.now();
@@ -3627,6 +3650,7 @@ function draw() {
   tsunamiWaves.forEach(drawTsunamiWave);
   treeGrabs.forEach(drawTreeGrab);
   rootDrags.forEach(drawRootDrag);
+  fireRings.forEach(drawFireRing);
   shockRings.forEach(drawShockRing);
   iceLances.forEach(drawIceLance);
   tornadoShots.forEach(drawTornadoShot);

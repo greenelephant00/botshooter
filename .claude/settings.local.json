@@ -18,7 +18,8 @@
       "PowerShell(node --check \"js/render.js\")",
       "PowerShell(node --check \"js/state.js\")",
       "PowerShell(node --check \"js/shop-ui.js\")",
-      "PowerShell(node --check \"js/player.js\")"
+      "PowerShell(node --check \"js/player.js\")",
+      "Bash(awk '/^function botShoot/{f=1} f{print NR\": \"$0; if\\(/^}/ && NR>1440\\) {print \"---END---\"; exit}}' js/combat.js)"
     ]
   }
 }

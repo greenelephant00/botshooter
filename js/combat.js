@@ -1565,6 +1565,33 @@ function bossFireNova(bot) {
   }, delay);
 }
 
+function bossFireRing(bot) {
+  // Vuurtitaan special 4 - Vuurring: een statische ring van vuur rond de speler. Bots lopen er ongehinderd doorheen,
+  // maar zodra de speler zelf de ring passeert (van binnen naar buiten of andersom) vat hij 5 sec vlam.
+  const cx = player.x, cy = player.y;
+  const radius = 130;
+  const duration = 5000;
+  const born = performance.now();
+  fireRings.push({ x: cx, y: cy, born, duration, radius });
+  spawnParticles(cx, cy, '#ff5a1f');
+  spawnParticles(cx, cy, '#fff275');
+  let lastInside = Math.hypot(player.x - cx, player.y - cy) < radius;
+  const checkInterval = setInterval(() => {
+    if (gameOver || levelTransition || performance.now() - born > duration) {
+      clearInterval(checkInterval);
+      return;
+    }
+    const dist = Math.hypot(player.x - cx, player.y - cy);
+    const inside = dist < radius;
+    if (inside !== lastInside) {
+      player.burnUntil = performance.now() + 5000 * (1 - getArmorStats().fireResist);
+      spawnParticles(player.x, player.y, '#ff5a1f');
+      spawnParticles(player.x, player.y, '#fff275');
+    }
+    lastInside = inside;
+  }, 40);
+}
+
 function bossFrostLance(bot) {
   // Vriesreus special 3 - Rijmlans: een doorborende vriesstraal recht op de speler af
   const now0 = performance.now();
