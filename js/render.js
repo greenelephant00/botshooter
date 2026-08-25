@@ -2619,6 +2619,10 @@ function drawBot(bot) {
   const isGetijgeest = bot.type === 'getijgeest';
   const isAswervelaar = bot.type === 'aswervelaar';
   const isSneeuwjager = bot.type === 'sneeuwjager';
+  const isVulkaanheer = bot.type === 'vulkaanheer';
+  const isVriesvorst = bot.type === 'vriesvorst';
+  const isStormwever = bot.type === 'stormwever';
+  const isWortelheer = bot.type === 'wortelheer';
   ctx.save();
   ctx.translate(bot.x, bot.y);
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
@@ -3035,6 +3039,91 @@ function drawBot(bot) {
       ctx.beginPath();
       ctx.arc(-bot.r * 0.2, -bot.r * 0.3, bot.r * 0.2, 0, Math.PI * 2);
       ctx.fill();
+    }
+  } else if (isVulkaanheer) {
+    // imposante, verkoolde rotsreus met gloeiende lavascheuren en een kroon van vlammen
+    ctx.arc(0, 0, bot.r, 0, Math.PI * 2);
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      const glow = 0.5 + Math.sin(performance.now() / 150) * 0.4;
+      ctx.strokeStyle = `rgba(255, 140, 0, ${glow})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.7, -bot.r * 0.3); ctx.lineTo(0, 0); ctx.lineTo(-bot.r * 0.2, bot.r * 0.7);
+      ctx.moveTo(bot.r * 0.6, -bot.r * 0.6); ctx.lineTo(bot.r * 0.1, 0); ctx.lineTo(bot.r * 0.7, bot.r * 0.5);
+      ctx.stroke();
+      ctx.fillStyle = `rgba(255, 180, 0, ${glow})`;
+      const flames = 5;
+      for (let i = 0; i < flames; i++) {
+        const a = (Math.PI * 2 / flames) * i + performance.now() / 500;
+        const flick = 1 + Math.sin(performance.now() / 130 + i) * 0.3;
+        ctx.beginPath();
+        ctx.arc(Math.cos(a) * bot.r * 1.05, Math.sin(a) * bot.r * 1.05 - bot.r * 0.4, bot.r * 0.16 * flick, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+  } else if (isVriesvorst) {
+    // grote ijskoningin-vorm met een gekartelde kroon en een gloeiende kern
+    const spikes = 10;
+    ctx.beginPath();
+    for (let i = 0; i < spikes; i++) {
+      const a = (Math.PI * 2 / spikes) * i;
+      const rad = i % 2 === 0 ? bot.r * 1.25 : bot.r * 0.6;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      const shine = 0.4 + Math.abs(Math.sin(performance.now() / 200)) * 0.5;
+      ctx.fillStyle = `rgba(255,255,255,${shine})`;
+      ctx.beginPath();
+      ctx.arc(0, 0, bot.r * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  } else if (isStormwever) {
+    // grote, kolkende onweerswolk met ronddraaiende bliksemarcs
+    ctx.arc(-bot.r * 0.35, 0, bot.r * 0.65, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath(); ctx.arc(bot.r * 0.35, -bot.r * 0.15, bot.r * 0.7, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(bot.r * 0.1, bot.r * 0.3, bot.r * 0.6, 0, Math.PI * 2); ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = 'rgba(255, 240, 102, 0.8)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 3; i++) {
+        const rot = performance.now() / 130 + (Math.PI * 2 / 3) * i;
+        ctx.beginPath();
+        ctx.arc(0, 0, bot.r * (1.1 + i * 0.3), rot, rot + 1.1);
+        ctx.stroke();
+      }
+    }
+  } else if (isWortelheer) {
+    // massieve, verweerde boomstam met gloeiende ogen
+    ctx.beginPath();
+    ctx.moveTo(-bot.r * 0.9, -bot.r * 0.6);
+    ctx.lineTo(-bot.r * 0.5, -bot.r * 1.1);
+    ctx.lineTo(bot.r * 0.5, -bot.r * 1.0);
+    ctx.lineTo(bot.r * 0.95, -bot.r * 0.4);
+    ctx.lineTo(bot.r * 0.8, bot.r * 0.7);
+    ctx.lineTo(bot.r * 0.15, bot.r * 1.1);
+    ctx.lineTo(-bot.r * 0.6, bot.r * 0.9);
+    ctx.lineTo(-bot.r * 0.95, bot.r * 0.1);
+    ctx.closePath();
+    ctx.fill();
+    if (!frozen && !rooted && !slashing) {
+      ctx.strokeStyle = '#2f1c0e';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-bot.r * 0.3, -bot.r * 0.7); ctx.lineTo(-bot.r * 0.1, 0); ctx.lineTo(-bot.r * 0.3, bot.r * 0.7);
+      ctx.moveTo(bot.r * 0.3, -bot.r * 0.6); ctx.lineTo(bot.r * 0.1, 0); ctx.lineTo(bot.r * 0.35, bot.r * 0.6);
+      ctx.stroke();
+      const glow = 0.6 + Math.sin(performance.now() / 250) * 0.35;
+      ctx.fillStyle = `rgba(63, 163, 77, ${glow})`;
+      ctx.beginPath(); ctx.arc(-bot.r * 0.25, -bot.r * 0.15, bot.r * 0.12, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(bot.r * 0.2, -bot.r * 0.2, bot.r * 0.12, 0, Math.PI * 2); ctx.fill();
     }
   } else {
     ctx.arc(0, 0, bot.r, 0, Math.PI * 2);

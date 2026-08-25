@@ -1600,6 +1600,94 @@ function rootGrabAttack(count) {
   });
 }
 
+function lavaRainAttack(bot) {
+  // Vulkaanheer (Wereld 2, special): laat 3 lavaklodders na elkaar rond de speler neerkomen
+  const count = 3;
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      if (gameOver || levelTransition || bot.dead) return;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 30 + Math.random() * 90;
+      const tx = Math.max(40, Math.min(canvas.width - 40, player.x + Math.cos(ang) * dist));
+      const ty = Math.max(40, Math.min(canvas.height - 40, player.y + Math.sin(ang) * dist));
+      const radius = 50;
+      const delay = 650;
+      telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
+      const born = performance.now();
+      lavaPools.push({ x: tx, y: ty, born, fallDelay: delay, lingerDuration: 3000, fadeDuration: 800, totalLife: delay + 3000 + 800, radius, lastIgniteTick: 0 });
+      setTimeout(() => {
+        if (gameOver || levelTransition) return;
+        explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
+        spawnParticles(tx, ty, '#ff8c00');
+        spawnParticles(tx, ty, '#3a1f12');
+        const dd = Math.hypot(player.x - tx, player.y - ty);
+        if (dd < radius + player.r) {
+          applyDamageToPlayer(bot.specialDmg || 16);
+          player.burnUntil = performance.now() + 3000;
+        }
+      }, delay);
+    }, i * 500);
+  }
+}
+
+function frostNovaAttack(bot) {
+  // Vriesvorst (Wereld 2, special): een uitdijende ijsring die je bevriest zodra hij je bereikt
+  const cx = bot.x, cy = bot.y;
+  const maxR = 260;
+  const duration = 900;
+  const born = performance.now();
+  shockRings.push({ x: cx, y: cy, born, maxR, duration, color: '#9ef7ff' });
+  let hit = false;
+  const checkInterval = setInterval(() => {
+    if (gameOver || levelTransition) { clearInterval(checkInterval); return; }
+    const age = performance.now() - born;
+    const t = Math.min(1, age / duration);
+    const r = maxR * t;
+    const dd = Math.hypot(player.x - cx, player.y - cy);
+    if (!hit && Math.abs(dd - r) < 24) {
+      hit = true;
+      applyDamageToPlayer(bot.specialDmg || 14);
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1000);
+      spawnParticles(player.x, player.y, '#9ef7ff');
+      spawnParticles(player.x, player.y, '#ffffff');
+    }
+    if (t >= 1) clearInterval(checkInterval);
+  }, 40);
+}
+
+function stormChainBolt(bot) {
+  // Stormwever (Wereld 2, special): een felle bliksemschicht rechtstreeks naar de speler
+  lightningBolts.push({ x1: bot.x, y1: bot.y, x2: player.x, y2: player.y, born: performance.now() });
+  spawnParticles(player.x, player.y, '#fff066');
+  spawnParticles(player.x, player.y, '#8ecbff');
+  const dd = Math.hypot(player.x - bot.x, player.y - bot.y);
+  if (dd < 500) {
+    applyDamageToPlayer(bot.specialDmg || 12);
+    staticShockUntil = performance.now() + 180;
+  }
+}
+
+function rootSnareAttack(bot) {
+  // Wortelheer (Wereld 2, special): laat een boom uit de grond komen die de speler vastgrijpt
+  const tx = player.x, ty = player.y;
+  const duration = 1400;
+  const riseDur = duration * 0.35;
+  const wrapDur = duration * 0.25;
+  const born = performance.now();
+  treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur });
+  telegraphs.push({ x: tx, y: ty, radius: 30, warnUntil: born + riseDur });
+  setTimeout(() => {
+    if (gameOver || levelTransition) return;
+    const dd = Math.hypot(player.x - tx, player.y - ty);
+    if (dd < 40) {
+      applyDamageToPlayer(bot.specialDmg || 14);
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1200);
+      spawnParticles(player.x, player.y, '#5c3a1e');
+      spawnParticles(player.x, player.y, '#3fa34d');
+    }
+  }, riseDur + wrapDur);
+}
+
 function fireNovaAttack(dmg, radius) {
   // Vuurnova (Wereld 2): felle, gelaagde vuurexplosie rond de speler die alle bots dichtbij direct beschadigt
   const now0 = performance.now();

@@ -258,6 +258,58 @@ function update() {
       return;
     }
 
+    if (bot.pattern === 'lavarain') {
+      // vulkaanheer (Wereld 2, special): houdt afstand en laat lava rond de speler neerkomen
+      if (bdist > 220) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
+        bot.lastShot = now;
+        lavaRainAttack(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'frostnova') {
+      // vriesvorst (Wereld 2, special): houdt gematigde afstand en laat een ijsring uitdijen
+      if (bdist > 160) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
+        bot.lastShot = now;
+        frostNovaAttack(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'chainbolt') {
+      // stormwever (Wereld 2, special): blijft ver weg en zapt met bliksemschichten
+      if (bdist > 280) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
+        bot.lastShot = now;
+        stormChainBolt(bot);
+      }
+      return;
+    }
+
+    if (bot.pattern === 'rootsnare') {
+      // wortelheer (Wereld 2, special): komt dichterbij en laat een boom je vastgrijpen
+      if (bdist > 60) {
+        bot.x += (bdx/bdist) * bot.speed * speedMult;
+        bot.y += (bdy/bdist) * bot.speed * speedMult;
+      }
+      if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
+        bot.lastShot = now;
+        rootSnareAttack(bot);
+      }
+      return;
+    }
+
     if (bot.pattern === 'snipebeam') {
       // railgunner: houdt veel afstand en vuurt na een lange telegraaf een verwoestende precisiestraal
       if (bdist > 350) {

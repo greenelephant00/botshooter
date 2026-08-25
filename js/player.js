@@ -187,11 +187,29 @@ const WORLD2_AMBIENT_FX = {
   doornrank: ['#2f7d3c', '#3fa34d'],
   getijgeest: ['#2a7fba', '#8ecbff'],
   aswervelaar: ['#6b6b6b', '#c9c9c9'],
-  sneeuwjager: ['#eaffff', '#bdf3ff']
+  sneeuwjager: ['#eaffff', '#bdf3ff'],
+  vulkaanheer: ['#ff8c00', '#3a1f12'],
+  vriesvorst: ['#9ef7ff', '#ffffff'],
+  stormwever: ['#c9a3ff', '#fff066'],
+  wortelheer: ['#3fa34d', '#5c3a1e']
 };
+
+// Zeldzame, zwaardere elementale special-bots voor Wereld 2 — elk met een eigen special attack
+const WORLD2_SPECIAL_BOT_TYPES = [
+  { name: 'vulkaanheer', r: 24, hp: 16, speed: [0.5, 0.8], cooldown: [4200, 5200], pattern: 'lavarain',  bulletSpeed: 0, specialDmg: 16, color: () => '#8a3a1f' },
+  { name: 'vriesvorst',  r: 22, hp: 14, speed: [0.6, 0.9], cooldown: [3800, 4600], pattern: 'frostnova', bulletSpeed: 0, specialDmg: 14, color: () => '#bdf3ff' },
+  { name: 'stormwever',  r: 20, hp: 12, speed: [0.8, 1.2], cooldown: [2200, 2800], pattern: 'chainbolt', bulletSpeed: 0, specialDmg: 12, color: () => '#c9a3ff' },
+  { name: 'wortelheer',  r: 25, hp: 18, speed: [0.5, 0.8], cooldown: [3200, 4000], pattern: 'rootsnare', bulletSpeed: 0, specialDmg: 14, color: () => '#4a3018' }
+];
+const WORLD2_SPECIAL_SPAWN_CHANCE = 0.15; // kans zodra we in Wereld 2 spawnen
+const MAX_WORLD2_SPECIAL_ALIVE = 2; // max aantal Wereld 2 special-bots tegelijk
 
 function pickBotType() {
   if (currentWorld === 2) {
+    const specialAliveCount = bots.filter(b => !b.dead && WORLD2_SPECIAL_BOT_TYPES.some(t => t.name === b.type)).length;
+    if (specialAliveCount < MAX_WORLD2_SPECIAL_ALIVE && Math.random() < WORLD2_SPECIAL_SPAWN_CHANCE) {
+      return WORLD2_SPECIAL_BOT_TYPES[Math.floor(Math.random() * WORLD2_SPECIAL_BOT_TYPES.length)];
+    }
     return WORLD2_BOT_TYPES[Math.floor(Math.random() * WORLD2_BOT_TYPES.length)];
   }
   let unlocked = gameMode === 'levels'

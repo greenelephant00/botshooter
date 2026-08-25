@@ -206,7 +206,8 @@ const BOT_DISPLAY_NAMES = {
   bliksemwicht: 'Donderknaap', windwicht: 'Windloper', magmawicht: 'Lavagolem',
   stormwicht: 'Onweersgeest', kristalwicht: 'Kristalreus',
   zandworm: 'Zandworm', doornrank: 'Doornrank', getijgeest: 'Getijgeest',
-  aswervelaar: 'Aswervelaar', sneeuwjager: 'Sneeuwjager'
+  aswervelaar: 'Aswervelaar', sneeuwjager: 'Sneeuwjager',
+  vulkaanheer: 'Vulkaanheer', vriesvorst: 'Vriesvorst', stormwever: 'Stormwever', wortelheer: 'Wortelheer'
 };
 const BOT_PATTERN_INFO = {
   single:    'Schiet één kogel recht op je af.',
@@ -233,7 +234,11 @@ const BOT_PATTERN_INFO = {
   freezetrap: 'Geen kogels — telegrafeert een grote ijsval op je positie die je bij impact 2,2 sec volledig verlamt.',
   snipebeam: 'Geen kogels — houdt veel afstand en vuurt na een lange telegraaf een instant, verwoestende precisiestraal.',
   curse:     'Geen kogels — vervloekt je zonder waarschuwing vooraf zodat je 7 sec lang 50% minder schade doet, geen directe schade.',
-  clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.'
+  clusterbomb: 'Geen kogels — bestookt je met 4 gelijktijdige, verspreide inslagen rond je positie.',
+  lavarain: 'Geen kogels — houdt afstand en laat 3 klodders lava na elkaar vlak bij je neerkomen die blijven liggen en je in brand zetten.',
+  frostnova: 'Geen kogels — laat een uitdijende ijsring om zich heen ontstaan die je bevriest zodra hij je bereikt.',
+  chainbolt: 'Geen kogels — blijft ver weg en zapt je op afstand met felle bliksemschichten.',
+  rootsnare: 'Geen kogels — laat een boom uit de grond komen op jouw positie die je vastgrijpt en vasthoudt.'
 };
 const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',
@@ -278,6 +283,18 @@ function botDamageText(type) {
   }
   if (type.pattern === 'clusterbomb') {
     return `${type.specialDmg || 14} schade per inslag (tot 4 tegelijk)`;
+  }
+  if (type.pattern === 'lavarain') {
+    return `${type.specialDmg || 16} schade per lavaklodder (3x) + 3 sec brand`;
+  }
+  if (type.pattern === 'frostnova') {
+    return `${type.specialDmg || 14} schade + 1 sec volledige bevriezing bij de ijsring`;
+  }
+  if (type.pattern === 'chainbolt') {
+    return `${type.specialDmg || 12} schade per bliksemschicht`;
+  }
+  if (type.pattern === 'rootsnare') {
+    return `${type.specialDmg || 14} schade + 1,2 sec vastgegrepen`;
   }
   if (type.pattern === 'boss') {
     return `8 schade per kogel + ${type.specialDmg || 30} schade bij schokgolf-aanval`;
@@ -325,7 +342,7 @@ function closeDisastersInfo() {
 window.closeDisastersInfo = closeDisastersInfo;
 
 function startPractice(botName) {
-  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES].find(t => t.name === botName);
+  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES].find(t => t.name === botName);
   if (!type) return;
 
   gameMode = 'practice';
@@ -716,9 +733,9 @@ function world2BotCardHtml(type) {
 function renderBotsInfo() {
   if (currentWorld === 2) {
     document.getElementById('botsInfoList').innerHTML = WORLD2_BOT_TYPES.map(world2BotCardHtml).join('');
-    document.getElementById('specialBotsInfoList').innerHTML = '<p style="color:#999;">Nog niks te zien in deze wereld. Kom later terug!</p>';
+    document.getElementById('specialBotsInfoList').innerHTML = WORLD2_SPECIAL_BOT_TYPES.map(world2BotCardHtml).join('');
     document.getElementById('bossInfoList').innerHTML = '';
-    WORLD2_BOT_TYPES.forEach(type => {
+    [...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES].forEach(type => {
       const canvasEl = document.getElementById(`botPreview_${type.name}`);
       if (canvasEl) drawBotPreview(canvasEl, type);
     });
