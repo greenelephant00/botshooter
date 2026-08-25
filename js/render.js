@@ -1084,6 +1084,31 @@ function drawPlayerBullet(b) {
     ctx.restore();
     return;
   }
+  if (b.isCrystal) {
+    // Kristalgeweer: een echte, goed zichtbare ronddraaiende ijsscherf i.p.v. een kogel
+    ctx.rotate(performance.now() / 90);
+    const grad = ctx.createRadialGradient(0, 0, 0, 0, 0, b.r + 3);
+    grad.addColorStop(0, '#ffffff');
+    grad.addColorStop(0.55, '#9ef7ff');
+    grad.addColorStop(1, '#1c6fd6');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(0, -(b.r + 3));
+    ctx.lineTo(b.r * 0.6, -b.r * 0.2);
+    ctx.lineTo(b.r + 3, 0);
+    ctx.lineTo(b.r * 0.6, b.r * 0.2);
+    ctx.lineTo(0, b.r + 3);
+    ctx.lineTo(-b.r * 0.6, b.r * 0.2);
+    ctx.lineTo(-(b.r + 3), 0);
+    ctx.lineTo(-b.r * 0.6, -b.r * 0.2);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+    return;
+  }
   switch (equippedSkin) {
     case 'muncher': {
       // knabbelpelletje: geel bolletje met hapje eruit

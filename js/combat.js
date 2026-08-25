@@ -78,7 +78,8 @@ function shoot() {
       homingTarget: target,
       maxRange: weapon.maxRange || 0,
       isFlame: weapon.id === 'flamethrower',
-      isGust: weapon.id === 'windrifle'
+      isGust: weapon.id === 'windrifle',
+      isCrystal: weapon.id === 'crystalgun'
     });
   });
 }
