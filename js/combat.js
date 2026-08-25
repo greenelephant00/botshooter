@@ -656,6 +656,94 @@ function triggerRiftPulse() {
 }
 window.triggerRiftPulse = triggerRiftPulse;
 
+function triggerLavaField() {
+  // Magma Kanon special (Wereld 2): legt een brandend lavaveld neer op het richtpunt
+  if (gameOver || isPaused) return;
+  const weapon = getWeapon();
+  if (weapon.id !== 'magmacannon') return;
+  const now = performance.now();
+  if (now - lavaFieldLastUsed < LAVA_FIELD_COOLDOWN) return;
+  lavaFieldLastUsed = now;
+  fireZones.push({ x: mouse.x, y: mouse.y, radius: LAVA_FIELD_RADIUS, until: now + LAVA_FIELD_DURATION, tickDmg: LAVA_FIELD_TICK_DMG, lastTick: 0 });
+  spawnParticles(mouse.x, mouse.y, '#ff8c00');
+  spawnParticles(mouse.x, mouse.y, '#3a1f12');
+}
+window.triggerLavaField = triggerLavaField;
+
+function triggerHurricaneBlast() {
+  // Orkaanstaf special (Wereld 2): windvlaag om de speler heen die bots beschadigt en wegblaast
+  if (gameOver || isPaused) return;
+  const weapon = getWeapon();
+  if (weapon.id !== 'hurricanestaff') return;
+  const now = performance.now();
+  if (now - hurricaneBlastLastUsed < HURRICANE_BLAST_COOLDOWN) return;
+  const targets = bots.filter(b => !b.dead && Math.hypot(b.x - player.x, b.y - player.y) < HURRICANE_BLAST_RADIUS);
+  hurricaneBlastLastUsed = now;
+  shockRings.push({ x: player.x, y: player.y, born: now, maxR: HURRICANE_BLAST_RADIUS, duration: 450, color: '#eaffff' });
+  spawnParticles(player.x, player.y, '#eaffff');
+  spawnParticles(player.x, player.y, '#cfe8ee');
+  targets.forEach(bot => {
+    damageBotSimple(bot, HURRICANE_BLAST_DMG, '#eaffff');
+    if (bot.dead) return;
+    const ang = Math.atan2(bot.y - player.y, bot.x - player.x);
+    bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * 90));
+    bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * 90));
+  });
+}
+window.triggerHurricaneBlast = triggerHurricaneBlast;
+
+function triggerFrostLance() {
+  // Rijmlans special (Wereld 2): doorborende vriesstraal in de richting van de muis
+  if (gameOver || isPaused) return;
+  const weapon = getWeapon();
+  if (weapon.id !== 'frostlance') return;
+  const now = performance.now();
+  if (now - frostLanceLastUsed < FROST_LANCE_COOLDOWN) return;
+  frostLanceLastUsed = now;
+  const angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+  const endX = player.x + Math.cos(angle) * FROST_LANCE_RANGE;
+  const endY = player.y + Math.sin(angle) * FROST_LANCE_RANGE;
+  iceLances.push({ x1: player.x, y1: player.y, x2: endX, y2: endY, born: now });
+  spawnParticles(player.x, player.y, '#9ef7ff');
+  const dx = endX - player.x, dy = endY - player.y;
+  const len2 = dx * dx + dy * dy;
+  bots.forEach(bot => {
+    if (bot.dead) return;
+    let t = ((bot.x - player.x) * dx + (bot.y - player.y) * dy) / len2;
+    t = Math.max(0, Math.min(1, t));
+    const px = player.x + dx * t, py = player.y + dy * t;
+    const dd = Math.hypot(bot.x - px, bot.y - py);
+    if (dd < bot.r + 14) {
+      damageBotSimple(bot, FROST_LANCE_DMG, '#9ef7ff');
+      if (!bot.dead) bot.frozenUntil = Math.max(bot.frozenUntil || 0, now + 2000);
+    }
+  });
+}
+window.triggerFrostLance = triggerFrostLance;
+
+function triggerEarthSlam() {
+  // Aardhamer special (Wereld 2): aardschok om de speler heen die beschadigt, wegstoot en heel even verlamt
+  if (gameOver || isPaused) return;
+  const weapon = getWeapon();
+  if (weapon.id !== 'earthhammer') return;
+  const now = performance.now();
+  if (now - earthSlamLastUsed < EARTH_SLAM_COOLDOWN) return;
+  const targets = bots.filter(b => !b.dead && Math.hypot(b.x - player.x, b.y - player.y) < EARTH_SLAM_RADIUS);
+  earthSlamLastUsed = now;
+  explosions.push({ x: player.x, y: player.y, born: now, maxR: EARTH_SLAM_RADIUS });
+  spawnParticles(player.x, player.y, '#8a6a3a');
+  spawnParticles(player.x, player.y, '#5c3a1e');
+  targets.forEach(bot => {
+    damageBotSimple(bot, EARTH_SLAM_DMG, '#8a6a3a');
+    if (bot.dead) return;
+    const ang = Math.atan2(bot.y - player.y, bot.x - player.x);
+    bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, bot.x + Math.cos(ang) * 70));
+    bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, bot.y + Math.sin(ang) * 70));
+    bot.rootedUntil = Math.max(bot.rootedUntil || 0, now + 500);
+  });
+}
+window.triggerEarthSlam = triggerEarthSlam;
+
 function triggerStickyBarrage() {
   // Kleefbom Werper special: gooit in één keer 3 kleefbommen naar de dichtstbijzijnde bots
   if (gameOver || isPaused) return;

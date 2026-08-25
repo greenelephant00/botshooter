@@ -368,6 +368,7 @@ function startPractice(botName) {
   treeGrabs = [];
   shockRings = [];
   lavaPools = [];
+  iceLances = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -487,6 +488,7 @@ function startDodgePractice() {
   treeGrabs = [];
   shockRings = [];
   lavaPools = [];
+  iceLances = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -798,7 +800,7 @@ function drawBotPreview(canvasEl, type) {
 }
 
 function buyWeapon(id) {
-  const w = WEAPONS.find(x => x.id === id) || SPECIAL_WEAPONS.find(x => x.id === id) || WORLD2_WEAPONS.find(x => x.id === id);
+  const w = WEAPONS.find(x => x.id === id) || SPECIAL_WEAPONS.find(x => x.id === id) || WORLD2_WEAPONS.find(x => x.id === id) || WORLD2_SPECIAL_WEAPONS.find(x => x.id === id);
   if (!w || ownedWeapons.includes(id) || coins < w.price) return;
   coins -= w.price;
   ownedWeapons.push(id);
@@ -1256,7 +1258,9 @@ function renderShop() {
     document.getElementById('shopWeapons').innerHTML = WORLD2_WEAPONS.map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
-    document.getElementById('shopSpecialWeapons').innerHTML = '';
+    document.getElementById('shopSpecialWeapons').innerHTML = WORLD2_SPECIAL_WEAPONS.map(w =>
+      weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
+    ).join('');
     document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.map(a =>
       shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor === a.id, 'buyArmor', 'equipArmor')
     ).join('');

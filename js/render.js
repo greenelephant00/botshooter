@@ -323,6 +323,27 @@ function drawTornadoOverlay() {
   ctx.restore();
 }
 
+function drawIceLance(l) {
+  // Rijmlans-special: een korte, felle rechte ijsstraal die snel uitdooft
+  const age = performance.now() - l.born;
+  const dur = 250;
+  const t = Math.min(1, age / dur);
+  if (t >= 1) return;
+  ctx.save();
+  ctx.globalAlpha = 1 - t;
+  ctx.strokeStyle = '#9ef7ff';
+  ctx.lineWidth = 6 * (1 - t) + 1;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(l.x1, l.y1);
+  ctx.lineTo(l.x2, l.y2);
+  ctx.stroke();
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 2 * (1 - t) + 0.5;
+  ctx.stroke();
+  ctx.restore();
+}
+
 function drawShockRing(r) {
   // Gedeeld: uitdijende, uitdovende schokgolf-ring (Wereld 2 elementale powerups)
   const age = performance.now() - r.born;
@@ -3368,6 +3389,7 @@ function draw() {
   tsunamiWaves.forEach(drawTsunamiWave);
   treeGrabs.forEach(drawTreeGrab);
   shockRings.forEach(drawShockRing);
+  iceLances.forEach(drawIceLance);
   activeLasers.forEach(drawActiveLaser);
   barrageTelegraphs.forEach(drawBarrageTelegraph);
   barrageLasers.forEach(drawBarrageLaser);

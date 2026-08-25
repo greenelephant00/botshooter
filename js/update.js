@@ -885,6 +885,7 @@ function update() {
   tsunamiWaves = tsunamiWaves.filter(w => now0 - w.born < w.totalLife);
   treeGrabs = treeGrabs.filter(t => now0 - t.born < t.duration);
   shockRings = shockRings.filter(r => now0 - r.born < r.duration);
+  iceLances = iceLances.filter(l => now0 - l.born < 250);
   iceGrenades = iceGrenades.filter(g => now0 - g.born < g.duration);
   vampBolts = vampBolts.filter(g => now0 - g.born < g.duration);
   stickyThrows = stickyThrows.filter(g => now0 - g.born < g.duration);

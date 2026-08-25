@@ -348,6 +348,7 @@ function initGame() {
   treeGrabs = [];
   shockRings = [];
   lavaPools = [];
+  iceLances = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -414,6 +415,7 @@ function setupNextLevel() {
   treeGrabs = [];
   shockRings = [];
   lavaPools = [];
+  iceLances = [];
   staticShockUntil = 0;
   blackHoles = [];
   laserTelegraphs = [];
@@ -570,6 +572,22 @@ function updateHUD() {
     if (getWeapon().id === 'momentum') {
       const remain = BLADE_DASH_COOLDOWN - (now - bladeDashLastUsed);
       active.push(remain <= 0 ? '🗡️ Zwaardsprong (E) gereed' : `🗡️ Zwaardsprong over ${Math.ceil(remain / 1000)}s`);
+    }
+    if (getWeapon().id === 'magmacannon') {
+      const remain = LAVA_FIELD_COOLDOWN - (now - lavaFieldLastUsed);
+      active.push(remain <= 0 ? '🌋 Lavaveld (E) gereed' : `🌋 Lavaveld over ${Math.ceil(remain / 1000)}s`);
+    }
+    if (getWeapon().id === 'hurricanestaff') {
+      const remain = HURRICANE_BLAST_COOLDOWN - (now - hurricaneBlastLastUsed);
+      active.push(remain <= 0 ? '🌬 Windvlaag (E) gereed' : `🌬 Windvlaag over ${Math.ceil(remain / 1000)}s`);
+    }
+    if (getWeapon().id === 'frostlance') {
+      const remain = FROST_LANCE_COOLDOWN - (now - frostLanceLastUsed);
+      active.push(remain <= 0 ? '❄️ Vriesstraal (E) gereed' : `❄️ Vriesstraal over ${Math.ceil(remain / 1000)}s`);
+    }
+    if (getWeapon().id === 'earthhammer') {
+      const remain = EARTH_SLAM_COOLDOWN - (now - earthSlamLastUsed);
+      active.push(remain <= 0 ? '🪨 Aardschok (E) gereed' : `🪨 Aardschok over ${Math.ceil(remain / 1000)}s`);
     }
   }
   const boostEl = document.getElementById('boostVal');

@@ -22,6 +22,10 @@ window.addEventListener('keydown', e => {
     triggerToxicCloud();
     triggerExecutionOrder();
     triggerBladeDash();
+    triggerLavaField();
+    triggerHurricaneBlast();
+    triggerFrostLance();
+    triggerEarthSlam();
   }
 });
 

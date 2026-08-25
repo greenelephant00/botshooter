@@ -19,6 +19,24 @@ const VOLT_NOVA_RADIUS = 220;
 const VOLT_NOVA_DMG = 12;
 let riftPulseLastUsed = 0;
 const RIFT_PULSE_COOLDOWN = 12000;
+let lavaFieldLastUsed = 0;
+const LAVA_FIELD_COOLDOWN = 10000;
+const LAVA_FIELD_RADIUS = 90;
+const LAVA_FIELD_DURATION = 5000;
+const LAVA_FIELD_TICK_DMG = 6;
+let hurricaneBlastLastUsed = 0;
+const HURRICANE_BLAST_COOLDOWN = 10000;
+const HURRICANE_BLAST_RADIUS = 200;
+const HURRICANE_BLAST_DMG = 8;
+let frostLanceLastUsed = 0;
+const FROST_LANCE_COOLDOWN = 10000;
+const FROST_LANCE_RANGE = 500;
+const FROST_LANCE_DMG = 10;
+let earthSlamLastUsed = 0;
+const EARTH_SLAM_COOLDOWN = 10000;
+const EARTH_SLAM_RADIUS = 170;
+const EARTH_SLAM_DMG = 10;
+let iceLances = []; // Rijmlans-special: korte, gloeiende ijslijn-visual
 let fireballThrows = []; // Pyromancer-transformatie: vliegende vuurballen
 let fireZones = []; // Pyromancer-transformatie: brandende zones die schade-over-tijd doen
 let gasClouds = []; // Miasma special bot: gifwolken die schade-over-tijd doen aan de speler
@@ -521,6 +539,14 @@ const WORLD2_WEAPONS = [
   { id: 'crystalgun',    name: 'Kristalgeweer', price: 2500, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, bulletR: 7, effect: 'shatterHit', desc: 'Schiet echte, zichtbare ijsscherven i.p.v. kogels. Elke scherf spat uiteen in ijsschilfers die bots dichtbij ook raken en even bevriezen.' }
 ];
 
+// Elementale speciale wapens: alleen te koop in de Wereld 2-shop, elk met een eigen E-ability
+const WORLD2_SPECIAL_WEAPONS = [
+  { id: 'magmacannon',    name: 'Magma Kanon',   price: 2600, cooldownMult: 1.2, dmg: 3, pellets: 1, spread: 0, desc: 'Zwaar vuurwapen. Druk op E om een brandend lavaveld op je richtpunt neer te leggen dat bots daarin voortdurend schade geeft.' },
+  { id: 'hurricanestaff', name: 'Orkaanstaf',    price: 2600, cooldownMult: 1.0, dmg: 2, pellets: 1, spread: 0, desc: 'Wind-staf. Druk op E voor een windvlaag om je heen die alle bots dichtbij beschadigt en wegblaast.' },
+  { id: 'frostlance',     name: 'Rijmlans',      price: 2700, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, desc: 'IJzige lans. Druk op E voor een doorborende vriesstraal die alle bots op een lijn beschadigt en bevriest.' },
+  { id: 'earthhammer',    name: 'Aardhamer',     price: 2700, cooldownMult: 1.3, dmg: 3, pellets: 1, spread: 0, desc: 'Zware aardstaf. Druk op E voor een aardschok om je heen die bots beschadigt, wegstoot en heel even verlamt.' }
+];
+
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
 const WORLD2_ARMOR = [
   { id: 'fireshield',   name: 'Vuurschild',            price: 1700, hpBonus: 30, reduction: 0, fireResist: 0.6, desc: '+30 max HP. Brandwonden (bv. van Lavagolem/Vulkaanheer) duren 60% korter.' },
@@ -539,7 +565,7 @@ let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oe
 
 function getWeapon() {
   const id = practiceWeaponId || equippedWeapon;
-  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WEAPONS[0];
+  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WORLD2_SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
 }
 function getArmor() { return ARMOR.find(a => a.id === equippedArmor) || WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0]; }
 function getArmor2() { return ARMOR.find(a => a.id === equippedArmor2) || WORLD2_ARMOR.find(a => a.id === equippedArmor2) || ARMOR[0]; }
