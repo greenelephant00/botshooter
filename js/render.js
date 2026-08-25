@@ -2988,7 +2988,7 @@ function draw() {
     ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
   } else if (nowShake < staticShockUntil) {
     // Donderknaap (Wereld 2): korte, scherpe schok-jolt bij een treffer
-    const mag = 6;
+    const mag = 11;
     ctx.translate((Math.random() - 0.5) * mag * 2, (Math.random() - 0.5) * mag * 2);
   }
 

@@ -704,8 +704,8 @@ function update() {
             lightningBolts.push({ x1: b.sourceBot.x, y1: b.sourceBot.y, x2: player.x, y2: player.y, born: now0 });
             spawnParticles(player.x, player.y, '#8ecbff');
           } else if (srcType === 'kristalwicht') {
-            // Kristalreus: een korte bevriezende vertraging
-            player.slowUntil = Math.max(player.slowUntil, now0 + 800);
+            // Kristalreus: een bevriezende vertraging
+            player.slowUntil = Math.max(player.slowUntil, now0 + 1700);
             spawnParticles(player.x, player.y, '#9ef7ff');
             spawnParticles(player.x, player.y, '#ffffff');
           }
