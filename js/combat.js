@@ -1529,6 +1529,9 @@ function botShoot(bot) {
     for (let i = 0; i < n; i++) {
       fireBotBullet(bot, (Math.PI * 2 / n) * i);
     }
+  } else if (bot.pattern === 'teleport') {
+    // ghost/zandworm: één gericht schot direct na het teleporteren
+    fireBotBullet(bot, baseAngle);
   }
 }
 

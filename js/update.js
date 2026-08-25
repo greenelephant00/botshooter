@@ -724,7 +724,7 @@ function update() {
             spawnParticles(player.x, player.y, '#8ecbff');
           } else if (srcType === 'aswervelaar') {
             // Aswervelaar: een askolk verblindt je kort
-            player.ashBlindUntil = now0 + 1200;
+            player.ashBlindUntil = now0 + 2600;
             spawnParticles(player.x, player.y, '#6b6b6b');
             spawnParticles(player.x, player.y, '#c9c9c9');
           } else if (srcType === 'sneeuwjager') {
