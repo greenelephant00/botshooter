@@ -1637,6 +1637,7 @@ function botShoot(bot) {
 }
 
 function spawnParticles(x, y, color) {
+  if (particles.length > 350) return; // veiligheidslimiet: voorkomt vertraging door een opeenstapeling van deeltjes
   for (let i = 0; i < 10; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 1 + Math.random() * 3;

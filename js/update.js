@@ -53,7 +53,7 @@ function update() {
     if (now < bot.frozenUntil || now < bot.rootedUntil) return; // bevroren of vastgeworteld, geen actie
     // Elementale Wereld 2-bots: periodiek een sprankje van hun element
     const ambientColors = WORLD2_AMBIENT_FX[bot.type];
-    if (ambientColors && (!bot.lastAmbientFx || now - bot.lastAmbientFx > 350)) {
+    if (ambientColors && (!bot.lastAmbientFx || now - bot.lastAmbientFx > 700)) {
       bot.lastAmbientFx = now;
       spawnParticles(bot.x, bot.y, ambientColors[Math.floor(Math.random() * ambientColors.length)]);
     }
@@ -272,7 +272,7 @@ function update() {
         bot.x += (bdx/bdist) * bot.speed * speedMult;
         bot.y += (bdy/bdist) * bot.speed * speedMult;
       }
-      if (!bot.lastLavaTrail || now - bot.lastLavaTrail > 300) {
+      if (!bot.lastLavaTrail || now - bot.lastLavaTrail > 450) {
         bot.lastLavaTrail = now;
         dropLavaTrail(bot);
       }
