@@ -400,26 +400,61 @@ function drawShockRing(r) {
 }
 
 function drawFireRing(r) {
-  // Vuurtitaan special: statische, flikkerende vuurring. Blijft op vaste straal staan tot hij dooft.
+  // Vuurtitaan special: statische ring van echte, dansende vlammen. Blijft op vaste straal staan tot hij dooft.
   const age = performance.now() - r.born;
   if (age < 0 || age > r.duration) return;
   const fadeIn = Math.min(1, age / 300);
   const fadeOut = Math.min(1, (r.duration - age) / 500);
-  const flicker = 0.75 + Math.sin(performance.now() / 70) * 0.15;
+  const alpha = Math.min(fadeIn, fadeOut);
+  const now = performance.now();
+
+  // gloeiende basisring op de grond
   ctx.save();
-  ctx.globalAlpha = Math.min(fadeIn, fadeOut) * 0.85;
-  ctx.strokeStyle = '#ff5a1f';
-  ctx.lineWidth = 10 * flicker;
+  ctx.globalAlpha = alpha * 0.9;
+  ctx.strokeStyle = '#8a1f00';
+  ctx.lineWidth = 14;
   ctx.beginPath();
   ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
   ctx.stroke();
-  ctx.globalAlpha = Math.min(fadeIn, fadeOut) * 0.9;
-  ctx.strokeStyle = '#fff275';
-  ctx.lineWidth = 3 * flicker;
+  ctx.strokeStyle = '#ff5a1f';
+  ctx.lineWidth = 7;
   ctx.beginPath();
   ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
   ctx.stroke();
   ctx.restore();
+
+  // dansende vlamtongen rondom de hele cirkel — dit maakt het echt zichtbaar als vuur i.p.v. een dunne lijn
+  const spikes = 32;
+  for (let i = 0; i < spikes; i++) {
+    const a = (Math.PI * 2 / spikes) * i;
+    const flicker = 0.5 + Math.sin(now / 85 + i * 2.1) * 0.5;
+    const nx = Math.cos(a), ny = Math.sin(a);
+    const tx = -ny, ty = nx;
+    const flameLen = 22 + flicker * 26;
+    const width = 6 + flicker * 4;
+    const bx = r.x + nx * (r.radius - 4);
+    const by = r.y + ny * (r.radius - 4);
+    const tipX = bx + nx * flameLen;
+    const tipY = by + ny * flameLen;
+    ctx.save();
+    ctx.globalAlpha = alpha * (0.65 + flicker * 0.35);
+    ctx.fillStyle = i % 2 === 0 ? '#ff5a1f' : '#ff8c42';
+    ctx.beginPath();
+    ctx.moveTo(bx - tx * width, by - ty * width);
+    ctx.lineTo(tipX, tipY);
+    ctx.lineTo(bx + tx * width, by + ty * width);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#fff275';
+    const coreLen = flameLen * 0.55;
+    ctx.beginPath();
+    ctx.moveTo(bx - tx * width * 0.4, by - ty * width * 0.4);
+    ctx.lineTo(bx + nx * coreLen, by + ny * coreLen);
+    ctx.lineTo(bx + tx * width * 0.4, by + ty * width * 0.4);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
 }
 
 function drawEarthAuraEffect() {
