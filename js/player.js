@@ -197,7 +197,7 @@ const WORLD2_AMBIENT_FX = {
 // Zeldzame, zwaardere elementale special-bots voor Wereld 2 — elk met een eigen special attack
 const WORLD2_SPECIAL_BOT_TYPES = [
   { name: 'vulkaanheer', r: 24, hp: 16, speed: [0.5, 0.8], cooldown: [4200, 5200], pattern: 'lavarain',  bulletSpeed: 0, specialDmg: 16, color: () => '#8a3a1f' },
-  { name: 'vriesvorst',  r: 22, hp: 14, speed: [0.6, 0.9], cooldown: [3800, 4600], pattern: 'frostnova', bulletSpeed: 0, specialDmg: 14, color: () => '#bdf3ff' },
+  { name: 'vriesvorst',  r: 22, hp: 14, speed: [0.6, 0.9], cooldown: [2800, 3400], pattern: 'frostnova', bulletSpeed: 0, specialDmg: 14, color: () => '#bdf3ff' },
   { name: 'stormwever',  r: 20, hp: 12, speed: [0.8, 1.2], cooldown: [2200, 2800], pattern: 'chainbolt', bulletSpeed: 0, specialDmg: 12, color: () => '#c9a3ff' },
   { name: 'wortelheer',  r: 25, hp: 18, speed: [0.5, 0.8], cooldown: [3200, 4000], pattern: 'rootsnare', bulletSpeed: 0, specialDmg: 14, color: () => '#4a3018' }
 ];
