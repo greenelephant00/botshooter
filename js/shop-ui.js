@@ -656,7 +656,7 @@ const POWERUP_PREVIEW_DURATION = 6000;
 // die laten we iets later spawnen zodat de bots eerst het beeld in kunnen lopen. Powerups die een tijdje
 // duren (aura, verwarring, snelvuur, ...) blijven toch actief terwijl de bots binnenkomen, dus die spawnen meteen.
 const POWERUP_PREVIEW_DELAY_IDS = ['freeze', 'nuke', 'elementstorm', 'wortelgreep', 'vuurnova', 'ijsbries', 'strike', 'lightningbarrage'];
-const POWERUP_PREVIEW_DELAY = 1200;
+const POWERUP_PREVIEW_DELAY = 2000;
 
 function exitSkinPractice() {
   if (skinPracticeActive) equippedSkin = previousEquippedSkin;
