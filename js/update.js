@@ -590,6 +590,11 @@ function update() {
             blackHoles.push({ x: bot.x, y: bot.y, born: performance.now(), duration: 1200, radius: 130, exploded: false });
           }
 
+          // Wortelgeweer: sleurt bij een kill de dichtstbijzijnde bot (geen boss) de grond in
+          if (b.effect === 'rootDragKill') {
+            rootDragNearest(bot.x, bot.y, ROOT_DRAG_RANGE);
+          }
+
           // Momentum Blade: killstreak opbouwen voor een schademultiplier
           if (b.effect === 'killstreak') {
             player.killStreak = Math.min(10, player.killStreak + 1);

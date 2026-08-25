@@ -1710,6 +1710,37 @@ function rootGrabAttack(count) {
   });
 }
 
+function rootDragNearest(x, y, maxRange) {
+  // Wortelgeweer (Wereld 2): bij een kill sleurt een boomwortel de dichtstbijzijnde bot (geen boss) de grond in
+  const candidates = bots.filter(b => !b.dead && !b.isBoss);
+  let nearest = null, nearestDist = maxRange;
+  candidates.forEach(b => {
+    const dd = Math.hypot(b.x - x, b.y - y);
+    if (dd < nearestDist) { nearest = b; nearestDist = dd; }
+  });
+  if (!nearest) return;
+  const bot = nearest;
+  const tx = bot.x, ty = bot.y;
+  const duration = 1400;
+  const riseDur = duration * 0.35;
+  const wrapDur = duration * 0.25;
+  const now0 = performance.now();
+  bot.rootedUntil = now0 + duration;
+  treeGrabs.push({ x: tx, y: ty, born: now0, duration, riseDur, wrapDur });
+  telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: now0 + riseDur });
+  spawnParticles(tx, ty, '#5c3a1e');
+  spawnParticles(tx, ty, '#3fa34d');
+  setTimeout(() => {
+    if (gameOver || levelTransition || bot.dead) return;
+    spawnParticles(tx, ty, '#5c3a1e');
+    spawnParticles(tx, ty, '#3fa34d');
+    spawnParticles(tx, ty, '#2f7d3c');
+    bot.dead = true;
+    score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
+    if (gameMode === 'levels') levelKills++;
+  }, riseDur + wrapDur);
+}
+
 function dropLavaTrail(bot) {
   // Vulkaanheer (Wereld 2): laat continu een spoor van kleine lavaplasjes achter zich terwijl hij loopt
   const born = performance.now();
