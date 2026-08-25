@@ -2172,7 +2172,7 @@ function bossRootSnare(bot) {
     if (gameOver || levelTransition) return;
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < grabRadius) {
-      applyDamageToPlayer(bot.specialDmg || 26);
+      applyDamageToPlayer(Math.round((bot.specialDmg || 26) * 0.7));
       player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 1300);
       spawnParticles(player.x, player.y, '#5c3a1e');
       spawnParticles(player.x, player.y, '#3fa34d');
