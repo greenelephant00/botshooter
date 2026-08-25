@@ -503,7 +503,7 @@ const WEAPONS = [
   { id: 'smg',      name: 'SMG',           price: 150,  cooldownMult: 0.55, dmg: 1, pellets: 1, spread: 0,    desc: 'Veel sneller schieten, zelfde schade per kogel.' },
   { id: 'rifle',    name: 'Geweer',        price: 350,  cooldownMult: 0.85, dmg: 2, pellets: 1, spread: 0,    bulletSpeedMult: 1.5, desc: 'Snelle, precieze kogels met meer schade.' },
   { id: 'shotgun',  name: 'Shotgun',       price: 400,  cooldownMult: 1.3,  dmg: 1, pellets: 3, spread: 0.26, desc: 'Vuurt 3 kogels in een waaier, dodelijk van dichtbij.' },
-  { id: 'minigun',  name: 'Minigun',       price: 700,  cooldownMult: 0.3,  dmg: 1, pellets: 1, spread: 0,    inaccuracy: 0.15, desc: 'Bizar hoog vuurtempo, iets minder nauwkeurig.' },
+  { id: 'minigun',  name: 'Minigun',       price: 700,  cooldownMult: 0.4167,  dmg: 1, pellets: 1, spread: 0,    inaccuracy: 0.15, desc: 'Bizar hoog vuurtempo (20 schoten/sec), iets minder nauwkeurig.' },
   { id: 'cannon',   name: 'Cannon',        price: 550,  cooldownMult: 1.8,  dmg: 3, pellets: 1, spread: 0,    desc: 'Traag maar keiharde klap per schot.' },
   { id: 'railgun',  name: 'Railgun',       price: 950,  cooldownMult: 2.2,  dmg: 4, pellets: 1, spread: 0,    pierce: 2, desc: 'Doorboort tot 3 bots op een rechte lijn.' },
   { id: 'rocket',   name: 'Raketwerper',   price: 1200, cooldownMult: 2.6,  dmg: 3, pellets: 1, spread: 0,    splashRadius: 70, splashDmg: 2, desc: 'Explodeert bij impact en beschadigt bots in de omgeving.' }
