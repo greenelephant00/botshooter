@@ -43,6 +43,18 @@ function update() {
   player.y += player.slideVY;
   player.x = Math.max(player.r, Math.min(canvas.width - player.r, player.x));
   player.y = Math.max(player.r, Math.min(canvas.height - player.r, player.y));
+
+  // Vuurtitaan-vuurring: een vurige kooi rond de speler — je kunt er niet uit, en tegen de vlammen aan duwen zet je in brand
+  if (now0 < player.fireCageUntil) {
+    const cageDist = Math.hypot(player.x - player.fireCageX, player.y - player.fireCageY);
+    if (cageDist > player.fireCageRadius) {
+      const cageAng = Math.atan2(player.y - player.fireCageY, player.x - player.fireCageX);
+      player.x = player.fireCageX + Math.cos(cageAng) * player.fireCageRadius;
+      player.y = player.fireCageY + Math.sin(cageAng) * player.fireCageRadius;
+      player.burnUntil = now0 + 5000 * (1 - getArmorStats().fireResist);
+    }
+  }
+
   player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
   if (keys[' '] || keys['mouse']) shoot();

@@ -1566,30 +1566,30 @@ function bossFireNova(bot) {
 }
 
 function bossFireRing(bot) {
-  // Vuurtitaan special 4 - Vuurring: een statische ring van vuur rond de speler. Bots lopen er ongehinderd doorheen,
-  // maar zodra de speler zelf de ring passeert (van binnen naar buiten of andersom) vat hij 5 sec vlam.
+  // Vuurtitaan special 4 - Vuurring: een vurige kooi rond de speler zelf (niet om de boss). De speler kan er 5 sec niet uit —
+  // beweging wordt aan de rand tegengehouden (zie update.js) en tegen de vlammen aan duwen zet je in brand.
   const cx = player.x, cy = player.y;
   const radius = 130;
   const duration = 5000;
   const born = performance.now();
   fireRings.push({ x: cx, y: cy, born, duration, radius });
+  player.fireCageUntil = born + duration;
+  player.fireCageX = cx;
+  player.fireCageY = cy;
+  player.fireCageRadius = radius;
   spawnParticles(cx, cy, '#ff5a1f');
   spawnParticles(cx, cy, '#fff275');
-  let lastInside = Math.hypot(player.x - cx, player.y - cy) < radius;
-  const checkInterval = setInterval(() => {
+  // vonken die willekeurig langs de kooiwand opspatten, voor een net iets dreigender vuurkooi-gevoel
+  const sparkInterval = setInterval(() => {
     if (gameOver || levelTransition || performance.now() - born > duration) {
-      clearInterval(checkInterval);
+      clearInterval(sparkInterval);
       return;
     }
-    const dist = Math.hypot(player.x - cx, player.y - cy);
-    const inside = dist < radius;
-    if (inside !== lastInside) {
-      player.burnUntil = performance.now() + 5000 * (1 - getArmorStats().fireResist);
-      spawnParticles(player.x, player.y, '#ff5a1f');
-      spawnParticles(player.x, player.y, '#fff275');
-    }
-    lastInside = inside;
-  }, 40);
+    const a = Math.random() * Math.PI * 2;
+    const sx = cx + Math.cos(a) * radius;
+    const sy = cy + Math.sin(a) * radius;
+    spawnParticles(sx, sy, Math.random() < 0.5 ? '#ff8c42' : '#fff275');
+  }, 140);
 }
 
 function bossFrostLance(bot) {

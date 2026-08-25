@@ -50,6 +50,10 @@ const player = {
   fireTrailUntil: 0,
   lastFireTrailDrop: 0,
   nextShotTornado: false,
+  fireCageUntil: 0,
+  fireCageX: 0,
+  fireCageY: 0,
+  fireCageRadius: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -100,6 +104,10 @@ function resetPlayer() {
   player.fireTrailUntil = 0;
   player.lastFireTrailDrop = 0;
   player.nextShotTornado = false;
+  player.fireCageUntil = 0;
+  player.fireCageX = 0;
+  player.fireCageY = 0;
+  player.fireCageRadius = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
