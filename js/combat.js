@@ -58,9 +58,13 @@ function shoot() {
           Math.hypot(b.x - player.x, b.y - player.y) < Math.hypot(a.x - player.x, a.y - player.y) ? b : a);
       }
     }
+    const spawnX = player.x + Math.cos(angle) * (player.r + 5);
+    const spawnY = player.y + Math.sin(angle) * (player.r + 5);
     bullets.push({
-      x: player.x + Math.cos(angle) * (player.r + 5),
-      y: player.y + Math.sin(angle) * (player.r + 5),
+      x: spawnX,
+      y: spawnY,
+      bornX: spawnX,
+      bornY: spawnY,
       vx: Math.cos(angle) * 9 * speedMult,
       vy: Math.sin(angle) * 9 * speedMult,
       r: 4,
@@ -71,7 +75,9 @@ function shoot() {
       splashRadius: weapon.splashRadius || 0,
       splashDmg: weapon.splashDmg || 0,
       effect: weapon.effect || null,
-      homingTarget: target
+      homingTarget: target,
+      maxRange: weapon.maxRange || 0,
+      isFlame: weapon.id === 'flamethrower'
     });
   });
 }

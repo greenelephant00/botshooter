@@ -515,7 +515,7 @@ const ARMOR = [
 
 // Elementale wapens: alleen te koop in de Wereld 2-shop
 const WORLD2_WEAPONS = [
-  { id: 'flamethrower', name: 'Vlammenwerper', price: 1200, cooldownMult: 0.5, dmg: 1, pellets: 1, spread: 0.05, effect: 'igniteHit',   desc: 'Elke kogel zet de geraakte bot 2,5 sec in brand voor schade-over-tijd.' },
+  { id: 'flamethrower', name: 'Vlammenwerper', price: 1200, cooldownMult: 0.35, dmg: 1, pellets: 2, spread: 0.16, maxRange: 190, effect: 'igniteHit', desc: 'Spuit een korte stoot echt vuur met beperkte reikwijdte (~190px). Zet de geraakte bot 2,5 sec in brand voor schade-over-tijd.' },
   { id: 'earthpounder',  name: 'Aardstamper',   price: 1300, cooldownMult: 1.6, dmg: 3, pellets: 1, spread: 0,    effect: 'knockbackHit', desc: 'Elke kogel stampt de geraakte bot een flink stuk naar achteren.' },
   { id: 'windrifle',     name: 'Windgeweer',    price: 1400, cooldownMult: 0.9, dmg: 2, pellets: 1, spread: 0,    pierce: 3, bulletSpeedMult: 1.3, desc: 'Een vlaag wind blaast de kogel dwars door tot 4 bots op een rechte lijn.' },
   { id: 'crystalgun',    name: 'Kristalgeweer', price: 1500, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0,    effect: 'shatterHit',   desc: 'Elke kogel spat uiteen in ijsscherven die bots dichtbij ook raken en even bevriezen.' }

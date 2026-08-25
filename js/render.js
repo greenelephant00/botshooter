@@ -1041,6 +1041,28 @@ function drawPlayerBullet(b) {
     ctx.restore();
     return;
   }
+  if (b.isFlame) {
+    // Vlammenwerper: een echte flakkerende vuurtong i.p.v. een kogel, dooft uit tegen het einde van zijn beperkte bereik
+    const dist = b.maxRange ? Math.hypot(b.x - b.bornX, b.y - b.bornY) / b.maxRange : 0;
+    const fade = 1 - Math.max(0, dist - 0.6) / 0.4;
+    const wob = Math.sin(performance.now() / 40 + b.x) * 2;
+    ctx.globalAlpha = Math.max(0.15, fade);
+    const len = 16 + wob;
+    const grad = ctx.createLinearGradient(-len, 0, 6, 0);
+    grad.addColorStop(0, 'rgba(200, 16, 46, 0)');
+    grad.addColorStop(0.5, '#ff5a1f');
+    grad.addColorStop(0.85, '#ffb703');
+    grad.addColorStop(1, '#fff9c4');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(6, 0);
+    ctx.quadraticCurveTo(-len * 0.4, -6 + wob * 0.5, -len, 0);
+    ctx.quadraticCurveTo(-len * 0.4, 6 - wob * 0.5, 6, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+    return;
+  }
   switch (equippedSkin) {
     case 'muncher': {
       // knabbelpelletje: geel bolletje met hapje eruit

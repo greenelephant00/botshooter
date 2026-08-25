@@ -442,7 +442,8 @@ function update() {
   });
   bullets = bullets.filter(b =>
     b.x > -20 && b.x < canvas.width + 20 &&
-    b.y > -20 && b.y < canvas.height + 20
+    b.y > -20 && b.y < canvas.height + 20 &&
+    (!b.maxRange || Math.hypot(b.x - b.bornX, b.y - b.bornY) < b.maxRange)
   );
 
   // Bullet-bot collisions
