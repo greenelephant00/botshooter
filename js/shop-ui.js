@@ -1255,10 +1255,10 @@ function leveledUpgradeItemHtml(name, desc, levels, currentLevel, buyFnName) {
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   if (currentWorld === 2) {
-    document.getElementById('shopWeapons').innerHTML = WORLD2_WEAPONS.map(w =>
+    document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
-    document.getElementById('shopSpecialWeapons').innerHTML = WORLD2_SPECIAL_WEAPONS.map(w =>
+    document.getElementById('shopSpecialWeapons').innerHTML = [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
     document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.map(a =>
