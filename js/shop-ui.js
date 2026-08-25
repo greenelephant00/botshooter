@@ -214,7 +214,8 @@ const BOT_DISPLAY_NAMES = {
   stormwicht: 'Onweersgeest', kristalwicht: 'Kristalreus',
   zandworm: 'Zandworm', doornrank: 'Doornrank', getijgeest: 'Getijgeest',
   aswervelaar: 'Aswervelaar', sneeuwjager: 'Sneeuwjager',
-  vulkaanheer: 'Vulkaanheer', vriesvorst: 'Vriesvorst', stormwever: 'Stormwever', wortelheer: 'Wortelheer'
+  vulkaanheer: 'Vulkaanheer', vriesvorst: 'Vriesvorst', stormwever: 'Stormwever', wortelheer: 'Wortelheer',
+  vuurtitaan: 'Vuurtitaan', vriesreus: 'Vriesreus', aardkoning: 'Aardkoning', stormvorst: 'Stormvorst'
 };
 const BOT_PATTERN_INFO = {
   single:    'Schiet één kogel recht op je af.',
@@ -251,7 +252,11 @@ const BOSS_SPECIAL_DESC = {
   colossus: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Spervuur: 3 snelle golven van 12 kogels in alle richtingen.',
   titan:    'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Meteorregen: 4 getelegrafeerde inslagen rond je positie, kort na elkaar.',
   behemoth: 'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Laserstraal: een gerichte, doorlopende straal met een korte waarschuwing vooraf.',
-  nemesis:  'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Doemspiraal: meerdere snelle golven roterende kogels die de hele arena vullen. Special 3 — Kruislaser: twee gelijktijdige, doorlopende laserstralen in een kruispatroon met een korte waarschuwing vooraf. De sterkste en taaiste boss in het spel.'
+  nemesis:  'Special 1 — Schokgolf: een AOE-slam rond zichzelf met een getelegrafeerde waarschuwing vooraf. Special 2 — Doemspiraal: meerdere snelle golven roterende kogels die de hele arena vullen. Special 3 — Kruislaser: twee gelijktijdige, doorlopende laserstralen in een kruispatroon met een korte waarschuwing vooraf. De sterkste en taaiste boss in het spel.',
+  vuurtitaan: 'Vuur-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Lavaregen: 3 getelegrafeerde lavaklodders vlak bij je die je in brand zetten. Special 3 — Vuurnova: een felle vuurexplosie rond zichzelf die je verbrandt als je te dichtbij staat.',
+  vriesreus: 'IJs-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — IJsring: een uitdijende ijsring die je bevriest zodra hij je bereikt. Special 3 — Rijmlans: een doorborende vriesstraal recht op je af die je verlamt bij een treffer.',
+  aardkoning: 'Aarde-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Wortelgreep: een boom uit de grond die je vastgrijpt en vasthoudt. Special 3 — Aardbeving: een verwoestende schok rond zichzelf die je wegstoot en even verlamt.',
+  stormvorst: 'Storm-boss (Wereld 2). Special 1 — Schokgolf: een AOE-slam rond zichzelf. Special 2 — Bliksemschicht: een felle bliksemschicht recht naar je toe. Special 3 — Orkaan: een kolkende windvlaag die je herhaaldelijk raakt en naar de boss toe trekt.'
 };
 
 function botDamageText(type) {
@@ -349,7 +354,7 @@ function closeDisastersInfo() {
 window.closeDisastersInfo = closeDisastersInfo;
 
 function startPractice(botName) {
-  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES].find(t => t.name === botName);
+  const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES, ...WORLD2_BOSS_TYPES].find(t => t.name === botName);
   if (!type) return;
 
   gameMode = 'practice';
@@ -747,8 +752,8 @@ function renderBotsInfo() {
   if (currentWorld === 2) {
     document.getElementById('botsInfoList').innerHTML = WORLD2_BOT_TYPES.map(world2BotCardHtml).join('');
     document.getElementById('specialBotsInfoList').innerHTML = WORLD2_SPECIAL_BOT_TYPES.map(world2BotCardHtml).join('');
-    document.getElementById('bossInfoList').innerHTML = '';
-    [...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES].forEach(type => {
+    document.getElementById('bossInfoList').innerHTML = WORLD2_BOSS_TYPES.map(botCardHtml).join('');
+    [...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES, ...WORLD2_BOSS_TYPES].forEach(type => {
       const canvasEl = document.getElementById(`botPreview_${type.name}`);
       if (canvasEl) drawBotPreview(canvasEl, type);
     });
