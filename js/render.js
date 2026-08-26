@@ -3582,7 +3582,24 @@ function drawPlayer() {
   else if (player.activeTransform === 'earthform') drawPlayerEarthForm(ctx, player.r);
   else if (player.activeTransform === 'windform') drawPlayerWindForm(ctx, player.r);
   else if (player.activeTransform === 'waterform') drawPlayerWaterForm(ctx, player.r);
-  else drawPlayerSkin(ctx, getSkin(), player.r);
+  else {
+    drawPlayerSkin(ctx, getSkin(), player.r);
+    drawPlayerWeapon(player.r);
+  }
+  ctx.restore();
+}
+
+function drawPlayerWeapon(r) {
+  // Generieke wapen-loop die bij elke personage-skin zichtbaar is, wijzend in de richting van je muis
+  ctx.save();
+  ctx.fillStyle = '#1a1a1a';
+  ctx.fillRect(-3, r * 0.35, 9, r * 0.55);
+  ctx.fillStyle = '#2a2a2a';
+  ctx.fillRect(r * 0.15, -4, r * 1.15, 8);
+  ctx.fillStyle = '#4a4a4a';
+  ctx.fillRect(r * 0.15, -4, r * 1.15, 2.5);
+  ctx.fillStyle = '#111';
+  ctx.fillRect(r * 1.1, -2.5, 5, 5);
   ctx.restore();
 }
 
