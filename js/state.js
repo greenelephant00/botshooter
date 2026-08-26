@@ -789,6 +789,8 @@ const MAGNET2_RADIUS_PER_LEVEL = 35;
 let hasRevive2 = localStorage.getItem('botShooterHasRevive2') === 'true';
 const REVIVE2_PRICE = 1800;
 const REVIVE2_HEAL_PCT = 0.35;
+let hasDualArmor2 = localStorage.getItem('botShooterHasDualArmor2') === 'true';
+const DUAL_ARMOR2_PRICE = 2000;
 let lvl2Vengeance = Number(localStorage.getItem('botShooterLvl2Vengeance')) || 0;
 const VENGEANCE_LEVELS = [800, 1250, 1800];
 const VENGEANCE_RADII = [80, 120, 160];
@@ -1071,10 +1073,11 @@ function getArmor2() {
   return a;
 }
 
-// Gecombineerde stats van beide pantser-slots (2e slot telt alleen mee als hasDualArmor is gekocht)
+// Gecombineerde stats van beide pantser-slots (2e slot telt alleen mee als de 2e-slot-upgrade van de huidige wereld is gekocht)
 function getArmorStats() {
   const a1 = getArmor();
-  const a2 = hasDualArmor ? getArmor2() : ARMOR[0];
+  const dualArmorOwned = currentWorld === 2 ? hasDualArmor2 : hasDualArmor;
+  const a2 = dualArmorOwned ? getArmor2() : ARMOR[0];
   return {
     hpBonus: a1.hpBonus + a2.hpBonus,
     reduction: 1 - (1 - (a1.reduction || 0)) * (1 - (a2.reduction || 0)),

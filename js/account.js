@@ -32,7 +32,8 @@ const ACCOUNT_KEYS = [
   'botShooterTotalLifetimeKills', 'botShooterTotalPlayTimeMs', 'botShooterTotalScoreSum',
   'botShooterTotalGamesPlayed', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint',
   'botShooterOwnedTrails', 'botShooterEquippedTrail',
-  'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground'
+  'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground',
+  'botShooterHasDualArmor2'
 ];
 
 let currentAccount = null;

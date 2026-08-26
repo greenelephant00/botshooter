@@ -6,6 +6,7 @@ function saveShopState() {
   localStorage.setItem('botShooterEquippedArmor', equippedArmor);
   localStorage.setItem('botShooterEquippedArmor2', equippedArmor2);
   localStorage.setItem('botShooterHasDualArmor', hasDualArmor);
+  localStorage.setItem('botShooterHasDualArmor2', hasDualArmor2);
   localStorage.setItem('botShooterLvlExtraHp', lvlExtraHp);
   localStorage.setItem('botShooterLvlSprint', lvlSprint);
   localStorage.setItem('botShooterLvlMagnet', lvlMagnet);
@@ -1538,7 +1539,8 @@ function equipArmor(id) {
 window.equipArmor = equipArmor;
 
 function equipArmor2(id) {
-  if (!hasDualArmor || !ownedArmor.includes(id)) return;
+  const dualArmorOwned = currentWorld === 2 ? hasDualArmor2 : hasDualArmor;
+  if (!dualArmorOwned || !ownedArmor.includes(id)) return;
   equippedArmor2 = id;
   saveShopState();
   renderShop();
@@ -1553,6 +1555,15 @@ function buyDualArmorSlot() {
   renderShop();
 }
 window.buyDualArmorSlot = buyDualArmorSlot;
+
+function buyDualArmorSlot2() {
+  if (hasDualArmor2 || coins < DUAL_ARMOR2_PRICE) return;
+  coins -= DUAL_ARMOR2_PRICE;
+  hasDualArmor2 = true;
+  saveShopState();
+  renderShop();
+}
+window.buyDualArmorSlot2 = buyDualArmorSlot2;
 
 function buySkin(id) {
   const skin = SKINS.find(s => s.id === id);
@@ -2188,6 +2199,7 @@ function renderShop() {
       shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor === a.id, 'buyArmor', 'equipArmor')
     ).join('');
     document.getElementById('shopUpgrades').innerHTML = [
+      upgradeItemHtml('2e Elementaal Pantser Slot', 'Wereld 2-only, werkt hetzelfde als 2e Armor Slot in Wereld 1. Ontgrendelt een tweede elementaal pantser-slot: je draagt dan twee elementale pantsers tegelijk en de bonussen van allebei tellen samen mee.', DUAL_ARMOR2_PRICE, hasDualArmor2, 'buyDualArmorSlot2'),
       leveledUpgradeItemHtml('Vuurkern', `Wereld 2-only. Verkort hoe lang brandwonden van vuur-bots en vuurwapens duren en vermindert de schade ervan, bovenop wat je pantser al biedt. Niveau 1: +${Math.round(FIRECORE_RESIST_PER_LEVEL*100)}% vuurweerstand. Niveau 2: +${Math.round(FIRECORE_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(FIRECORE_RESIST_PER_LEVEL*300)}%.`, FIRECORE_LEVELS, lvl2FireCore, 'buyFireCore'),
       leveledUpgradeItemHtml('Vriesbloed', `Wereld 2-only. Verkort hoe lang bevriezing en vertraging door ijs-bots en ijswapens duren, bovenop wat je pantser al biedt. Niveau 1: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*100)}% ijsweerstand. Niveau 2: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*300)}%.`, FROSTBLOOD_LEVELS, lvl2FrostBlood, 'buyFrostBlood'),
       leveledUpgradeItemHtml('Aardvastheid', `Wereld 2-only. Vermindert hoe ver je wordt weggeblazen door wegstoot-effecten (Windloper, Windgeweer-terugslag, Orkaanstaf, etc.), bovenop wat je pantser al biedt. Niveau 1: +${Math.round(STEADFAST_RESIST_PER_LEVEL*100)}% wegblaas-weerstand. Niveau 2: +${Math.round(STEADFAST_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(STEADFAST_RESIST_PER_LEVEL*300)}%.`, STEADFAST_LEVELS, lvl2Steadfast, 'buySteadfast'),
@@ -2210,7 +2222,19 @@ function renderShop() {
       leveledUpgradeItemHtml('Elementoverkill', 'Wereld 2-only, werkt hetzelfde als Overkill in Wereld 1. Als een schot in Wereld 2 veel meer schade doet dan nodig was om een bot te doden, ontstaat er een kleine explosie die het overschot doorgeeft aan bots in de buurt. Niveau 1: Overkill-schade veroorzaakt mini-explosies. Niveau 2: Groter + meer schade. Niveau 3: Nog groter radius.', OVERKILL2_LEVELS, lvl2Overkill, 'buyOverkill2')
     ].join('');
     const section2 = document.getElementById('shopArmor2Section');
-    if (section2) section2.style.display = 'none';
+    const navArmor2Btn = document.getElementById('navArmor2Btn');
+    if (hasDualArmor2) {
+      section2.style.display = 'block';
+      if (navArmor2Btn) navArmor2Btn.style.display = 'inline-block';
+      const equippedSlot1 = WORLD2_ARMOR.find(a => a.id === equippedArmor) || ARMOR[0];
+      document.getElementById('shopArmor1Equipped').textContent = `Slot 1: ${equippedSlot1.name} uitgerust`;
+      document.getElementById('shopArmor2').innerHTML = WORLD2_ARMOR.filter(a => !a.coreOnly).map(a =>
+        shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor2 === a.id, 'buyArmor', 'equipArmor2')
+      ).join('');
+    } else {
+      section2.style.display = 'none';
+      if (navArmor2Btn) navArmor2Btn.style.display = 'none';
+    }
     return;
   }
   document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
