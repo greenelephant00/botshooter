@@ -1511,7 +1511,7 @@ function endGame(won) {
     }
     updateHUD();
     msgBtn.textContent = 'Opnieuw proberen';
-    msgBtn.onclick = () => { startBossRush(bossRushMode); };
+    msgBtn.onclick = () => { startBossRush(); };
   } else if (weaponPracticeActive) {
     document.getElementById('msgText').innerHTML =
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen.</span>`;

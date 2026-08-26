@@ -115,12 +115,15 @@ let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 let bossRushActive = false;
 let bossRushIndex = 0;
 let bossRushWorld = 1;
-let bossRushMode = 'endless'; // 'endless' of 'levels' — bepaalt in Wereld 2 hoeveel Elemental Cores elke boss oplevert
 let bossRushCoresEarned = 0;
 
-// ---- Elemental Cores: aparte valuta, alleen te verdienen in Eindbaas Rush in Wereld 2 ----
-// Beloning per verslagen boss (1e/2e/3e/4e), afhankelijk van de gekozen Eindbaas Rush-modus
+// ---- Elemental Cores: aparte valuta, alleen te verdienen in Wereld 2 ----
+// Elke keer dat je in Wereld 2 een boss verslaat (in een gewoon potje Endless/Levels/Hardcore, of tijdens
+// Eindbaas Rush) levert dat Elemental Cores op. Hoeveel hangt af van de hoeveelste boss het is deze sessie
+// (1e/2e/3e/4e+) en van de spelmodus: Endless/Hardcore/Eindbaas Rush gebruiken de hogere Endless-tabel,
+// Levels gebruikt de lagere Levels-tabel.
 let elementalCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
+let world2BossKillCount = 0; // reset elk potje, telt hoeveelste Wereld 2-boss je deze sessie verslaat
 const BOSSRUSH_CORES_ENDLESS = [5, 10, 15, 20];
 const BOSSRUSH_CORES_LEVELS = [2, 5, 8, 15];
 
@@ -165,13 +168,15 @@ function checkAchievements() {
 function onBossDefeated(bot) {
   if (bossRushActive) {
     bossRushIndex++;
-    if (bossRushWorld === 2) {
-      const table = bossRushMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
-      const coreReward = (table[bossRushIndex - 1] || 0) + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
-      elementalCores += coreReward;
-      bossRushCoresEarned += coreReward;
-      localStorage.setItem('botShooterElementalCores', elementalCores);
-    }
+  }
+  if (currentWorld === 2) {
+    world2BossKillCount++;
+    const table = gameMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
+    const pos = Math.min(world2BossKillCount, table.length) - 1;
+    const coreReward = table[pos] + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
+    elementalCores += coreReward;
+    if (bossRushActive) bossRushCoresEarned += coreReward;
+    localStorage.setItem('botShooterElementalCores', elementalCores);
   }
   if (!hasFirstBoss) {
     hasFirstBoss = true;
