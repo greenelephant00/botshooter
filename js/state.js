@@ -1027,11 +1027,11 @@ let ownedMenuBackgrounds = JSON.parse(localStorage.getItem('botShooterOwnedMenuB
 let equippedMenuBackground = localStorage.getItem('botShooterEquippedMenuBackground') || 'none';
 const MENU_BACKGROUNDS = [
   { id: 'none',      name: 'Geen',          price: 0,    desc: 'Geen animatie, gewoon de standaard donkere achtergrond.' },
-  { id: 'starfield', name: 'Sterrenveld',   price: 1400, desc: 'Rustig drijvende, twinkelende sterren op een diepzwarte achtergrond.' },
-  { id: 'nebula',    name: 'Nevelwolk',     price: 1500, desc: 'Langzaam kolkende, kleurrijke nevelwolken die zachtjes gloeien en verschuiven.' },
-  { id: 'matrix',    name: 'Codewolk',      price: 1500, desc: 'Groene digitale tekens die van boven naar beneden naar beneden vallen, als een regen van code.' },
-  { id: 'lava',      name: 'Lavaveld',      price: 1550, desc: 'Pulserende, gebarsten lava met opstijgende gloeiende asdeeltjes.' },
-  { id: 'aurora',    name: 'Poollicht',     price: 1600, desc: 'Golvende, kleurwisselende poollicht-banden die rustig over het scherm bewegen.' }
+  { id: 'starfield', name: 'Sterrenveld',   price: 2400, desc: 'Rustig drijvende, twinkelende sterren op een diepzwarte achtergrond.' },
+  { id: 'nebula',    name: 'Nevelwolk',     price: 2500, desc: 'Langzaam kolkende, kleurrijke nevelwolken die zachtjes gloeien en verschuiven.' },
+  { id: 'matrix',    name: 'Codewolk',      price: 2500, desc: 'Groene digitale tekens die van boven naar beneden naar beneden vallen, als een regen van code.' },
+  { id: 'lava',      name: 'Lavaveld',      price: 2550, desc: 'Pulserende, gebarsten lava met opstijgende gloeiende asdeeltjes.' },
+  { id: 'aurora',    name: 'Poollicht',     price: 2600, desc: 'Golvende, kleurwisselende poollicht-banden die rustig over het scherm bewegen.' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
