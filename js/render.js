@@ -2627,6 +2627,121 @@ function drawPlayerSkin(c, skinId, r) {
       c.lineTo(x2, y2);
       c.stroke();
     }
+  } else if (skinId === 'comboearth') {
+    // Aardschok Combo (Wereld 2-exclusief): dof gesteente dat barst open en gaat gloeien met mos-aders, met steeds meer rotspieken naarmate de killstreak oploopt
+    const t = Math.min(1, player.comboStreak / 10);
+    if (t > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + t * 0.35;
+      c.strokeStyle = lerpColor('#4a3a2a', '#7fff00', t);
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, r + 5 + t * 8, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    const spikesE = 6 + Math.round(t * 3);
+    c.fillStyle = lerpColor('#3a3025', '#2a1a10', t);
+    c.beginPath();
+    for (let i = 0; i < spikesE; i++) {
+      const a = (Math.PI * 2 / spikesE) * i;
+      const rad = i % 2 === 0 ? r * (1 + t * 0.25) : r * 0.7;
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath();
+    c.fill();
+    c.fillStyle = lerpColor('#5c4a35', '#8a6a3a', t);
+    c.beginPath(); c.arc(0, 0, r * 0.55, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = lerpColor('#3a3025', '#7fff00', t);
+    c.lineWidth = 1.5;
+    const cracks = Math.round(t * 4);
+    for (let i = 0; i < cracks; i++) {
+      const a = (Math.PI * 2 / 4) * i + 0.4;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(Math.cos(a) * r * 0.5, Math.sin(a) * r * 0.5);
+      c.stroke();
+    }
+  } else if (skinId === 'combowind') {
+    // Wervelwind Combo (Wereld 2-exclusief): ijl, doorschijnend lichaam met steeds meer en snellere kolkende windbogen naarmate de killstreak oploopt
+    const t = Math.min(1, player.comboStreak / 10);
+    c.save();
+    c.globalAlpha = 0.35 + t * 0.3;
+    c.fillStyle = lerpColor('#3a3a3a', '#eaffff', t);
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.restore();
+    const rings = 1 + Math.round(t * 3);
+    c.strokeStyle = lerpColor('#555', '#c9f7ff', t);
+    c.lineWidth = 2;
+    const spinCE = performance.now() / (140 - t * 60);
+    for (let i = 0; i < rings; i++) {
+      const a = spinCE + (Math.PI * 2 / rings) * i;
+      c.beginPath(); c.arc(0, 0, r * (0.55 + i * 0.12), a, a + 1.6 + t); c.stroke();
+    }
+    c.fillStyle = lerpColor('#4a4a4a', '#ffffff', t);
+    c.beginPath(); c.arc(0, 0, r * 0.25, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'combowater') {
+    // Vloedgolf Combo (Wereld 2-exclusief): kolkend waterlichaam met steeds meer golfringen en schuimspatten naarmate de killstreak oploopt
+    const t = Math.min(1, player.comboStreak / 10);
+    if (t > 0.05) {
+      c.save();
+      c.globalAlpha = 0.2 + t * 0.35;
+      c.strokeStyle = lerpColor('#1c3a4a', '#4ad4ff', t);
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, r + 5 + t * 9, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    c.fillStyle = lerpColor('#1c2f3a', '#1a4d6b', t);
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = lerpColor('#2a3f4a', '#4a90c2', t);
+    c.beginPath(); c.arc(-r * 0.15, r * 0.2, r * 0.6, 0, Math.PI * 2); c.fill();
+    const waveCount = 1 + Math.round(t * 2);
+    c.strokeStyle = lerpColor('#3a4f5a', '#eaffff', t);
+    c.lineWidth = 2;
+    for (let i = 0; i < waveCount; i++) {
+      const yy = -r * 0.3 + i * r * 0.5;
+      c.beginPath();
+      c.moveTo(-r * 0.7, yy);
+      c.quadraticCurveTo(-r * 0.3, yy - r * 0.25, 0, yy);
+      c.quadraticCurveTo(r * 0.3, yy + r * 0.25, r * 0.7, yy);
+      c.stroke();
+    }
+    const droplets = Math.round(t * 5);
+    c.fillStyle = lerpColor('#3a4f5a', '#eaffff', t);
+    for (let i = 0; i < droplets; i++) {
+      const a = (Math.PI * 2 / 5) * i - Math.PI / 2;
+      c.beginPath(); c.arc(Math.cos(a) * r * 1.1, Math.sin(a) * r * 1.1, r * 0.08, 0, Math.PI * 2); c.fill();
+    }
+  } else if (skinId === 'combocrystal') {
+    // Kristalpracht Combo (Wereld 2-exclusief): een dof gesteente dat verandert in een schitterende, veelkleurige kristalstructuur met steeds meer facetten naarmate de killstreak oploopt
+    const t = Math.min(1, player.comboStreak / 10);
+    const hue = (performance.now() / 12) % 360;
+    if (t > 0.05) {
+      c.save();
+      c.globalAlpha = 0.25 + t * 0.4;
+      c.strokeStyle = `hsl(${hue}, 90%, ${65 + t * 15}%)`;
+      c.lineWidth = 2.5;
+      c.beginPath(); c.arc(0, 0, r + 6 + t * 10, 0, Math.PI * 2); c.stroke();
+      c.restore();
+    }
+    const facets = 5 + Math.round(t * 5);
+    c.fillStyle = lerpColor('#2a2a35', '#0f3d47', t);
+    c.beginPath();
+    for (let i = 0; i < facets; i++) {
+      const a = (Math.PI * 2 / facets) * i - Math.PI / 2;
+      const rad = r * (0.85 + t * 0.35);
+      const px = Math.cos(a) * rad, py = Math.sin(a) * rad;
+      if (i === 0) c.moveTo(px, py); else c.lineTo(px, py);
+    }
+    c.closePath();
+    c.fill();
+    c.strokeStyle = t > 0.05 ? `hsl(${hue}, 90%, 80%)` : '#4a4a55';
+    c.lineWidth = 1;
+    for (let i = 0; i < facets; i++) {
+      const a = (Math.PI * 2 / facets) * i - Math.PI / 2;
+      c.beginPath(); c.moveTo(0, 0); c.lineTo(Math.cos(a) * r * (0.85 + t * 0.35), Math.sin(a) * r * (0.85 + t * 0.35)); c.stroke();
+    }
+    c.fillStyle = t > 0.05 ? `hsl(${(hue + 180) % 360}, 90%, 85%)` : '#5a5a65';
+    c.beginPath(); c.arc(0, 0, r * 0.22, 0, Math.PI * 2); c.fill();
   } else if (skinId === 'neonpink') {
     // roze neon: gloeiende ring met kruisende lijnen op een zwarte kern
     c.fillStyle = '#000';
