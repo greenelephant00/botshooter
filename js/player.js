@@ -432,10 +432,12 @@ function initGame() {
   bossWarningActive = false;
   bossesSpawned = {};
   world2BossKillCount = 0;
+  if (bestMomentSnapshot) URL.revokeObjectURL(bestMomentSnapshot);
   bestMomentSnapshot = null;
   bestMomentLabel = '';
   bestMomentScore = -1;
   sessionBestStreak = 0;
+  killCamRecording = false;
   score = 0;
   gameOver = false;
   levelTransition = false;

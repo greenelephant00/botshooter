@@ -111,11 +111,13 @@ let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) 
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 
-// ---- Kill Cam: bewaart een screenshot van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
-let bestMomentSnapshot = null;
+// ---- Kill Cam: neemt een kort (3 sec) filmpje op van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
+let bestMomentSnapshot = null; // object-URL van het opgenomen webm-filmpje
 let bestMomentLabel = '';
 let bestMomentScore = -1;
 let sessionBestStreak = 0;
+let killCamRecording = false;
+let killCamLastRecordEnd = 0;
 
 // ---- Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit, zonder dood te gaan ----
 let bossRushActive = false;

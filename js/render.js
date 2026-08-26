@@ -1,9 +1,32 @@
+const KILL_CAM_DURATION = 3000;
+
 function recordMoment(importance, label) {
-  // Kill Cam: bewaart een screenshot van het meest indrukwekkende moment dit potje (hoogste importance wint)
+  // Kill Cam: neemt een kort filmpje op vanaf het meest indrukwekkende moment dit potje (hoogste importance wint)
   if (importance <= bestMomentScore) return;
+  if (killCamRecording) return; // laat een lopende opname eerst afronden
+  const now = performance.now();
+  if (now - killCamLastRecordEnd < 500) return; // korte afkoeling tussen opnames
+  if (typeof canvas.captureStream !== 'function' || typeof MediaRecorder === 'undefined') return; // niet ondersteund
   bestMomentScore = importance;
   bestMomentLabel = label;
-  try { bestMomentSnapshot = canvas.toDataURL('image/png'); } catch (e) { bestMomentSnapshot = null; }
+  try {
+    const stream = canvas.captureStream(30);
+    const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+    const chunks = [];
+    recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'video/webm' });
+      if (bestMomentSnapshot) URL.revokeObjectURL(bestMomentSnapshot);
+      bestMomentSnapshot = URL.createObjectURL(blob);
+      killCamRecording = false;
+      killCamLastRecordEnd = performance.now();
+    };
+    killCamRecording = true;
+    recorder.start();
+    setTimeout(() => { if (recorder.state !== 'inactive') recorder.stop(); }, KILL_CAM_DURATION);
+  } catch (e) {
+    killCamRecording = false;
+  }
 }
 
 function lerpColor(hexA, hexB, t) {

@@ -722,12 +722,17 @@ window.closeWeaponSkinsShop = closeWeaponSkinsShop;
 function openKillCam() {
   if (!bestMomentSnapshot) return;
   document.getElementById('killCamLabel').textContent = bestMomentLabel;
-  document.getElementById('killCamImage').src = bestMomentSnapshot;
+  const video = document.getElementById('killCamVideo');
+  video.src = bestMomentSnapshot;
   document.getElementById('killCamScreen').style.display = 'flex';
+  video.currentTime = 0;
+  video.play();
 }
 window.openKillCam = openKillCam;
 
 function closeKillCam() {
+  const video = document.getElementById('killCamVideo');
+  video.pause();
   document.getElementById('killCamScreen').style.display = 'none';
 }
 window.closeKillCam = closeKillCam;
