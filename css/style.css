@@ -267,6 +267,7 @@
   #world2Screen .modeBtn.levels { background: #8a6a3a; color: #fff; }
   #world2Screen .modeBtn.endless { background: #ff5a1f; color: #fff; }
   #world2Screen .modeBtn.hardcore { background: #25c2e8; color: #06222b; }
+  #world2Screen .modeBtn.sprint { background: #b967ff; color: #1a1a1a; }
   #world2Screen .shopOpenBtn { border-color: #ff8800; color: #ff8800; }
   #startScreen h1, #world2Screen h1 {
     font-size: 36px;
@@ -294,16 +295,20 @@
   .modeBtn:hover { transform: scale(1.04); }
   .modeBtn.levels { background: #ffd60a; }
   .modeBtn.hardcore { background: #8b0000; color: #fff; }
+  .modeBtn.sprint { background: #ff8c00; color: #1a1a1a; }
   .modeBtnRow {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    width: 620px;
+    width: 820px;
     max-width: 92vw;
     margin: 10px auto;
+    justify-content: center;
   }
   .modeBtnRow .modeBtn {
     width: auto;
     flex: 1;
+    min-width: 140px;
     margin: 0;
     padding: 16px 12px;
     font-size: 16px;
