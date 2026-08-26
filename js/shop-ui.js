@@ -522,6 +522,59 @@ function buyCoreHarvest() {
 }
 window.buyCoreHarvest = buyCoreHarvest;
 
+function buyCoreSpeed() {
+  const price = CORE_SPEED_LEVELS[lvlCoreSpeed];
+  if (price === undefined || elementalCores < price) return;
+  elementalCores -= price;
+  lvlCoreSpeed++;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterLvlCoreSpeed', lvlCoreSpeed);
+  renderCoreShop();
+}
+window.buyCoreSpeed = buyCoreSpeed;
+
+function buyCoreRegen() {
+  const price = CORE_REGEN_LEVELS[lvlCoreRegen];
+  if (price === undefined || elementalCores < price) return;
+  elementalCores -= price;
+  lvlCoreRegen++;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterLvlCoreRegen', lvlCoreRegen);
+  renderCoreShop();
+}
+window.buyCoreRegen = buyCoreRegen;
+
+function buyCoreVampire() {
+  const price = CORE_VAMPIRE_LEVELS[lvlCoreVampire];
+  if (price === undefined || elementalCores < price) return;
+  elementalCores -= price;
+  lvlCoreVampire++;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterLvlCoreVampire', lvlCoreVampire);
+  renderCoreShop();
+}
+window.buyCoreVampire = buyCoreVampire;
+
+function buyCoreAura() {
+  if (hasCoreAura || elementalCores < CORE_AURA_PRICE) return;
+  elementalCores -= CORE_AURA_PRICE;
+  hasCoreAura = true;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterHasCoreAura', 'true');
+  renderCoreShop();
+}
+window.buyCoreAura = buyCoreAura;
+
+function buyCoreShock() {
+  if (hasCoreShock || elementalCores < CORE_SHOCK_PRICE) return;
+  elementalCores -= CORE_SHOCK_PRICE;
+  hasCoreShock = true;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterHasCoreShock', 'true');
+  renderCoreShop();
+}
+window.buyCoreShock = buyCoreShock;
+
 function renderCoreShop() {
   document.getElementById('coreShopCores').textContent = elementalCores;
   const armor = WORLD2_ARMOR.find(x => x.id === 'coreplate');
@@ -548,6 +601,24 @@ function renderCoreShop() {
   const coreHarvestBtn = hasCoreHarvest
     ? `<button class="equipped" disabled>Ontgrendeld</button>`
     : `<button class="buy" onclick="buyCoreHarvest()" ${elementalCores < CORE_HARVEST_PRICE ? 'disabled' : ''}>Koop · 🔮${CORE_HARVEST_PRICE}</button>`;
+  const coreSpeedMaxed = lvlCoreSpeed >= CORE_SPEED_LEVELS.length;
+  const coreSpeedBtn = coreSpeedMaxed
+    ? `<button class="equipped" disabled>Max niveau (${CORE_SPEED_LEVELS.length})</button>`
+    : `<button class="buy" onclick="buyCoreSpeed()" ${elementalCores < CORE_SPEED_LEVELS[lvlCoreSpeed] ? 'disabled' : ''}>Koop niveau ${lvlCoreSpeed + 1}/${CORE_SPEED_LEVELS.length} · 🔮${CORE_SPEED_LEVELS[lvlCoreSpeed]}</button>`;
+  const coreRegenMaxed = lvlCoreRegen >= CORE_REGEN_LEVELS.length;
+  const coreRegenBtn = coreRegenMaxed
+    ? `<button class="equipped" disabled>Max niveau (${CORE_REGEN_LEVELS.length})</button>`
+    : `<button class="buy" onclick="buyCoreRegen()" ${elementalCores < CORE_REGEN_LEVELS[lvlCoreRegen] ? 'disabled' : ''}>Koop niveau ${lvlCoreRegen + 1}/${CORE_REGEN_LEVELS.length} · 🔮${CORE_REGEN_LEVELS[lvlCoreRegen]}</button>`;
+  const coreVampireMaxed = lvlCoreVampire >= CORE_VAMPIRE_LEVELS.length;
+  const coreVampireBtn = coreVampireMaxed
+    ? `<button class="equipped" disabled>Max niveau (${CORE_VAMPIRE_LEVELS.length})</button>`
+    : `<button class="buy" onclick="buyCoreVampire()" ${elementalCores < CORE_VAMPIRE_LEVELS[lvlCoreVampire] ? 'disabled' : ''}>Koop niveau ${lvlCoreVampire + 1}/${CORE_VAMPIRE_LEVELS.length} · 🔮${CORE_VAMPIRE_LEVELS[lvlCoreVampire]}</button>`;
+  const coreAuraBtn = hasCoreAura
+    ? `<button class="equipped" disabled>Ontgrendeld</button>`
+    : `<button class="buy" onclick="buyCoreAura()" ${elementalCores < CORE_AURA_PRICE ? 'disabled' : ''}>Koop · 🔮${CORE_AURA_PRICE}</button>`;
+  const coreShockBtn = hasCoreShock
+    ? `<button class="equipped" disabled>Ontgrendeld</button>`
+    : `<button class="buy" onclick="buyCoreShock()" ${elementalCores < CORE_SHOCK_PRICE ? 'disabled' : ''}>Koop · 🔮${CORE_SHOCK_PRICE}</button>`;
 
   document.getElementById('coreShopList').innerHTML = [
     `<div class="shopItem"><div class="info"><div class="name">${armor.name}</div><div class="desc">${armor.desc}</div></div>${ownedArmorBtn}</div>`,
@@ -555,7 +626,12 @@ function renderCoreShop() {
     `<div class="shopItem"><div class="info"><div class="name">${skin.name}</div><div class="desc">${skin.desc}</div></div>${ownedSkinBtn}</div>`,
     `<div class="shopItem"><div class="info"><div class="name">Kernkracht (Lv. ${lvlCoreDamage}/${CORE_DAMAGE_LEVELS.length})</div><div class="desc">Verhoogt permanent je schade in Wereld 2 met een percentage, bovenop alle andere schadebonussen. Niveau 1: +${Math.round(CORE_DAMAGE_PER_LEVEL*100)}% schade. Niveau 2: +${Math.round(CORE_DAMAGE_PER_LEVEL*200)}%. Niveau 3: +${Math.round(CORE_DAMAGE_PER_LEVEL*300)}%.</div></div>${coreDamageBtn}</div>`,
     `<div class="shopItem"><div class="info"><div class="name">Kernschild (Lv. ${lvlCoreShield}/${CORE_SHIELD_LEVELS.length})</div><div class="desc">Vermindert permanent alle inkomende schade in Wereld 2 met een vast percentage, bovenop pantser en andere reducties. Niveau 1: -${Math.round(CORE_SHIELD_REDUCTIONS[0]*100)}% schade. Niveau 2: -${Math.round(CORE_SHIELD_REDUCTIONS[1]*100)}%. Niveau 3: -${Math.round(CORE_SHIELD_REDUCTIONS[2]*100)}%.</div></div>${coreShieldBtn}</div>`,
-    `<div class="shopItem"><div class="info"><div class="name">Kernoogst</div><div class="desc">Eenmalig te koop: verhoogt permanent hoeveel Elemental Cores je verdient per verslagen boss tijdens Eindbaas Rush in Wereld 2. +${CORE_HARVEST_BONUS} Cores per boss, voor altijd.</div></div>${coreHarvestBtn}</div>`
+    `<div class="shopItem"><div class="info"><div class="name">Kernoogst</div><div class="desc">Eenmalig te koop: verhoogt permanent hoeveel Elemental Cores je verdient per verslagen boss tijdens Eindbaas Rush in Wereld 2. +${CORE_HARVEST_BONUS} Cores per boss, voor altijd.</div></div>${coreHarvestBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernsnelheid (Lv. ${lvlCoreSpeed}/${CORE_SPEED_LEVELS.length})</div><div class="desc">Verhoogt permanent je bewegingssnelheid in Wereld 2. Niveau 1: +${Math.round(CORE_SPEED_PER_LEVEL*100)}% snelheid. Niveau 2: +${Math.round(CORE_SPEED_PER_LEVEL*200)}%. Niveau 3: +${Math.round(CORE_SPEED_PER_LEVEL*300)}%.</div></div>${coreSpeedBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernregeneratie (Lv. ${lvlCoreRegen}/${CORE_REGEN_LEVELS.length})</div><div class="desc">Geneest je passief elke seconde in Wereld 2, bovenop regeneratie van je pantser. Niveau 1: +${CORE_REGEN_PER_LEVEL} HP/sec. Niveau 2: +${CORE_REGEN_PER_LEVEL*2} HP/sec. Niveau 3: +${CORE_REGEN_PER_LEVEL*3} HP/sec.</div></div>${coreRegenBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernvampier (Lv. ${lvlCoreVampire}/${CORE_VAMPIRE_LEVELS.length})</div><div class="desc">Geneest je extra bij elke gedode bot in Wereld 2, bovenop vampier-effecten van je pantser. Niveau 1: +${CORE_VAMPIRE_PER_LEVEL} HP per kill. Niveau 2: +${CORE_VAMPIRE_PER_LEVEL*2} HP per kill. Niveau 3: +${CORE_VAMPIRE_PER_LEVEL*3} HP per kill.</div></div>${coreVampireBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernaura</div><div class="desc">Eenmalig te koop: zolang je in Wereld 2 speelt, heb je een permanente, zwakke schade-aura om je heen (radius ${CORE_AURA_RADIUS}px, ${CORE_AURA_DMG} schade per tik) die alle bots dichtbij voortdurend raakt.</div></div>${coreAuraBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernschok</div><div class="desc">Eenmalig te koop: elke kogel die je in Wereld 2 afvuurt heeft ${Math.round(CORE_SHOCK_CHANCE*100)}% kans om over te springen naar een nabije bot, ongeacht welk wapen je gebruikt.</div></div>${coreShockBtn}</div>`
   ].join('');
 }
 window.renderCoreShop = renderCoreShop;

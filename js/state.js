@@ -705,6 +705,22 @@ const CORE_SHIELD_REDUCTIONS = [0.1, 0.18, 0.25];
 let hasCoreHarvest = localStorage.getItem('botShooterHasCoreHarvest') === 'true';
 const CORE_HARVEST_PRICE = 38;
 const CORE_HARVEST_BONUS = 3; // extra Elemental Cores per verslagen boss in Eindbaas Rush
+let lvlCoreSpeed = Number(localStorage.getItem('botShooterLvlCoreSpeed')) || 0;
+const CORE_SPEED_LEVELS = [23, 33, 43];
+const CORE_SPEED_PER_LEVEL = 0.08;
+let lvlCoreRegen = Number(localStorage.getItem('botShooterLvlCoreRegen')) || 0;
+const CORE_REGEN_LEVELS = [23, 33, 43];
+const CORE_REGEN_PER_LEVEL = 1; // extra HP/sec per niveau
+let lvlCoreVampire = Number(localStorage.getItem('botShooterLvlCoreVampire')) || 0;
+const CORE_VAMPIRE_LEVELS = [23, 33, 43];
+const CORE_VAMPIRE_PER_LEVEL = 2; // extra HP per kill per niveau
+let hasCoreAura = localStorage.getItem('botShooterHasCoreAura') === 'true';
+const CORE_AURA_PRICE = 38;
+const CORE_AURA_RADIUS = 90;
+const CORE_AURA_DMG = 2;
+let hasCoreShock = localStorage.getItem('botShooterHasCoreShock') === 'true';
+const CORE_SHOCK_PRICE = 38;
+const CORE_SHOCK_CHANCE = 0.12;
 
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
 let powerupLevels = JSON.parse(localStorage.getItem('botShooterPowerupLevels') || '{}'); // id -> huidig niveau (0-3)
@@ -852,13 +868,13 @@ function getArmorStats() {
   return {
     hpBonus: a1.hpBonus + a2.hpBonus,
     reduction: 1 - (1 - (a1.reduction || 0)) * (1 - (a2.reduction || 0)),
-    regen: (a1.regen || 0) + (a2.regen || 0),
+    regen: (a1.regen || 0) + (a2.regen || 0) + w2Lvl(lvlCoreRegen) * CORE_REGEN_PER_LEVEL,
     thorns: (a1.thorns || 0) + (a2.thorns || 0),
-    vampireHeal: (a1.vampireHeal || 0) + (a2.vampireHeal || 0),
+    vampireHeal: (a1.vampireHeal || 0) + (a2.vampireHeal || 0) + w2Lvl(lvlCoreVampire) * CORE_VAMPIRE_PER_LEVEL,
     coinMult: (a1.coinMult || 1) * (a2.coinMult || 1),
     adrenaline: !!(a1.adrenaline || a2.adrenaline),
     reflection: (a1.reflection || 0) + (a2.reflection || 0),
-    speedBonus: (a1.speedBonus || 0) + (a2.speedBonus || 0),
+    speedBonus: (a1.speedBonus || 0) + (a2.speedBonus || 0) + w2Lvl(lvlCoreSpeed) * CORE_SPEED_PER_LEVEL,
     poisonReflect: !!(a1.poisonReflect || a2.poisonReflect),
     freezeReflect: !!(a1.freezeReflect || a2.freezeReflect),
     fireResist: 1 - (1 - (a1.fireResist || 0)) * (1 - (a2.fireResist || 0)) * (1 - w2Lvl(lvl2FireCore) * FIRECORE_RESIST_PER_LEVEL),

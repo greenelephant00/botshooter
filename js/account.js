@@ -24,7 +24,9 @@ const ACCOUNT_KEYS = [
   'botShooterLvl2CriticalHit', 'botShooterLvl2SplinterShot', 'botShooterLvl2MultiShield', 'botShooterLvl2Overkill',
   'botShooterElementalCores', 'botShooterHasFirstBoss', 'botShooterHasWorldBoss',
   'botShooterHasBossRushW1', 'botShooterHasBossRushW2', 'botShooterUnlockedAchievements',
-  'botShooterLvlCoreDamage', 'botShooterLvlCoreShield', 'botShooterHasCoreHarvest'
+  'botShooterLvlCoreDamage', 'botShooterLvlCoreShield', 'botShooterHasCoreHarvest',
+  'botShooterLvlCoreSpeed', 'botShooterLvlCoreRegen', 'botShooterLvlCoreVampire',
+  'botShooterHasCoreAura', 'botShooterHasCoreShock'
 ];
 
 let currentAccount = null;

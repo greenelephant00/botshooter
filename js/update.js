@@ -574,8 +574,8 @@ function update() {
           }, 800);
         }
 
-        // Volt Caster: kogel slaat over naar een nabije bot
-        if (b.effect === 'chainLightning') {
+        // Volt Caster: kogel slaat over naar een nabije bot. Kernschok geeft elke kogel in Wereld 2 een kans op hetzelfde effect.
+        if (b.effect === 'chainLightning' || (currentWorld === 2 && hasCoreShock && Math.random() < CORE_SHOCK_CHANCE)) {
           let nearest = null, nearestDist = 140;
           bots.forEach(other => {
             if (other === bot || other.dead) return;
@@ -1143,6 +1143,18 @@ function update() {
         if (bot.dead) return;
         const d = Math.hypot(bot.x - player.x, bot.y - player.y);
         if (d < 190) damageBotSimple(bot, 3, '#7fff00');
+      });
+    }
+  }
+  // Kernaura: permanente, zwakkere versie van de Aura-powerup zolang je Kernaura bezit en in Wereld 2 speelt
+  if (currentWorld === 2 && hasCoreAura) {
+    if (!player.coreAuraLastTick || now0 - player.coreAuraLastTick > 500) {
+      player.coreAuraLastTick = now0;
+      shockRings.push({ x: player.x, y: player.y, born: now0, maxR: CORE_AURA_RADIUS, duration: 350, color: '#9be3ff' });
+      bots.forEach(bot => {
+        if (bot.dead) return;
+        const d = Math.hypot(bot.x - player.x, bot.y - player.y);
+        if (d < CORE_AURA_RADIUS) damageBotSimple(bot, CORE_AURA_DMG, '#9be3ff');
       });
     }
   }
