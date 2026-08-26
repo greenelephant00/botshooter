@@ -485,9 +485,9 @@ const SKINS = [
   { id: 'elemcrystal', name: 'Kristalwezen', price: 1750, desc: 'Wereld 2-exclusief. Facet-geslepen edelsteen-lichaam dat schittert. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemthunder', name: 'Donderwezen',  price: 1750, desc: 'Wereld 2-exclusief. Donkere onweerswolk met een felle bliksemschicht erdoorheen. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemtide',    name: 'Getijwezen',   price: 1750, desc: 'Wereld 2-exclusief. Diepblauw lichaam van kolkende zee met witte schuimkoppen. Werkt alleen in Wereld 2.', element: true },
-  { id: 'titanchrome', name: 'Titan Chroom', achievementOnly: true, desc: 'Prestatie-exclusief. Een gepolijst, spiegelend chroom-lichaam met een rondzwenkende lichtglans en gelaagde titan-pantserplaten. Niet te koop — alleen te verdienen.' },
-  { id: 'supernova',   name: 'Supernova',    achievementOnly: true, desc: 'Prestatie-exclusief. Een verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen. Niet te koop — alleen te verdienen.' },
-  { id: 'neonultra',   name: 'Neon Ultra',   achievementOnly: true, desc: 'Prestatie-exclusief. Een zwarte kern omringd door een volledig kleurwisselende regenboog-neonring met ronddraaiende neon-spaken. Niet te koop — alleen te verdienen.' }
+  { id: 'titanchrome', name: 'Titan Chroom', achievementOnly: true, desc: 'Quest-exclusief. Een gepolijst, spiegelend chroom-lichaam met een rondzwenkende lichtglans en gelaagde titan-pantserplaten. Niet te koop — alleen te verdienen.' },
+  { id: 'supernova',   name: 'Supernova',    achievementOnly: true, desc: 'Quest-exclusief. Een verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen. Niet te koop — alleen te verdienen.' },
+  { id: 'neonultra',   name: 'Neon Ultra',   achievementOnly: true, desc: 'Quest-exclusief. Een zwarte kern omringd door een volledig kleurwisselende regenboog-neonring met ronddraaiende neon-spaken. Niet te koop — alleen te verdienen.' }
 ];
 
 // Elementen Skins werken alleen in Wereld 2 — val in Wereld 1 terug op de standaard-skin, net als wapens/pantsers/transformaties

@@ -460,7 +460,7 @@ let achievementToastTimeout = null;
 function showAchievementToast(a) {
   const el = document.getElementById('achievementToast');
   if (!el) return;
-  el.innerHTML = `<div class="achTitle">🏆 PRESTATIE BEHAALD</div><div class="achName">${a.icon} ${a.name}</div><div class="achDesc">${a.desc}</div><div class="achReward">Beloning: ${rewardText(a.reward)}</div>`;
+  el.innerHTML = `<div class="achTitle">🏆 QUEST VOLTOOID</div><div class="achName">${a.icon} ${a.name}</div><div class="achDesc">${a.desc}</div><div class="achReward">Beloning: ${rewardText(a.reward)}</div>`;
   el.style.display = 'block';
   el.style.animation = 'none';
   void el.offsetWidth;
@@ -1594,7 +1594,7 @@ function renderSkinsShop() {
     let btn;
     if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
     else if (owned) btn = `<button class="equip" onclick="equipSkin('${s.id}')">Uitrusten</button>`;
-    else if (s.achievementOnly) btn = `<button class="buy" disabled>🔒 Prestatie nodig</button>`;
+    else if (s.achievementOnly) btn = `<button class="buy" disabled>🔒 Quest nodig</button>`;
     else btn = `<button class="buy" onclick="buySkin('${s.id}')" ${coins < s.price ? 'disabled' : ''}>Koop · 🪙${s.price}</button>`;
     return `<div class="shopItem">
       <canvas class="botPreview" id="skinPreview_${s.id}" width="60" height="60"></canvas>
