@@ -183,7 +183,12 @@ const ACHIEVEMENTS = [
   { id: 'max_core_regen', category: 'w2', name: 'Kernregeneratie Voltooid', icon: '💗', desc: 'Koop alle 3 niveaus van Kernregeneratie in de Elemental Kern-winkel.', reward: { type: 'cores', amount: 20 }, check: () => lvlCoreRegen >= CORE_REGEN_LEVELS.length },
   { id: 'max_core_vampire', category: 'w2', name: 'Kernvampier Voltooid', icon: '🧛', desc: 'Koop alle 3 niveaus van Kernvampier in de Elemental Kern-winkel.', reward: { type: 'cores', amount: 20 }, check: () => lvlCoreVampire >= CORE_VAMPIRE_LEVELS.length },
   { id: 'core_aura_owned', category: 'w2', name: 'Kernaura Ontgrendeld', icon: '💫', desc: 'Koop Kernaura in de Elemental Kern-winkel.', reward: { type: 'cores', amount: 15 }, check: () => hasCoreAura },
-  { id: 'core_shock_owned', category: 'w2', name: 'Kernschok Ontgrendeld', icon: '⚡', desc: 'Koop Kernschok in de Elemental Kern-winkel.', reward: { type: 'cores', amount: 15 }, check: () => hasCoreShock }
+  { id: 'core_shock_owned', category: 'w2', name: 'Kernschok Ontgrendeld', icon: '⚡', desc: 'Koop Kernschok in de Elemental Kern-winkel.', reward: { type: 'cores', amount: 15 }, check: () => hasCoreShock },
+  { id: 'max_firecore', category: 'w2', name: 'Vuurkern Voltooid', icon: '🔥', desc: 'Koop alle 3 niveaus van Vuurkern bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2FireCore >= FIRECORE_LEVELS.length },
+  { id: 'max_frostblood', category: 'w2', name: 'Vriesbloed Voltooid', icon: '❄️', desc: 'Koop alle 3 niveaus van Vriesbloed bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2FrostBlood >= FROSTBLOOD_LEVELS.length },
+  { id: 'max_steadfast', category: 'w2', name: 'Aardvastheid Voltooid', icon: '🪨', desc: 'Koop alle 3 niveaus van Aardvastheid bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Steadfast >= STEADFAST_LEVELS.length },
+  { id: 'max_extrahp2', category: 'w2', name: 'Elementaire Conditie Voltooid', icon: '💪', desc: 'Koop alle 5 niveaus van Elementaire Conditie bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 400 }, check: () => lvl2ExtraHp >= EXTRAHP2_LEVELS.length },
+  { id: 'max_vengeance', category: 'w2', name: 'Elementaire Wraak Voltooid', icon: '💢', desc: 'Koop alle 3 niveaus van Elementaire Wraak bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Vengeance >= VENGEANCE_LEVELS.length }
 ];
 
 function grantAchievementReward(a) {
