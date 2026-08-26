@@ -1143,7 +1143,8 @@ function update() {
   }
 
   // Powerups: spawn periodically (niet tijdens oefenen)
-  const powerupInterval = lvlLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[lvlLuckyDrop - 1] : 6000;
+  const effLuckyDrop = w1Lvl(lvlLuckyDrop);
+  const powerupInterval = effLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[effLuckyDrop - 1] : 6000;
   if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
@@ -1151,8 +1152,9 @@ function update() {
   // Powerups: expire after their lifetime
   powerups = powerups.filter(p => now - p.bornAt < p.life);
   // Powerups: pickup by player
-  const boostDurMult = 1 + lvlLongBoosts * LONG_BOOSTS_MULT_PER_LEVEL;
-  const pickupBonus = lvlMagnet * MAGNET_RADIUS_PER_LEVEL + (lvlGoldRush > 0 ? GOLD_RUSH_RADIUS[lvlGoldRush - 1] : 0);
+  const boostDurMult = 1 + w1Lvl(lvlLongBoosts) * LONG_BOOSTS_MULT_PER_LEVEL;
+  const effGoldRush = w1Lvl(lvlGoldRush);
+  const pickupBonus = w1Lvl(lvlMagnet) * MAGNET_RADIUS_PER_LEVEL + (effGoldRush > 0 ? GOLD_RUSH_RADIUS[effGoldRush - 1] : 0);
   powerups.forEach(p => {
     const d = Math.hypot(player.x - p.x, player.y - p.y);
     if (d < player.r + p.r + pickupBonus) {
@@ -1172,7 +1174,8 @@ function update() {
         player.fireBoostUntil = now + info.durations[lvl] * boostDurMult;
         spawnParticles(p.x, p.y, '#ffd60a');
       } else if (p.type === 'shield') {
-        const maxShields = lvlMultiShield > 0 ? [2, 3, 4][lvlMultiShield - 1] : 1;
+        const effMultiShield = w1Lvl(lvlMultiShield);
+        const maxShields = effMultiShield > 0 ? [2, 3, 4][effMultiShield - 1] : 1;
         const newShieldUntil = now + info.durations[lvl] * boostDurMult;
         if (now < player.shieldUntil && maxShields > 1) {
           player.shieldUntil = Math.max(player.shieldUntil, newShieldUntil);
@@ -1284,7 +1287,8 @@ function update() {
     const d = Math.hypot(player.x - c.x, player.y - c.y);
     if (d < player.r + c.r + pickupBonus) {
       c.collected = true;
-      coins += Math.round(c.value * (getArmorStats().coinMult || 1)) + (lvlCoinRain > 0 ? COIN_RAIN_BONUSES[lvlCoinRain - 1] : 0);
+      const effCoinRain = w1Lvl(lvlCoinRain);
+      coins += Math.round(c.value * (getArmorStats().coinMult || 1)) + (effCoinRain > 0 ? COIN_RAIN_BONUSES[effCoinRain - 1] : 0);
       saveShopState();
       spawnParticles(c.x, c.y, '#ffd60a');
     }
@@ -1418,9 +1422,10 @@ function update() {
     if (nextBoss) triggerBossWarning(nextBoss);
   }
 
-  if (lvlSecondWind > 0 && !player.secondWindUsed && player.hp > 0 && player.hp / player.maxHp < 0.5) {
+  const effSecondWind = w1Lvl(lvlSecondWind);
+  if (effSecondWind > 0 && !player.secondWindUsed && player.hp > 0 && player.hp / player.maxHp < 0.5) {
     player.secondWindUsed = true;
-    player.hp = Math.min(player.maxHp, player.hp + SECOND_WIND_HEALS[lvlSecondWind - 1]);
+    player.hp = Math.min(player.maxHp, player.hp + SECOND_WIND_HEALS[effSecondWind - 1]);
     spawnParticles(player.x, player.y, '#4cd964');
     spawnParticles(player.x, player.y, '#ffffff');
   }
@@ -1434,13 +1439,13 @@ function update() {
       // Transformatie sterft: word één keer teruggevormd tot normaal poppetje met vast HP en je uitgeruste wapen
       player.activeTransform = 'none';
       player.r = PLAYER_BASE_R;
-      player.baseSpeed = 3.5 * (1 + lvlSprint * SPRINT_PER_LEVEL);
-      player.maxHp = 100 + getArmorStats().hpBonus + lvlExtraHp * EXTRA_HP_PER_LEVEL;
+      player.baseSpeed = 3.5 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL);
+      player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL;
       player.hp = Math.min(player.maxHp, TRANSFORM_REVIVE_HP);
       player.shieldUntil = now0 + 1500; // korte adempauze na de transformatie
       spawnParticles(player.x, player.y, '#4cd964');
       spawnParticles(player.x, player.y, '#ffffff');
-    } else if (hasRevive && !player.reviveUsed) {
+    } else if (w1Flag(hasRevive) && !player.reviveUsed) {
       player.reviveUsed = true;
       player.hp = player.maxHp * REVIVE_HEAL_PCT;
       player.shieldUntil = now0 + 1500; // korte adempauze na reanimatie

@@ -522,6 +522,10 @@ const GOLD_RUSH_RADIUS = [150, 200, 250];
 let lvlOverkill = Number(localStorage.getItem('botShooterLvlOverkill')) || 0;
 const OVERKILL_LEVELS = [850, 1300, 1900];
 let lvlBloodlust = Number(localStorage.getItem('botShooterLvlBloodlust')) || 0;
+
+// Alle permanente meta-upgrades hierboven zijn Wereld 1-only: geen effect in Wereld 2, net als speciale wapens/pantsers/powerups
+function w1Lvl(lvl) { return currentWorld === 2 ? 0 : lvl; }
+function w1Flag(flag) { return currentWorld === 2 ? false : flag; }
 const BLOODLUST_LEVELS = [750, 1150, 1650];
 const BLOODLUST_BONUSES = [0.05, 0.08, 0.12];
 

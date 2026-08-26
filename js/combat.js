@@ -21,7 +21,7 @@ function shoot() {
   const now = performance.now();
   const weapon = getWeapon();
   const fireRateMult = (now < player.fireBoostUntil || now < player.overloadUntil) ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = shootCooldown * weapon.cooldownMult * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -37,15 +37,18 @@ function shoot() {
     return;
   }
   const streakMult = (weapon.effect === 'killstreak') ? 1 + Math.min(player.killStreak, 10) * 0.15 : 1;
-  const bloodlustBonus = lvlBloodlust > 0 && player.killStreak > 0 ? 1 + BLOODLUST_BONUSES[lvlBloodlust - 1] * player.killStreak : 1;
-  const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : 0;
+  const effBloodlust = w1Lvl(lvlBloodlust);
+  const bloodlustBonus = effBloodlust > 0 && player.killStreak > 0 ? 1 + BLOODLUST_BONUSES[effBloodlust - 1] * player.killStreak : 1;
+  const effCriticalHit = w1Lvl(lvlCriticalHit);
+  const critChance = effCriticalHit > 0 ? CRITICAL_HIT_CHANCES[effCriticalHit - 1] : 0;
   const isCrit = Math.random() < critChance;
   const critMult = isCrit ? 2 : 1;
   const curseMult = now < player.curseUntil ? 0.5 : 1;
   const elementalMult = weapon.effect === 'igniteHit' ? getArmorStats().fireDmgMult : weapon.effect === 'shatterHit' ? getArmorStats().iceDmgMult : 1;
   const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult * elementalMult;
-  const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (lvlSharpshooter > 0 ? SHARPSHOOTER_BONUSES[lvlSharpshooter - 1] : 0));
-  const extraPierce = lvlPiercingRounds;
+  const effSharpshooter = w1Lvl(lvlSharpshooter);
+  const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (effSharpshooter > 0 ? SHARPSHOOTER_BONUSES[effSharpshooter - 1] : 0));
+  const extraPierce = w1Lvl(lvlPiercingRounds);
 
   let pellets = weapon.pellets;
   let spread = weapon.spread || 0.18;
@@ -107,7 +110,7 @@ function shootTankGrenade() {
   // Tank-transformatie: geen wapens, alleen zware handgranaten met splash-schade
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = TANK_GRENADE_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -134,7 +137,7 @@ function berserkerSlash() {
   // Berserker-transformatie: geen vuurwapens, alleen een snelle mes-waaier vlak voor je
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = BERSERKER_SLASH_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -159,7 +162,7 @@ function sniperMechShot() {
   // Sniper Mech-transformatie: geen normale wapens, alleen een trage, doorborende railgun-kogel
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = SNIPER_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -187,7 +190,7 @@ function droneHiveVolley() {
   // Drone Hive-transformatie: geen eigen wapen, lanceert bij elk schot zelfsturende mini-drones
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = SWARM_VOLLEY_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   const alive = bots.filter(b => !b.dead);
@@ -225,7 +228,7 @@ function pyroFireball() {
   // Pyromancer-transformatie: geen wapens, lobt vuurballen die een brandende zone achterlaten
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = PYRO_FIREBALL_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -252,7 +255,7 @@ function vampireBite() {
   // Vampire Lord-transformatie: geen wapens, bijt de dichtstbijzijnde bot van dichtbij en geneest zichzelf
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = VAMPIRE_BITE_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -276,7 +279,7 @@ function assassinBlinkStrike() {
   // Shadow Assassin-transformatie: geen wapens, blinkt naar de muispositie en snijdt bots op de route neer
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = ASSASSIN_BLINK_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -302,7 +305,7 @@ function soulReap() {
   // Soul Reaper-transformatie: geen wapens, maait op afstand zielen en springt door bij een kill
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = SOUL_REAP_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   const inRange = bots.filter(b => !b.dead && Math.hypot(b.x - player.x, b.y - player.y) < SOUL_REAP_RANGE);
@@ -331,7 +334,7 @@ function stormCallerBolt() {
   // Storm Caller-transformatie: geen wapens, slingert een bliksemschicht die overspringt tussen nabije bots
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = STORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   const inRange = bots.filter(b => !b.dead && Math.hypot(b.x - player.x, b.y - player.y) < STORM_CHAIN_RANGE);
@@ -359,7 +362,7 @@ function juggernautCharge() {
   // Juggernaut-transformatie: geen wapens, beukt naar voren en ramt bots op het pad omver
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = JUGGERNAUT_CHARGE_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -391,7 +394,7 @@ function engineerDeployTurret() {
   // Field Engineer-transformatie: geen wapens, zet een automatische geschutskoepel neer
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = ENGINEER_DEPLOY_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -407,7 +410,7 @@ function fireFormSlash() {
   // Vuurgestalte (Wereld 2-transformatie): geen wapens, slaat een brandende vlammenboog vlak voor je uit die bots ontsteekt
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = FIREFORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -434,7 +437,7 @@ function iceFormBeam() {
   // IJsgestalte (Wereld 2-transformatie): geen wapens, schiet een doorborende vriesstraal die alle bots op de lijn bevriest
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = ICEFORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -464,7 +467,7 @@ function earthFormSpikeWallAttack() {
   // Aardgestalte (Wereld 2-transformatie): geen wapens, laat een muur van rotspieken vlak voor je uit de grond schieten
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = EARTHFORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -517,7 +520,7 @@ function windFormDash() {
   // Windgestalte (Wereld 2-transformatie): geen wapens, schiet als een vlaag naar de muispositie en blaast bots op de route weg
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = WINDFORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -549,7 +552,7 @@ function waterFormWave() {
   // Watergestalte (Wereld 2-transformatie): geen wapens, laat een vloedgolf om je heen losbarsten die bots wegstoot en jezelf een kort schild geeft
   const now = performance.now();
   const fireRateMult = now < player.fireBoostUntil ? 0.4 : 1;
-  const reloadMult = 1 - lvlFastReload * FAST_RELOAD_PER_LEVEL;
+  const reloadMult = 1 - w1Lvl(lvlFastReload) * FAST_RELOAD_PER_LEVEL;
   const activeCooldown = WATERFORM_COOLDOWN * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
@@ -592,7 +595,8 @@ function applyDamageToPlayer(amount) {
   if (performance.now() < player.shieldUntil) return false;
   const stoneskinReduction = performance.now() < player.stoneskinUntil ? player.stoneskinReduction : 0;
   if (stoneskinReduction > 0) spawnParticles(player.x, player.y, '#a08050'); // rotsscherven vliegen af als de aardhuid een klap opvangt
-  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : 0)) * (1 - stoneskinReduction);
+  const effIronSkin = w1Lvl(lvlIronSkin);
+  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - (effIronSkin > 0 ? IRON_SKIN_REDUCTIONS[effIronSkin - 1] : 0)) * (1 - stoneskinReduction);
   player.hp -= amount * (1 - totalReduction);
   return true;
 }
@@ -618,9 +622,10 @@ function damageBotSimple(bot, dmg, color) {
     if (bot.poisonSpread) spreadPoison(bot);
 
     // Shockwave bij kills
-    if (lvlShockwave > 0) {
-      const radius = SHOCKWAVE_RADII[lvlShockwave - 1];
-      const shockDmg = 5 + lvlShockwave * 2;
+    const effShockwave = w1Lvl(lvlShockwave);
+    if (effShockwave > 0) {
+      const radius = SHOCKWAVE_RADII[effShockwave - 1];
+      const shockDmg = 5 + effShockwave * 2;
       bots.forEach(other => {
         if (other === bot || other.dead) return;
         const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
@@ -630,8 +635,9 @@ function damageBotSimple(bot, dmg, color) {
     }
 
     // Splinter-schoten bij kills
-    if (lvlSplinterShot > 0) {
-      const splinterCount = [3, 5, 7][lvlSplinterShot - 1];
+    const effSplinterShot = w1Lvl(lvlSplinterShot);
+    if (effSplinterShot > 0) {
+      const splinterCount = [3, 5, 7][effSplinterShot - 1];
       for (let i = 0; i < splinterCount; i++) {
         const angle = (Math.PI * 2 / splinterCount) * i;
         bullets.push({
@@ -652,9 +658,10 @@ function damageBotSimple(bot, dmg, color) {
     }
 
     // Overkill-explosies
-    if (lvlOverkill > 0 && dmg > bot.maxHp * 0.2) {
+    const effOverkill = w1Lvl(lvlOverkill);
+    if (effOverkill > 0 && dmg > bot.maxHp * 0.2) {
       const overkillDmg = dmg - bot.maxHp;
-      const radius = 60 + lvlOverkill * 30;
+      const radius = 60 + effOverkill * 30;
       bots.forEach(other => {
         if (other === bot || other.dead) return;
         const dd = Math.hypot(bot.x - other.x, bot.y - other.y);

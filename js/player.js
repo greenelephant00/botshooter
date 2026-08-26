@@ -76,9 +76,9 @@ function resetPlayer() {
   player.activeTransform = gameMode !== 'practice' ? wantedTransform : 'none';
   const tStats = TRANSFORM_STATS[player.activeTransform] || WORLD2_TRANSFORM_STATS[player.activeTransform] || TRANSFORM_STATS.none;
   const armorSpeed = 1 + getArmorStats().speedBonus;
-  player.baseSpeed = 4 * (1 + lvlSprint * SPRINT_PER_LEVEL) * tStats.speedMult * armorSpeed;
+  player.baseSpeed = 4 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL) * tStats.speedMult * armorSpeed;
   player.r = PLAYER_BASE_R * tStats.rMult;
-  player.maxHp = 100 + getArmorStats().hpBonus + lvlExtraHp * EXTRA_HP_PER_LEVEL + tStats.hpBonus;
+  player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL + tStats.hpBonus;
   player.hp = player.maxHp;
   player.speed = player.baseSpeed;
   player.boostUntil = 0;
@@ -122,7 +122,8 @@ function resetPlayer() {
   player.slideVX = 0;
   player.slideVY = 0;
   player.secondWindUsed = false;
-  if (lvlFlyingStart > 0) player.shieldUntil = performance.now() + FLYING_START_DURATIONS[lvlFlyingStart - 1];
+  const effFlyingStart = w1Lvl(lvlFlyingStart);
+  if (effFlyingStart > 0) player.shieldUntil = performance.now() + FLYING_START_DURATIONS[effFlyingStart - 1];
 }
 
 const BOT_TYPES = [
