@@ -1013,13 +1013,13 @@ let ownedTrails = JSON.parse(localStorage.getItem('botShooterOwnedTrails') || '[
 let equippedTrail = localStorage.getItem('botShooterEquippedTrail') || 'none';
 let trailParticles = [];
 const TRAILS = [
-  { id: 'none',     name: 'Geen',            price: 0,   color: '#fff',    desc: 'Geen bewegingsspoor.' },
-  { id: 'fire',     name: 'Vuurspoor',       price: 500, color: '#ff6a00', desc: 'Laat een spoor van dovende, gloeiende vuurdeeltjes achter je vallen terwijl je beweegt.' },
-  { id: 'ice',      name: 'IJsspoor',        price: 500, color: '#8ecbff', desc: 'Laat kleine glinsterende ijskristallen achter je vallen terwijl je beweegt.' },
-  { id: 'smoke',    name: 'Rookspoor',       price: 450, color: '#777777', desc: 'Laat een kolkend, langzaam optrekkend rookspoor achter je terwijl je beweegt.' },
-  { id: 'stars',    name: 'Sterrenspoor',    price: 550, color: '#ffe066', desc: 'Laat fonkelende gouden sterretjes achter je vallen terwijl je beweegt.' },
-  { id: 'electric', name: 'Bliksemspoor',    price: 600, color: '#4cc9f0', desc: 'Laat knetterende elektrische vonken achter je vallen terwijl je beweegt.' },
-  { id: 'rainbow',  name: 'Regenboogspoor',  price: 700, color: '#ff5cf1', desc: 'Laat een kleurwisselend regenboogspoor achter je vallen terwijl je beweegt.' }
+  { id: 'none',     name: 'Geen',            price: 0,    color: '#fff',    desc: 'Geen bewegingsspoor.' },
+  { id: 'fire',     name: 'Vuurspoor',       price: 2500, color: '#ff6a00', desc: 'Laat een spoor van dovende, gloeiende vuurdeeltjes achter je vallen terwijl je beweegt.' },
+  { id: 'ice',      name: 'IJsspoor',        price: 2500, color: '#8ecbff', desc: 'Laat kleine glinsterende ijskristallen achter je vallen terwijl je beweegt.' },
+  { id: 'smoke',    name: 'Rookspoor',       price: 2450, color: '#777777', desc: 'Laat een kolkend, langzaam optrekkend rookspoor achter je terwijl je beweegt.' },
+  { id: 'stars',    name: 'Sterrenspoor',    price: 2550, color: '#ffe066', desc: 'Laat fonkelende gouden sterretjes achter je vallen terwijl je beweegt.' },
+  { id: 'electric', name: 'Bliksemspoor',    price: 2600, color: '#4cc9f0', desc: 'Laat knetterende elektrische vonken achter je vallen terwijl je beweegt.' },
+  { id: 'rainbow',  name: 'Regenboogspoor',  price: 2700, color: '#ff5cf1', desc: 'Laat een kleurwisselend regenboogspoor achter je vallen terwijl je beweegt.' }
 ];
 
 // ---- Menu-achtergronden: animated achtergrond voor het hoofdmenu (Wereld 1 en Wereld 2) ----
