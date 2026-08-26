@@ -27,7 +27,8 @@ const ACCOUNT_KEYS = [
   'botShooterLvlCoreDamage', 'botShooterLvlCoreShield', 'botShooterHasCoreHarvest',
   'botShooterLvlCoreSpeed', 'botShooterLvlCoreRegen', 'botShooterLvlCoreVampire',
   'botShooterHasCoreAura', 'botShooterHasCoreShock', 'botShooterClaimedAchievementRewards',
-  'botShooterOwnedWeaponSkins', 'botShooterEquippedWeaponSkins'
+  'botShooterOwnedWeaponSkins', 'botShooterEquippedWeaponSkins',
+  'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation'
 ];
 
 let currentAccount = null;

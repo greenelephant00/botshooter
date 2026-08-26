@@ -719,6 +719,53 @@ function closeWeaponSkinsShop() {
 }
 window.closeWeaponSkinsShop = closeWeaponSkinsShop;
 
+function buyDeathAnimation(id) {
+  const d = DEATH_ANIMATIONS.find(x => x.id === id);
+  if (!d || ownedDeathAnimations.includes(id) || coins < d.price) return;
+  coins -= d.price;
+  ownedDeathAnimations.push(id);
+  saveShopState();
+  localStorage.setItem('botShooterOwnedDeathAnimations', JSON.stringify(ownedDeathAnimations));
+  renderDeathAnimShop();
+}
+window.buyDeathAnimation = buyDeathAnimation;
+
+function equipDeathAnimation(id) {
+  if (!ownedDeathAnimations.includes(id)) return;
+  equippedDeathAnimation = id;
+  localStorage.setItem('botShooterEquippedDeathAnimation', equippedDeathAnimation);
+  renderDeathAnimShop();
+}
+window.equipDeathAnimation = equipDeathAnimation;
+
+function renderDeathAnimShop() {
+  document.getElementById('deathAnimCoins').textContent = coins;
+  document.getElementById('deathAnimList').innerHTML = DEATH_ANIMATIONS.map(d => {
+    const owned = ownedDeathAnimations.includes(d.id);
+    const equipped = equippedDeathAnimation === d.id;
+    const btn = equipped
+      ? `<button class="equipped" disabled>Uitgerust</button>`
+      : owned
+        ? `<button class="equip" onclick="equipDeathAnimation('${d.id}')">Uitrusten</button>`
+        : `<button class="buy" onclick="buyDeathAnimation('${d.id}')" ${coins < d.price ? 'disabled' : ''}>Koop · 🪙${d.price}</button>`;
+    return `<div class="shopItem"><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>${btn}</div>`;
+  }).join('');
+}
+window.renderDeathAnimShop = renderDeathAnimShop;
+
+function openDeathAnimShop() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('deathAnimScreen').style.display = 'flex';
+  renderDeathAnimShop();
+}
+window.openDeathAnimShop = openDeathAnimShop;
+
+function closeDeathAnimShop() {
+  document.getElementById('deathAnimScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeDeathAnimShop = closeDeathAnimShop;
+
 function openKillCam() {
   if (!bestMomentSnapshot) return;
   document.getElementById('killCamLabel').textContent = bestMomentLabel;
@@ -1272,7 +1319,7 @@ window.buyDualArmorSlot = buyDualArmorSlot;
 
 function buySkin(id) {
   const skin = SKINS.find(s => s.id === id);
-  if (!skin || skin.coreOnly || ownedSkins.includes(id) || coins < skin.price) return;
+  if (!skin || skin.coreOnly || skin.achievementOnly || ownedSkins.includes(id) || coins < skin.price) return;
   coins -= skin.price;
   ownedSkins.push(id);
   saveShopState();
@@ -1323,10 +1370,10 @@ function renderSkinsShop() {
       </div>
     </div>`;
   };
-  const killstreakSkins = SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly);
-  const elementSkins = SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly);
-  const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak && !s.coreOnly);
-  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly);
+  const killstreakSkins = SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly);
+  const elementSkins = SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly && !s.achievementOnly);
+  const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak && !s.coreOnly && !s.achievementOnly);
+  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly);
   const elementSections = currentWorld === 2
     ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(renderSkinItem).join('')}</div>` +
       `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>`

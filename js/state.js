@@ -116,6 +116,7 @@ let bestMomentSnapshot = null; // object-URL van het opgenomen webm-filmpje
 let bestMomentLabel = '';
 let bestMomentScore = -1;
 let sessionBestStreak = 0;
+let highestComboStreak = Number(localStorage.getItem('botShooterHighestComboStreak')) || 0;
 let killCamRecording = false;
 let killCamLastRecordEnd = 0;
 
@@ -144,7 +145,9 @@ let unlockedAchievements = JSON.parse(localStorage.getItem('botShooterUnlockedAc
 let claimedAchievementRewards = JSON.parse(localStorage.getItem('botShooterClaimedAchievementRewards') || '[]');
 
 function rewardText(r) {
-  return r.type === 'cores' ? `🔮 ${r.amount} Elemental Cores` : `🪙 ${r.amount} munten`;
+  if (r.type === 'cores') return `🔮 ${r.amount} Elemental Cores`;
+  if (r.type === 'skin') return `🎨 Exclusieve skin: ${(SKINS.find(s => s.id === r.skinId) || {}).name || r.skinId}`;
+  return `🪙 ${r.amount} munten`;
 }
 
 const ACHIEVEMENTS = [
@@ -196,13 +199,19 @@ const ACHIEVEMENTS = [
   { id: 'max_frostblood', category: 'w2', name: 'Vriesbloed Voltooid', icon: '❄️', desc: 'Koop alle 3 niveaus van Vriesbloed bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2FrostBlood >= FROSTBLOOD_LEVELS.length },
   { id: 'max_steadfast', category: 'w2', name: 'Aardvastheid Voltooid', icon: '🪨', desc: 'Koop alle 3 niveaus van Aardvastheid bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Steadfast >= STEADFAST_LEVELS.length },
   { id: 'max_extrahp2', category: 'w2', name: 'Elementaire Conditie Voltooid', icon: '💪', desc: 'Koop alle 5 niveaus van Elementaire Conditie bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 400 }, check: () => lvl2ExtraHp >= EXTRAHP2_LEVELS.length },
-  { id: 'max_vengeance', category: 'w2', name: 'Elementaire Wraak Voltooid', icon: '💢', desc: 'Koop alle 3 niveaus van Elementaire Wraak bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Vengeance >= VENGEANCE_LEVELS.length }
+  { id: 'max_vengeance', category: 'w2', name: 'Elementaire Wraak Voltooid', icon: '💢', desc: 'Koop alle 3 niveaus van Elementaire Wraak bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Vengeance >= VENGEANCE_LEVELS.length },
+  { id: 'master_both_worlds', category: 'w1', name: 'Meester van Beide Werelden', icon: '🌐', desc: 'Voltooi de Eindbaas Rush in zowel Wereld 1 als Wereld 2.', reward: { type: 'skin', skinId: 'titanchrome' }, check: () => hasBossRushW1 && hasBossRushW2 },
+  { id: 'killstreak_legend', category: 'w1', name: 'Killstreak Legende', icon: '🔥', desc: 'Bereik ooit de maximale killstreak van 20 op rij, in Wereld 1 of Wereld 2.', reward: { type: 'skin', skinId: 'supernova' }, check: () => highestComboStreak >= 20 },
+  { id: 'neon_master', category: 'w1', name: 'Neon Meester', icon: '🌈', desc: 'Koop alle 6 neon-skins in de Skins-shop: Neon Roze, Neon Cyaan, Neon Limoen en hun 3 killstreak-combo-varianten.', reward: { type: 'skin', skinId: 'neonultra' }, check: () => ['neonpink', 'neoncyan', 'neonlime', 'comboneonpink', 'comboneoncyan', 'comboneonlime'].every(id => ownedSkins.includes(id)) }
 ];
 
 function grantAchievementReward(a) {
   if (a.reward.type === 'cores') {
     elementalCores += a.reward.amount;
     localStorage.setItem('botShooterElementalCores', elementalCores);
+  } else if (a.reward.type === 'skin') {
+    if (!ownedSkins.includes(a.reward.skinId)) ownedSkins.push(a.reward.skinId);
+    if (typeof saveShopState === 'function') saveShopState();
   } else {
     coins += a.reward.amount;
     if (typeof saveShopState === 'function') saveShopState();
@@ -426,7 +435,10 @@ const SKINS = [
   { id: 'elemlava',    name: 'Lavawezen',    price: 750, desc: 'Wereld 2-exclusief. Donker gebarsten gesteente met gloeiende lava-aders. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemcrystal', name: 'Kristalwezen', price: 750, desc: 'Wereld 2-exclusief. Facet-geslepen edelsteen-lichaam dat schittert. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemthunder', name: 'Donderwezen',  price: 750, desc: 'Wereld 2-exclusief. Donkere onweerswolk met een felle bliksemschicht erdoorheen. Werkt alleen in Wereld 2.', element: true },
-  { id: 'elemtide',    name: 'Getijwezen',   price: 750, desc: 'Wereld 2-exclusief. Diepblauw lichaam van kolkende zee met witte schuimkoppen. Werkt alleen in Wereld 2.', element: true }
+  { id: 'elemtide',    name: 'Getijwezen',   price: 750, desc: 'Wereld 2-exclusief. Diepblauw lichaam van kolkende zee met witte schuimkoppen. Werkt alleen in Wereld 2.', element: true },
+  { id: 'titanchrome', name: 'Titan Chroom', achievementOnly: true, desc: 'Prestatie-exclusief. Een gepolijst, spiegelend chroom-lichaam met een rondzwenkende lichtglans en gelaagde titan-pantserplaten. Niet te koop — alleen te verdienen.' },
+  { id: 'supernova',   name: 'Supernova',    achievementOnly: true, desc: 'Prestatie-exclusief. Een verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen. Niet te koop — alleen te verdienen.' },
+  { id: 'neonultra',   name: 'Neon Ultra',   achievementOnly: true, desc: 'Prestatie-exclusief. Een zwarte kern omringd door een volledig kleurwisselende regenboog-neonring met ronddraaiende neon-spaken. Niet te koop — alleen te verdienen.' }
 ];
 
 // Elementen Skins werken alleen in Wereld 2 — val in Wereld 1 terug op de standaard-skin, net als wapens/pantsers/transformaties
@@ -917,8 +929,18 @@ const WEAPON_SKINS = [
   { id: 'coreblaster_prism',  weaponId: 'coreblaster',  name: 'Prisma Kern',      price: 500, color: '#ff00ff', coreColor: '#00ffff' }
 ];
 
-// Elementale pantsers: alleen te koop in de Wereld 2-shop
-const WORLD2_ARMOR = [
+// ---- Death Animations: koop een eigen animatie die afspeelt op het moment dat je doodgaat ----
+let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeathAnimations') || '["default"]');
+let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
+const DEATH_ANIM_DURATION = 1400;
+const DEATH_ANIMATIONS = [
+  { id: 'default',      name: 'Standaard',        price: 0,   desc: 'Een simpele fade-out — je klassieke, ingebouwde verdwijning.' },
+  { id: 'explosion',     name: 'Explosie',         price: 300, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur en licht.' },
+  { id: 'disintegrate',  name: 'Uiteenvallen',     price: 350, desc: 'Je lichaam valt uiteen in blokjes die alle kanten op vliegen en wegvagen.' },
+  { id: 'fireworks',     name: 'Vuurwerk',         price: 400, desc: 'Er gaan meerdere kleurrijke vuurwerk-bursts achter elkaar af op je plek.' },
+  { id: 'ghost',         name: 'Spookverschijning', price: 350, desc: 'Je vervaagt tot een doorschijnende geest die langzaam omhoog wegdrijft.' },
+  { id: 'implosion',     name: 'Implosie',         price: 400, desc: 'Je klapt razendsnel in tot een punt, gevolgd door een felle witte flits.' }
+];
   { id: 'fireshield',   name: 'Vuurschild',            price: 1700, hpBonus: 30, reduction: 0, fireResist: 0.6, desc: '+30 max HP. Brandwonden (bv. van Lavagolem/Vulkaanheer) duren 60% korter.' },
   { id: 'iceshield',    name: 'IJsschild',             price: 1700, hpBonus: 30, reduction: 0, iceResist: 0.6, desc: '+30 max HP. Bevriezingen en vertragingen door ijs (Sneeuwjager, Vriesvorst, Kristalreus) duren 60% korter.' },
   { id: 'earthplate',   name: 'Aardharnas',            price: 1800, hpBonus: 80, reduction: 0.3, desc: '+80 max HP, -30% inkomende schade. Zwaar en degelijk, net als de aarde zelf.' },

@@ -2135,6 +2135,32 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
       break;
     }
+    case 'titanchrome': {
+      // glimmend chroom-kogeltje
+      ctx.fillStyle = '#9aa0a6';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(-1, -1, 1.8, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'supernova': {
+      // witheet stervonkje
+      ctx.fillStyle = '#ff8c42';
+      ctx.beginPath(); ctx.arc(0, 0, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(0, 0, 2.2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'neonultra': {
+      // kleurwisselend neon-kogeltje
+      const hueNu = (performance.now() / 8) % 360;
+      ctx.strokeStyle = `hsl(${hueNu}, 100%, 60%)`;
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#000';
+      ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
@@ -3274,6 +3300,84 @@ function drawPlayerSkin(c, skinId, r) {
     }
     c.fillStyle = '#333';
     c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'titanchrome') {
+    // Titan Chroom (prestatie-exclusief): gepolijst spiegelend chroom-lichaam met rondzwenkende lichtglans en titan-platen
+    const sweepA = (performance.now() / 700) % (Math.PI * 2);
+    c.fillStyle = '#3a3d40';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#c8ccd0';
+    c.beginPath(); c.arc(0, 0, r * 0.82, 0, Math.PI * 2); c.fill();
+    c.save();
+    c.beginPath(); c.arc(0, 0, r * 0.82, 0, Math.PI * 2); c.clip();
+    c.fillStyle = 'rgba(255,255,255,0.85)';
+    c.beginPath();
+    c.arc(Math.cos(sweepA) * r * 0.6, Math.sin(sweepA) * r * 0.6, r * 0.35, 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+    c.strokeStyle = '#6a6f75';
+    c.lineWidth = 2;
+    for (let i = 0; i < 4; i++) {
+      const a = (Math.PI * 2 / 4) * i + 0.4;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * r * 0.4, Math.sin(a) * r * 0.4);
+      c.lineTo(Math.cos(a) * r * 0.95, Math.sin(a) * r * 0.95);
+      c.stroke();
+    }
+    c.fillStyle = '#e8ecef';
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'supernova') {
+    // Supernova (prestatie-exclusief): verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen
+    const now = performance.now();
+    const pulse = 0.85 + Math.sin(now / 140) * 0.15;
+    const spin = now / 300;
+    const rays = 10;
+    c.fillStyle = '#c8102e';
+    for (let i = 0; i < rays; i++) {
+      const a = (Math.PI * 2 / rays) * i + spin;
+      const len = r * (1.3 + 0.3 * Math.sin(now / 100 + i)) * pulse;
+      c.beginPath();
+      c.moveTo(Math.cos(a - 0.12) * r * 0.6, Math.sin(a - 0.12) * r * 0.6);
+      c.lineTo(Math.cos(a) * len, Math.sin(a) * len);
+      c.lineTo(Math.cos(a + 0.12) * r * 0.6, Math.sin(a + 0.12) * r * 0.6);
+      c.closePath(); c.fill();
+    }
+    c.fillStyle = '#ff8c42';
+    c.beginPath(); c.arc(0, 0, r * 0.85 * pulse, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ffe066';
+    c.beginPath(); c.arc(0, 0, r * 0.55 * pulse, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ffffff';
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'neonultra') {
+    // Neon Ultra (prestatie-exclusief): zwarte kern met een volledig kleurwisselende regenboog-neonring en ronddraaiende spaken
+    const now = performance.now();
+    const hue = (now / 8) % 360;
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.save();
+    c.globalAlpha = 0.85;
+    c.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+    c.lineWidth = 3.5;
+    c.beginPath(); c.arc(0, 0, r * 0.9, 0, Math.PI * 2); c.stroke();
+    c.restore();
+    const spin = now / 250;
+    const spokes = 8;
+    for (let i = 0; i < spokes; i++) {
+      const a = (Math.PI * 2 / spokes) * i + spin;
+      c.strokeStyle = `hsl(${(hue + i * 45) % 360}, 100%, 65%)`;
+      c.lineWidth = 2;
+      c.beginPath();
+      c.moveTo(Math.cos(a) * r * 0.3, Math.sin(a) * r * 0.3);
+      c.lineTo(Math.cos(a) * r * 0.85, Math.sin(a) * r * 0.85);
+      c.stroke();
+    }
+    c.fillStyle = `hsl(${(hue + 180) % 360}, 100%, 75%)`;
+    c.beginPath(); c.arc(0, 0, r * 0.28, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
   } else {
     // standaard
     c.fillStyle = '#4cc9f0';
@@ -3585,11 +3689,75 @@ function drawPlayerWaterForm(c, r) {
   c.stroke();
 }
 
+function drawDeathAnimation(type, age, r) {
+  const t = Math.min(1, age / DEATH_ANIM_DURATION);
+  if (type === 'explosion') {
+    ctx.globalAlpha = 1 - t;
+    ctx.fillStyle = '#ff5a1f';
+    ctx.beginPath(); ctx.arc(0, 0, r + t * 50, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#fff275';
+    ctx.beginPath(); ctx.arc(0, 0, r + t * 30, 0, Math.PI * 2); ctx.fill();
+  } else if (type === 'disintegrate') {
+    ctx.globalAlpha = 1 - t;
+    const pieces = 8;
+    for (let i = 0; i < pieces; i++) {
+      const a = (Math.PI * 2 / pieces) * i;
+      const dist = t * (r + 40);
+      ctx.save();
+      ctx.translate(Math.cos(a) * dist, Math.sin(a) * dist);
+      ctx.rotate(a + t * 6);
+      ctx.fillStyle = '#4cc9f0';
+      ctx.fillRect(-4, -4, 8, 8);
+      ctx.restore();
+    }
+  } else if (type === 'fireworks') {
+    const bursts = 3;
+    for (let b = 0; b < bursts; b++) {
+      const bt = (age - b * 250) / 500;
+      if (bt <= 0 || bt >= 1) continue;
+      const hue = (b * 120) % 360;
+      const rays = 10;
+      ctx.globalAlpha = 1 - bt;
+      ctx.fillStyle = `hsl(${hue}, 90%, 65%)`;
+      for (let i = 0; i < rays; i++) {
+        const a = (Math.PI * 2 / rays) * i;
+        const dist = bt * (r + 45);
+        ctx.beginPath(); ctx.arc(Math.cos(a) * dist, Math.sin(a) * dist, 3, 0, Math.PI * 2); ctx.fill();
+      }
+    }
+  } else if (type === 'ghost') {
+    ctx.globalAlpha = (1 - t) * 0.6;
+    ctx.fillStyle = '#dfffff';
+    ctx.beginPath(); ctx.arc(0, -t * 40, r, 0, Math.PI * 2); ctx.fill();
+  } else if (type === 'implosion') {
+    if (age < DEATH_ANIM_DURATION * 0.6) {
+      const shrink = 1 - age / (DEATH_ANIM_DURATION * 0.6);
+      ctx.globalAlpha = shrink;
+      ctx.fillStyle = '#8a2be2';
+      ctx.beginPath(); ctx.arc(0, 0, r * shrink, 0, Math.PI * 2); ctx.fill();
+    } else {
+      const ft = (age - DEATH_ANIM_DURATION * 0.6) / (DEATH_ANIM_DURATION * 0.4);
+      ctx.globalAlpha = 1 - ft;
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, 0, ft * 60, 0, Math.PI * 2); ctx.fill();
+    }
+  } else {
+    // default: eenvoudige fade + krimp
+    ctx.globalAlpha = 1 - t;
+    ctx.fillStyle = '#4cc9f0';
+    ctx.beginPath(); ctx.arc(0, 0, r * (1 - t * 0.6), 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x, player.y);
   ctx.rotate(player.angle);
-  if (player.activeTransform === 'tank') drawPlayerTank(ctx, player.r);
+  if (player.deathAnimStart) {
+    const age = performance.now() - player.deathAnimStart;
+    if (age < DEATH_ANIM_DURATION) drawDeathAnimation(equippedDeathAnimation, age, player.r);
+  } else if (player.activeTransform === 'tank') drawPlayerTank(ctx, player.r);
   else if (player.activeTransform === 'berserker') drawPlayerBerserker(ctx, player.r);
   else if (player.activeTransform === 'sniper') drawPlayerSniperMech(ctx, player.r);
   else if (player.activeTransform === 'swarm') drawPlayerDroneHive(ctx, player.r);

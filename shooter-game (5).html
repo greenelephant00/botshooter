@@ -71,6 +71,9 @@
     <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
     <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
   </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
+  </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
@@ -109,6 +112,7 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
+    <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
@@ -238,6 +242,16 @@
     <div id="weaponSkinsList"></div>
   </div>
   <button class="backBtn" onclick="closeWeaponSkinsShop()">← Terug</button>
+</div>
+<div id="deathAnimScreen">
+  <h1>💀 Death Animation</h1>
+  <button class="topBackBtn" onclick="closeDeathAnimShop()">← Menu</button>
+  <div class="coinDisplay">🪙 <span id="deathAnimCoins">0</span></div>
+  <div class="shopSection">
+    <h3>Kies wat er gebeurt op het moment dat je doodgaat.</h3>
+    <div id="deathAnimList"></div>
+  </div>
+  <button class="backBtn" onclick="closeDeathAnimShop()">← Terug</button>
 </div>
 <div id="killCamScreen">
   <h2>🎬 Kill Cam</h2>

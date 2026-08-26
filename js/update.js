@@ -605,6 +605,10 @@ function update() {
             sessionBestStreak = player.comboStreak;
             if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
           }
+          if (player.comboStreak > highestComboStreak) {
+            highestComboStreak = player.comboStreak;
+            localStorage.setItem('botShooterHighestComboStreak', highestComboStreak);
+          }
           score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
           spawnParticles(bot.x, bot.y, bot.color);
           if (gameMode === 'levels') levelKills++;
@@ -1498,6 +1502,7 @@ function update() {
       player.shieldUntil = now0 + 1500; // korte adempauze na elementaire reanimatie
       spawnParticles(player.x, player.y, '#9be3ff');
     } else {
+      player.deathAnimStart = now0;
       endGame(false);
     }
   }

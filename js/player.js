@@ -55,6 +55,7 @@ const player = {
   fireCageY: 0,
   fireCageRadius: 0,
   jammedUntil: 0,
+  deathAnimStart: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -113,6 +114,7 @@ function resetPlayer() {
   player.fireCageY = 0;
   player.fireCageRadius = 0;
   player.jammedUntil = 0;
+  player.deathAnimStart = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;

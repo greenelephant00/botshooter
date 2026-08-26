@@ -627,6 +627,10 @@ function damageBotSimple(bot, dmg, color) {
       sessionBestStreak = player.comboStreak;
       if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
     }
+    if (player.comboStreak > highestComboStreak) {
+      highestComboStreak = player.comboStreak;
+      localStorage.setItem('botShooterHighestComboStreak', highestComboStreak);
+    }
     score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
     if (gameMode === 'levels') levelKills++;
     if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
