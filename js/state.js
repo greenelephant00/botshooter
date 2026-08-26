@@ -341,7 +341,7 @@ const SKINS = [
   { id: 'combowind',   name: 'Wervelwind Combo',  price: 1000, desc: 'Wereld 2-exclusief killstreak-skin. IJl, doorschijnend lichaam met steeds meer en snellere kolkende windbogen naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
   { id: 'combowater',  name: 'Vloedgolf Combo',   price: 1000, desc: 'Wereld 2-exclusief killstreak-skin. Kolkend waterlichaam met steeds meer golfringen en opspattende schuimdruppels naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
   { id: 'combocrystal', name: 'Kristalpracht Combo', price: 1100, desc: 'Wereld 2-exclusief killstreak-skin. Een dof gesteente dat verandert in een schitterende, kleurwisselende kristalstructuur met steeds meer facetten naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
-  { id: 'coreessence', name: 'Kernwezen', coreOnly: true, corePrice: 25, element: true, desc: 'Elemental Cores-exclusief (Kern-winkel). Een levend lichaam van pure, kleurwisselende kernenergie met ronddraaiende energiepieken. Werkt alleen in Wereld 2.' },
+  { id: 'coreessence', name: 'Kernwezen', coreOnly: true, corePrice: 33, element: true, desc: 'Elemental Cores-exclusief (Kern-winkel). Een levend lichaam van pure, kleurwisselende kernenergie met ronddraaiende energiepieken. Werkt alleen in Wereld 2.' },
   { id: 'elemfire',    name: 'Vuurwezen',    price: 700, desc: 'Wereld 2-exclusief. Gloeiend lichaam van gestold vuur met een flikkerende gloed. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemice',     name: 'IJswezen',     price: 700, desc: 'Wereld 2-exclusief. Kristallijnen lichaam van blauwig ijs. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemearth',   name: 'Aardwezen',    price: 700, desc: 'Wereld 2-exclusief. Zwaar rotslichaam met mosplekjes. Werkt alleen in Wereld 2.', element: true },
@@ -697,13 +697,13 @@ const OVERKILL2_LEVELS = [900, 1350, 1950];
 
 // ---- Elemental Kern-winkel (Wereld 2-only): items en upgrades gekocht met Elemental Cores i.p.v. munten ----
 let lvlCoreDamage = Number(localStorage.getItem('botShooterLvlCoreDamage')) || 0;
-const CORE_DAMAGE_LEVELS = [15, 25, 35]; // prijzen in Elemental Cores
+const CORE_DAMAGE_LEVELS = [23, 33, 43]; // prijzen in Elemental Cores
 const CORE_DAMAGE_PER_LEVEL = 0.08;
 let lvlCoreShield = Number(localStorage.getItem('botShooterLvlCoreShield')) || 0;
-const CORE_SHIELD_LEVELS = [15, 25, 35];
+const CORE_SHIELD_LEVELS = [23, 33, 43];
 const CORE_SHIELD_REDUCTIONS = [0.1, 0.18, 0.25];
 let hasCoreHarvest = localStorage.getItem('botShooterHasCoreHarvest') === 'true';
-const CORE_HARVEST_PRICE = 30;
+const CORE_HARVEST_PRICE = 38;
 const CORE_HARVEST_BONUS = 3; // extra Elemental Cores per verslagen boss in Eindbaas Rush
 
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
@@ -803,7 +803,7 @@ const WORLD2_SPECIAL_WEAPONS = [
   { id: 'frostlance',     name: 'Rijmlans',      price: 2700, cooldownMult: 1.1, dmg: 2, pellets: 1, spread: 0, effect: 'shatterHit',  desc: 'IJzige lans. Elke kogel spat uiteen in ijsscherven die bots dichtbij ook raken en even bevriezen. Druk op E voor een doorborende vriesstraal die alle bots op een lijn beschadigt en bevriest.' },
   { id: 'earthhammer',    name: 'Aardhamer',     price: 2700, cooldownMult: 1.3, dmg: 3, pellets: 1, spread: 0, effect: 'knockbackHit', desc: 'Zware aardstaf. Elke kogel stampt de geraakte bot naar achteren. Druk op E voor een aardschok om je heen die bots beschadigt, wegstoot en heel even verlamt.' },
   { id: 'rootrifle',      name: 'Wortelgeweer',  price: 2700, cooldownMult: 1.0, dmg: 2, pellets: 1, spread: 0, effect: 'rootDragKill', desc: `Elke kogel doet gewone schade. Bij een kill schiet een boomwortel uit de grond omhoog en sleurt de dichtstbijzijnde bot (binnen ${ROOT_DRAG_RANGE}px, geen bosses) meteen de aarde in.` },
-  { id: 'coreblaster', name: 'Kernblaster', coreOnly: true, corePrice: 50, cooldownMult: 0.9, dmg: 4, pellets: 1, spread: 0, effect: 'chainLightning', desc: 'Elemental Cores-exclusief (Kern-winkel). Zware kern-energie kogels met hoge schade die bij een treffer overspringen naar een nabije bot.' }
+  { id: 'coreblaster', name: 'Kernblaster', coreOnly: true, corePrice: 58, cooldownMult: 0.9, dmg: 4, pellets: 1, spread: 0, effect: 'chainLightning', desc: 'Elemental Cores-exclusief (Kern-winkel). Zware kern-energie kogels met hoge schade die bij een treffer overspringen naar een nabije bot.' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
@@ -818,7 +818,7 @@ const WORLD2_ARMOR = [
   { id: 'magmaskin',    name: 'Magmahuid',             price: 1950, hpBonus: 20, reduction: 0, fireResist: 0.7, regen: 2, desc: '+20 max HP. Brand-effecten duren 70% korter en je geneest passief 2 HP/sec.' },
   { id: 'permafrost',   name: 'Permafrosthuid',        price: 1950, hpBonus: 20, reduction: 0.15, iceResist: 0.7, desc: '+20 max HP, -15% schade. IJs-effecten duren 70% korter.' },
   { id: 'elementguard', name: 'Elementenwacht',        price: 2400, hpBonus: 60, reduction: 0, fireResist: 0.3, iceResist: 0.3, knockbackResist: 0.3, desc: '+60 max HP. Een beetje bestand tegen alles: vuur, ijs én wegblaas-effecten.' },
-  { id: 'coreplate', name: 'Kernpantser', coreOnly: true, corePrice: 40, hpBonus: 100, reduction: 0.35, fireResist: 0.4, iceResist: 0.4, knockbackResist: 0.4, desc: 'Elemental Cores-exclusief (Kern-winkel). +100 max HP, -35% schade, en 40% weerstand tegen vuur, ijs én wegblaas-effecten tegelijk.' }
+  { id: 'coreplate', name: 'Kernpantser', coreOnly: true, corePrice: 48, hpBonus: 100, reduction: 0.35, fireResist: 0.4, iceResist: 0.4, knockbackResist: 0.4, desc: 'Elemental Cores-exclusief (Kern-winkel). +100 max HP, -35% schade, en 40% weerstand tegen vuur, ijs én wegblaas-effecten tegelijk.' }
 ];
 
 let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oefensessie
