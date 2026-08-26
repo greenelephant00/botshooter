@@ -941,27 +941,27 @@ let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeath
 let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
 const DEATH_ANIM_DURATION = 2600;
 const DEATH_ANIMATIONS = [
-  { id: 'default',      name: 'Standaard',        price: 2500, desc: 'Geen enkel effect — je verdwijnt gewoon direct, zonder animatie.' },
-  { id: 'explosion',     name: 'Explosie',         price: 2800, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur, een schokgolfring en wegvliegende vonken.' },
-  { id: 'disintegrate',  name: 'Uiteenvallen',     price: 2850, desc: 'Je lichaam trilt even op, dan vallen er 14 blokjes met een sporend spoor alle kanten op uiteen.' },
-  { id: 'fireworks',     name: 'Vuurwerk',         price: 2900, desc: 'Er gaan 6 kleurrijke vuurwerk-bursts achter elkaar af, elk met stralen en een dovende ring.' },
-  { id: 'ghost',         name: 'Spookverschijning', price: 2850, desc: 'Je vervaagt tot een doorschijnende geest die ver omhoog wegdrijft, met achterblijvende echo\'s en dwarrelende sterretjes.' },
-  { id: 'implosion',     name: 'Implosie',         price: 2900, desc: 'Een oplaadende gloeiring, dan klap je razendsnel in tot een punt, gevolgd door een felle flits met meerdere schokgolven.' },
-  { id: 'lightning',     name: 'Blikseminslag',    price: 1850, desc: 'Meerdere flikkerende bliksemschichten slaan achter elkaar op je neer, met een felle flits bij elke inslag.' },
-  { id: 'blackhole',     name: 'Zwart Gat',        price: 1950, desc: 'Een kolkende, alles verzwelgende vortex zuigt je met ronddraaiende deeltjes naar binnen, gevolgd door een korte flits.' },
-  { id: 'petrify',       name: 'Verstening',       price: 1850, desc: 'Je verandert in steen, barst dan open en valt in stukken uiteen die naar beneden vallen.' },
-  { id: 'freezeshatter', name: 'Bevriezen & Breken', price: 1900, desc: 'Je bevriest volledig tot ijs en spat daarna in scherpe, wegvliegende ijsscherven uiteen.' },
-  { id: 'confetti',      name: 'Confetti',         price: 1850, desc: 'Een vrolijke uitbarsting van kleurrijke, ronddwarrelende confetti-snippers.' },
-  { id: 'smoke',         name: 'Rooksignaal',      price: 1850, desc: 'Je lost op in een kolkende pluim donkere rook die langzaam omhoog optrekt en vervaagt.' },
-  { id: 'portal',        name: 'Portaal',          price: 1950, desc: 'Een ronddraaiend portaal opent zich en zuigt je krimpend naar binnen tot je verdwenen bent.' },
-  { id: 'lavamelt',      name: 'Smelten',          price: 1900, desc: 'Je smelt weg tot een gloeiende plas lava die langzaam uitdooft.' },
-  { id: 'starburst',     name: 'Sterexplosie',     price: 1900, desc: 'Je verandert in een felle, ronddraaiende ster die krimpt en een sprankelend spoor achterlaat.' },
-  { id: 'glitch',        name: 'Glitch',           price: 1900, desc: 'Je lichaam valt uiteen in flikkerende, kleur-gesplitste digitale reepjes vol pixel-ruis.' },
-  { id: 'butterflies',   name: 'Vlinders',         price: 1950, desc: 'Je lost op in een zwerm fladderende vlindertjes die alle kanten op wegvliegen.' },
-  { id: 'timewarp',      name: 'Tijdvervorming',   price: 1950, desc: 'Ronddraaiende ringen vervormen en rekken je uit voordat je in een flits verdwijnt.' },
-  { id: 'sand',          name: 'Zandkorrels',      price: 1850, desc: 'Je valt uiteen in duizenden zandkorrels die zijwaarts wegwaaien.' },
-  { id: 'rainbow',       name: 'Regenboogspoor',   price: 1900, desc: 'Je tolt razendsnel rond en laat een kleurrijk regenboogspoor na voordat je vervaagt.' },
-  { id: 'void',          name: 'Leegte',           price: 1950, desc: 'Een groeiende duistere leegte verzwelgt je van binnenuit naar buiten toe, tegenovergesteld aan een explosie.' }
+  { id: 'default',      name: 'Standaard',        price: 2200, desc: 'Geen enkel effect — je verdwijnt gewoon direct, zonder animatie.' },
+  { id: 'explosion',     name: 'Explosie',         price: 2350, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur, een schokgolfring en wegvliegende vonken.' },
+  { id: 'disintegrate',  name: 'Uiteenvallen',     price: 2400, desc: 'Je lichaam trilt even op, dan vallen er 14 blokjes met een sporend spoor alle kanten op uiteen.' },
+  { id: 'fireworks',     name: 'Vuurwerk',         price: 2500, desc: 'Er gaan 6 kleurrijke vuurwerk-bursts achter elkaar af, elk met stralen en een dovende ring.' },
+  { id: 'ghost',         name: 'Spookverschijning', price: 2400, desc: 'Je vervaagt tot een doorschijnende geest die ver omhoog wegdrijft, met achterblijvende echo\'s en dwarrelende sterretjes.' },
+  { id: 'implosion',     name: 'Implosie',         price: 2500, desc: 'Een oplaadende gloeiring, dan klap je razendsnel in tot een punt, gevolgd door een felle flits met meerdere schokgolven.' },
+  { id: 'lightning',     name: 'Blikseminslag',    price: 1800, desc: 'Meerdere flikkerende bliksemschichten slaan achter elkaar op je neer, met een felle flits bij elke inslag.' },
+  { id: 'blackhole',     name: 'Zwart Gat',        price: 1900, desc: 'Een kolkende, alles verzwelgende vortex zuigt je met ronddraaiende deeltjes naar binnen, gevolgd door een korte flits.' },
+  { id: 'petrify',       name: 'Verstening',       price: 1800, desc: 'Je verandert in steen, barst dan open en valt in stukken uiteen die naar beneden vallen.' },
+  { id: 'freezeshatter', name: 'Bevriezen & Breken', price: 1850, desc: 'Je bevriest volledig tot ijs en spat daarna in scherpe, wegvliegende ijsscherven uiteen.' },
+  { id: 'confetti',      name: 'Confetti',         price: 1800, desc: 'Een vrolijke uitbarsting van kleurrijke, ronddwarrelende confetti-snippers.' },
+  { id: 'smoke',         name: 'Rooksignaal',      price: 1800, desc: 'Je lost op in een kolkende pluim donkere rook die langzaam omhoog optrekt en vervaagt.' },
+  { id: 'portal',        name: 'Portaal',          price: 1900, desc: 'Een ronddraaiend portaal opent zich en zuigt je krimpend naar binnen tot je verdwenen bent.' },
+  { id: 'lavamelt',      name: 'Smelten',          price: 1850, desc: 'Je smelt weg tot een gloeiende plas lava die langzaam uitdooft.' },
+  { id: 'starburst',     name: 'Sterexplosie',     price: 1850, desc: 'Je verandert in een felle, ronddraaiende ster die krimpt en een sprankelend spoor achterlaat.' },
+  { id: 'glitch',        name: 'Glitch',           price: 1850, desc: 'Je lichaam valt uiteen in flikkerende, kleur-gesplitste digitale reepjes vol pixel-ruis.' },
+  { id: 'butterflies',   name: 'Vlinders',         price: 1900, desc: 'Je lost op in een zwerm fladderende vlindertjes die alle kanten op wegvliegen.' },
+  { id: 'timewarp',      name: 'Tijdvervorming',   price: 1900, desc: 'Ronddraaiende ringen vervormen en rekken je uit voordat je in een flits verdwijnt.' },
+  { id: 'sand',          name: 'Zandkorrels',      price: 1800, desc: 'Je valt uiteen in duizenden zandkorrels die zijwaarts wegwaaien.' },
+  { id: 'rainbow',       name: 'Regenboogspoor',   price: 1850, desc: 'Je tolt razendsnel rond en laat een kleurrijk regenboogspoor na voordat je vervaagt.' },
+  { id: 'void',          name: 'Leegte',           price: 1900, desc: 'Een groeiende duistere leegte verzwelgt je van binnenuit naar buiten toe, tegenovergesteld aan een explosie.' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
