@@ -133,23 +133,58 @@ let hasWorldBoss = localStorage.getItem('botShooterHasWorldBoss') === 'true';
 let hasBossRushW1 = localStorage.getItem('botShooterHasBossRushW1') === 'true';
 let hasBossRushW2 = localStorage.getItem('botShooterHasBossRushW2') === 'true';
 let unlockedAchievements = JSON.parse(localStorage.getItem('botShooterUnlockedAchievements') || '[]');
+let claimedAchievementRewards = JSON.parse(localStorage.getItem('botShooterClaimedAchievementRewards') || '[]');
+
+function rewardText(r) {
+  return r.type === 'cores' ? `🔮 ${r.amount} Elemental Cores` : `🪙 ${r.amount} munten`;
+}
 
 const ACHIEVEMENTS = [
-  { id: 'first_kill', name: 'Eerste Bloed', icon: '🎯', desc: 'Dood je eerste bot.', check: () => score > 0 || highScore > 0 || highScoreWorld2 > 0 || highScoreHardcore > 0 },
-  { id: 'first_boss', name: 'Bazenslachter', icon: '⚔️', desc: 'Versla je eerste boss.', check: () => hasFirstBoss },
-  { id: 'score_1000', name: 'Op Gang', icon: '⭐', desc: 'Behaal een score van 1000 in één potje.', check: () => highScore >= 1000 || highScoreWorld2 >= 1000 || highScoreHardcore >= 1000 },
-  { id: 'score_5000', name: 'Doorgewinterd', icon: '🌟', desc: 'Behaal een score van 5000 in één potje.', check: () => highScore >= 5000 || highScoreWorld2 >= 5000 || highScoreHardcore >= 5000 },
-  { id: 'score_10000', name: 'Veteraan', icon: '💫', desc: 'Behaal een score van 10.000 in één potje.', check: () => highScore >= 10000 || highScoreWorld2 >= 10000 || highScoreHardcore >= 10000 },
-  { id: 'score_25000', name: 'Legende', icon: '👑', desc: 'Behaal een score van 25.000 in één potje.', check: () => highScore >= 25000 || highScoreWorld2 >= 25000 || highScoreHardcore >= 25000 },
-  { id: 'hardcore_2500', name: 'Hardcore Overlever', icon: '☠️', desc: 'Behaal een score van 2500 in Hardcore.', check: () => highScoreHardcore >= 2500 },
-  { id: 'world2_unlocked', name: 'Elementair', icon: '🔥', desc: 'Ontgrendel Wereld 2.', check: () => world2Unlocked },
-  { id: 'bossrush_w1', name: 'Eindbaas Rush: Wereld 1', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 1.', check: () => hasBossRushW1 },
-  { id: 'bossrush_w2', name: 'Eindbaas Rush: Wereld 2', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 2.', check: () => hasBossRushW2 },
-  { id: 'worldboss', name: 'Oerelementaal Verslagen', icon: '🌍', desc: 'Versla de Oerelementaal, de zeldzame wereldbaas van Wereld 2.', check: () => hasWorldBoss },
-  { id: 'cores_10', name: 'Kernverzamelaar', icon: '🔮', desc: 'Verzamel 10 Elemental Cores.', check: () => elementalCores >= 10 },
-  { id: 'cores_50', name: 'Kernmeester', icon: '💎', desc: 'Verzamel 50 Elemental Cores.', check: () => elementalCores >= 50 },
-  { id: 'all_transforms', name: 'Gedaanteverwisselaar', icon: '🔄', desc: 'Ontgrendel alle Wereld 1-transformaties.', check: () => TRANSFORMS.every(t => ownedTransforms.includes(t.id)) }
+  { id: 'first_kill', name: 'Eerste Bloed', icon: '🎯', desc: 'Dood je eerste bot.', reward: { type: 'coins', amount: 50 }, check: () => score > 0 || highScore > 0 || highScoreWorld2 > 0 || highScoreHardcore > 0 },
+  { id: 'first_boss', name: 'Bazenslachter', icon: '⚔️', desc: 'Versla je eerste boss.', reward: { type: 'coins', amount: 150 }, check: () => hasFirstBoss },
+  { id: 'score_1000', name: 'Op Gang', icon: '⭐', desc: 'Behaal een score van 1000 in één potje.', reward: { type: 'coins', amount: 100 }, check: () => highScore >= 1000 || highScoreWorld2 >= 1000 || highScoreHardcore >= 1000 },
+  { id: 'score_5000', name: 'Doorgewinterd', icon: '🌟', desc: 'Behaal een score van 5000 in één potje.', reward: { type: 'coins', amount: 300 }, check: () => highScore >= 5000 || highScoreWorld2 >= 5000 || highScoreHardcore >= 5000 },
+  { id: 'score_10000', name: 'Veteraan', icon: '💫', desc: 'Behaal een score van 10.000 in één potje.', reward: { type: 'coins', amount: 600 }, check: () => highScore >= 10000 || highScoreWorld2 >= 10000 || highScoreHardcore >= 10000 },
+  { id: 'score_25000', name: 'Legende', icon: '👑', desc: 'Behaal een score van 25.000 in één potje.', reward: { type: 'coins', amount: 1200 }, check: () => highScore >= 25000 || highScoreWorld2 >= 25000 || highScoreHardcore >= 25000 },
+  { id: 'hardcore_2500', name: 'Hardcore Overlever', icon: '☠️', desc: 'Behaal een score van 2500 in Hardcore.', reward: { type: 'coins', amount: 500 }, check: () => highScoreHardcore >= 2500 },
+  { id: 'world2_unlocked', name: 'Elementair', icon: '🔥', desc: 'Ontgrendel Wereld 2.', reward: { type: 'coins', amount: 500 }, check: () => world2Unlocked },
+  { id: 'bossrush_w1', name: 'Eindbaas Rush: Wereld 1', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 1.', reward: { type: 'coins', amount: 400 }, check: () => hasBossRushW1 },
+  { id: 'bossrush_w2', name: 'Eindbaas Rush: Wereld 2', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 2.', reward: { type: 'cores', amount: 20 }, check: () => hasBossRushW2 },
+  { id: 'worldboss', name: 'Oerelementaal Verslagen', icon: '🌍', desc: 'Versla de Oerelementaal, de zeldzame wereldbaas van Wereld 2.', reward: { type: 'cores', amount: 40 }, check: () => hasWorldBoss },
+  { id: 'cores_10', name: 'Kernverzamelaar', icon: '🔮', desc: 'Verzamel 10 Elemental Cores.', reward: { type: 'coins', amount: 100 }, check: () => elementalCores >= 10 },
+  { id: 'cores_50', name: 'Kernmeester', icon: '💎', desc: 'Verzamel 50 Elemental Cores.', reward: { type: 'coins', amount: 300 }, check: () => elementalCores >= 50 },
+  { id: 'all_transforms', name: 'Gedaanteverwisselaar', icon: '🔄', desc: 'Ontgrendel alle Wereld 1-transformaties.', reward: { type: 'coins', amount: 800 }, check: () => TRANSFORMS.every(t => ownedTransforms.includes(t.id)) },
+  { id: 'all_weapons_w1', name: 'Wapenverzamelaar', icon: '🔫', desc: 'Bezit alle Wereld 1-wapens (normaal en speciaal).', reward: { type: 'coins', amount: 500 }, check: () => [...WEAPONS, ...SPECIAL_WEAPONS].every(w => ownedWeapons.includes(w.id)) },
+  { id: 'all_armor_w1', name: 'Pantserverzamelaar', icon: '🛡️', desc: 'Bezit alle Wereld 1-pantsers.', reward: { type: 'coins', amount: 500 }, check: () => ARMOR.every(a => ownedArmor.includes(a.id)) },
+  { id: 'all_world2_weapons', name: 'Elementwapens', icon: '🔥', desc: 'Bezit alle Wereld 2-wapens (normaal en speciaal, exclusief Kern-winkel).', reward: { type: 'cores', amount: 30 }, check: () => [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].filter(w => !w.coreOnly).every(w => ownedWeapons.includes(w.id)) },
+  { id: 'all_world2_armor', name: 'Elementpantsers', icon: '🪨', desc: 'Bezit alle Wereld 2-pantsers (exclusief Kern-winkel).', reward: { type: 'cores', amount: 30 }, check: () => WORLD2_ARMOR.filter(a => !a.coreOnly).every(a => ownedArmor.includes(a.id)) },
+  { id: 'dual_armor', name: 'Dubbel Gepantserd', icon: '🛡️', desc: 'Koop het 2e pantser-slot.', reward: { type: 'coins', amount: 300 }, check: () => hasDualArmor },
+  { id: 'coins_5000', name: 'Spaarpot', icon: '🪙', desc: 'Heb ooit 5000 munten tegelijk in bezit.', reward: { type: 'cores', amount: 10 }, check: () => coins >= 5000 },
+  { id: 'coins_20000', name: 'Rijkdom', icon: '💰', desc: 'Heb ooit 20.000 munten tegelijk in bezit.', reward: { type: 'cores', amount: 25 }, check: () => coins >= 20000 },
+  { id: 'all_skins_normal', name: 'Modebewust', icon: '🎨', desc: 'Bezit alle gewone skins (geen killstreak- of elementen-skins).', reward: { type: 'coins', amount: 500 }, check: () => SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly).every(s => ownedSkins.includes(s.id)) },
+  { id: 'all_killstreak_skins', name: 'Streak Style', icon: '🔥', desc: 'Bezit alle Wereld 1-killstreak-skins.', reward: { type: 'coins', amount: 400 }, check: () => SKINS.filter(s => s.killstreak && !s.element).every(s => ownedSkins.includes(s.id)) },
+  { id: 'all_element_skins', name: 'Elementenmode', icon: '🌍', desc: 'Bezit alle gewone Elementen Skins.', reward: { type: 'cores', amount: 25 }, check: () => SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly).every(s => ownedSkins.includes(s.id)) },
+  { id: 'all_element_killstreak_skins', name: 'Elementaire Streak', icon: '🌈', desc: 'Bezit alle Wereld 2-killstreak-elementen-skins.', reward: { type: 'cores', amount: 30 }, check: () => SKINS.filter(s => s.element && s.killstreak).every(s => ownedSkins.includes(s.id)) },
+  { id: 'core_shop_full', name: 'Kern-verzamelaar', icon: '🔮', desc: 'Bezit Kernpantser, Kernblaster en Kernwezen.', reward: { type: 'coins', amount: 500 }, check: () => ownedArmor.includes('coreplate') && ownedWeapons.includes('coreblaster') && ownedSkins.includes('coreessence') },
+  { id: 'max_upgrade_w1', name: 'Volledig Uitgerust', icon: '💪', desc: 'Bereik het maximale niveau van Extra Conditie.', reward: { type: 'coins', amount: 300 }, check: () => lvlExtraHp >= EXTRA_HP_LEVELS.length },
+  { id: 'max_core_damage', name: 'Kernkracht Voltooid', icon: '💥', desc: 'Bereik het maximale niveau van Kernkracht.', reward: { type: 'cores', amount: 20 }, check: () => lvlCoreDamage >= CORE_DAMAGE_LEVELS.length },
+  { id: 'max_core_shield', name: 'Kernschild Voltooid', icon: '🛡️', desc: 'Bereik het maximale niveau van Kernschild.', reward: { type: 'cores', amount: 20 }, check: () => lvlCoreShield >= CORE_SHIELD_LEVELS.length },
+  { id: 'core_harvest_owned', name: 'Kernoogster', icon: '🌾', desc: 'Koop Kernoogst.', reward: { type: 'cores', amount: 15 }, check: () => hasCoreHarvest },
+  { id: 'revive_w1', name: 'Reanimatie Gekocht', icon: '❤️', desc: 'Koop Reanimatie in Wereld 1.', reward: { type: 'coins', amount: 200 }, check: () => hasRevive },
+  { id: 'revive_w2', name: 'Elementreanimatie Gekocht', icon: '💚', desc: 'Koop Elementreanimatie in Wereld 2.', reward: { type: 'cores', amount: 15 }, check: () => hasRevive2 },
+  { id: 'highlevel_20', name: 'Klimmer', icon: '🧗', desc: 'Bereik level 20 in Levels-modus.', reward: { type: 'coins', amount: 400 }, check: () => highLevel >= 20 },
+  { id: 'highlevel_40', name: 'Bergbeklimmer', icon: '⛰️', desc: 'Bereik level 40 in Levels-modus.', reward: { type: 'coins', amount: 800 }, check: () => highLevel >= 40 }
 ];
+
+function grantAchievementReward(a) {
+  if (a.reward.type === 'cores') {
+    elementalCores += a.reward.amount;
+    localStorage.setItem('botShooterElementalCores', elementalCores);
+  } else {
+    coins += a.reward.amount;
+    if (typeof saveShopState === 'function') saveShopState();
+  }
+}
 
 function checkAchievements() {
   const newlyUnlocked = [];
@@ -161,8 +196,19 @@ function checkAchievements() {
   });
   if (newlyUnlocked.length > 0) {
     localStorage.setItem('botShooterUnlockedAchievements', JSON.stringify(unlockedAchievements));
-    newlyUnlocked.forEach(a => { if (typeof showAchievementToast === 'function') showAchievementToast(a); });
   }
+  // Beloningen uitkeren: voor elke ontgrendelde prestatie die nog geen beloning heeft gekregen — inclusief
+  // prestaties die al eerder (voor dit beloningssysteem bestond) ontgrendeld waren.
+  let grantedAny = false;
+  ACHIEVEMENTS.forEach(a => {
+    if (unlockedAchievements.includes(a.id) && !claimedAchievementRewards.includes(a.id)) {
+      grantAchievementReward(a);
+      claimedAchievementRewards.push(a.id);
+      grantedAny = true;
+    }
+  });
+  if (grantedAny) localStorage.setItem('botShooterClaimedAchievementRewards', JSON.stringify(claimedAchievementRewards));
+  newlyUnlocked.forEach(a => { if (typeof showAchievementToast === 'function') showAchievementToast(a); });
 }
 
 function onBossDefeated(bot) {

@@ -425,7 +425,7 @@ function renderAchievements() {
   document.getElementById('achievementsProgress').textContent = `${unlockedCount}/${ACHIEVEMENTS.length} behaald`;
   document.getElementById('achievementsList').innerHTML = ACHIEVEMENTS.map(a => {
     const unlocked = unlockedAchievements.includes(a.id);
-    return `<div class="shopItem achievementCard${unlocked ? ' unlocked' : ''}"><div class="info"><div class="name">${a.icon} ${a.name}</div><div class="desc">${a.desc}</div></div>
+    return `<div class="shopItem achievementCard${unlocked ? ' unlocked' : ''}"><div class="info"><div class="name">${a.icon} ${a.name}</div><div class="desc">${a.desc}</div><div class="desc" style="color:#ffd60a; margin-top:4px;">Beloning: ${rewardText(a.reward)}</div></div>
       <div style="min-width:90px; font-weight:bold; color:${unlocked ? '#4cd964' : '#888'};">${unlocked ? '✔ Behaald' : '🔒 Op slot'}</div></div>`;
   }).join('');
 }
@@ -447,7 +447,7 @@ let achievementToastTimeout = null;
 function showAchievementToast(a) {
   const el = document.getElementById('achievementToast');
   if (!el) return;
-  el.innerHTML = `<div class="achTitle">🏆 PRESTATIE BEHAALD</div><div class="achName">${a.icon} ${a.name}</div><div class="achDesc">${a.desc}</div>`;
+  el.innerHTML = `<div class="achTitle">🏆 PRESTATIE BEHAALD</div><div class="achName">${a.icon} ${a.name}</div><div class="achDesc">${a.desc}</div><div class="achReward">Beloning: ${rewardText(a.reward)}</div>`;
   el.style.display = 'block';
   el.style.animation = 'none';
   void el.offsetWidth;

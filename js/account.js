@@ -26,7 +26,7 @@ const ACCOUNT_KEYS = [
   'botShooterHasBossRushW1', 'botShooterHasBossRushW2', 'botShooterUnlockedAchievements',
   'botShooterLvlCoreDamage', 'botShooterLvlCoreShield', 'botShooterHasCoreHarvest',
   'botShooterLvlCoreSpeed', 'botShooterLvlCoreRegen', 'botShooterLvlCoreVampire',
-  'botShooterHasCoreAura', 'botShooterHasCoreShock'
+  'botShooterHasCoreAura', 'botShooterHasCoreShock', 'botShooterClaimedAchievementRewards'
 ];
 
 let currentAccount = null;
