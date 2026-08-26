@@ -748,10 +748,47 @@ function renderDeathAnimShop() {
       : owned
         ? `<button class="equip" onclick="equipDeathAnimation('${d.id}')">Uitrusten</button>`
         : `<button class="buy" onclick="buyDeathAnimation('${d.id}')" ${coins < d.price ? 'disabled' : ''}>Koop · 🪙${d.price}</button>`;
-    return `<div class="shopItem"><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>${btn}</div>`;
+    return `<div class="shopItem"><canvas id="deathAnimPreview_${d.id}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewDeathAnimation('${d.id}')">👁 Bekijk</button></div></div>`;
   }).join('');
+  DEATH_ANIMATIONS.forEach(d => {
+    const canvasEl = document.getElementById(`deathAnimPreview_${d.id}`);
+    if (!canvasEl) return;
+    const c = canvasEl.getContext('2d');
+    c.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    c.save();
+    c.translate(canvasEl.width / 2, canvasEl.height / 2);
+    drawPlayerSkin(c, getSkin(), 16);
+    c.restore();
+  });
 }
 window.renderDeathAnimShop = renderDeathAnimShop;
+
+let deathAnimPreviewRAF = null;
+function previewDeathAnimation(id) {
+  if (deathAnimPreviewRAF) cancelAnimationFrame(deathAnimPreviewRAF);
+  const canvasEl = document.getElementById(`deathAnimPreview_${id}`);
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  const w = canvasEl.width, h = canvasEl.height;
+  const start = performance.now();
+  const loopDur = DEATH_ANIM_DURATION + 600; // korte pauze tussen elke herhaling
+  function frame() {
+    const elapsed = (performance.now() - start) % loopDur;
+    c.clearRect(0, 0, w, h);
+    c.save();
+    c.translate(w / 2, h / 2);
+    if (elapsed < DEATH_ANIM_DURATION) {
+      drawDeathAnimation(c, id, elapsed, 16);
+    } else {
+      drawPlayerSkin(c, getSkin(), 16);
+    }
+    c.restore();
+    deathAnimPreviewRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+window.previewDeathAnimation = previewDeathAnimation;
 
 function openDeathAnimShop() {
   document.getElementById(menuScreenId()).style.display = 'none';
@@ -761,6 +798,7 @@ function openDeathAnimShop() {
 window.openDeathAnimShop = openDeathAnimShop;
 
 function closeDeathAnimShop() {
+  if (deathAnimPreviewRAF) { cancelAnimationFrame(deathAnimPreviewRAF); deathAnimPreviewRAF = null; }
   document.getElementById('deathAnimScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
 }

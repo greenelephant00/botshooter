@@ -3689,26 +3689,26 @@ function drawPlayerWaterForm(c, r) {
   c.stroke();
 }
 
-function drawDeathAnimation(type, age, r) {
+function drawDeathAnimation(c, type, age, r) {
   const t = Math.min(1, age / DEATH_ANIM_DURATION);
   if (type === 'explosion') {
-    ctx.globalAlpha = 1 - t;
-    ctx.fillStyle = '#ff5a1f';
-    ctx.beginPath(); ctx.arc(0, 0, r + t * 50, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = '#fff275';
-    ctx.beginPath(); ctx.arc(0, 0, r + t * 30, 0, Math.PI * 2); ctx.fill();
+    c.globalAlpha = 1 - t;
+    c.fillStyle = '#ff5a1f';
+    c.beginPath(); c.arc(0, 0, r + t * 50, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff275';
+    c.beginPath(); c.arc(0, 0, r + t * 30, 0, Math.PI * 2); c.fill();
   } else if (type === 'disintegrate') {
-    ctx.globalAlpha = 1 - t;
+    c.globalAlpha = 1 - t;
     const pieces = 8;
     for (let i = 0; i < pieces; i++) {
       const a = (Math.PI * 2 / pieces) * i;
       const dist = t * (r + 40);
-      ctx.save();
-      ctx.translate(Math.cos(a) * dist, Math.sin(a) * dist);
-      ctx.rotate(a + t * 6);
-      ctx.fillStyle = '#4cc9f0';
-      ctx.fillRect(-4, -4, 8, 8);
-      ctx.restore();
+      c.save();
+      c.translate(Math.cos(a) * dist, Math.sin(a) * dist);
+      c.rotate(a + t * 6);
+      c.fillStyle = '#4cc9f0';
+      c.fillRect(-4, -4, 8, 8);
+      c.restore();
     }
   } else if (type === 'fireworks') {
     const bursts = 3;
@@ -3717,37 +3717,37 @@ function drawDeathAnimation(type, age, r) {
       if (bt <= 0 || bt >= 1) continue;
       const hue = (b * 120) % 360;
       const rays = 10;
-      ctx.globalAlpha = 1 - bt;
-      ctx.fillStyle = `hsl(${hue}, 90%, 65%)`;
+      c.globalAlpha = 1 - bt;
+      c.fillStyle = `hsl(${hue}, 90%, 65%)`;
       for (let i = 0; i < rays; i++) {
         const a = (Math.PI * 2 / rays) * i;
         const dist = bt * (r + 45);
-        ctx.beginPath(); ctx.arc(Math.cos(a) * dist, Math.sin(a) * dist, 3, 0, Math.PI * 2); ctx.fill();
+        c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 3, 0, Math.PI * 2); c.fill();
       }
     }
   } else if (type === 'ghost') {
-    ctx.globalAlpha = (1 - t) * 0.6;
-    ctx.fillStyle = '#dfffff';
-    ctx.beginPath(); ctx.arc(0, -t * 40, r, 0, Math.PI * 2); ctx.fill();
+    c.globalAlpha = (1 - t) * 0.6;
+    c.fillStyle = '#dfffff';
+    c.beginPath(); c.arc(0, -t * 40, r, 0, Math.PI * 2); c.fill();
   } else if (type === 'implosion') {
     if (age < DEATH_ANIM_DURATION * 0.6) {
       const shrink = 1 - age / (DEATH_ANIM_DURATION * 0.6);
-      ctx.globalAlpha = shrink;
-      ctx.fillStyle = '#8a2be2';
-      ctx.beginPath(); ctx.arc(0, 0, r * shrink, 0, Math.PI * 2); ctx.fill();
+      c.globalAlpha = shrink;
+      c.fillStyle = '#8a2be2';
+      c.beginPath(); c.arc(0, 0, r * shrink, 0, Math.PI * 2); c.fill();
     } else {
       const ft = (age - DEATH_ANIM_DURATION * 0.6) / (DEATH_ANIM_DURATION * 0.4);
-      ctx.globalAlpha = 1 - ft;
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(0, 0, ft * 60, 0, Math.PI * 2); ctx.fill();
+      c.globalAlpha = 1 - ft;
+      c.fillStyle = '#fff';
+      c.beginPath(); c.arc(0, 0, ft * 60, 0, Math.PI * 2); c.fill();
     }
   } else {
     // default: eenvoudige fade + krimp
-    ctx.globalAlpha = 1 - t;
-    ctx.fillStyle = '#4cc9f0';
-    ctx.beginPath(); ctx.arc(0, 0, r * (1 - t * 0.6), 0, Math.PI * 2); ctx.fill();
+    c.globalAlpha = 1 - t;
+    c.fillStyle = '#4cc9f0';
+    c.beginPath(); c.arc(0, 0, r * (1 - t * 0.6), 0, Math.PI * 2); c.fill();
   }
-  ctx.globalAlpha = 1;
+  c.globalAlpha = 1;
 }
 
 function drawPlayer() {
@@ -3756,7 +3756,7 @@ function drawPlayer() {
   ctx.rotate(player.angle);
   if (player.deathAnimStart) {
     const age = performance.now() - player.deathAnimStart;
-    if (age < DEATH_ANIM_DURATION) drawDeathAnimation(equippedDeathAnimation, age, player.r);
+    if (age < DEATH_ANIM_DURATION) drawDeathAnimation(ctx, equippedDeathAnimation, age, player.r);
   } else if (player.activeTransform === 'tank') drawPlayerTank(ctx, player.r);
   else if (player.activeTransform === 'berserker') drawPlayerBerserker(ctx, player.r);
   else if (player.activeTransform === 'sniper') drawPlayerSniperMech(ctx, player.r);
