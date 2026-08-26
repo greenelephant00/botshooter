@@ -1,4 +1,4 @@
-const KILL_CAM_DURATION = 3000;
+const KILL_CAM_DURATION = 5000;
 
 function recordMoment(importance, label) {
   // Kill Cam: neemt een kort filmpje op vanaf het meest indrukwekkende moment dit potje (hoogste importance wint)

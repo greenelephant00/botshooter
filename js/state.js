@@ -111,7 +111,7 @@ let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) 
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 
-// ---- Kill Cam: neemt een kort (3 sec) filmpje op van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
+// ---- Kill Cam: neemt een kort (5 sec) filmpje op van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
 let bestMomentSnapshot = null; // object-URL van het opgenomen webm-filmpje
 let bestMomentLabel = '';
 let bestMomentScore = -1;
