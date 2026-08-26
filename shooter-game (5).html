@@ -69,10 +69,15 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
     <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
+    <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
+  </div>
+  <div class="dodgePracticeRow">
+    <input type="number" id="gambleWagerInput" min="10" step="10" value="100" title="Inzet in munten">
+    <button class="shopOpenBtn" onclick="startGamble()" style="border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
   </div>
 </div>
 <div id="world2Screen">
@@ -106,9 +111,16 @@
     <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
     <button class="shopOpenBtn" onclick="openCoreShop()" style="border-color:#9be3ff; color:#9be3ff;">🔮 Kern-winkel</button>
   </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
+  </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
+  </div>
+  <div class="dodgePracticeRow">
+    <input type="number" id="gambleWagerInput2" min="10" step="10" value="100" title="Inzet in munten">
+    <button class="shopOpenBtn" onclick="startGamble()" style="border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
   </div>
 </div>
 <div id="shopScreen">
@@ -225,6 +237,22 @@
   </div>
   <button class="backBtn" onclick="closeCoreShop()">← Terug</button>
 </div>
+<div id="weaponSkinsScreen">
+  <h1>🎨 Wapenskins</h1>
+  <button class="topBackBtn" onclick="closeWeaponSkinsShop()">← Menu</button>
+  <div class="coinDisplay">🪙 <span id="weaponSkinsCoins">0</span></div>
+  <div class="shopSection">
+    <h3>Eén alternatieve kogelkleur per speciaal wapen, los van je personage-skin.</h3>
+    <div id="weaponSkinsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeWeaponSkinsShop()">← Terug</button>
+</div>
+<div id="killCamScreen">
+  <h2>🎬 Kill Cam</h2>
+  <div id="killCamLabel"></div>
+  <img id="killCamImage" alt="Kill Cam screenshot">
+  <button onclick="closeKillCam()">Sluiten</button>
+</div>
 <div id="hud">
   Score: <span class="score" id="scoreVal">0</span> &nbsp;|&nbsp;
   Highscore: <span class="score" id="highScoreVal">0</span> &nbsp;|&nbsp;
@@ -248,6 +276,7 @@
 <div id="msg">
   <div id="msgText"></div>
   <button id="msgBtn" onclick="restartGame()">Opnieuw spelen</button>
+  <button id="msgKillCamBtn" onclick="openKillCam()" style="display:none; margin-top:10px;">🎬 Bekijk Kill Cam</button>
   <button id="msgMenuBtn" onclick="goToMenu()" style="display:none; margin-top:10px; margin-left:0;">Menu</button>
 </div>
 

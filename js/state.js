@@ -111,6 +111,17 @@ let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) 
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 
+// ---- Munten-gokje: zet munten in voor een Endless-potje, verdubbel bij het halen van je doelscore of raak ze kwijt ----
+let gambleActive = false;
+let gambleWager = 0;
+let gambleTarget = 0;
+
+// ---- Kill Cam: bewaart een screenshot van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
+let bestMomentSnapshot = null;
+let bestMomentLabel = '';
+let bestMomentScore = -1;
+let sessionBestStreak = 0;
+
 // ---- Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit, zonder dood te gaan ----
 let bossRushActive = false;
 let bossRushIndex = 0;
@@ -227,6 +238,12 @@ function checkAchievements() {
 }
 
 function onBossDefeated(bot) {
+  if (typeof recordMoment === 'function') {
+    const pool = [...BOSS_TYPES, ...WORLD2_BOSS_TYPES, WORLD_BOSS_TYPE];
+    const type = pool.find(b => b.name === bot.type);
+    const importance = bot.type === 'oerelementaal' ? 150 : 100;
+    recordMoment(importance, `👑 Boss verslagen: ${type ? type.displayName : bot.type}`);
+  }
   if (bossRushActive) {
     bossRushIndex++;
   }
@@ -881,6 +898,26 @@ const WORLD2_SPECIAL_WEAPONS = [
   { id: 'earthhammer',    name: 'Aardhamer',     price: 2700, cooldownMult: 1.3, dmg: 3, pellets: 1, spread: 0, effect: 'knockbackHit', desc: 'Zware aardstaf. Elke kogel stampt de geraakte bot naar achteren. Druk op E voor een aardschok om je heen die bots beschadigt, wegstoot en heel even verlamt.' },
   { id: 'rootrifle',      name: 'Wortelgeweer',  price: 2700, cooldownMult: 1.0, dmg: 2, pellets: 1, spread: 0, effect: 'rootDragKill', desc: `Elke kogel doet gewone schade. Bij een kill schiet een boomwortel uit de grond omhoog en sleurt de dichtstbijzijnde bot (binnen ${ROOT_DRAG_RANGE}px, geen bosses) meteen de aarde in.` },
   { id: 'coreblaster', name: 'Kernblaster', coreOnly: true, corePrice: 58, cooldownMult: 0.9, dmg: 4, pellets: 1, spread: 0, effect: 'chainLightning', desc: 'Elemental Cores-exclusief (Kern-winkel). Zware kern-energie kogels met hoge schade die bij een treffer overspringen naar een nabije bot.' }
+];
+
+// ---- Wapenskins: per speciaal wapen één alternatieve kogelkleur, los van je personage-skin, met munten te koop ----
+let ownedWeaponSkins = JSON.parse(localStorage.getItem('botShooterOwnedWeaponSkins') || '[]');
+let equippedWeaponSkins = JSON.parse(localStorage.getItem('botShooterEquippedWeaponSkins') || '{}'); // weaponId -> skinId
+const WEAPON_SKINS = [
+  { id: 'cryorifle_neon',     weaponId: 'cryorifle',    name: 'Neon Cryo',        price: 350, color: '#00e5ff', coreColor: '#ffffff' },
+  { id: 'vampcannon_blood',   weaponId: 'vampcannon',   name: 'Bloedkanon',       price: 350, color: '#ff0044', coreColor: '#330008' },
+  { id: 'voltcaster_arc',     weaponId: 'voltcaster',   name: 'Paarse Boog',      price: 350, color: '#b026ff', coreColor: '#fff066' },
+  { id: 'singularity_void',   weaponId: 'singularity',  name: 'Duister Vacuüm',   price: 400, color: '#4b0082', coreColor: '#000000' },
+  { id: 'stickybomb_radio',   weaponId: 'stickybomb',   name: 'Radioactief',      price: 400, color: '#39ff14', coreColor: '#003300' },
+  { id: 'toxiccannon_venom',  weaponId: 'toxiccannon',  name: 'Giftig Groen',     price: 350, color: '#7fff00', coreColor: '#1a3300' },
+  { id: 'executioner_gold',   weaponId: 'executioner',  name: 'Bloedgoud',        price: 450, color: '#ffd700', coreColor: '#4a0000' },
+  { id: 'momentum_ember',     weaponId: 'momentum',     name: 'Vurige Momentum',  price: 400, color: '#ff6600', coreColor: '#ffffff' },
+  { id: 'magmacannon_frost',  weaponId: 'magmacannon',  name: 'Vrieskanon',       price: 400, color: '#00ccff', coreColor: '#ffffff' },
+  { id: 'hurricanestaff_storm', weaponId: 'hurricanestaff', name: 'Stormpaars',   price: 400, color: '#8a2be2', coreColor: '#ffffff' },
+  { id: 'frostlance_ember',   weaponId: 'frostlance',   name: 'Vurige Lans',      price: 400, color: '#ff4500', coreColor: '#fff275' },
+  { id: 'earthhammer_crystal', weaponId: 'earthhammer', name: 'Kristalhamer',     price: 400, color: '#00e5ff', coreColor: '#ffffff' },
+  { id: 'rootrifle_autumn',   weaponId: 'rootrifle',    name: 'Herfstwortel',     price: 400, color: '#ff8c00', coreColor: '#4a2f18' },
+  { id: 'coreblaster_prism',  weaponId: 'coreblaster',  name: 'Prisma Kern',      price: 500, color: '#ff00ff', coreColor: '#00ffff' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop

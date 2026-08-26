@@ -1,3 +1,11 @@
+function recordMoment(importance, label) {
+  // Kill Cam: bewaart een screenshot van het meest indrukwekkende moment dit potje (hoogste importance wint)
+  if (importance <= bestMomentScore) return;
+  bestMomentScore = importance;
+  bestMomentLabel = label;
+  try { bestMomentSnapshot = canvas.toDataURL('image/png'); } catch (e) { bestMomentSnapshot = null; }
+}
+
 function lerpColor(hexA, hexB, t) {
   const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
   const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
@@ -1270,6 +1278,27 @@ function drawPlayerBullet(b) {
   ctx.save();
   ctx.translate(b.x, b.y);
   ctx.rotate(angle);
+  if (b.weaponSkin) {
+    // Wapenskin: overschrijft het normale uiterlijk van dit speciale wapen met een eigen kleurenschema
+    const ws = WEAPON_SKINS.find(w => w.id === b.weaponSkin);
+    if (ws) {
+      ctx.fillStyle = ws.color;
+      ctx.beginPath();
+      ctx.arc(0, 0, (b.r || 4) + 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = ws.coreColor;
+      ctx.beginPath();
+      ctx.arc(0, 0, (b.r || 4) * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = ws.coreColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(0, 0, (b.r || 4) + 3, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
+  }
   if (b.isGrenade) {
     // tank: grote handgranaat i.p.v. het uiterlijk van een normaal wapen
     ctx.fillStyle = '#4a5d23';

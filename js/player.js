@@ -432,6 +432,10 @@ function initGame() {
   bossWarningActive = false;
   bossesSpawned = {};
   world2BossKillCount = 0;
+  bestMomentSnapshot = null;
+  bestMomentLabel = '';
+  bestMomentScore = -1;
+  sessionBestStreak = 0;
   score = 0;
   gameOver = false;
   levelTransition = false;
@@ -562,6 +566,22 @@ function startBossRush() {
 }
 window.startBossRush = startBossRush;
 
+function startGamble() {
+  // Munten-gokje: zet munten in voor een Endless-potje. Haal je score minstens je eigen highscore (of 500),
+  // dan verdubbelt je inzet; anders ben je hem kwijt (al bij het starten afgeschreven).
+  const inputId = currentWorld === 2 ? 'gambleWagerInput2' : 'gambleWagerInput';
+  const input = document.getElementById(inputId);
+  const wager = Math.max(10, Math.floor(Number(input ? input.value : 100)) || 100);
+  if (wager > coins) return;
+  coins -= wager;
+  saveShopState();
+  gambleActive = true;
+  gambleWager = wager;
+  gambleTarget = Math.max(500, currentWorld === 2 ? highScoreWorld2 : highScore);
+  selectMode('endless');
+}
+window.startGamble = startGamble;
+
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;
   document.getElementById('scoreVal').textContent = inPracticeSession ? '—' : score;
@@ -582,6 +602,7 @@ function updateHUD() {
     const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
     active.push(`👑 Eindbaas Rush: boss ${Math.min(bossRushIndex + 1, rushPool.length)}/${rushPool.length}`);
   }
+  if (gambleActive) active.push(`🎲 Gokje: haal score ${gambleTarget} (inzet ${gambleWager})`);
   if (now < player.boostUntil) active.push('⚡ Speed');
   if (now < player.fireBoostUntil) active.push('🔥 Snelvuur');
   if (now < player.shieldUntil) active.push('🛡 Schild');

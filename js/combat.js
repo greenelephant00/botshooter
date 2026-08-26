@@ -104,7 +104,8 @@ function shoot() {
       isMagmaOrb: weapon.id === 'magmacannon',
       isWindVortex: weapon.id === 'hurricanestaff',
       isIceLanceBolt: weapon.id === 'frostlance',
-      isRockChunk: weapon.id === 'earthhammer'
+      isRockChunk: weapon.id === 'earthhammer',
+      weaponSkin: equippedWeaponSkins[weapon.id] || null
     });
   });
 }
@@ -622,6 +623,10 @@ function damageBotSimple(bot, dmg, color) {
     bot.dead = true;
     player.comboStreak = Math.min(20, player.comboStreak + 1);
     player.comboLastKill = performance.now();
+    if (player.comboStreak > sessionBestStreak) {
+      sessionBestStreak = player.comboStreak;
+      if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
+    }
     score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
     if (gameMode === 'levels') levelKills++;
     if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
