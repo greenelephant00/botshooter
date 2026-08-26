@@ -3692,57 +3692,153 @@ function drawPlayerWaterForm(c, r) {
 function drawDeathAnimation(c, type, age, r) {
   const t = Math.min(1, age / DEATH_ANIM_DURATION);
   if (type === 'explosion') {
-    c.globalAlpha = 1 - t;
+    // Fase 1: felle kernexplosie met uitdijende schokgolfring, fase 2: wegvliegende, uitdovende vonken
+    const coreT = Math.min(1, age / (DEATH_ANIM_DURATION * 0.4));
+    c.globalAlpha = Math.max(0, 1 - t * 1.1);
     c.fillStyle = '#ff5a1f';
-    c.beginPath(); c.arc(0, 0, r + t * 50, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, 0, r + coreT * 60, 0, Math.PI * 2); c.fill();
     c.fillStyle = '#fff275';
-    c.beginPath(); c.arc(0, 0, r + t * 30, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, 0, r + coreT * 35, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = Math.max(0, (1 - t) * 0.8);
+    c.strokeStyle = '#ffcc66';
+    c.lineWidth = 4 * (1 - t);
+    c.beginPath(); c.arc(0, 0, r + t * 90, 0, Math.PI * 2); c.stroke();
+    const sparks = 14;
+    c.fillStyle = '#ff8c42';
+    for (let i = 0; i < sparks; i++) {
+      const a = (Math.PI * 2 / sparks) * i + i * 0.3;
+      const dist = t * (r + 75);
+      c.globalAlpha = Math.max(0, (1 - t) * 0.9);
+      c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 2.5, 0, Math.PI * 2); c.fill();
+    }
   } else if (type === 'disintegrate') {
-    c.globalAlpha = 1 - t;
-    const pieces = 8;
-    for (let i = 0; i < pieces; i++) {
-      const a = (Math.PI * 2 / pieces) * i;
-      const dist = t * (r + 40);
+    // Fase 1: oplichtende, trillende omtrek, fase 2: blokjes vliegen met een sporend spoor alle kanten op
+    if (t < 0.15) {
+      const buildT = t / 0.15;
+      const jitter = 2 * buildT;
       c.save();
-      c.translate(Math.cos(a) * dist, Math.sin(a) * dist);
-      c.rotate(a + t * 6);
-      c.fillStyle = '#4cc9f0';
-      c.fillRect(-4, -4, 8, 8);
+      c.translate((Math.random() - 0.5) * jitter, (Math.random() - 0.5) * jitter);
+      c.globalAlpha = buildT;
+      c.strokeStyle = '#4cc9f0';
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, r + 3, 0, Math.PI * 2); c.stroke();
       c.restore();
+    } else {
+      const pt = (t - 0.15) / 0.85;
+      c.globalAlpha = Math.max(0, 1 - pt);
+      const pieces = 14;
+      for (let i = 0; i < pieces; i++) {
+        const a = (Math.PI * 2 / pieces) * i;
+        const dist = pt * (r + 90);
+        const trailSteps = 3;
+        for (let s = trailSteps; s >= 0; s--) {
+          const trailDist = Math.max(0, dist - s * 8);
+          c.save();
+          c.globalAlpha = Math.max(0, (1 - pt) * (1 - s / (trailSteps + 1)));
+          c.translate(Math.cos(a) * trailDist, Math.sin(a) * trailDist);
+          c.rotate(a + pt * 8);
+          c.fillStyle = '#4cc9f0';
+          c.fillRect(-3.5, -3.5, 7, 7);
+          c.restore();
+        }
+      }
     }
   } else if (type === 'fireworks') {
-    const bursts = 3;
+    // Meerdere staggered vuurwerk-bursts verspreid over de hele duur, elk met stralen én een dovende ring
+    const bursts = 6;
     for (let b = 0; b < bursts; b++) {
-      const bt = (age - b * 250) / 500;
+      const bt = (age - b * 380) / 750;
       if (bt <= 0 || bt >= 1) continue;
-      const hue = (b * 120) % 360;
-      const rays = 10;
+      const hue = (b * 65) % 360;
+      const rays = 14;
       c.globalAlpha = 1 - bt;
+      c.strokeStyle = `hsl(${hue}, 90%, 65%)`;
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, bt * (r + 50), 0, Math.PI * 2); c.stroke();
       c.fillStyle = `hsl(${hue}, 90%, 65%)`;
       for (let i = 0; i < rays; i++) {
-        const a = (Math.PI * 2 / rays) * i;
-        const dist = bt * (r + 45);
+        const a = (Math.PI * 2 / rays) * i + b * 0.4;
+        const dist = bt * (r + 55);
         c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 3, 0, Math.PI * 2); c.fill();
       }
     }
   } else if (type === 'ghost') {
+    // Doorschijnende geest die ver omhoog wegdrijft, met achterblijvende echo's en ronddwarrelende sterretjes
+    const riseT = t;
     c.globalAlpha = (1 - t) * 0.6;
     c.fillStyle = '#dfffff';
-    c.beginPath(); c.arc(0, -t * 40, r, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(0, -riseT * 90, r, 0, Math.PI * 2); c.fill();
+    const echoes = 3;
+    for (let i = 1; i <= echoes; i++) {
+      const echoT = Math.max(0, riseT - i * 0.12);
+      c.globalAlpha = Math.max(0, (1 - t) * 0.6 * (1 - i / (echoes + 1)));
+      c.fillStyle = '#9be8ff';
+      c.beginPath(); c.arc(0, -echoT * 90, r * (1 - i * 0.1), 0, Math.PI * 2); c.fill();
+    }
+    const wisps = 6;
+    for (let i = 0; i < wisps; i++) {
+      const a = (Math.PI * 2 / wisps) * i + t * 4;
+      const wispR = r * 1.6 + Math.sin(t * 10 + i) * 6;
+      c.globalAlpha = Math.max(0, (1 - t) * 0.8);
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(Math.cos(a) * wispR, -riseT * 90 + Math.sin(a) * wispR * 0.5, 1.8, 0, Math.PI * 2); c.fill();
+    }
   } else if (type === 'implosion') {
-    if (age < DEATH_ANIM_DURATION * 0.6) {
-      const shrink = 1 - age / (DEATH_ANIM_DURATION * 0.6);
-      c.globalAlpha = shrink;
+    // Fase 1: oplaadende, pulserende gloeiring, fase 2: razendsnelle inklap, fase 3: felle flits met meerdere schokgolven
+    if (t < 0.35) {
+      const chargeT = t / 0.35;
+      const pulse = 0.7 + Math.sin(performance.now() / 60) * 0.3;
+      c.globalAlpha = chargeT;
+      c.strokeStyle = '#8a2be2';
+      c.lineWidth = 3;
+      c.beginPath(); c.arc(0, 0, r * (1 + 0.3 * pulse), 0, Math.PI * 2); c.stroke();
+      c.fillStyle = '#8a2be2';
+      c.globalAlpha = chargeT * 0.5;
+      c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    } else if (t < 0.55) {
+      const shrink = 1 - (t - 0.35) / 0.2;
+      c.globalAlpha = Math.max(0, shrink);
       c.fillStyle = '#8a2be2';
       c.beginPath(); c.arc(0, 0, r * shrink, 0, Math.PI * 2); c.fill();
     } else {
-      const ft = (age - DEATH_ANIM_DURATION * 0.6) / (DEATH_ANIM_DURATION * 0.4);
-      c.globalAlpha = 1 - ft;
+      const ft = (t - 0.55) / 0.45;
+      c.globalAlpha = Math.max(0, 1 - ft);
       c.fillStyle = '#fff';
-      c.beginPath(); c.arc(0, 0, ft * 60, 0, Math.PI * 2); c.fill();
+      c.beginPath(); c.arc(0, 0, ft * 90, 0, Math.PI * 2); c.fill();
+      const rings = 3;
+      for (let i = 0; i < rings; i++) {
+        const ringT = Math.max(0, ft - i * 0.2);
+        c.globalAlpha = Math.max(0, (1 - ft) * 0.7);
+        c.strokeStyle = '#c9a3ff';
+        c.lineWidth = 2.5;
+        c.beginPath(); c.arc(0, 0, ringT * 110, 0, Math.PI * 2); c.stroke();
+      }
+      const rays = 8;
+      c.strokeStyle = '#fff';
+      c.lineWidth = 2;
+      for (let i = 0; i < rays; i++) {
+        const a = (Math.PI * 2 / rays) * i;
+        c.globalAlpha = Math.max(0, (1 - ft) * 0.6);
+        c.beginPath();
+        c.moveTo(Math.cos(a) * ft * 20, Math.sin(a) * ft * 20);
+        c.lineTo(Math.cos(a) * ft * 100, Math.sin(a) * ft * 100);
+        c.stroke();
+      }
     }
   } else {
-    // default: eenvoudige fade + krimp
+    // Standaard: fade + krimp met een zacht uitdijende sprankelring en een draaiende gloed-halo
+    c.globalAlpha = (1 - t) * 0.5;
+    c.strokeStyle = '#4cc9f0';
+    c.lineWidth = 2;
+    c.beginPath(); c.arc(0, 0, r + t * 30, 0, Math.PI * 2); c.stroke();
+    const sparkles = 8;
+    c.fillStyle = '#8ecbff';
+    for (let i = 0; i < sparkles; i++) {
+      const a = (Math.PI * 2 / sparkles) * i + t * 3;
+      const dist = r + t * 40;
+      c.globalAlpha = Math.max(0, (1 - t) * 0.8);
+      c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 1.8, 0, Math.PI * 2); c.fill();
+    }
     c.globalAlpha = 1 - t;
     c.fillStyle = '#4cc9f0';
     c.beginPath(); c.arc(0, 0, r * (1 - t * 0.6), 0, Math.PI * 2); c.fill();

@@ -932,7 +932,7 @@ const WEAPON_SKINS = [
 // ---- Death Animations: koop een eigen animatie die afspeelt op het moment dat je doodgaat ----
 let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeathAnimations') || '["default"]');
 let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
-const DEATH_ANIM_DURATION = 1400;
+const DEATH_ANIM_DURATION = 2600;
 const DEATH_ANIMATIONS = [
   { id: 'default',      name: 'Standaard',        price: 0,   desc: 'Een simpele fade-out — je klassieke, ingebouwde verdwijning.' },
   { id: 'explosion',     name: 'Explosie',         price: 300, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur en licht.' },
