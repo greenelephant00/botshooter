@@ -419,15 +419,23 @@ function closeDisastersInfo() {
 }
 window.closeDisastersInfo = closeDisastersInfo;
 
+function renderAchievementCard(a) {
+  const unlocked = unlockedAchievements.includes(a.id);
+  return `<div class="shopItem achievementCard${unlocked ? ' unlocked' : ''}"><div class="info"><div class="name">${a.icon} ${a.name}</div><div class="desc">${a.desc}</div><div class="desc" style="color:#ffd60a; margin-top:4px;">Beloning: ${rewardText(a.reward)}</div></div>
+    <div style="min-width:90px; font-weight:bold; color:${unlocked ? '#4cd964' : '#888'};">${unlocked ? '✔ Behaald' : '🔒 Op slot'}</div></div>`;
+}
+
 function renderAchievements() {
   checkAchievements();
   const unlockedCount = ACHIEVEMENTS.filter(a => unlockedAchievements.includes(a.id)).length;
   document.getElementById('achievementsProgress').textContent = `${unlockedCount}/${ACHIEVEMENTS.length} behaald`;
-  document.getElementById('achievementsList').innerHTML = ACHIEVEMENTS.map(a => {
-    const unlocked = unlockedAchievements.includes(a.id);
-    return `<div class="shopItem achievementCard${unlocked ? ' unlocked' : ''}"><div class="info"><div class="name">${a.icon} ${a.name}</div><div class="desc">${a.desc}</div><div class="desc" style="color:#ffd60a; margin-top:4px;">Beloning: ${rewardText(a.reward)}</div></div>
-      <div style="min-width:90px; font-weight:bold; color:${unlocked ? '#4cd964' : '#888'};">${unlocked ? '✔ Behaald' : '🔒 Op slot'}</div></div>`;
-  }).join('');
+  const w1 = ACHIEVEMENTS.filter(a => a.category === 'w1');
+  const w2 = ACHIEVEMENTS.filter(a => a.category === 'w2');
+  const w1Count = w1.filter(a => unlockedAchievements.includes(a.id)).length;
+  const w2Count = w2.filter(a => unlockedAchievements.includes(a.id)).length;
+  document.getElementById('achievementsList').innerHTML =
+    `<div class="shopSection"><h3>🌍 Wereld 1 (${w1Count}/${w1.length})</h3>${w1.map(renderAchievementCard).join('')}</div>` +
+    `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${w2.map(renderAchievementCard).join('')}</div>`;
 }
 
 function openAchievements() {
