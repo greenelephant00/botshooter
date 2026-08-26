@@ -1909,6 +1909,171 @@ function drawPlayerBullet(b) {
       ctx.beginPath(); ctx.arc(0, 0, 4, 0, Math.PI * 2); ctx.stroke();
       break;
     }
+    case 'elemfire': {
+      // vuurbolletje met een felle kern
+      ctx.fillStyle = '#ff5a1f';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff275';
+      ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'elemice': {
+      // draaiend ijskristal
+      ctx.rotate(performance.now() / 130);
+      ctx.fillStyle = '#9ef7ff';
+      ctx.beginPath();
+      ctx.moveTo(0, -5.5); ctx.lineTo(4, 0); ctx.lineTo(0, 5.5); ctx.lineTo(-4, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#eaffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      break;
+    }
+    case 'elemearth': {
+      // tuimelend brokje steen
+      ctx.rotate(performance.now() / 110);
+      ctx.fillStyle = '#8a6a3a';
+      ctx.beginPath();
+      ctx.moveTo(-4, -2.5); ctx.lineTo(-1, -5); ctx.lineTo(4, -2); ctx.lineTo(4.5, 2); ctx.lineTo(0, 5); ctx.lineTo(-4.5, 1.5);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#5c3a1e';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      break;
+    }
+    case 'elemstorm': {
+      // knetterend elektrisch bolletje met vonken
+      ctx.fillStyle = '#8ecbff';
+      ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#fff066';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 3; i++) {
+        const a = performance.now() / 55 + (Math.PI * 2 / 3) * i;
+        ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a) * 6, Math.sin(a) * 6); ctx.stroke();
+      }
+      break;
+    }
+    case 'elemwind': {
+      // doorschijnende, ronddraaiende windswirl
+      ctx.save();
+      ctx.globalAlpha = 0.8;
+      ctx.strokeStyle = '#eaffff';
+      ctx.lineWidth = 2;
+      const spinBW = performance.now() / 150;
+      ctx.beginPath(); ctx.arc(0, 0, 4, spinBW, spinBW + 4); ctx.stroke();
+      ctx.restore();
+      break;
+    }
+    case 'elemwater': {
+      // waterdruppel met een lichte glans
+      ctx.fillStyle = 'rgba(42, 127, 186, 0.9)';
+      ctx.beginPath(); ctx.arc(0, 0, 4.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.8)';
+      ctx.beginPath(); ctx.arc(-1.2, -1.2, 1.2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'elemlava': {
+      // gloeiend lavaklompje met een felle kern
+      ctx.fillStyle = '#3a1f12';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff6a1f';
+      ctx.beginPath(); ctx.arc(0, 0, 2.6, 0, Math.PI * 2); ctx.fill();
+      const glowLB = 0.6 + Math.sin(performance.now() / 150) * 0.3;
+      ctx.fillStyle = `rgba(255,204,0,${glowLB.toFixed(2)})`;
+      ctx.beginPath(); ctx.arc(0, 0, 1.2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
+    case 'elemcrystal': {
+      // ronddraaiende, facet-geslepen ijsdiamant
+      ctx.save();
+      ctx.translate(0, 0);
+      ctx.rotate(performance.now() / 120);
+      ctx.fillStyle = '#bdf3ff';
+      ctx.beginPath();
+      ctx.moveTo(0, -5); ctx.lineTo(4, 0); ctx.lineTo(0, 5); ctx.lineTo(-4, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+      break;
+    }
+    case 'elemthunder': {
+      // klein bliksemschichtje
+      const angT = Math.atan2(b.vy, b.vx);
+      ctx.save();
+      ctx.rotate(angT);
+      ctx.strokeStyle = '#fff066';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-6, 0); ctx.lineTo(-1.5, -2.5); ctx.lineTo(1, 1.5); ctx.lineTo(6, 0);
+      ctx.stroke();
+      ctx.restore();
+      break;
+    }
+    case 'elemtide': {
+      // diepblauwe druppel met een schuimrand
+      ctx.fillStyle = '#1a4d6b';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#eaffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.stroke();
+      break;
+    }
+    case 'comboearth': {
+      // gebarsten rotskogel die feller mos-groen gloeit naarmate de killstreak oploopt
+      const tEb = Math.min(1, player.comboStreak / 10);
+      ctx.rotate(performance.now() / 110);
+      ctx.fillStyle = lerpColor('#3a3025', '#2a1a10', tEb);
+      ctx.beginPath();
+      ctx.moveTo(-4, -2.5); ctx.lineTo(-1, -5); ctx.lineTo(4, -2); ctx.lineTo(4.5, 2); ctx.lineTo(0, 5); ctx.lineTo(-4.5, 1.5);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = lerpColor('#4a3a2a', '#7fff00', tEb);
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+      break;
+    }
+    case 'combowind': {
+      // windswirl die sneller en feller ronddraait naarmate de killstreak oploopt
+      const tWb = Math.min(1, player.comboStreak / 10);
+      ctx.save();
+      ctx.globalAlpha = 0.6 + tWb * 0.3;
+      ctx.strokeStyle = lerpColor('#8ea0a0', '#eaffff', tWb);
+      ctx.lineWidth = 1.5 + tWb;
+      const spinWb = performance.now() / (150 - tWb * 70);
+      ctx.beginPath(); ctx.arc(0, 0, 4, spinWb, spinWb + 4 + tWb); ctx.stroke();
+      ctx.restore();
+      break;
+    }
+    case 'combowater': {
+      // waterdruppel met een groeiende golfring naarmate de killstreak oploopt
+      const tWtb = Math.min(1, player.comboStreak / 10);
+      ctx.fillStyle = lerpColor('#2a3f4a', '#1a4d6b', tWtb);
+      ctx.beginPath(); ctx.arc(0, 0, 4.2, 0, Math.PI * 2); ctx.fill();
+      if (tWtb > 0.05) {
+        ctx.strokeStyle = lerpColor('#3a4f5a', '#eaffff', tWtb);
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.arc(0, 0, 5.5 + tWtb * 2, 0, Math.PI * 2); ctx.stroke();
+      }
+      break;
+    }
+    case 'combocrystal': {
+      // ronddraaiende kristalscherf die kleurwisselend gaat schitteren naarmate de killstreak oploopt
+      const tCb = Math.min(1, player.comboStreak / 10);
+      const hueB = (performance.now() / 12) % 360;
+      ctx.save();
+      ctx.rotate(performance.now() / 120);
+      ctx.fillStyle = tCb > 0.05 ? `hsl(${hueB}, 90%, 70%)` : '#4a4a55';
+      ctx.beginPath();
+      ctx.moveTo(0, -5); ctx.lineTo(4, 0); ctx.lineTo(0, 5); ctx.lineTo(-4, 0);
+      ctx.closePath(); ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
