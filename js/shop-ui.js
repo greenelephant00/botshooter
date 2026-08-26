@@ -1004,9 +1004,11 @@ function renderSkinsShop() {
     </div>`;
   };
   const killstreakSkins = SKINS.filter(s => s.killstreak);
-  const normalSkins = SKINS.filter(s => !s.killstreak);
+  const elementSkins = SKINS.filter(s => s.element);
+  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element);
   document.getElementById('skinsShopList').innerHTML =
     `<div class="shopSection"><h3>🔥 Kill Streak</h3>${killstreakSkins.map(renderSkinItem).join('')}</div>` +
+    `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>` +
     normalSkins.map(renderSkinItem).join('');
   SKINS.forEach(s => {
     const canvasEl = document.getElementById(`skinPreview_${s.id}`);

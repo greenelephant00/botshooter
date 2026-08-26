@@ -1450,7 +1450,7 @@ function drawPlayerBullet(b) {
     ctx.restore();
     return;
   }
-  switch (equippedSkin) {
+  switch (getSkin()) {
     case 'muncher': {
       // knabbelpelletje: geel bolletje met hapje eruit
       ctx.fillStyle = '#ffe066';
@@ -2762,6 +2762,153 @@ function drawPlayerSkin(c, skinId, r) {
     }
     c.fillStyle = lerpColor('#4a4a4a', '#e4ffb0', tNL);
     c.beginPath(); c.arc(0, 0, r * 0.2, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'elemfire') {
+    // Vuurwezen (Wereld 2-exclusief): gloeiend lichaam van gestold vuur
+    c.fillStyle = '#5c2410';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#ff5a1f';
+    c.beginPath(); c.arc(0, 0, r * 0.7, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#fff275';
+    c.beginPath(); c.arc(0, 0, r * 0.35, 0, Math.PI * 2); c.fill();
+    const flick = 0.7 + Math.sin(performance.now() / 90) * 0.3;
+    c.strokeStyle = `rgba(255,138,0,${flick.toFixed(2)})`;
+    c.lineWidth = 2;
+    c.beginPath(); c.arc(0, 0, r + 4, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemice') {
+    // IJswezen (Wereld 2-exclusief): kristallijnen lichaam van blauwig ijs
+    c.fillStyle = '#1c4a5c';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#9ef7ff';
+    c.beginPath();
+    c.moveTo(0, -r * 0.85); c.lineTo(r * 0.75, 0); c.lineTo(0, r * 0.85); c.lineTo(-r * 0.75, 0);
+    c.closePath(); c.fill();
+    c.strokeStyle = '#eaffff';
+    c.lineWidth = 1.5;
+    c.stroke();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemearth') {
+    // Aardwezen (Wereld 2-exclusief): zwaar rotslichaam met mosplekjes
+    c.fillStyle = '#5c3a1e';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#8a6a3a';
+    c.beginPath(); c.arc(-r * 0.2, -r * 0.15, r * 0.6, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#3a2410';
+    c.lineWidth = 2;
+    c.stroke();
+    c.fillStyle = '#3fa34d';
+    c.beginPath(); c.arc(r * 0.3, r * 0.3, r * 0.18, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemstorm') {
+    // Stormwezen (Wereld 2-exclusief): elektrisch lichaam met knetterende vonken
+    c.fillStyle = '#1c2b4a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#8ecbff';
+    c.lineWidth = 2;
+    const spinS = performance.now() / 130;
+    for (let i = 0; i < 4; i++) {
+      const a = spinS + (Math.PI * 2 / 4) * i;
+      c.beginPath();
+      c.moveTo(0, 0);
+      c.lineTo(Math.cos(a) * (r + 4), Math.sin(a) * (r + 4));
+      c.stroke();
+    }
+    c.fillStyle = '#fff066';
+    c.beginPath(); c.arc(0, 0, r * 0.4, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemwind') {
+    // Windwezen (Wereld 2-exclusief): ijl, doorschijnend lichaam van kolkende lucht
+    c.save();
+    c.globalAlpha = 0.55;
+    c.fillStyle = '#eaffff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.restore();
+    c.strokeStyle = '#c9f7ff';
+    c.lineWidth = 2;
+    const spinW = performance.now() / 130;
+    for (let i = 0; i < 3; i++) {
+      const a = spinW + (Math.PI * 2 / 3) * i;
+      c.beginPath(); c.arc(0, 0, r * 0.65, a, a + 1.8); c.stroke();
+    }
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemwater') {
+    // Waterwezen (Wereld 2-exclusief): druppelvormig, doorschijnend lichaam van kolkend water
+    c.fillStyle = 'rgba(42, 127, 186, 0.9)';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = 'rgba(234, 255, 255, 0.6)';
+    c.beginPath(); c.arc(-r * 0.3, -r * 0.3, r * 0.35, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#eaffff';
+    c.lineWidth = 1.5;
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemlava') {
+    // Lavawezen (Wereld 2-exclusief): donker gebarsten gesteente met gloeiende lava-aders
+    c.fillStyle = '#2a1108';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#ff6a1f';
+    c.lineWidth = 2;
+    c.beginPath();
+    c.moveTo(-r * 0.6, -r * 0.3); c.lineTo(-r * 0.1, r * 0.1); c.lineTo(-r * 0.4, r * 0.6);
+    c.moveTo(r * 0.5, -r * 0.5); c.lineTo(r * 0.1, 0); c.lineTo(r * 0.5, r * 0.4);
+    c.stroke();
+    const glowL = 0.6 + Math.sin(performance.now() / 200) * 0.3;
+    c.fillStyle = `rgba(255,204,0,${glowL.toFixed(2)})`;
+    c.beginPath(); c.arc(0, 0, r * 0.3, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemcrystal') {
+    // Kristalwezen (Wereld 2-exclusief): facet-geslepen edelsteen-lichaam
+    c.fillStyle = '#0f3d47';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#bdf3ff';
+    c.beginPath();
+    c.moveTo(0, -r); c.lineTo(r * 0.65, -r * 0.2); c.lineTo(r * 0.4, r * 0.85);
+    c.lineTo(-r * 0.4, r * 0.85); c.lineTo(-r * 0.65, -r * 0.2);
+    c.closePath(); c.fill();
+    c.strokeStyle = '#fff';
+    c.lineWidth = 1;
+    c.beginPath(); c.moveTo(0, -r); c.lineTo(0, r * 0.85); c.stroke();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemthunder') {
+    // Donderwezen (Wereld 2-exclusief): donkere onweerswolk met een felle bliksemschicht
+    c.fillStyle = '#2c2c4a';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#3a3a66';
+    c.beginPath(); c.arc(-r * 0.3, r * 0.2, r * 0.55, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(r * 0.35, r * 0.15, r * 0.5, 0, Math.PI * 2); c.fill();
+    const boltT = Math.sin(performance.now() / 150) > 0.3;
+    c.fillStyle = boltT ? '#fff066' : '#8a7a1f';
+    c.beginPath();
+    c.moveTo(-r * 0.1, -r * 0.6); c.lineTo(r * 0.15, -r * 0.1); c.lineTo(-r * 0.05, -r * 0.1);
+    c.lineTo(r * 0.2, r * 0.7); c.lineTo(-r * 0.05, r * 0.05); c.lineTo(r * 0.1, r * 0.05);
+    c.closePath(); c.fill();
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
+  } else if (skinId === 'elemtide') {
+    // Getijwezen (Wereld 2-exclusief): diepblauw lichaam van kolkende zee met witte schuimkoppen
+    c.fillStyle = '#1a4d6b';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.fillStyle = '#4a90c2';
+    c.beginPath(); c.arc(-r * 0.15, r * 0.25, r * 0.65, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#eaffff';
+    c.lineWidth = 2;
+    for (let i = 0; i < 2; i++) {
+      const yy = -r * 0.3 + i * r * 0.5;
+      c.beginPath();
+      c.moveTo(-r * 0.7, yy);
+      c.quadraticCurveTo(-r * 0.3, yy - r * 0.25, 0, yy);
+      c.quadraticCurveTo(r * 0.3, yy + r * 0.25, r * 0.7, yy);
+      c.stroke();
+    }
+    c.fillStyle = '#333';
+    c.fillRect(0, -4, 26, 8);
   } else {
     // standaard
     c.fillStyle = '#4cc9f0';
@@ -3093,7 +3240,7 @@ function drawPlayer() {
   else if (player.activeTransform === 'earthform') drawPlayerEarthForm(ctx, player.r);
   else if (player.activeTransform === 'windform') drawPlayerWindForm(ctx, player.r);
   else if (player.activeTransform === 'waterform') drawPlayerWaterForm(ctx, player.r);
-  else drawPlayerSkin(ctx, equippedSkin, player.r);
+  else drawPlayerSkin(ctx, getSkin(), player.r);
   ctx.restore();
 }
 

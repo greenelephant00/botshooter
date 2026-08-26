@@ -257,8 +257,26 @@ const SKINS = [
   { id: 'neonlime',   name: 'Neon Limoen',   price: 650,              desc: 'Zwarte kern met felgroene, pulserende neon-chevrons.' },
   { id: 'comboneonpink', name: 'Neon Roze Combo', price: 900,         desc: 'Een gedimde kern die een felle roze neonring en een groeiend kruispatroon krijgt naarmate je killstreak oploopt.', killstreak: true },
   { id: 'comboneoncyan', name: 'Neon Cyaan Combo', price: 900,        desc: 'Een gedimde kern die een felle cyaan neon-veelhoek krijgt, met steeds meer zijden naarmate je killstreak stijgt.', killstreak: true },
-  { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 900,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true }
+  { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 900,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true },
+  { id: 'elemfire',    name: 'Vuurwezen',    price: 700, desc: 'Wereld 2-exclusief. Gloeiend lichaam van gestold vuur met een flikkerende gloed. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemice',     name: 'IJswezen',     price: 700, desc: 'Wereld 2-exclusief. Kristallijnen lichaam van blauwig ijs. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemearth',   name: 'Aardwezen',    price: 700, desc: 'Wereld 2-exclusief. Zwaar rotslichaam met mosplekjes. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemstorm',   name: 'Stormwezen',   price: 700, desc: 'Wereld 2-exclusief. Elektrisch lichaam met knetterende vonken. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemwind',    name: 'Windwezen',    price: 700, desc: 'Wereld 2-exclusief. IJl, doorschijnend lichaam van kolkende lucht. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemwater',   name: 'Waterwezen',   price: 700, desc: 'Wereld 2-exclusief. Druppelvormig, doorschijnend lichaam van kolkend water. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemlava',    name: 'Lavawezen',    price: 750, desc: 'Wereld 2-exclusief. Donker gebarsten gesteente met gloeiende lava-aders. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemcrystal', name: 'Kristalwezen', price: 750, desc: 'Wereld 2-exclusief. Facet-geslepen edelsteen-lichaam dat schittert. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemthunder', name: 'Donderwezen',  price: 750, desc: 'Wereld 2-exclusief. Donkere onweerswolk met een felle bliksemschicht erdoorheen. Werkt alleen in Wereld 2.', element: true },
+  { id: 'elemtide',    name: 'Getijwezen',   price: 750, desc: 'Wereld 2-exclusief. Diepblauw lichaam van kolkende zee met witte schuimkoppen. Werkt alleen in Wereld 2.', element: true }
 ];
+
+// Elementen Skins werken alleen in Wereld 2 — val in Wereld 1 terug op de standaard-skin, net als wapens/pantsers/transformaties
+function getSkin() {
+  if (skinPracticeActive) return equippedSkin; // tijdens oefenen altijd tonen, ongeacht wereld
+  const s = SKINS.find(x => x.id === equippedSkin);
+  if (s && s.element && currentWorld !== 2) return 'default';
+  return equippedSkin;
+}
 
 // ---- Wereld 2: Elementen ----
 let world2Unlocked = localStorage.getItem('botShooterWorld2Unlocked') === 'true';
