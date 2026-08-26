@@ -940,7 +940,7 @@ function update() {
 
   // Explosies (bomber): korte uitdijende schokgolf
   explosions = explosions.filter(e => now0 - e.born < 400);
-  botDeathAnimations = botDeathAnimations.filter(e => now0 - e.born < DEATH_ANIM_DURATION);
+  botDeathAnimations = botDeathAnimations.filter(e => now0 - e.born < (e.duration || DEATH_ANIM_DURATION));
   telegraphs = telegraphs.filter(t => now0 < t.warnUntil);
   lightningBolts = lightningBolts.filter(l => now0 - l.born < 150);
   fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);

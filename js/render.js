@@ -5060,10 +5060,13 @@ function draw() {
   explosions.forEach(drawExplosion);
   botDeathAnimations.forEach(e => {
     const age = performance.now() - e.born;
-    if (age >= DEATH_ANIM_DURATION) return;
+    const dur = e.duration || DEATH_ANIM_DURATION;
+    if (age >= dur) return;
+    // Kortere kill-effecten spelen versneld af zodat ze alle fases nog volledig doorlopen binnen hun eigen (kortere) duur
+    const scaledAge = age * (DEATH_ANIM_DURATION / dur);
     ctx.save();
     ctx.translate(e.x, e.y);
-    drawDeathAnimation(ctx, e.type, age, e.r);
+    drawDeathAnimation(ctx, e.type, scaledAge, e.r);
     ctx.restore();
   });
   lightningBolts.forEach(drawLightningBolt);

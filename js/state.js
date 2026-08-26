@@ -8,10 +8,13 @@ let explosions = [];
 let botDeathAnimations = [];
 // Elke prestatie-exclusieve skin heeft zijn eigen unieke death animation voor bots die je ermee killt
 const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'novacollapse', neonultra: 'neonoverload' };
+// Sommige exclusieve kill-effecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
+const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
 function maybeTriggerExclusiveSkinDeathAnim(bot) {
   const animType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
   if (!animType) return;
-  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: animType, born: performance.now() });
+  const duration = EXCLUSIVE_SKIN_DEATH_ANIM_DURATION[animType] || DEATH_ANIM_DURATION;
+  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: animType, duration, born: performance.now() });
 }
 let iceGrenades = [];
 let cryoGrenadeLastUsed = 0;
