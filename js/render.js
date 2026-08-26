@@ -3589,17 +3589,132 @@ function drawPlayer() {
   ctx.restore();
 }
 
-function drawPlayerWeapon(r) {
-  // Generieke wapen-loop die bij elke personage-skin zichtbaar is, wijzend in de richting van je muis
-  ctx.save();
-  ctx.fillStyle = '#1a1a1a';
+function drawWeaponGrip(r, color) {
+  ctx.fillStyle = color || '#1a1a1a';
   ctx.fillRect(-3, r * 0.35, 9, r * 0.55);
-  ctx.fillStyle = '#2a2a2a';
-  ctx.fillRect(r * 0.15, -4, r * 1.15, 8);
-  ctx.fillStyle = '#4a4a4a';
-  ctx.fillRect(r * 0.15, -4, r * 1.15, 2.5);
-  ctx.fillStyle = '#111';
-  ctx.fillRect(r * 1.1, -2.5, 5, 5);
+}
+
+function drawPlayerWeapon(r) {
+  // Wapen-loop die bij elke personage-skin zichtbaar is, wijzend in de richting van je muis.
+  // Elk speciaal wapen heeft een eigen vorm; heb je er een wapenskin voor uitgerust, dan wordt diens kleur gebruikt.
+  ctx.save();
+  const weapon = getWeapon();
+  const skinId = equippedWeaponSkins[weapon.id];
+  const ws = skinId ? WEAPON_SKINS.find(w => w.id === skinId) : null;
+  const accent = ws ? ws.color : null;
+  if (weapon.id === 'cryorifle') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#3a3a3a';
+    ctx.fillRect(r * 0.1, -2.5, r * 1.5, 5);
+    ctx.fillStyle = accent || '#9ef7ff';
+    ctx.beginPath();
+    ctx.moveTo(r * 1.6, 0); ctx.lineTo(r * 1.4, -5); ctx.lineTo(r * 1.9, 0); ctx.lineTo(r * 1.4, 5);
+    ctx.closePath(); ctx.fill();
+  } else if (weapon.id === 'vampcannon') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#3a1010';
+    ctx.fillRect(r * 0.15, -6, r * 0.9, 12);
+    ctx.fillStyle = accent || '#ff0044';
+    ctx.beginPath(); ctx.arc(r * 1.05, 0, 6, 0, Math.PI * 2); ctx.fill();
+  } else if (weapon.id === 'voltcaster') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#2a2a3a';
+    ctx.fillRect(r * 0.15, -3, r, 6);
+    ctx.strokeStyle = accent || '#b026ff';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(r * 1.1, 0, 5, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.arc(r * 0.85, 0, 5, 0, Math.PI * 2); ctx.stroke();
+  } else if (weapon.id === 'singularity') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#2a1a3a';
+    ctx.fillRect(r * 0.15, -4, r * 0.9, 8);
+    ctx.fillStyle = accent || '#4b0082';
+    ctx.beginPath(); ctx.arc(r * 1.1, 0, 7, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(r * 1.1, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+  } else if (weapon.id === 'stickybomb') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = accent || '#2f6b1f';
+    ctx.fillRect(r * 0.15, -7, r * 0.7, 14);
+    ctx.fillStyle = '#1a3310';
+    ctx.beginPath(); ctx.arc(r * 0.85, 0, 7, 0, Math.PI * 2); ctx.fill();
+  } else if (weapon.id === 'toxiccannon') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#2a3a1a';
+    ctx.fillRect(r * 0.15, -4, r * 1.1, 8);
+    ctx.fillStyle = accent || '#7fff00';
+    ctx.beginPath(); ctx.ellipse(r * 0.55, -8, 6, 5, 0, 0, Math.PI * 2); ctx.fill();
+  } else if (weapon.id === 'executioner') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#3a2a10';
+    ctx.fillRect(r * 0.15, -3, r * 1.4, 6);
+    ctx.fillStyle = accent || '#ffd700';
+    ctx.fillRect(r * 0.6, -8, 12, 5);
+  } else if (weapon.id === 'momentum') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#3a2a1a';
+    ctx.beginPath();
+    ctx.moveTo(r * 0.15, -4); ctx.lineTo(r * 1.3, -2); ctx.lineTo(r * 1.5, 0); ctx.lineTo(r * 1.3, 2); ctx.lineTo(r * 0.15, 4);
+    ctx.closePath(); ctx.fill();
+    ctx.fillStyle = accent || '#ff6600';
+    ctx.fillRect(r * 0.2, -1.5, r * 0.9, 3);
+  } else if (weapon.id === 'magmacannon') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#3a1f12';
+    ctx.fillRect(r * 0.15, -7, r, 14);
+    ctx.fillStyle = accent || '#ff6a1f';
+    ctx.fillRect(r * 0.3, -5, 4, 3); ctx.fillRect(r * 0.3, 2, 4, 3);
+    ctx.beginPath(); ctx.arc(r * 1.15, 0, 5, 0, Math.PI * 2); ctx.fill();
+  } else if (weapon.id === 'hurricanestaff') {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-2, r * 0.3, 5, r * 0.5);
+    ctx.fillStyle = '#4a3a5a';
+    ctx.fillRect(-1.5, -2, r * 1.8, 4);
+    ctx.strokeStyle = accent || '#8a2be2';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(r * 1.8, 0, 6, 0.3, Math.PI * 1.8); ctx.stroke();
+  } else if (weapon.id === 'frostlance') {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-2, r * 0.3, 5, r * 0.5);
+    ctx.fillStyle = '#5a5a6a';
+    ctx.fillRect(-1.5, -1.5, r * 1.9, 3);
+    ctx.fillStyle = accent || '#eaffff';
+    ctx.beginPath(); ctx.moveTo(r * 1.9, 0); ctx.lineTo(r * 1.6, -4); ctx.lineTo(r * 1.6, 4); ctx.closePath(); ctx.fill();
+  } else if (weapon.id === 'earthhammer') {
+    ctx.fillStyle = '#1a1a1a';
+    ctx.fillRect(-2, r * 0.3, 5, r * 0.5);
+    ctx.fillStyle = '#5c3a1e';
+    ctx.fillRect(-1.5, -1.5, r * 1.4, 3);
+    ctx.fillStyle = accent || '#8a6a3a';
+    ctx.fillRect(r * 1.2, -8, 10, 16);
+  } else if (weapon.id === 'rootrifle') {
+    drawWeaponGrip(r, '#3a2a1a');
+    ctx.fillStyle = '#4a2f18';
+    ctx.fillRect(r * 0.15, -3, r * 1.2, 6);
+    ctx.strokeStyle = accent || '#3fa34d';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(r * 0.3, -3); ctx.lineTo(r * 0.6, 3);
+    ctx.moveTo(r * 0.8, -3); ctx.lineTo(r * 1.1, 3);
+    ctx.stroke();
+  } else if (weapon.id === 'coreblaster') {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(r * 0.15, -3.5, r * 1.1, 7);
+    const hue = (performance.now() / 10) % 360;
+    ctx.fillStyle = accent || `hsl(${hue}, 90%, 65%)`;
+    ctx.beginPath();
+    ctx.moveTo(r * 1.25, 0); ctx.lineTo(r * 1.05, -5); ctx.lineTo(r * 1.5, 0); ctx.lineTo(r * 1.05, 5);
+    ctx.closePath(); ctx.fill();
+  } else {
+    drawWeaponGrip(r, '#1a1a1a');
+    ctx.fillStyle = '#2a2a2a';
+    ctx.fillRect(r * 0.15, -4, r * 1.15, 8);
+    ctx.fillStyle = '#4a4a4a';
+    ctx.fillRect(r * 0.15, -4, r * 1.15, 2.5);
+    ctx.fillStyle = '#111';
+    ctx.fillRect(r * 1.1, -2.5, 5, 5);
+  }
   ctx.restore();
 }
 
