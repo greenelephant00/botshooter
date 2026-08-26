@@ -565,6 +565,34 @@ const EXTRAHP2_PER_LEVEL = 25;
 function w2Lvl(lvl) { return currentWorld === 2 ? lvl : 0; }
 function w2Flag(flag) { return currentWorld === 2 ? flag : false; }
 
+// ---- Nog 10 Wereld 2-exclusieve permanente upgrades: geen effect in Wereld 1 ----
+let lvl2LuckyDrop = Number(localStorage.getItem('botShooterLvl2LuckyDrop')) || 0;
+const LUCKYDROP2_LEVELS = [600, 900, 1300];
+const LUCKYDROP2_INTERVALS = [3600, 2700, 1800];
+let lvl2PiercingRounds = Number(localStorage.getItem('botShooterLvl2PiercingRounds')) || 0;
+const PIERCINGROUNDS2_LEVELS = [800, 1200, 1650];
+let lvl2CoinRain = Number(localStorage.getItem('botShooterLvl2CoinRain')) || 0;
+const COINRAIN2_LEVELS = [650, 950, 1350, 1850];
+const COINRAIN2_BONUSES = [2, 4, 5, 6];
+let lvl2SecondWind = Number(localStorage.getItem('botShooterLvl2SecondWind')) || 0;
+const SECONDWIND2_LEVELS = [1050, 1550, 2150];
+const SECONDWIND2_HEALS = [20, 35, 50];
+let lvl2Sharpshooter = Number(localStorage.getItem('botShooterLvl2Sharpshooter')) || 0;
+const SHARPSHOOTER2_LEVELS = [700, 1050, 1450];
+const SHARPSHOOTER2_BONUSES = [0.15, 0.25, 0.35];
+let lvl2FlyingStart = Number(localStorage.getItem('botShooterLvl2FlyingStart')) || 0;
+const FLYINGSTART2_LEVELS = [550, 850, 1200];
+const FLYINGSTART2_DURATIONS = [3000, 5000, 7000];
+let lvl2CriticalHit = Number(localStorage.getItem('botShooterLvl2CriticalHit')) || 0;
+const CRITICALHIT2_LEVELS = [650, 1000, 1400];
+const CRITICALHIT2_CHANCES = [0.15, 0.25, 0.35];
+let lvl2SplinterShot = Number(localStorage.getItem('botShooterLvl2SplinterShot')) || 0;
+const SPLINTERSHOT2_LEVELS = [750, 1150, 1600];
+let lvl2MultiShield = Number(localStorage.getItem('botShooterLvl2MultiShield')) || 0;
+const MULTISHIELD2_LEVELS = [1050, 1550, 2150];
+let lvl2Overkill = Number(localStorage.getItem('botShooterLvl2Overkill')) || 0;
+const OVERKILL2_LEVELS = [900, 1350, 1950];
+
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
 let powerupLevels = JSON.parse(localStorage.getItem('botShooterPowerupLevels') || '{}'); // id -> huidig niveau (0-3)
 const POWERUP_LEVELS = {

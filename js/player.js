@@ -123,7 +123,9 @@ function resetPlayer() {
   player.slideVY = 0;
   player.secondWindUsed = false;
   const effFlyingStart = w1Lvl(lvlFlyingStart);
+  const effFlyingStart2 = w2Lvl(lvl2FlyingStart);
   if (effFlyingStart > 0) player.shieldUntil = performance.now() + FLYING_START_DURATIONS[effFlyingStart - 1];
+  else if (effFlyingStart2 > 0) player.shieldUntil = performance.now() + FLYINGSTART2_DURATIONS[effFlyingStart2 - 1];
 }
 
 const BOT_TYPES = [

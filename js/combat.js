@@ -40,15 +40,17 @@ function shoot() {
   const effBloodlust = w1Lvl(lvlBloodlust);
   const bloodlustBonus = effBloodlust > 0 && player.killStreak > 0 ? 1 + BLOODLUST_BONUSES[effBloodlust - 1] * player.killStreak : 1;
   const effCriticalHit = w1Lvl(lvlCriticalHit);
-  const critChance = effCriticalHit > 0 ? CRITICAL_HIT_CHANCES[effCriticalHit - 1] : 0;
+  const effCriticalHit2 = w2Lvl(lvl2CriticalHit);
+  const critChance = effCriticalHit > 0 ? CRITICAL_HIT_CHANCES[effCriticalHit - 1] : (effCriticalHit2 > 0 ? CRITICALHIT2_CHANCES[effCriticalHit2 - 1] : 0);
   const isCrit = Math.random() < critChance;
   const critMult = isCrit ? 2 : 1;
   const curseMult = now < player.curseUntil ? 0.5 : 1;
   const elementalMult = weapon.effect === 'igniteHit' ? getArmorStats().fireDmgMult : weapon.effect === 'shatterHit' ? getArmorStats().iceDmgMult : 1;
   const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult * elementalMult;
   const effSharpshooter = w1Lvl(lvlSharpshooter);
-  const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (effSharpshooter > 0 ? SHARPSHOOTER_BONUSES[effSharpshooter - 1] : 0));
-  const extraPierce = w1Lvl(lvlPiercingRounds);
+  const effSharpshooter2 = w2Lvl(lvl2Sharpshooter);
+  const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (effSharpshooter > 0 ? SHARPSHOOTER_BONUSES[effSharpshooter - 1] : 0) + (effSharpshooter2 > 0 ? SHARPSHOOTER2_BONUSES[effSharpshooter2 - 1] : 0));
+  const extraPierce = w1Lvl(lvlPiercingRounds) + w2Lvl(lvl2PiercingRounds);
 
   let pellets = weapon.pellets;
   let spread = weapon.spread || 0.18;
@@ -638,8 +640,9 @@ function damageBotSimple(bot, dmg, color) {
 
     // Splinter-schoten bij kills
     const effSplinterShot = w1Lvl(lvlSplinterShot);
-    if (effSplinterShot > 0) {
-      const splinterCount = [3, 5, 7][effSplinterShot - 1];
+    const effSplinterShot2 = w2Lvl(lvl2SplinterShot);
+    if (effSplinterShot > 0 || effSplinterShot2 > 0) {
+      const splinterCount = effSplinterShot > 0 ? [3, 5, 7][effSplinterShot - 1] : [3, 5, 7][effSplinterShot2 - 1];
       for (let i = 0; i < splinterCount; i++) {
         const angle = (Math.PI * 2 / splinterCount) * i;
         bullets.push({
@@ -661,9 +664,10 @@ function damageBotSimple(bot, dmg, color) {
 
     // Overkill-explosies
     const effOverkill = w1Lvl(lvlOverkill);
-    if (effOverkill > 0 && dmg > bot.maxHp * 0.2) {
+    const effOverkill2 = w2Lvl(lvl2Overkill);
+    if ((effOverkill > 0 || effOverkill2 > 0) && dmg > bot.maxHp * 0.2) {
       const overkillDmg = dmg - bot.maxHp;
-      const radius = 60 + effOverkill * 30;
+      const radius = 60 + (effOverkill > 0 ? effOverkill : effOverkill2) * 30;
       bots.forEach(other => {
         if (other === bot || other.dead) return;
         const dd = Math.hypot(bot.x - other.x, bot.y - other.y);

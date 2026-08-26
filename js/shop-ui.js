@@ -36,6 +36,16 @@ function saveShopState() {
   localStorage.setItem('botShooterLvl2Vengeance', lvl2Vengeance);
   localStorage.setItem('botShooterLvl2IronSkin', lvl2IronSkin);
   localStorage.setItem('botShooterLvl2ExtraHp', lvl2ExtraHp);
+  localStorage.setItem('botShooterLvl2LuckyDrop', lvl2LuckyDrop);
+  localStorage.setItem('botShooterLvl2PiercingRounds', lvl2PiercingRounds);
+  localStorage.setItem('botShooterLvl2CoinRain', lvl2CoinRain);
+  localStorage.setItem('botShooterLvl2SecondWind', lvl2SecondWind);
+  localStorage.setItem('botShooterLvl2Sharpshooter', lvl2Sharpshooter);
+  localStorage.setItem('botShooterLvl2FlyingStart', lvl2FlyingStart);
+  localStorage.setItem('botShooterLvl2CriticalHit', lvl2CriticalHit);
+  localStorage.setItem('botShooterLvl2SplinterShot', lvl2SplinterShot);
+  localStorage.setItem('botShooterLvl2MultiShield', lvl2MultiShield);
+  localStorage.setItem('botShooterLvl2Overkill', lvl2Overkill);
   localStorage.setItem('botShooterPowerupLevels', JSON.stringify(powerupLevels));
   localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
   localStorage.setItem('botShooterEquippedSkin', skinPracticeActive ? previousEquippedSkin : equippedSkin);
@@ -1407,6 +1417,106 @@ function buyExtraHp2() {
 }
 window.buyExtraHp2 = buyExtraHp2;
 
+function buyLuckyDrop2() {
+  const price = LUCKYDROP2_LEVELS[lvl2LuckyDrop];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2LuckyDrop++;
+  saveShopState();
+  renderShop();
+}
+window.buyLuckyDrop2 = buyLuckyDrop2;
+
+function buyPiercingRounds2() {
+  const price = PIERCINGROUNDS2_LEVELS[lvl2PiercingRounds];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2PiercingRounds++;
+  saveShopState();
+  renderShop();
+}
+window.buyPiercingRounds2 = buyPiercingRounds2;
+
+function buyCoinRain2() {
+  const price = COINRAIN2_LEVELS[lvl2CoinRain];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2CoinRain++;
+  saveShopState();
+  renderShop();
+}
+window.buyCoinRain2 = buyCoinRain2;
+
+function buySecondWind2() {
+  const price = SECONDWIND2_LEVELS[lvl2SecondWind];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2SecondWind++;
+  saveShopState();
+  renderShop();
+}
+window.buySecondWind2 = buySecondWind2;
+
+function buySharpshooter2() {
+  const price = SHARPSHOOTER2_LEVELS[lvl2Sharpshooter];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2Sharpshooter++;
+  saveShopState();
+  renderShop();
+}
+window.buySharpshooter2 = buySharpshooter2;
+
+function buyFlyingStart2() {
+  const price = FLYINGSTART2_LEVELS[lvl2FlyingStart];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2FlyingStart++;
+  saveShopState();
+  renderShop();
+}
+window.buyFlyingStart2 = buyFlyingStart2;
+
+function buyCriticalHit2() {
+  const price = CRITICALHIT2_LEVELS[lvl2CriticalHit];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2CriticalHit++;
+  saveShopState();
+  renderShop();
+}
+window.buyCriticalHit2 = buyCriticalHit2;
+
+function buySplinterShot2() {
+  const price = SPLINTERSHOT2_LEVELS[lvl2SplinterShot];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2SplinterShot++;
+  saveShopState();
+  renderShop();
+}
+window.buySplinterShot2 = buySplinterShot2;
+
+function buyMultiShield2() {
+  const price = MULTISHIELD2_LEVELS[lvl2MultiShield];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2MultiShield++;
+  saveShopState();
+  renderShop();
+}
+window.buyMultiShield2 = buyMultiShield2;
+
+function buyOverkill2() {
+  const price = OVERKILL2_LEVELS[lvl2Overkill];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2Overkill++;
+  saveShopState();
+  renderShop();
+}
+window.buyOverkill2 = buyOverkill2;
+
 function weaponStatsLine(w) {
   const cooldownMs = shootCooldown * w.cooldownMult;
   const shotsPerSec = 1000 / cooldownMs;
@@ -1472,7 +1582,17 @@ function renderShop() {
       upgradeItemHtml('Elementreanimatie', `Wereld 2-only, werkt hetzelfde als Reanimatie in Wereld 1. Eenmalig te koop: de eerste keer dat je in Wereld 2 dodelijke schade zou oplopen, kom je direct terug tot leven met een deel van je HP, in plaats van dat het potje eindigt. Overleef één keer per leven en kom terug met ${Math.round(REVIVE2_HEAL_PCT*100)}% van je max HP.`, REVIVE2_PRICE, hasRevive2, 'buyRevive2'),
       leveledUpgradeItemHtml('Elementaire Wraak', `Wereld 2-only, werkt hetzelfde als Schokgolf in Wereld 1. Bij elke bot die je doodt in Wereld 2 ontstaat er een elementale schokgolf die extra schade doet aan andere bots binnen een bepaalde straal. Niveau 1: radius ${VENGEANCE_RADII[0]}px, ${VENGEANCE_DMGS[0]} schade. Niveau 2: radius ${VENGEANCE_RADII[1]}px, ${VENGEANCE_DMGS[1]} schade. Niveau 3: radius ${VENGEANCE_RADII[2]}px, ${VENGEANCE_DMGS[2]} schade.`, VENGEANCE_LEVELS, lvl2Vengeance, 'buyVengeance'),
       leveledUpgradeItemHtml('IJzeren Elementhuid', `Wereld 2-only, werkt hetzelfde als IJzeren Huid in Wereld 1. Vermindert permanent alle inkomende schade in Wereld 2 met een vast percentage, bovenop de schadevermindering van je pantser. Niveau 1: -${Math.round(IRONSKIN2_REDUCTIONS[0]*100)}% schade. Niveau 2: -${Math.round(IRONSKIN2_REDUCTIONS[1]*100)}% schade. Niveau 3: -${Math.round(IRONSKIN2_REDUCTIONS[2]*100)}% schade.`, IRONSKIN2_LEVELS, lvl2IronSkin, 'buyIronSkin2'),
-      leveledUpgradeItemHtml('Elementaire Conditie', `Wereld 2-only, werkt hetzelfde als Extra Conditie in Wereld 1. Verhoogt permanent je maximale HP in Wereld 2, boven op wat je pantser al geeft. Niveau 1: +${EXTRAHP2_PER_LEVEL} max HP. Niveau 2: +${EXTRAHP2_PER_LEVEL*2}. Niveau 3: +${EXTRAHP2_PER_LEVEL*3}. Niveau 4: +${EXTRAHP2_PER_LEVEL*4}. Niveau 5: +${EXTRAHP2_PER_LEVEL*5}.`, EXTRAHP2_LEVELS, lvl2ExtraHp, 'buyExtraHp2')
+      leveledUpgradeItemHtml('Elementaire Conditie', `Wereld 2-only, werkt hetzelfde als Extra Conditie in Wereld 1. Verhoogt permanent je maximale HP in Wereld 2, boven op wat je pantser al geeft. Niveau 1: +${EXTRAHP2_PER_LEVEL} max HP. Niveau 2: +${EXTRAHP2_PER_LEVEL*2}. Niveau 3: +${EXTRAHP2_PER_LEVEL*3}. Niveau 4: +${EXTRAHP2_PER_LEVEL*4}. Niveau 5: +${EXTRAHP2_PER_LEVEL*5}.`, EXTRAHP2_LEVELS, lvl2ExtraHp, 'buyExtraHp2'),
+      leveledUpgradeItemHtml('Elementgeluk', `Wereld 2-only, werkt hetzelfde als Geluksvinder in Wereld 1. Verkort het interval waarop nieuwe powerups op het veld verschijnen in Wereld 2. Basis interval: 6s. Niveau 1: interval ${(LUCKYDROP2_INTERVALS[0]/1000).toFixed(1)}s. Niveau 2: interval ${(LUCKYDROP2_INTERVALS[1]/1000).toFixed(1)}s. Niveau 3: interval ${(LUCKYDROP2_INTERVALS[2]/1000).toFixed(1)}s.`, LUCKYDROP2_LEVELS, lvl2LuckyDrop, 'buyLuckyDrop2'),
+      leveledUpgradeItemHtml('Element-doorboring', 'Wereld 2-only, werkt hetzelfde als Doorborende Kogels in Wereld 1. Laat je kogels in Wereld 2 dwars door extra bots heen vliegen in plaats van te stoppen bij de eerste treffer. Niveau 1: +1 extra bot doorboord. Niveau 2: +2 extra bots doorboord. Niveau 3: +3 extra bots doorboord.', PIERCINGROUNDS2_LEVELS, lvl2PiercingRounds, 'buyPiercingRounds2'),
+      leveledUpgradeItemHtml('Elementregen', `Wereld 2-only, werkt hetzelfde als Muntenregen in Wereld 1. Geeft telkens als je in Wereld 2 een muntje oppakt extra bonus-munten bovenop de normale waarde. Niveau 1: +${COINRAIN2_BONUSES[0]} munten. Niveau 2: +${COINRAIN2_BONUSES[1]} munten. Niveau 3: +${COINRAIN2_BONUSES[2]} munten. Niveau 4: +${COINRAIN2_BONUSES[3]} munten.`, COINRAIN2_LEVELS, lvl2CoinRain, 'buyCoinRain2'),
+      leveledUpgradeItemHtml('Elementwil', `Wereld 2-only, werkt hetzelfde als IJzeren Wil in Wereld 1. Eenmalig per leven: zodra je HP in Wereld 2 voor het eerst onder de 50% zakt, geneest je automatisch een vaste hoeveelheid HP. Niveau 1: geneest ${SECONDWIND2_HEALS[0]} HP. Niveau 2: geneest ${SECONDWIND2_HEALS[1]} HP. Niveau 3: geneest ${SECONDWIND2_HEALS[2]} HP.`, SECONDWIND2_LEVELS, lvl2SecondWind, 'buySecondWind2'),
+      leveledUpgradeItemHtml('Elementscherpschutter', `Wereld 2-only, werkt hetzelfde als Scherpschutter in Wereld 1. Verhoogt de vliegsnelheid van je kogels in Wereld 2. Niveau 1: +${Math.round(SHARPSHOOTER2_BONUSES[0]*100)}% kogelsnelheid. Niveau 2: +${Math.round(SHARPSHOOTER2_BONUSES[1]*100)}% kogelsnelheid. Niveau 3: +${Math.round(SHARPSHOOTER2_BONUSES[2]*100)}% kogelsnelheid.`, SHARPSHOOTER2_LEVELS, lvl2Sharpshooter, 'buySharpshooter2'),
+      leveledUpgradeItemHtml('Elementaire Start', `Wereld 2-only, werkt hetzelfde als Vliegende Start in Wereld 1. Je begint elk potje in Wereld 2 automatisch met een tijdelijk schild dat alle inkomende schade blokkeert. Niveau 1: ${FLYINGSTART2_DURATIONS[0]/1000}s schild. Niveau 2: ${FLYINGSTART2_DURATIONS[1]/1000}s schild. Niveau 3: ${FLYINGSTART2_DURATIONS[2]/1000}s schild.`, FLYINGSTART2_LEVELS, lvl2FlyingStart, 'buyFlyingStart2'),
+      leveledUpgradeItemHtml('Elementaire Kritiek', `Wereld 2-only, werkt hetzelfde als Kritieke Hit in Wereld 1. Geeft elk schot in Wereld 2 een kans om dubbele schade te doen. Niveau 1: ${Math.round(CRITICALHIT2_CHANCES[0]*100)}% kans op 2x schade. Niveau 2: ${Math.round(CRITICALHIT2_CHANCES[1]*100)}% kans. Niveau 3: ${Math.round(CRITICALHIT2_CHANCES[2]*100)}% kans.`, CRITICALHIT2_LEVELS, lvl2CriticalHit, 'buyCriticalHit2'),
+      leveledUpgradeItemHtml('Elementsplinters', 'Wereld 2-only, werkt hetzelfde als Splinter-schoten in Wereld 1. Bij elke bot die je doodt in Wereld 2 schieten er automatisch extra splinter-kogels in alle richtingen om die bot heen. Niveau 1: Bij elke kill schieten 3 splinters. Niveau 2: 5 splinters. Niveau 3: 7 splinters.', SPLINTERSHOT2_LEVELS, lvl2SplinterShot, 'buySplinterShot2'),
+      leveledUpgradeItemHtml('Elementveelvoud', 'Wereld 2-only, werkt hetzelfde als Multi-schild in Wereld 1. Laat Schild-powerups in Wereld 2 stapelen in plaats van elkaar te overschrijven. Niveau 1: Schilden stapelen (2 tegelijk). Niveau 2: 3 tegelijk. Niveau 3: 4 tegelijk.', MULTISHIELD2_LEVELS, lvl2MultiShield, 'buyMultiShield2'),
+      leveledUpgradeItemHtml('Elementoverkill', 'Wereld 2-only, werkt hetzelfde als Overkill in Wereld 1. Als een schot in Wereld 2 veel meer schade doet dan nodig was om een bot te doden, ontstaat er een kleine explosie die het overschot doorgeeft aan bots in de buurt. Niveau 1: Overkill-schade veroorzaakt mini-explosies. Niveau 2: Groter + meer schade. Niveau 3: Nog groter radius.', OVERKILL2_LEVELS, lvl2Overkill, 'buyOverkill2')
     ].join('');
     const section2 = document.getElementById('shopArmor2Section');
     if (section2) section2.style.display = 'none';

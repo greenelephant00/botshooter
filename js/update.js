@@ -1144,7 +1144,8 @@ function update() {
 
   // Powerups: spawn periodically (niet tijdens oefenen)
   const effLuckyDrop = w1Lvl(lvlLuckyDrop);
-  const powerupInterval = effLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[effLuckyDrop - 1] : 6000;
+  const effLuckyDrop2 = w2Lvl(lvl2LuckyDrop);
+  const powerupInterval = effLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[effLuckyDrop - 1] : (effLuckyDrop2 > 0 ? LUCKYDROP2_INTERVALS[effLuckyDrop2 - 1] : 6000);
   if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
@@ -1175,7 +1176,8 @@ function update() {
         spawnParticles(p.x, p.y, '#ffd60a');
       } else if (p.type === 'shield') {
         const effMultiShield = w1Lvl(lvlMultiShield);
-        const maxShields = effMultiShield > 0 ? [2, 3, 4][effMultiShield - 1] : 1;
+        const effMultiShield2 = w2Lvl(lvl2MultiShield);
+        const maxShields = effMultiShield > 0 ? [2, 3, 4][effMultiShield - 1] : (effMultiShield2 > 0 ? [2, 3, 4][effMultiShield2 - 1] : 1);
         const newShieldUntil = now + info.durations[lvl] * boostDurMult;
         if (now < player.shieldUntil && maxShields > 1) {
           player.shieldUntil = Math.max(player.shieldUntil, newShieldUntil);
@@ -1288,7 +1290,8 @@ function update() {
     if (d < player.r + c.r + pickupBonus) {
       c.collected = true;
       const effCoinRain = w1Lvl(lvlCoinRain);
-      coins += Math.round(c.value * (getArmorStats().coinMult || 1)) + (effCoinRain > 0 ? COIN_RAIN_BONUSES[effCoinRain - 1] : 0);
+      const effCoinRain2 = w2Lvl(lvl2CoinRain);
+      coins += Math.round(c.value * (getArmorStats().coinMult || 1)) + (effCoinRain > 0 ? COIN_RAIN_BONUSES[effCoinRain - 1] : 0) + (effCoinRain2 > 0 ? COINRAIN2_BONUSES[effCoinRain2 - 1] : 0);
       saveShopState();
       spawnParticles(c.x, c.y, '#ffd60a');
     }
@@ -1423,9 +1426,11 @@ function update() {
   }
 
   const effSecondWind = w1Lvl(lvlSecondWind);
-  if (effSecondWind > 0 && !player.secondWindUsed && player.hp > 0 && player.hp / player.maxHp < 0.5) {
+  const effSecondWind2 = w2Lvl(lvl2SecondWind);
+  if ((effSecondWind > 0 || effSecondWind2 > 0) && !player.secondWindUsed && player.hp > 0 && player.hp / player.maxHp < 0.5) {
     player.secondWindUsed = true;
-    player.hp = Math.min(player.maxHp, player.hp + SECOND_WIND_HEALS[effSecondWind - 1]);
+    const healAmount = effSecondWind > 0 ? SECOND_WIND_HEALS[effSecondWind - 1] : SECONDWIND2_HEALS[effSecondWind2 - 1];
+    player.hp = Math.min(player.maxHp, player.hp + healAmount);
     spawnParticles(player.x, player.y, '#4cd964');
     spawnParticles(player.x, player.y, '#ffffff');
   }
