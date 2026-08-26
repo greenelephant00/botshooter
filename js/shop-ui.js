@@ -924,10 +924,28 @@ function renderMenuBgShop() {
       : owned
         ? `<button class="equip" onclick="equipMenuBackground('${b.id}')">Uitrusten</button>`
         : `<button class="buy" onclick="buyMenuBackground('${b.id}')" ${coins < b.price ? 'disabled' : ''}>Koop · 🪙${b.price}</button>`;
-    return `<div class="shopItem"><div class="info"><div class="name">${b.name}</div><div class="desc">${b.desc}</div></div>${btn}</div>`;
+    return `<div class="shopItem">
+      <canvas id="menuBgPreview_${b.id}" width="90" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
+      <div class="info"><div class="name">${b.name}</div><div class="desc">${b.desc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewMenuBackground('${b.id}')">👁 Bekijk</button></div>
+    </div>`;
   }).join('');
 }
 window.renderMenuBgShop = renderMenuBgShop;
+
+let menuBgPreviewRAF = null;
+function previewMenuBackground(id) {
+  if (menuBgPreviewRAF) cancelAnimationFrame(menuBgPreviewRAF);
+  const canvasEl = document.getElementById(`menuBgPreview_${id}`);
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  function frame() {
+    drawMenuBackground(canvasEl, c, id, 'preview');
+    menuBgPreviewRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+window.previewMenuBackground = previewMenuBackground;
 
 function openMenuBgShop() {
   document.getElementById(menuScreenId()).style.display = 'none';
@@ -937,6 +955,7 @@ function openMenuBgShop() {
 window.openMenuBgShop = openMenuBgShop;
 
 function closeMenuBgShop() {
+  if (menuBgPreviewRAF) { cancelAnimationFrame(menuBgPreviewRAF); menuBgPreviewRAF = null; }
   document.getElementById('menuBgShopScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
 }

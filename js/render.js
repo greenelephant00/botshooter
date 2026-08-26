@@ -4182,22 +4182,26 @@ function drawDeathAnimation(c, type, age, r) {
 }
 
 // ---- Menu-achtergronden: animatie op het aparte menuBgCanvas, achter het hoofdmenu ----
-let menuBgStarsCache = [];
-let menuBgEmbersCache = [];
-let menuBgMatrixCols = [];
-function drawMenuBackground(mc, mctx) {
+// Elke afnemer (Wereld 1-canvas, Wereld 2-canvas, shop-voorbeeld) krijgt zijn eigen deeltjescache via cacheKey,
+// zodat een klein voorbeeld-canvasje niet de posities van het grote menu-canvas overneemt (of omgekeerd).
+const menuBgCaches = {};
+function getMenuBgCache(cacheKey) {
+  if (!menuBgCaches[cacheKey]) menuBgCaches[cacheKey] = { stars: [], embers: [], matrixCols: [] };
+  return menuBgCaches[cacheKey];
+}
+function drawMenuBackground(mc, mctx, type, cacheKey) {
   const w = mc.width, h = mc.height;
   mctx.clearRect(0, 0, w, h);
-  const type = equippedMenuBackground;
   if (type === 'none' || w === 0 || h === 0) return;
+  const cache = getMenuBgCache(cacheKey || 'default');
   const now = performance.now();
   if (type === 'starfield') {
-    if (menuBgStarsCache.length === 0) {
-      for (let i = 0; i < 150; i++) menuBgStarsCache.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5 + 0.5, speed: Math.random() * 0.3 + 0.05, phase: Math.random() * Math.PI * 2 });
+    if (cache.stars.length === 0) {
+      for (let i = 0; i < 150; i++) cache.stars.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5 + 0.5, speed: Math.random() * 0.3 + 0.05, phase: Math.random() * Math.PI * 2 });
     }
     mctx.fillStyle = '#05050a';
     mctx.fillRect(0, 0, w, h);
-    menuBgStarsCache.forEach(s => {
+    cache.stars.forEach(s => {
       s.y += s.speed;
       if (s.y > h) s.y = 0;
       mctx.globalAlpha = 0.5 + 0.5 * Math.sin(now / 500 + s.phase);
@@ -4223,16 +4227,16 @@ function drawMenuBackground(mc, mctx) {
   } else if (type === 'matrix') {
     const colWidth = 18;
     const cols = Math.ceil(w / colWidth);
-    if (menuBgMatrixCols.length !== cols) menuBgMatrixCols = Array.from({ length: cols }, () => Math.random() * h);
+    if (cache.matrixCols.length !== cols) cache.matrixCols = Array.from({ length: cols }, () => Math.random() * h);
     mctx.fillStyle = 'rgba(2, 8, 2, 0.15)';
     mctx.fillRect(0, 0, w, h);
     mctx.fillStyle = '#3dff6a';
     mctx.font = '16px monospace';
-    menuBgMatrixCols.forEach((y, i) => {
+    cache.matrixCols.forEach((y, i) => {
       const ch = String.fromCharCode(0x30A0 + Math.floor(Math.random() * 96));
       mctx.fillText(ch, i * colWidth, y);
-      menuBgMatrixCols[i] += 6 + Math.random() * 4;
-      if (menuBgMatrixCols[i] > h && Math.random() < 0.02) menuBgMatrixCols[i] = 0;
+      cache.matrixCols[i] += 6 + Math.random() * 4;
+      if (cache.matrixCols[i] > h && Math.random() < 0.02) cache.matrixCols[i] = 0;
     });
   } else if (type === 'lava') {
     mctx.fillStyle = '#1a0500';
@@ -4248,11 +4252,11 @@ function drawMenuBackground(mc, mctx) {
       for (let x = 0; x <= w; x += 40) mctx.lineTo(x, cy + Math.sin(x / 80 + now / 800 + i) * 15);
       mctx.stroke();
     }
-    if (menuBgEmbersCache.length === 0) {
-      for (let i = 0; i < 40; i++) menuBgEmbersCache.push({ x: Math.random() * w, y: h + Math.random() * h, speed: 0.3 + Math.random() * 0.6, r: 1 + Math.random() * 2 });
+    if (cache.embers.length === 0) {
+      for (let i = 0; i < 40; i++) cache.embers.push({ x: Math.random() * w, y: h + Math.random() * h, speed: 0.3 + Math.random() * 0.6, r: 1 + Math.random() * 2 });
     }
     mctx.fillStyle = '#ff8c42';
-    menuBgEmbersCache.forEach(p => {
+    cache.embers.forEach(p => {
       p.y -= p.speed;
       if (p.y < 0) p.y = h;
       mctx.globalAlpha = 0.7;
@@ -4282,9 +4286,9 @@ function menuBgLoop() {
   const s2 = document.getElementById('world2Screen');
   const world1Visible = s1 && s1.style.display !== 'none';
   const world2Visible = s2 && s2.style.display !== 'none';
-  if (world1Visible) drawMenuBackground(menuBgCanvas1, menuBgCtx1);
+  if (world1Visible) drawMenuBackground(menuBgCanvas1, menuBgCtx1, equippedMenuBackground, 'world1');
   else menuBgCtx1.clearRect(0, 0, menuBgCanvas1.width, menuBgCanvas1.height);
-  if (world2Visible) drawMenuBackground(menuBgCanvas2, menuBgCtx2);
+  if (world2Visible) drawMenuBackground(menuBgCanvas2, menuBgCtx2, equippedMenuBackground, 'world2');
   else menuBgCtx2.clearRect(0, 0, menuBgCanvas2.width, menuBgCanvas2.height);
   requestAnimationFrame(menuBgLoop);
 }
