@@ -688,24 +688,59 @@ function equipWeaponSkin(weaponId, skinId) {
 }
 window.equipWeaponSkin = equipWeaponSkin;
 
-function renderWeaponSkinsShop() {
-  document.getElementById('weaponSkinsCoins').textContent = coins;
-  const allWeapons = [...SPECIAL_WEAPONS, ...WORLD2_SPECIAL_WEAPONS];
-  document.getElementById('weaponSkinsList').innerHTML = allWeapons.map(w => {
+function renderWeaponSkinsGroup(weapons) {
+  return weapons.map(w => {
     const skins = WEAPON_SKINS.filter(ws => ws.weaponId === w.id);
     const equipped = equippedWeaponSkins[w.id] || 'default';
-    const swatches = [
-      `<button class="${equipped === 'default' ? 'equipped' : 'equip'}" ${equipped === 'default' ? 'disabled' : ''} onclick="equipWeaponSkin('${w.id}', 'default')">Standaard</button>`
-    ].concat(skins.map(ws => {
+    const rows = skins.map(ws => {
       const owned = ownedWeaponSkins.includes(ws.id);
-      if (!owned) return `<button class="buy" onclick="buyWeaponSkin('${ws.id}')" ${coins < ws.price ? 'disabled' : ''} style="border-color:${ws.color}; color:${ws.color};">${ws.name} · 🪙${ws.price}</button>`;
-      return `<button class="${equipped === ws.id ? 'equipped' : 'equip'}" ${equipped === ws.id ? 'disabled' : ''} onclick="equipWeaponSkin('${w.id}', '${ws.id}')" style="border-color:${ws.color}; color:${ws.color};">${ws.name}</button>`;
-    }));
-    return `<div class="shopItem"><div class="info"><div class="name">${w.name}</div><div class="desc">Kies een kogelkleur voor dit wapen.</div></div>
-      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${swatches.join('')}</div></div>`;
+      const btn = owned
+        ? `<button class="${equipped === ws.id ? 'equipped' : 'equip'}" ${equipped === ws.id ? 'disabled' : ''} onclick="equipWeaponSkin('${w.id}', '${ws.id}')" style="border-color:${ws.color}; color:${ws.color};">${equipped === ws.id ? 'Uitgerust' : 'Uitrusten'}</button>`
+        : `<button class="buy" onclick="buyWeaponSkin('${ws.id}')" ${coins < ws.price ? 'disabled' : ''} style="border-color:${ws.color}; color:${ws.color};">Koop · 🪙${ws.price}</button>`;
+      return `<div class="shopItem">
+        <canvas id="wsPreview_${ws.id}" width="70" height="40" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
+        <div class="info"><div class="name" style="color:${ws.color};">${ws.name}</div></div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewWeaponSkin('${ws.id}')">👁 Bekijk</button></div>
+      </div>`;
+    }).join('');
+    return `<div class="shopItem" style="flex-direction:column; align-items:stretch;">
+      <div class="info"><div class="name">${w.name}</div><div class="desc">Kies een kogelkleur voor dit wapen.</div></div>
+      <button class="${equipped === 'default' ? 'equipped' : 'equip'}" ${equipped === 'default' ? 'disabled' : ''} onclick="equipWeaponSkin('${w.id}', 'default')" style="margin-bottom:8px;">Standaard uitrusten</button>
+      ${rows}
+    </div>`;
   }).join('');
 }
+
+function renderWeaponSkinsShop() {
+  document.getElementById('weaponSkinsCoins').textContent = coins;
+  document.getElementById('weaponSkinsListW1').innerHTML = renderWeaponSkinsGroup(SPECIAL_WEAPONS);
+  document.getElementById('weaponSkinsListW2').innerHTML = renderWeaponSkinsGroup(WORLD2_SPECIAL_WEAPONS);
+}
 window.renderWeaponSkinsShop = renderWeaponSkinsShop;
+
+let weaponSkinPreviewRAF = null;
+function previewWeaponSkin(id) {
+  if (weaponSkinPreviewRAF) cancelAnimationFrame(weaponSkinPreviewRAF);
+  const ws = WEAPON_SKINS.find(w => w.id === id);
+  const canvasEl = document.getElementById(`wsPreview_${id}`);
+  if (!ws || !canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  const w = canvasEl.width, h = canvasEl.height;
+  function frame() {
+    c.clearRect(0, 0, w, h);
+    const x = ((performance.now() / 600) % 1) * (w + 20) - 10;
+    c.fillStyle = ws.color;
+    c.beginPath(); c.arc(x, h / 2, 7, 0, Math.PI * 2); c.fill();
+    c.fillStyle = ws.coreColor;
+    c.beginPath(); c.arc(x, h / 2, 3.5, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = ws.coreColor;
+    c.lineWidth = 1;
+    c.beginPath(); c.arc(x, h / 2, 9, 0, Math.PI * 2); c.stroke();
+    weaponSkinPreviewRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+window.previewWeaponSkin = previewWeaponSkin;
 
 function openWeaponSkinsShop() {
   document.getElementById(menuScreenId()).style.display = 'none';
@@ -715,6 +750,7 @@ function openWeaponSkinsShop() {
 window.openWeaponSkinsShop = openWeaponSkinsShop;
 
 function closeWeaponSkinsShop() {
+  if (weaponSkinPreviewRAF) { cancelAnimationFrame(weaponSkinPreviewRAF); weaponSkinPreviewRAF = null; }
   document.getElementById('weaponSkinsScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
 }
