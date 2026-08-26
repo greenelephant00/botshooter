@@ -1395,6 +1395,7 @@ function renderSkinsShop() {
     let btn;
     if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
     else if (owned) btn = `<button class="equip" onclick="equipSkin('${s.id}')">Uitrusten</button>`;
+    else if (s.achievementOnly) btn = `<button class="buy" disabled>🔒 Prestatie nodig</button>`;
     else btn = `<button class="buy" onclick="buySkin('${s.id}')" ${coins < s.price ? 'disabled' : ''}>Koop · 🪙${s.price}</button>`;
     return `<div class="shopItem">
       <canvas class="botPreview" id="skinPreview_${s.id}" width="60" height="60"></canvas>
@@ -1412,6 +1413,7 @@ function renderSkinsShop() {
   const elementSkins = SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly && !s.achievementOnly);
   const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak && !s.coreOnly && !s.achievementOnly);
   const normalSkins = SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly);
+  const exclusiveSkins = SKINS.filter(s => s.achievementOnly);
   const elementSections = currentWorld === 2
     ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(renderSkinItem).join('')}</div>` +
       `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>`
@@ -1419,7 +1421,8 @@ function renderSkinsShop() {
   document.getElementById('skinsShopList').innerHTML =
     `<div class="shopSection"><h3>🔥 Kill Streak</h3>${killstreakSkins.map(renderSkinItem).join('')}</div>` +
     elementSections +
-    normalSkins.map(renderSkinItem).join('');
+    normalSkins.map(renderSkinItem).join('') +
+    `<div class="shopSection"><h3>🏆 Exclusieve Skins</h3>${exclusiveSkins.map(renderSkinItem).join('')}</div>`;
   SKINS.forEach(s => {
     const canvasEl = document.getElementById(`skinPreview_${s.id}`);
     if (canvasEl) drawSkinPreview(canvasEl, s.id);
