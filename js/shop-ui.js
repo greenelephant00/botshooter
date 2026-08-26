@@ -427,15 +427,19 @@ function renderAchievementCard(a) {
 
 function renderAchievements() {
   checkAchievements();
-  const unlockedCount = ACHIEVEMENTS.filter(a => unlockedAchievements.includes(a.id)).length;
-  document.getElementById('achievementsProgress').textContent = `${unlockedCount}/${ACHIEVEMENTS.length} behaald`;
   const w1 = ACHIEVEMENTS.filter(a => a.category === 'w1');
   const w2 = ACHIEVEMENTS.filter(a => a.category === 'w2');
   const w1Count = w1.filter(a => unlockedAchievements.includes(a.id)).length;
   const w2Count = w2.filter(a => unlockedAchievements.includes(a.id)).length;
+  const w2Section = currentWorld === 2
+    ? `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${w2.map(renderAchievementCard).join('')}</div>`
+    : '';
+  const totalShown = currentWorld === 2 ? w1.length + w2.length : w1.length;
+  const unlockedShown = currentWorld === 2 ? w1Count + w2Count : w1Count;
+  document.getElementById('achievementsProgress').textContent = `${unlockedShown}/${totalShown} behaald`;
   document.getElementById('achievementsList').innerHTML =
     `<div class="shopSection"><h3>🌍 Wereld 1 (${w1Count}/${w1.length})</h3>${w1.map(renderAchievementCard).join('')}</div>` +
-    `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${w2.map(renderAchievementCard).join('')}</div>`;
+    w2Section;
 }
 
 function openAchievements() {
