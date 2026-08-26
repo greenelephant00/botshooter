@@ -89,6 +89,7 @@ function buyWorld2() {
   world2Unlocked = true;
   localStorage.setItem('botShooterWorld2Unlocked', 'true');
   saveShopState();
+  checkAchievements();
   document.getElementById('startCoins').textContent = coins;
   updateWorld2Button();
   openWorld2();
@@ -100,6 +101,7 @@ function openWorld2() {
   currentWorld = 2;
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('world2Coins').textContent = coins;
+  document.getElementById('world2Cores').textContent = elementalCores;
   document.getElementById('world2Screen').style.display = 'flex';
 }
 window.openWorld2 = openWorld2;
@@ -416,6 +418,44 @@ function closeDisastersInfo() {
   document.getElementById(menuScreenId()).style.display = 'flex';
 }
 window.closeDisastersInfo = closeDisastersInfo;
+
+function renderAchievements() {
+  checkAchievements();
+  const unlockedCount = ACHIEVEMENTS.filter(a => unlockedAchievements.includes(a.id)).length;
+  document.getElementById('achievementsProgress').textContent = `${unlockedCount}/${ACHIEVEMENTS.length} behaald`;
+  document.getElementById('achievementsList').innerHTML = ACHIEVEMENTS.map(a => {
+    const unlocked = unlockedAchievements.includes(a.id);
+    return `<div class="shopItem achievementCard${unlocked ? ' unlocked' : ''}"><div class="info"><div class="name">${a.icon} ${a.name}</div><div class="desc">${a.desc}</div></div>
+      <div style="min-width:90px; font-weight:bold; color:${unlocked ? '#4cd964' : '#888'};">${unlocked ? '✔ Behaald' : '🔒 Op slot'}</div></div>`;
+  }).join('');
+}
+
+function openAchievements() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('achievementsScreen').style.display = 'flex';
+  renderAchievements();
+}
+window.openAchievements = openAchievements;
+
+function closeAchievements() {
+  document.getElementById('achievementsScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeAchievements = closeAchievements;
+
+let achievementToastTimeout = null;
+function showAchievementToast(a) {
+  const el = document.getElementById('achievementToast');
+  if (!el) return;
+  el.innerHTML = `<div class="achTitle">🏆 PRESTATIE BEHAALD</div><div class="achName">${a.icon} ${a.name}</div><div class="achDesc">${a.desc}</div>`;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
+  if (achievementToastTimeout) clearTimeout(achievementToastTimeout);
+  achievementToastTimeout = setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+window.showAchievementToast = showAchievementToast;
 
 function startPractice(botName) {
   const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES, ...WORLD2_BOSS_TYPES].find(t => t.name === botName);
@@ -1037,6 +1077,7 @@ function buyTransform(id) {
   coins -= t.price;
   ownedTransforms.push(id);
   saveShopState();
+  checkAchievements();
   renderTransformShop();
 }
 window.buyTransform = buyTransform;

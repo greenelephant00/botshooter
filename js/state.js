@@ -110,6 +110,76 @@ let highScoreHardcore = Number(localStorage.getItem('botShooterHighScoreHardcore
 let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) || 0;
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
+
+// ---- Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit, zonder dood te gaan ----
+let bossRushActive = false;
+let bossRushIndex = 0;
+let bossRushWorld = 1;
+let bossRushCoresEarned = 0;
+
+// ---- Elemental Cores: aparte valuta, alleen te verdienen in Eindbaas Rush in Wereld 2 ----
+let elementalCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
+const ELEMENTAL_CORE_PER_BOSS = 5;
+const ELEMENTAL_CORE_COMPLETION_BONUS = 20;
+
+// ---- Prestaties ----
+let hasFirstBoss = localStorage.getItem('botShooterHasFirstBoss') === 'true';
+let hasWorldBoss = localStorage.getItem('botShooterHasWorldBoss') === 'true';
+let hasBossRushW1 = localStorage.getItem('botShooterHasBossRushW1') === 'true';
+let hasBossRushW2 = localStorage.getItem('botShooterHasBossRushW2') === 'true';
+let unlockedAchievements = JSON.parse(localStorage.getItem('botShooterUnlockedAchievements') || '[]');
+
+const ACHIEVEMENTS = [
+  { id: 'first_kill', name: 'Eerste Bloed', icon: '🎯', desc: 'Dood je eerste bot.', check: () => score > 0 || highScore > 0 || highScoreWorld2 > 0 || highScoreHardcore > 0 },
+  { id: 'first_boss', name: 'Bazenslachter', icon: '⚔️', desc: 'Versla je eerste boss.', check: () => hasFirstBoss },
+  { id: 'score_1000', name: 'Op Gang', icon: '⭐', desc: 'Behaal een score van 1000 in één potje.', check: () => highScore >= 1000 || highScoreWorld2 >= 1000 || highScoreHardcore >= 1000 },
+  { id: 'score_5000', name: 'Doorgewinterd', icon: '🌟', desc: 'Behaal een score van 5000 in één potje.', check: () => highScore >= 5000 || highScoreWorld2 >= 5000 || highScoreHardcore >= 5000 },
+  { id: 'score_10000', name: 'Veteraan', icon: '💫', desc: 'Behaal een score van 10.000 in één potje.', check: () => highScore >= 10000 || highScoreWorld2 >= 10000 || highScoreHardcore >= 10000 },
+  { id: 'score_25000', name: 'Legende', icon: '👑', desc: 'Behaal een score van 25.000 in één potje.', check: () => highScore >= 25000 || highScoreWorld2 >= 25000 || highScoreHardcore >= 25000 },
+  { id: 'hardcore_2500', name: 'Hardcore Overlever', icon: '☠️', desc: 'Behaal een score van 2500 in Hardcore.', check: () => highScoreHardcore >= 2500 },
+  { id: 'world2_unlocked', name: 'Elementair', icon: '🔥', desc: 'Ontgrendel Wereld 2.', check: () => world2Unlocked },
+  { id: 'bossrush_w1', name: 'Eindbaas Rush: Wereld 1', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 1.', check: () => hasBossRushW1 },
+  { id: 'bossrush_w2', name: 'Eindbaas Rush: Wereld 2', icon: '🏆', desc: 'Voltooi de Eindbaas Rush in Wereld 2.', check: () => hasBossRushW2 },
+  { id: 'worldboss', name: 'Oerelementaal Verslagen', icon: '🌍', desc: 'Versla de Oerelementaal, de zeldzame wereldbaas van Wereld 2.', check: () => hasWorldBoss },
+  { id: 'cores_10', name: 'Kernverzamelaar', icon: '🔮', desc: 'Verzamel 10 Elemental Cores.', check: () => elementalCores >= 10 },
+  { id: 'cores_50', name: 'Kernmeester', icon: '💎', desc: 'Verzamel 50 Elemental Cores.', check: () => elementalCores >= 50 },
+  { id: 'all_transforms', name: 'Gedaanteverwisselaar', icon: '🔄', desc: 'Ontgrendel alle Wereld 1-transformaties.', check: () => TRANSFORMS.every(t => ownedTransforms.includes(t.id)) }
+];
+
+function checkAchievements() {
+  const newlyUnlocked = [];
+  ACHIEVEMENTS.forEach(a => {
+    if (!unlockedAchievements.includes(a.id) && a.check()) {
+      unlockedAchievements.push(a.id);
+      newlyUnlocked.push(a);
+    }
+  });
+  if (newlyUnlocked.length > 0) {
+    localStorage.setItem('botShooterUnlockedAchievements', JSON.stringify(unlockedAchievements));
+    newlyUnlocked.forEach(a => { if (typeof showAchievementToast === 'function') showAchievementToast(a); });
+  }
+}
+
+function onBossDefeated(bot) {
+  if (bossRushActive) {
+    bossRushIndex++;
+    if (bossRushWorld === 2) {
+      elementalCores += ELEMENTAL_CORE_PER_BOSS;
+      bossRushCoresEarned += ELEMENTAL_CORE_PER_BOSS;
+      localStorage.setItem('botShooterElementalCores', elementalCores);
+    }
+  }
+  if (!hasFirstBoss) {
+    hasFirstBoss = true;
+    localStorage.setItem('botShooterHasFirstBoss', 'true');
+  }
+  if (bot.type === 'oerelementaal' && !hasWorldBoss) {
+    hasWorldBoss = true;
+    localStorage.setItem('botShooterHasWorldBoss', 'true');
+  }
+  checkAchievements();
+}
+
 let gameOver = false;
 let isPaused = false;
 let gameStarted = false;

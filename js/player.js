@@ -183,6 +183,16 @@ const WORLD2_BOSS_TYPES = [
   { name: 'aardkoning', displayName: 'Aardkoning', minScore: 7000,  minLevel: 22, r: 76, hp: 340, speed: [0.25, 0.35], cooldown: [1500, 1900], pattern: 'boss', bulletSpeed: 6,   specialACooldown: 5600, specialBCooldown: 5000, specialCCooldown: 7200, specialECooldown: 6500, specialFCooldown: 10000, specialDmg: 26, color: () => '#4a3018' },
   { name: 'stormvorst', displayName: 'Stormvorst', minScore: 10000, minLevel: 28, r: 82, hp: 420, speed: [0.3, 0.42], cooldown: [1300, 1700], pattern: 'boss', bulletSpeed: 6.5, specialACooldown: 5400, specialBCooldown: 4600, specialCCooldown: 6800, specialECooldown: 6200, specialFCooldown: 9500, specialDmg: 28, color: () => '#c9a3ff' }
 ];
+
+// Wereldbaas (Wereld 2-only): een zeldzame megaboss die de aanvallen van alle 4 elementale bosses combineert.
+// Special A is de gedeelde schokgolf; Specials B t/m F kiezen elke keer willekeurig een aanval uit de volledige
+// pool van Vuurtitaan/Vriesreus/Aardkoning/Stormvorst (zie dispatch in update.js).
+const WORLD_BOSS_TYPE = {
+  name: 'oerelementaal', displayName: 'Oerelementaal', minScore: 20000, minLevel: 45, r: 105, hp: 1100,
+  speed: [0.22, 0.32], cooldown: [1100, 1400], pattern: 'boss', bulletSpeed: 7.5,
+  specialACooldown: 4800, specialBCooldown: 4000, specialCCooldown: 5600, specialDCooldown: 7000, specialECooldown: 5400, specialFCooldown: 8000,
+  specialDmg: 32, color: () => `hsl(${Math.floor(performance.now() / 15) % 360}, 75%, 45%)`
+};
 let bossAlive = false;
 let bossWarningActive = false;
 let bossesSpawned = {}; // per boss-naam: true zodra hij deze sessie al is verschenen
@@ -433,7 +443,7 @@ function initGame() {
     levelTarget = cfg.target;
     levelKills = 0;
     for (let i = 0; i < Math.min(3, cfg.maxBots); i++) spawnBot();
-  } else {
+  } else if (gameMode !== 'bossrush') {
     for (let i = 0; i < 4; i++) spawnBot();
   }
   document.getElementById('msg').style.display = 'none';
@@ -526,12 +536,39 @@ function selectMode(mode) {
 }
 window.selectMode = selectMode;
 
+function startBossRush() {
+  // Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit zonder dood te gaan.
+  // In Wereld 2 verdien je per verslagen boss (en een bonus bij voltooien) Elemental Cores.
+  gameMode = 'bossrush';
+  currentLevel = 1;
+  bossRushActive = true;
+  bossRushIndex = 0;
+  bossRushWorld = currentWorld;
+  bossRushCoresEarned = 0;
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  exitSkinPractice();
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'none';
+  initGame();
+  startMusic();
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+}
+window.startBossRush = startBossRush;
+
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;
   document.getElementById('scoreVal').textContent = inPracticeSession ? '—' : score;
   document.getElementById('highScoreVal').textContent = inPracticeSession ? '—' : (currentWorld === 2 ? highScoreWorld2 : (gameMode === 'hardcore' ? highScoreHardcore : highScore));
   document.getElementById('hpVal').textContent = Math.max(0, Math.round(player.hp));
   document.getElementById('coinsVal').textContent = inPracticeSession ? '—' : coins;
+  const coresEl = document.getElementById('coresVal');
+  if (coresEl) coresEl.textContent = elementalCores;
   document.getElementById('botsVal').textContent = bots.length;
   if (gameMode === 'levels') {
     document.getElementById('levelVal').textContent = currentLevel;
@@ -540,6 +577,10 @@ function updateHUD() {
   const now = performance.now();
   const active = [];
   if (powerupPreviewActive) active.push('🎬 Voorbeeld — keert vanzelf terug naar het menu');
+  if (bossRushActive) {
+    const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
+    active.push(`👑 Eindbaas Rush: boss ${Math.min(bossRushIndex + 1, rushPool.length)}/${rushPool.length}`);
+  }
   if (now < player.boostUntil) active.push('⚡ Speed');
   if (now < player.fireBoostUntil) active.push('🔥 Snelvuur');
   if (now < player.shieldUntil) active.push('🛡 Schild');

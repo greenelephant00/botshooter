@@ -68,6 +68,10 @@
     <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
     <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
   </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
+    <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
+  </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
@@ -76,7 +80,7 @@
 <div id="world2Screen">
   <button class="shopOpenBtn" onclick="goToWorld1()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
   <h1>🔥❄️🪨 Wereld 2: Elementen</h1>
-  <div class="coinDisplay">🪙 <span id="world2Coins">0</span></div>
+  <div class="coinDisplay">🪙 <span id="world2Coins">0</span> &nbsp; 🔮 <span id="world2Cores">0</span></div>
   <p>Kies een spelmodus</p>
   <div class="modeBtnRow">
     <button class="modeBtn levels" onclick="selectMode('levels')">Levels
@@ -100,6 +104,10 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
     <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
+    <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
@@ -200,11 +208,22 @@
   </div>
   <button class="backBtn" onclick="closeDisastersInfo()">← Terug</button>
 </div>
+<div id="achievementsScreen">
+  <h1>🏆 Prestaties</h1>
+  <button class="topBackBtn" onclick="closeAchievements()">← Menu</button>
+  <div class="shopSection">
+    <h3 id="achievementsProgress">Prestaties</h3>
+    <div id="achievementsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeAchievements()">← Terug</button>
+</div>
+<div id="achievementToast"></div>
 <div id="hud">
   Score: <span class="score" id="scoreVal">0</span> &nbsp;|&nbsp;
   Highscore: <span class="score" id="highScoreVal">0</span> &nbsp;|&nbsp;
   HP: <span class="hp" id="hpVal">100</span> &nbsp;|&nbsp;
   🪙 <span id="coinsVal" style="color:#ffd60a; font-weight:bold;">0</span> &nbsp;|&nbsp;
+  🔮 <span id="coresVal" style="color:#9be3ff; font-weight:bold;">0</span> &nbsp;|&nbsp;
   Bots over: <span id="botsVal">0</span> &nbsp;|&nbsp;
   Actief: <span id="boostVal" style="color:#4cc9f0; font-weight:bold;">-</span>
   <span id="levelHud" style="display:none;">&nbsp;|&nbsp; Level: <span id="levelVal" style="color:#ffd60a; font-weight:bold;">1</span> (<span id="levelProgressVal">0/5</span>)</span>

@@ -622,7 +622,7 @@ function damageBotSimple(bot, dmg, color) {
     score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
     if (gameMode === 'levels') levelKills++;
     if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-    if (bot.isBoss) bossAlive = false;
+    if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
     if (bot.poisonSpread) spreadPoison(bot);
 
     // Shockwave bij kills

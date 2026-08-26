@@ -403,6 +403,7 @@ function update() {
         else if (bot.type === 'vriesreus') frostNovaAttack(bot);
         else if (bot.type === 'aardkoning') bossRootSnare(bot);
         else if (bot.type === 'stormvorst') bossLightningStrike(bot);
+        else if (bot.type === 'oerelementaal') [lavaRainAttack, frostNovaAttack, bossRootSnare, bossLightningStrike][Math.floor(Math.random() * 4)](bot);
       }
       // Special 3 - Nemesis, Leviathan, Abomination, en alle Wereld 2-bosses
       if (bot.specialCCooldown && now - (bot.specialCLastUsed || 0) > bot.specialCCooldown) {
@@ -414,11 +415,12 @@ function update() {
         else if (bot.type === 'vriesreus') bossFrostLance(bot);
         else if (bot.type === 'aardkoning') bossEarthSlam(bot);
         else if (bot.type === 'stormvorst') bossHurricane(bot);
+        else if (bot.type === 'oerelementaal') [bossFireNova, bossFrostLance, bossEarthSlam, bossHurricane][Math.floor(Math.random() * 4)](bot);
       }
-      // Special 4 - alleen Vuurtitaan: vuurring
+      // Special 4 - alleen Vuurtitaan (en de Wereldbaas): vuurring
       if (bot.specialDCooldown && now - (bot.specialDLastUsed || 0) > bot.specialDCooldown) {
         bot.specialDLastUsed = now;
-        if (bot.type === 'vuurtitaan') bossFireRing(bot);
+        if (bot.type === 'vuurtitaan' || bot.type === 'oerelementaal') bossFireRing(bot);
       }
       // Special 5 - unieke 2e extra aanval per Wereld 2-boss
       if (bot.specialECooldown && now - (bot.specialELastUsed || 0) > bot.specialECooldown) {
@@ -427,6 +429,7 @@ function update() {
         else if (bot.type === 'vriesreus') bossIceFan(bot);
         else if (bot.type === 'aardkoning') bossGroundSpike(bot);
         else if (bot.type === 'stormvorst') bossLightningCluster(bot);
+        else if (bot.type === 'oerelementaal') [bossFireLine, bossIceFan, bossGroundSpike, bossLightningCluster][Math.floor(Math.random() * 4)](bot);
       }
       // Special 6 - unieke 3e extra aanval per Wereld 2-boss
       if (bot.specialFCooldown && now - (bot.specialFLastUsed || 0) > bot.specialFCooldown) {
@@ -435,6 +438,7 @@ function update() {
         else if (bot.type === 'vriesreus') bossIceField(bot);
         else if (bot.type === 'aardkoning') bossChasingCrack(bot);
         else if (bot.type === 'stormvorst') bossEmpJam(bot);
+        else if (bot.type === 'oerelementaal') [bossPhoenixDive, bossIceField, bossChasingCrack, bossEmpJam][Math.floor(Math.random() * 4)](bot);
       }
       return;
     }
@@ -588,7 +592,7 @@ function update() {
               score += nearest.isBoss ? 500 : (nearest.maxHp >= 10 ? 40 : nearest.maxHp >= 6 ? 25 : nearest.maxHp >= 3 ? 15 : 10);
               if (gameMode === 'levels') levelKills++;
               if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-              if (nearest.isBoss) bossAlive = false;
+              if (nearest.isBoss) { bossAlive = false; onBossDefeated(nearest); }
             }
           }
         }
@@ -603,6 +607,7 @@ function update() {
           if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
           if (bot.isBoss) {
             bossAlive = false;
+            onBossDefeated(bot);
             spawnParticles(bot.x, bot.y, '#ffaa00');
             spawnParticles(bot.x, bot.y, '#ff3838');
           }
@@ -660,7 +665,7 @@ function update() {
                   score += other.isBoss ? 500 : (other.maxHp >= 10 ? 40 : other.maxHp >= 6 ? 25 : other.maxHp >= 3 ? 15 : 10);
                   if (gameMode === 'levels') levelKills++;
                   if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-                  if (other.isBoss) bossAlive = false;
+                  if (other.isBoss) { bossAlive = false; onBossDefeated(other); }
                 }
               }
             });
@@ -744,7 +749,7 @@ function update() {
                 score += other.isBoss ? 500 : (other.maxHp >= 10 ? 40 : other.maxHp >= 6 ? 25 : other.maxHp >= 3 ? 15 : 10);
                 if (gameMode === 'levels') levelKills++;
                 if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-                if (other.isBoss) bossAlive = false;
+                if (other.isBoss) { bossAlive = false; onBossDefeated(other); }
               }
             }
           });
@@ -1419,10 +1424,25 @@ function update() {
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
   if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
-    const bossPool = currentWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
-    const nextBoss = bossPool.find(b => !bossesSpawned[b.name] &&
-      (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
-    if (nextBoss) triggerBossWarning(nextBoss);
+    if (bossRushActive) {
+      // Eindbaas Rush: geen score/level-drempel, gewoon de bosses van de gekozen wereld na elkaar
+      const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
+      if (bossRushIndex < rushPool.length) {
+        triggerBossWarning(rushPool[bossRushIndex]);
+      } else if (!gameOver) {
+        endGame(true);
+      }
+    } else {
+      const bossPool = currentWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
+      const nextBoss = bossPool.find(b => !bossesSpawned[b.name] &&
+        (gameMode === 'levels' ? currentLevel >= b.minLevel : score >= b.minScore));
+      if (nextBoss) triggerBossWarning(nextBoss);
+      // Wereldbaas (Wereld 2-only): een zeldzame megaboss die verschijnt bij een hoge score/level-drempel
+      else if (currentWorld === 2 && !bossesSpawned[WORLD_BOSS_TYPE.name] &&
+        (gameMode === 'levels' ? currentLevel >= WORLD_BOSS_TYPE.minLevel : score >= WORLD_BOSS_TYPE.minScore)) {
+        triggerBossWarning(WORLD_BOSS_TYPE);
+      }
+    }
   }
 
   const effSecondWind = w1Lvl(lvlSecondWind);
@@ -1471,7 +1491,33 @@ function update() {
 function endGame(won) {
   gameOver = true;
   const msgBtn = document.getElementById('msgBtn');
-  if (weaponPracticeActive) {
+  if (bossRushActive) {
+    bossRushActive = false;
+    const bossPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
+    const totalBosses = bossPool.length;
+    const coreLine = bossRushWorld === 2
+      ? `<br><span style="color:#9be3ff; font-size:16px;">🔮 +${bossRushCoresEarned} Elemental Cores verdiend (totaal: ${elementalCores})</span>`
+      : '';
+    if (won) {
+      bossRushCoresEarned += bossRushWorld === 2 ? ELEMENTAL_CORE_COMPLETION_BONUS : 0;
+      if (bossRushWorld === 2) {
+        elementalCores += ELEMENTAL_CORE_COMPLETION_BONUS;
+        localStorage.setItem('botShooterElementalCores', elementalCores);
+      }
+      if (bossRushWorld === 2 && !hasBossRushW2) { hasBossRushW2 = true; localStorage.setItem('botShooterHasBossRushW2', 'true'); }
+      if (bossRushWorld === 1 && !hasBossRushW1) { hasBossRushW1 = true; localStorage.setItem('botShooterHasBossRushW1', 'true'); }
+      checkAchievements();
+      document.getElementById('msgText').innerHTML =
+        `👑 Eindbaas Rush voltooid! Alle ${totalBosses} bosses van Wereld ${bossRushWorld} verslagen.` +
+        (bossRushWorld === 2 ? `<br><span style="color:#9be3ff; font-size:16px;">🔮 +${bossRushCoresEarned} Elemental Cores verdiend (totaal: ${elementalCores})</span>` : '');
+    } else {
+      document.getElementById('msgText').innerHTML =
+        `Eindbaas Rush mislukt — ${bossRushIndex}/${totalBosses} bosses van Wereld ${bossRushWorld} verslagen voordat je stierf.` + coreLine;
+    }
+    updateHUD();
+    msgBtn.textContent = 'Opnieuw proberen';
+    msgBtn.onclick = () => { startBossRush(); };
+  } else if (weaponPracticeActive) {
     document.getElementById('msgText').innerHTML =
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen.</span>`;
     msgBtn.textContent = 'Opnieuw oefenen';
@@ -1507,6 +1553,7 @@ function endGame(won) {
         localStorage.setItem('botShooterHighScore', highScore);
       }
     }
+    checkAchievements();
     updateHUD();
     const isNewHigh = score >= currentHigh && score > 0;
     const modeLabel = isHardcore ? '☠️ Hardcore' : 'Endless';
@@ -1563,6 +1610,7 @@ function goToMenu() {
   disasterPracticeType = null;
   powerupPreviewActive = false;
   powerupPreviewId = null;
+  bossRushActive = false;
   exitSkinPractice();
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';
@@ -1572,6 +1620,7 @@ function goToMenu() {
   document.getElementById('msg').style.display = 'none';
   if (currentWorld === 2) {
     document.getElementById('world2Coins').textContent = coins;
+    document.getElementById('world2Cores').textContent = elementalCores;
     document.getElementById('world2Screen').style.display = 'flex';
   } else {
     document.getElementById('startCoins').textContent = coins;
