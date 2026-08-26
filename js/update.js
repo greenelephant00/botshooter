@@ -1152,9 +1152,9 @@ function update() {
   // Powerups: expire after their lifetime
   powerups = powerups.filter(p => now - p.bornAt < p.life);
   // Powerups: pickup by player
-  const boostDurMult = 1 + w1Lvl(lvlLongBoosts) * LONG_BOOSTS_MULT_PER_LEVEL;
+  const boostDurMult = 1 + w1Lvl(lvlLongBoosts) * LONG_BOOSTS_MULT_PER_LEVEL + w2Lvl(lvl2LongBoosts) * LONGBOOSTS2_MULT_PER_LEVEL;
   const effGoldRush = w1Lvl(lvlGoldRush);
-  const pickupBonus = w1Lvl(lvlMagnet) * MAGNET_RADIUS_PER_LEVEL + (effGoldRush > 0 ? GOLD_RUSH_RADIUS[effGoldRush - 1] : 0);
+  const pickupBonus = w1Lvl(lvlMagnet) * MAGNET_RADIUS_PER_LEVEL + w2Lvl(lvl2Magnet) * MAGNET2_RADIUS_PER_LEVEL + (effGoldRush > 0 ? GOLD_RUSH_RADIUS[effGoldRush - 1] : 0);
   powerups.forEach(p => {
     const d = Math.hypot(player.x - p.x, player.y - p.y);
     if (d < player.r + p.r + pickupBonus) {
@@ -1440,7 +1440,7 @@ function update() {
       player.activeTransform = 'none';
       player.r = PLAYER_BASE_R;
       player.baseSpeed = 3.5 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL);
-      player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL;
+      player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL + w2Lvl(lvl2ExtraHp) * EXTRAHP2_PER_LEVEL;
       player.hp = Math.min(player.maxHp, TRANSFORM_REVIVE_HP);
       player.shieldUntil = now0 + 1500; // korte adempauze na de transformatie
       spawnParticles(player.x, player.y, '#4cd964');
@@ -1450,6 +1450,11 @@ function update() {
       player.hp = player.maxHp * REVIVE_HEAL_PCT;
       player.shieldUntil = now0 + 1500; // korte adempauze na reanimatie
       spawnParticles(player.x, player.y, '#4cd964');
+    } else if (w2Flag(hasRevive2) && !player.reviveUsed) {
+      player.reviveUsed = true;
+      player.hp = player.maxHp * REVIVE2_HEAL_PCT;
+      player.shieldUntil = now0 + 1500; // korte adempauze na elementaire reanimatie
+      spawnParticles(player.x, player.y, '#9be3ff');
     } else {
       endGame(false);
     }

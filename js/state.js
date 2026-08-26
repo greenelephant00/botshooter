@@ -522,12 +522,48 @@ const GOLD_RUSH_RADIUS = [150, 200, 250];
 let lvlOverkill = Number(localStorage.getItem('botShooterLvlOverkill')) || 0;
 const OVERKILL_LEVELS = [850, 1300, 1900];
 let lvlBloodlust = Number(localStorage.getItem('botShooterLvlBloodlust')) || 0;
+const BLOODLUST_LEVELS = [750, 1150, 1650];
+const BLOODLUST_BONUSES = [0.05, 0.08, 0.12];
 
 // Alle permanente meta-upgrades hierboven zijn Wereld 1-only: geen effect in Wereld 2, net als speciale wapens/pantsers/powerups
 function w1Lvl(lvl) { return currentWorld === 2 ? 0 : lvl; }
 function w1Flag(flag) { return currentWorld === 2 ? false : flag; }
-const BLOODLUST_LEVELS = [750, 1150, 1650];
-const BLOODLUST_BONUSES = [0.05, 0.08, 0.12];
+
+// ---- Wereld 2-exclusieve permanente upgrades: geen effect in Wereld 1, net als de elementale wapens/pantsers ----
+let lvl2FireCore = Number(localStorage.getItem('botShooterLvl2FireCore')) || 0;
+const FIRECORE_LEVELS = [700, 1100, 1600];
+const FIRECORE_RESIST_PER_LEVEL = 0.15;
+let lvl2FrostBlood = Number(localStorage.getItem('botShooterLvl2FrostBlood')) || 0;
+const FROSTBLOOD_LEVELS = [700, 1100, 1600];
+const FROSTBLOOD_RESIST_PER_LEVEL = 0.15;
+let lvl2Steadfast = Number(localStorage.getItem('botShooterLvl2Steadfast')) || 0;
+const STEADFAST_LEVELS = [650, 1000, 1450];
+const STEADFAST_RESIST_PER_LEVEL = 0.2;
+let lvl2FastReload = Number(localStorage.getItem('botShooterLvl2FastReload')) || 0;
+const FASTRELOAD2_LEVELS = [750, 1150, 1650];
+const FASTRELOAD2_PER_LEVEL = 0.06;
+let lvl2LongBoosts = Number(localStorage.getItem('botShooterLvl2LongBoosts')) || 0;
+const LONGBOOSTS2_LEVELS = [700, 1050, 1500];
+const LONGBOOSTS2_MULT_PER_LEVEL = 0.5;
+let lvl2Magnet = Number(localStorage.getItem('botShooterLvl2Magnet')) || 0;
+const MAGNET2_LEVELS = [550, 850, 1250];
+const MAGNET2_RADIUS_PER_LEVEL = 35;
+let hasRevive2 = localStorage.getItem('botShooterHasRevive2') === 'true';
+const REVIVE2_PRICE = 1800;
+const REVIVE2_HEAL_PCT = 0.35;
+let lvl2Vengeance = Number(localStorage.getItem('botShooterLvl2Vengeance')) || 0;
+const VENGEANCE_LEVELS = [800, 1250, 1800];
+const VENGEANCE_RADII = [80, 120, 160];
+const VENGEANCE_DMGS = [6, 8, 10];
+let lvl2IronSkin = Number(localStorage.getItem('botShooterLvl2IronSkin')) || 0;
+const IRONSKIN2_LEVELS = [750, 1150, 1650];
+const IRONSKIN2_REDUCTIONS = [0.15, 0.25, 0.35];
+let lvl2ExtraHp = Number(localStorage.getItem('botShooterLvl2ExtraHp')) || 0;
+const EXTRAHP2_LEVELS = [750, 1150, 1600, 2200, 2900];
+const EXTRAHP2_PER_LEVEL = 25;
+
+function w2Lvl(lvl) { return currentWorld === 2 ? lvl : 0; }
+function w2Flag(flag) { return currentWorld === 2 ? flag : false; }
 
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
 let powerupLevels = JSON.parse(localStorage.getItem('botShooterPowerupLevels') || '{}'); // id -> huidig niveau (0-3)
@@ -682,11 +718,11 @@ function getArmorStats() {
     speedBonus: (a1.speedBonus || 0) + (a2.speedBonus || 0),
     poisonReflect: !!(a1.poisonReflect || a2.poisonReflect),
     freezeReflect: !!(a1.freezeReflect || a2.freezeReflect),
-    fireResist: 1 - (1 - (a1.fireResist || 0)) * (1 - (a2.fireResist || 0)),
-    iceResist: 1 - (1 - (a1.iceResist || 0)) * (1 - (a2.iceResist || 0)),
+    fireResist: 1 - (1 - (a1.fireResist || 0)) * (1 - (a2.fireResist || 0)) * (1 - w2Lvl(lvl2FireCore) * FIRECORE_RESIST_PER_LEVEL),
+    iceResist: 1 - (1 - (a1.iceResist || 0)) * (1 - (a2.iceResist || 0)) * (1 - w2Lvl(lvl2FrostBlood) * FROSTBLOOD_RESIST_PER_LEVEL),
     fireDmgMult: (a1.fireDmgMult || 1) * (a2.fireDmgMult || 1),
     iceDmgMult: (a1.iceDmgMult || 1) * (a2.iceDmgMult || 1),
-    knockbackResist: 1 - (1 - (a1.knockbackResist || 0)) * (1 - (a2.knockbackResist || 0))
+    knockbackResist: 1 - (1 - (a1.knockbackResist || 0)) * (1 - (a2.knockbackResist || 0)) * (1 - w2Lvl(lvl2Steadfast) * STEADFAST_RESIST_PER_LEVEL)
   };
 }
 

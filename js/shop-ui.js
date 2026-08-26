@@ -26,6 +26,16 @@ function saveShopState() {
   localStorage.setItem('botShooterLvlGoldRush', lvlGoldRush);
   localStorage.setItem('botShooterLvlOverkill', lvlOverkill);
   localStorage.setItem('botShooterLvlBloodlust', lvlBloodlust);
+  localStorage.setItem('botShooterLvl2FireCore', lvl2FireCore);
+  localStorage.setItem('botShooterLvl2FrostBlood', lvl2FrostBlood);
+  localStorage.setItem('botShooterLvl2Steadfast', lvl2Steadfast);
+  localStorage.setItem('botShooterLvl2FastReload', lvl2FastReload);
+  localStorage.setItem('botShooterLvl2LongBoosts', lvl2LongBoosts);
+  localStorage.setItem('botShooterLvl2Magnet', lvl2Magnet);
+  localStorage.setItem('botShooterHasRevive2', hasRevive2);
+  localStorage.setItem('botShooterLvl2Vengeance', lvl2Vengeance);
+  localStorage.setItem('botShooterLvl2IronSkin', lvl2IronSkin);
+  localStorage.setItem('botShooterLvl2ExtraHp', lvl2ExtraHp);
   localStorage.setItem('botShooterPowerupLevels', JSON.stringify(powerupLevels));
   localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
   localStorage.setItem('botShooterEquippedSkin', skinPracticeActive ? previousEquippedSkin : equippedSkin);
@@ -1298,6 +1308,105 @@ function buyBloodlust() {
 }
 window.buyBloodlust = buyBloodlust;
 
+function buyFireCore() {
+  const price = FIRECORE_LEVELS[lvl2FireCore];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2FireCore++;
+  saveShopState();
+  renderShop();
+}
+window.buyFireCore = buyFireCore;
+
+function buyFrostBlood() {
+  const price = FROSTBLOOD_LEVELS[lvl2FrostBlood];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2FrostBlood++;
+  saveShopState();
+  renderShop();
+}
+window.buyFrostBlood = buyFrostBlood;
+
+function buySteadfast() {
+  const price = STEADFAST_LEVELS[lvl2Steadfast];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2Steadfast++;
+  saveShopState();
+  renderShop();
+}
+window.buySteadfast = buySteadfast;
+
+function buyFastReload2() {
+  const price = FASTRELOAD2_LEVELS[lvl2FastReload];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2FastReload++;
+  saveShopState();
+  renderShop();
+}
+window.buyFastReload2 = buyFastReload2;
+
+function buyLongBoosts2() {
+  const price = LONGBOOSTS2_LEVELS[lvl2LongBoosts];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2LongBoosts++;
+  saveShopState();
+  renderShop();
+}
+window.buyLongBoosts2 = buyLongBoosts2;
+
+function buyMagnet2() {
+  const price = MAGNET2_LEVELS[lvl2Magnet];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2Magnet++;
+  saveShopState();
+  renderShop();
+}
+window.buyMagnet2 = buyMagnet2;
+
+function buyRevive2() {
+  if (hasRevive2 || coins < REVIVE2_PRICE) return;
+  coins -= REVIVE2_PRICE;
+  hasRevive2 = true;
+  saveShopState();
+  renderShop();
+}
+window.buyRevive2 = buyRevive2;
+
+function buyVengeance() {
+  const price = VENGEANCE_LEVELS[lvl2Vengeance];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2Vengeance++;
+  saveShopState();
+  renderShop();
+}
+window.buyVengeance = buyVengeance;
+
+function buyIronSkin2() {
+  const price = IRONSKIN2_LEVELS[lvl2IronSkin];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2IronSkin++;
+  saveShopState();
+  renderShop();
+}
+window.buyIronSkin2 = buyIronSkin2;
+
+function buyExtraHp2() {
+  const price = EXTRAHP2_LEVELS[lvl2ExtraHp];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvl2ExtraHp++;
+  saveShopState();
+  renderShop();
+}
+window.buyExtraHp2 = buyExtraHp2;
+
 function weaponStatsLine(w) {
   const cooldownMs = shootCooldown * w.cooldownMult;
   const shotsPerSec = 1000 / cooldownMs;
@@ -1353,7 +1462,18 @@ function renderShop() {
     document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.map(a =>
       shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor === a.id, 'buyArmor', 'equipArmor')
     ).join('');
-    document.getElementById('shopUpgrades').innerHTML = '';
+    document.getElementById('shopUpgrades').innerHTML = [
+      leveledUpgradeItemHtml('Vuurkern', `Niveau 1: +${Math.round(FIRECORE_RESIST_PER_LEVEL*100)}% vuurweerstand. Niveau 2: +${Math.round(FIRECORE_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(FIRECORE_RESIST_PER_LEVEL*300)}%.`, FIRECORE_LEVELS, lvl2FireCore, 'buyFireCore'),
+      leveledUpgradeItemHtml('Vriesbloed', `Niveau 1: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*100)}% ijsweerstand. Niveau 2: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(FROSTBLOOD_RESIST_PER_LEVEL*300)}%.`, FROSTBLOOD_LEVELS, lvl2FrostBlood, 'buyFrostBlood'),
+      leveledUpgradeItemHtml('Aardvastheid', `Niveau 1: +${Math.round(STEADFAST_RESIST_PER_LEVEL*100)}% wegblaas-weerstand. Niveau 2: +${Math.round(STEADFAST_RESIST_PER_LEVEL*200)}%. Niveau 3: +${Math.round(STEADFAST_RESIST_PER_LEVEL*300)}%.`, STEADFAST_LEVELS, lvl2Steadfast, 'buySteadfast'),
+      leveledUpgradeItemHtml('Elementherlaad', `Niveau 1: -${Math.round(FASTRELOAD2_PER_LEVEL*100)}% cooldown. Niveau 2: -${Math.round(FASTRELOAD2_PER_LEVEL*200)}% cooldown. Niveau 3: -${Math.round(FASTRELOAD2_PER_LEVEL*300)}% cooldown.`, FASTRELOAD2_LEVELS, lvl2FastReload, 'buyFastReload2'),
+      leveledUpgradeItemHtml('Krachtaanvoer', `Niveau 1: +${Math.round(LONGBOOSTS2_MULT_PER_LEVEL*100)}% boost-duur. Niveau 2: +${Math.round(LONGBOOSTS2_MULT_PER_LEVEL*200)}%. Niveau 3: +${Math.round(LONGBOOSTS2_MULT_PER_LEVEL*300)}%.`, LONGBOOSTS2_LEVELS, lvl2LongBoosts, 'buyLongBoosts2'),
+      leveledUpgradeItemHtml('Elementmagneet', `Niveau 1: +${MAGNET2_RADIUS_PER_LEVEL} oprapafstand. Niveau 2: +${MAGNET2_RADIUS_PER_LEVEL*2}. Niveau 3: +${MAGNET2_RADIUS_PER_LEVEL*3}.`, MAGNET2_LEVELS, lvl2Magnet, 'buyMagnet2'),
+      upgradeItemHtml('Elementreanimatie', `Eenmalig te koop: overleef één keer per leven een dodelijke klap in Wereld 2 en kom terug met ${Math.round(REVIVE2_HEAL_PCT*100)}% van je max HP.`, REVIVE2_PRICE, hasRevive2, 'buyRevive2'),
+      leveledUpgradeItemHtml('Elementaire Wraak', `Niveau 1: bij kills radius ${VENGEANCE_RADII[0]}px, ${VENGEANCE_DMGS[0]} schade. Niveau 2: radius ${VENGEANCE_RADII[1]}px, ${VENGEANCE_DMGS[1]} schade. Niveau 3: radius ${VENGEANCE_RADII[2]}px, ${VENGEANCE_DMGS[2]} schade.`, VENGEANCE_LEVELS, lvl2Vengeance, 'buyVengeance'),
+      leveledUpgradeItemHtml('IJzeren Elementhuid', `Niveau 1: -${Math.round(IRONSKIN2_REDUCTIONS[0]*100)}% schade. Niveau 2: -${Math.round(IRONSKIN2_REDUCTIONS[1]*100)}% schade. Niveau 3: -${Math.round(IRONSKIN2_REDUCTIONS[2]*100)}% schade.`, IRONSKIN2_LEVELS, lvl2IronSkin, 'buyIronSkin2'),
+      leveledUpgradeItemHtml('Elementaire Conditie', `Niveau 1: +${EXTRAHP2_PER_LEVEL} max HP. Niveau 2: +${EXTRAHP2_PER_LEVEL*2}. Niveau 3: +${EXTRAHP2_PER_LEVEL*3}. Niveau 4: +${EXTRAHP2_PER_LEVEL*4}. Niveau 5: +${EXTRAHP2_PER_LEVEL*5}.`, EXTRAHP2_LEVELS, lvl2ExtraHp, 'buyExtraHp2')
+    ].join('');
     const section2 = document.getElementById('shopArmor2Section');
     if (section2) section2.style.display = 'none';
     return;

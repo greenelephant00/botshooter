@@ -78,7 +78,7 @@ function resetPlayer() {
   const armorSpeed = 1 + getArmorStats().speedBonus;
   player.baseSpeed = 4 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL) * tStats.speedMult * armorSpeed;
   player.r = PLAYER_BASE_R * tStats.rMult;
-  player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL + tStats.hpBonus;
+  player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL + w2Lvl(lvl2ExtraHp) * EXTRAHP2_PER_LEVEL + tStats.hpBonus;
   player.hp = player.maxHp;
   player.speed = player.baseSpeed;
   player.boostUntil = 0;
