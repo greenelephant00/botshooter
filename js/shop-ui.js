@@ -843,6 +843,7 @@ function startPractice(botName) {
   powerups = [];
   coinPickups = [];
   explosions = [];
+  botDeathAnimations = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
@@ -973,6 +974,7 @@ function startDodgePractice() {
   powerups = [];
   coinPickups = [];
   explosions = [];
+  botDeathAnimations = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];

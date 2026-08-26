@@ -599,6 +599,7 @@ function update() {
 
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
+          maybeTriggerExclusiveSkinDeathAnim(bot);
           player.comboStreak = Math.min(20, player.comboStreak + 1);
           player.comboLastKill = performance.now();
           if (player.comboStreak > sessionBestStreak) {
@@ -939,6 +940,7 @@ function update() {
 
   // Explosies (bomber): korte uitdijende schokgolf
   explosions = explosions.filter(e => now0 - e.born < 400);
+  botDeathAnimations = botDeathAnimations.filter(e => now0 - e.born < DEATH_ANIM_DURATION);
   telegraphs = telegraphs.filter(t => now0 < t.warnUntil);
   lightningBolts = lightningBolts.filter(l => now0 - l.born < 150);
   fallingMeteors = fallingMeteors.filter(m => now0 - m.born < m.totalLife);
@@ -1091,6 +1093,7 @@ function update() {
         t.captured.forEach(bot => {
           if (bot.dead) return;
           bot.dead = true;
+          maybeTriggerExclusiveSkinDeathAnim(bot);
           score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
           if (gameMode === 'levels') levelKills++;
           spawnParticles(bot.x, bot.y, '#cfe8ee');
@@ -1227,6 +1230,7 @@ function update() {
           spawnParticles(bot.x, bot.y, '#ff8800');
           if (bot.hp <= 0 && !bot.immortal) {
             bot.dead = true;
+            maybeTriggerExclusiveSkinDeathAnim(bot);
             score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
             if (gameMode === 'levels') levelKills++;
             if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);

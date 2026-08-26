@@ -390,6 +390,7 @@ function initGame() {
   powerups = [];
   coinPickups = [];
   explosions = [];
+  botDeathAnimations = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
@@ -468,6 +469,7 @@ function setupNextLevel() {
   powerups = [];
   coinPickups = [];
   explosions = [];
+  botDeathAnimations = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];

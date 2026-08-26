@@ -4,6 +4,13 @@ let bots = [];
 let particles = [];
 let powerups = [];
 let explosions = [];
+// Death-animation-op-de-bot wanneer je een prestatie-exclusieve skin draagt (titanchrome/supernova/neonultra) en een bot killt
+let botDeathAnimations = [];
+const EXCLUSIVE_SKIN_IDS = ['titanchrome', 'supernova', 'neonultra'];
+function maybeTriggerExclusiveSkinDeathAnim(bot) {
+  if (!EXCLUSIVE_SKIN_IDS.includes(getSkin())) return;
+  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: equippedDeathAnimation, born: performance.now() });
+}
 let iceGrenades = [];
 let cryoGrenadeLastUsed = 0;
 const CRYO_GRENADE_COOLDOWN = 10000;
@@ -412,19 +419,19 @@ const SKINS = [
   { id: 'turtle',     name: 'Schildpad',     price: 1600,             desc: 'Groene schildpad met een stevig gestreept pantser.' },
   { id: 'jester',     name: 'Hofnar',        price: 1650,             desc: 'Kleurrijke hofnar met een bellenmuts in paars en goud.' },
   { id: 'cyclops',    name: 'Cycloop',       price: 1700,             desc: 'Paars eenogig monster met een groot gloeiend oog.' },
-  { id: 'combofire',  name: 'Infernische Combo', price: 1850,          desc: 'Een dovende ember-kern die feller ontbrandt en een groeiende vuuraura krijgt naarmate je killstreak oploopt.', killstreak: true },
-  { id: 'combofrost', name: 'Vrieskristal Combo', price: 1850,         desc: 'Een dof ijskristal dat steeds feller gaat gloeien en scherpere kristalpunten krijgt bij een oplopende killstreak.', killstreak: true },
-  { id: 'combovolt',  name: 'Voltaïsche Combo', price: 1850,           desc: 'Een gedimde energiekern die steeds meer knetterende bliksemboogjes om zich heen krijgt naarmate je killstreak stijgt.', killstreak: true },
+  { id: 'combofire',  name: 'Infernische Combo', price: 3350,          desc: 'Een dovende ember-kern die feller ontbrandt en een groeiende vuuraura krijgt naarmate je killstreak oploopt.', killstreak: true },
+  { id: 'combofrost', name: 'Vrieskristal Combo', price: 3350,         desc: 'Een dof ijskristal dat steeds feller gaat gloeien en scherpere kristalpunten krijgt bij een oplopende killstreak.', killstreak: true },
+  { id: 'combovolt',  name: 'Voltaïsche Combo', price: 3350,           desc: 'Een gedimde energiekern die steeds meer knetterende bliksemboogjes om zich heen krijgt naarmate je killstreak stijgt.', killstreak: true },
   { id: 'neonpink',   name: 'Neon Roze',     price: 1650,              desc: 'Zwarte kern met een felle, pulserende roze neonring en kruisende lichtstrepen.' },
   { id: 'neoncyan',   name: 'Neon Cyaan',    price: 1650,              desc: 'Zwarte kern met een gloeiende cyaan neon-zeshoek erop getekend.' },
   { id: 'neonlime',   name: 'Neon Limoen',   price: 1650,              desc: 'Zwarte kern met felgroene, pulserende neon-chevrons.' },
-  { id: 'comboneonpink', name: 'Neon Roze Combo', price: 1850,         desc: 'Een gedimde kern die een felle roze neonring en een groeiend kruispatroon krijgt naarmate je killstreak oploopt.', killstreak: true },
-  { id: 'comboneoncyan', name: 'Neon Cyaan Combo', price: 1850,        desc: 'Een gedimde kern die een felle cyaan neon-veelhoek krijgt, met steeds meer zijden naarmate je killstreak stijgt.', killstreak: true },
-  { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 1850,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true },
-  { id: 'comboearth',  name: 'Aardschok Combo',   price: 1900, desc: 'Wereld 2-exclusief killstreak-skin. Dof gesteente dat openbarst en gaat gloeien met mos-groene aders, met steeds meer rotspieken naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
-  { id: 'combowind',   name: 'Wervelwind Combo',  price: 1900, desc: 'Wereld 2-exclusief killstreak-skin. IJl, doorschijnend lichaam met steeds meer en snellere kolkende windbogen naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
-  { id: 'combowater',  name: 'Vloedgolf Combo',   price: 1900, desc: 'Wereld 2-exclusief killstreak-skin. Kolkend waterlichaam met steeds meer golfringen en opspattende schuimdruppels naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
-  { id: 'combocrystal', name: 'Kristalpracht Combo', price: 2000, desc: 'Wereld 2-exclusief killstreak-skin. Een dof gesteente dat verandert in een schitterende, kleurwisselende kristalstructuur met steeds meer facetten naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
+  { id: 'comboneonpink', name: 'Neon Roze Combo', price: 3350,         desc: 'Een gedimde kern die een felle roze neonring en een groeiend kruispatroon krijgt naarmate je killstreak oploopt.', killstreak: true },
+  { id: 'comboneoncyan', name: 'Neon Cyaan Combo', price: 3350,        desc: 'Een gedimde kern die een felle cyaan neon-veelhoek krijgt, met steeds meer zijden naarmate je killstreak stijgt.', killstreak: true },
+  { id: 'comboneonlime', name: 'Neon Limoen Combo', price: 3350,       desc: 'Een gedimde kern die feller limoengroen gaat gloeien met steeds meer neon-chevrons bij een oplopende killstreak.', killstreak: true },
+  { id: 'comboearth',  name: 'Aardschok Combo',   price: 3400, desc: 'Wereld 2-exclusief killstreak-skin. Dof gesteente dat openbarst en gaat gloeien met mos-groene aders, met steeds meer rotspieken naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
+  { id: 'combowind',   name: 'Wervelwind Combo',  price: 3400, desc: 'Wereld 2-exclusief killstreak-skin. IJl, doorschijnend lichaam met steeds meer en snellere kolkende windbogen naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
+  { id: 'combowater',  name: 'Vloedgolf Combo',   price: 3400, desc: 'Wereld 2-exclusief killstreak-skin. Kolkend waterlichaam met steeds meer golfringen en opspattende schuimdruppels naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
+  { id: 'combocrystal', name: 'Kristalpracht Combo', price: 3500, desc: 'Wereld 2-exclusief killstreak-skin. Een dof gesteente dat verandert in een schitterende, kleurwisselende kristalstructuur met steeds meer facetten naarmate je killstreak oploopt. Werkt alleen in Wereld 2.', killstreak: true, element: true },
   { id: 'coreessence', name: 'Kernwezen', coreOnly: true, corePrice: 33, element: true, desc: 'Elemental Cores-exclusief (Kern-winkel). Een levend lichaam van pure, kleurwisselende kernenergie met ronddraaiende energiepieken. Werkt alleen in Wereld 2.' },
   { id: 'elemfire',    name: 'Vuurwezen',    price: 1700, desc: 'Wereld 2-exclusief. Gloeiend lichaam van gestold vuur met een flikkerende gloed. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemice',     name: 'IJswezen',     price: 1700, desc: 'Wereld 2-exclusief. Kristallijnen lichaam van blauwig ijs. Werkt alleen in Wereld 2.', element: true },
@@ -934,27 +941,27 @@ let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeath
 let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
 const DEATH_ANIM_DURATION = 2600;
 const DEATH_ANIMATIONS = [
-  { id: 'default',      name: 'Standaard',        price: 1000, desc: 'Geen enkel effect — je verdwijnt gewoon direct, zonder animatie.' },
-  { id: 'explosion',     name: 'Explosie',         price: 1300, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur, een schokgolfring en wegvliegende vonken.' },
-  { id: 'disintegrate',  name: 'Uiteenvallen',     price: 1350, desc: 'Je lichaam trilt even op, dan vallen er 14 blokjes met een sporend spoor alle kanten op uiteen.' },
-  { id: 'fireworks',     name: 'Vuurwerk',         price: 1400, desc: 'Er gaan 6 kleurrijke vuurwerk-bursts achter elkaar af, elk met stralen en een dovende ring.' },
-  { id: 'ghost',         name: 'Spookverschijning', price: 1350, desc: 'Je vervaagt tot een doorschijnende geest die ver omhoog wegdrijft, met achterblijvende echo\'s en dwarrelende sterretjes.' },
-  { id: 'implosion',     name: 'Implosie',         price: 1400, desc: 'Een oplaadende gloeiring, dan klap je razendsnel in tot een punt, gevolgd door een felle flits met meerdere schokgolven.' },
-  { id: 'lightning',     name: 'Blikseminslag',    price: 350, desc: 'Meerdere flikkerende bliksemschichten slaan achter elkaar op je neer, met een felle flits bij elke inslag.' },
-  { id: 'blackhole',     name: 'Zwart Gat',        price: 450, desc: 'Een kolkende, alles verzwelgende vortex zuigt je met ronddraaiende deeltjes naar binnen, gevolgd door een korte flits.' },
-  { id: 'petrify',       name: 'Verstening',       price: 350, desc: 'Je verandert in steen, barst dan open en valt in stukken uiteen die naar beneden vallen.' },
-  { id: 'freezeshatter', name: 'Bevriezen & Breken', price: 400, desc: 'Je bevriest volledig tot ijs en spat daarna in scherpe, wegvliegende ijsscherven uiteen.' },
-  { id: 'confetti',      name: 'Confetti',         price: 350, desc: 'Een vrolijke uitbarsting van kleurrijke, ronddwarrelende confetti-snippers.' },
-  { id: 'smoke',         name: 'Rooksignaal',      price: 350, desc: 'Je lost op in een kolkende pluim donkere rook die langzaam omhoog optrekt en vervaagt.' },
-  { id: 'portal',        name: 'Portaal',          price: 450, desc: 'Een ronddraaiend portaal opent zich en zuigt je krimpend naar binnen tot je verdwenen bent.' },
-  { id: 'lavamelt',      name: 'Smelten',          price: 400, desc: 'Je smelt weg tot een gloeiende plas lava die langzaam uitdooft.' },
-  { id: 'starburst',     name: 'Sterexplosie',     price: 400, desc: 'Je verandert in een felle, ronddraaiende ster die krimpt en een sprankelend spoor achterlaat.' },
-  { id: 'glitch',        name: 'Glitch',           price: 400, desc: 'Je lichaam valt uiteen in flikkerende, kleur-gesplitste digitale reepjes vol pixel-ruis.' },
-  { id: 'butterflies',   name: 'Vlinders',         price: 450, desc: 'Je lost op in een zwerm fladderende vlindertjes die alle kanten op wegvliegen.' },
-  { id: 'timewarp',      name: 'Tijdvervorming',   price: 450, desc: 'Ronddraaiende ringen vervormen en rekken je uit voordat je in een flits verdwijnt.' },
-  { id: 'sand',          name: 'Zandkorrels',      price: 350, desc: 'Je valt uiteen in duizenden zandkorrels die zijwaarts wegwaaien.' },
-  { id: 'rainbow',       name: 'Regenboogspoor',   price: 400, desc: 'Je tolt razendsnel rond en laat een kleurrijk regenboogspoor na voordat je vervaagt.' },
-  { id: 'void',          name: 'Leegte',           price: 450, desc: 'Een groeiende duistere leegte verzwelgt je van binnenuit naar buiten toe, tegenovergesteld aan een explosie.' }
+  { id: 'default',      name: 'Standaard',        price: 2500, desc: 'Geen enkel effect — je verdwijnt gewoon direct, zonder animatie.' },
+  { id: 'explosion',     name: 'Explosie',         price: 2800, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur, een schokgolfring en wegvliegende vonken.' },
+  { id: 'disintegrate',  name: 'Uiteenvallen',     price: 2850, desc: 'Je lichaam trilt even op, dan vallen er 14 blokjes met een sporend spoor alle kanten op uiteen.' },
+  { id: 'fireworks',     name: 'Vuurwerk',         price: 2900, desc: 'Er gaan 6 kleurrijke vuurwerk-bursts achter elkaar af, elk met stralen en een dovende ring.' },
+  { id: 'ghost',         name: 'Spookverschijning', price: 2850, desc: 'Je vervaagt tot een doorschijnende geest die ver omhoog wegdrijft, met achterblijvende echo\'s en dwarrelende sterretjes.' },
+  { id: 'implosion',     name: 'Implosie',         price: 2900, desc: 'Een oplaadende gloeiring, dan klap je razendsnel in tot een punt, gevolgd door een felle flits met meerdere schokgolven.' },
+  { id: 'lightning',     name: 'Blikseminslag',    price: 1850, desc: 'Meerdere flikkerende bliksemschichten slaan achter elkaar op je neer, met een felle flits bij elke inslag.' },
+  { id: 'blackhole',     name: 'Zwart Gat',        price: 1950, desc: 'Een kolkende, alles verzwelgende vortex zuigt je met ronddraaiende deeltjes naar binnen, gevolgd door een korte flits.' },
+  { id: 'petrify',       name: 'Verstening',       price: 1850, desc: 'Je verandert in steen, barst dan open en valt in stukken uiteen die naar beneden vallen.' },
+  { id: 'freezeshatter', name: 'Bevriezen & Breken', price: 1900, desc: 'Je bevriest volledig tot ijs en spat daarna in scherpe, wegvliegende ijsscherven uiteen.' },
+  { id: 'confetti',      name: 'Confetti',         price: 1850, desc: 'Een vrolijke uitbarsting van kleurrijke, ronddwarrelende confetti-snippers.' },
+  { id: 'smoke',         name: 'Rooksignaal',      price: 1850, desc: 'Je lost op in een kolkende pluim donkere rook die langzaam omhoog optrekt en vervaagt.' },
+  { id: 'portal',        name: 'Portaal',          price: 1950, desc: 'Een ronddraaiend portaal opent zich en zuigt je krimpend naar binnen tot je verdwenen bent.' },
+  { id: 'lavamelt',      name: 'Smelten',          price: 1900, desc: 'Je smelt weg tot een gloeiende plas lava die langzaam uitdooft.' },
+  { id: 'starburst',     name: 'Sterexplosie',     price: 1900, desc: 'Je verandert in een felle, ronddraaiende ster die krimpt en een sprankelend spoor achterlaat.' },
+  { id: 'glitch',        name: 'Glitch',           price: 1900, desc: 'Je lichaam valt uiteen in flikkerende, kleur-gesplitste digitale reepjes vol pixel-ruis.' },
+  { id: 'butterflies',   name: 'Vlinders',         price: 1950, desc: 'Je lost op in een zwerm fladderende vlindertjes die alle kanten op wegvliegen.' },
+  { id: 'timewarp',      name: 'Tijdvervorming',   price: 1950, desc: 'Ronddraaiende ringen vervormen en rekken je uit voordat je in een flits verdwijnt.' },
+  { id: 'sand',          name: 'Zandkorrels',      price: 1850, desc: 'Je valt uiteen in duizenden zandkorrels die zijwaarts wegwaaien.' },
+  { id: 'rainbow',       name: 'Regenboogspoor',   price: 1900, desc: 'Je tolt razendsnel rond en laat een kleurrijk regenboogspoor na voordat je vervaagt.' },
+  { id: 'void',          name: 'Leegte',           price: 1950, desc: 'Een groeiende duistere leegte verzwelgt je van binnenuit naar buiten toe, tegenovergesteld aan een explosie.' }
 ];
 
 // Elementale pantsers: alleen te koop in de Wereld 2-shop

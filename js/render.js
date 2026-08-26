@@ -4961,6 +4961,14 @@ function draw() {
   laserTelegraphs.forEach(drawLaserTelegraph);
   blackHoles.forEach(drawBlackHole);
   explosions.forEach(drawExplosion);
+  botDeathAnimations.forEach(e => {
+    const age = performance.now() - e.born;
+    if (age >= DEATH_ANIM_DURATION) return;
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    drawDeathAnimation(ctx, e.type, age, e.r);
+    ctx.restore();
+  });
   lightningBolts.forEach(drawLightningBolt);
   fallingMeteors.forEach(drawFallingMeteor);
   tsunamiWaves.forEach(drawTsunamiWave);
