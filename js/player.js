@@ -577,7 +577,7 @@ function startBossRush() {
 window.startBossRush = startBossRush;
 
 function startSprintMode() {
-  // Golfsprint: 3 minuten lang zoveel mogelijk score halen, onkwetsbaar zolang de klok loopt — pure snelheid, geen overleving nodig
+  // Golfsprint: 5 minuten lang zoveel mogelijk score halen tegen de klok — gewoon kwetsbaar, dus overleven blijft nodig
   gameMode = 'sprint';
   currentLevel = 1;
   practiceWeaponId = null;

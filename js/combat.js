@@ -596,7 +596,6 @@ function fireBotBullet(bot, angle, speedMult = 1) {
 }
 
 function applyDamageToPlayer(amount) {
-  if (gameMode === 'sprint') return false; // Golfsprint: onkwetsbaar, alleen de klok kan het potje beëindigen
   if (performance.now() < player.shieldUntil) return false;
   const stoneskinReduction = performance.now() < player.stoneskinUntil ? player.stoneskinReduction : 0;
   if (stoneskinReduction > 0) spawnParticles(player.x, player.y, '#a08050'); // rotsscherven vliegen af als de aardhuid een klap opvangt
