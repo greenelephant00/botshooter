@@ -2074,6 +2074,15 @@ function drawPlayerBullet(b) {
       ctx.restore();
       break;
     }
+    case 'coreessence': {
+      // kernenergie-bolletje dat continu van kleur wisselt
+      const hueCe = (performance.now() / 10) % 360;
+      ctx.fillStyle = `hsl(${hueCe}, 90%, 65%)`;
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = `hsl(${(hueCe + 180) % 360}, 95%, 85%)`;
+      ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      break;
+    }
     default: {
       ctx.fillStyle = '#ffd60a';
       ctx.beginPath(); ctx.arc(0, 0, b.r, 0, Math.PI * 2); ctx.fill();
@@ -2907,6 +2916,30 @@ function drawPlayerSkin(c, skinId, r) {
     }
     c.fillStyle = t > 0.05 ? `hsl(${(hue + 180) % 360}, 90%, 85%)` : '#5a5a65';
     c.beginPath(); c.arc(0, 0, r * 0.22, 0, Math.PI * 2); c.fill();
+  } else if (skinId === 'coreessence') {
+    // Kernwezen (Elemental Cores-exclusief): een levend lichaam van pure, kleurwisselende kernenergie met ronddraaiende energiepieken
+    const hueE = (performance.now() / 10) % 360;
+    c.save();
+    c.globalAlpha = 0.5;
+    c.strokeStyle = `hsl(${hueE}, 90%, 70%)`;
+    c.lineWidth = 3;
+    c.beginPath(); c.arc(0, 0, r + 8, 0, Math.PI * 2); c.stroke();
+    c.restore();
+    c.fillStyle = '#1a1030';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    const spikesCE = 8;
+    const spinCE = performance.now() / 500;
+    for (let i = 0; i < spikesCE; i++) {
+      const a = (Math.PI * 2 / spikesCE) * i + spinCE;
+      const len = r * (0.5 + 0.25 * Math.sin(performance.now() / 180 + i));
+      const px = Math.cos(a) * (r + len), py = Math.sin(a) * (r + len);
+      c.strokeStyle = `hsl(${(hueE + i * 30) % 360}, 90%, 65%)`;
+      c.lineWidth = 3;
+      c.lineCap = 'round';
+      c.beginPath(); c.moveTo(Math.cos(a) * r * 0.6, Math.sin(a) * r * 0.6); c.lineTo(px, py); c.stroke();
+    }
+    c.fillStyle = `hsl(${(hueE + 180) % 360}, 95%, 85%)`;
+    c.beginPath(); c.arc(0, 0, r * 0.4, 0, Math.PI * 2); c.fill();
   } else if (skinId === 'neonpink') {
     // roze neon: gloeiende ring met kruisende lijnen op een zwarte kern
     c.fillStyle = '#000';

@@ -46,7 +46,8 @@ function shoot() {
   const critMult = isCrit ? 2 : 1;
   const curseMult = now < player.curseUntil ? 0.5 : 1;
   const elementalMult = weapon.effect === 'igniteHit' ? getArmorStats().fireDmgMult : weapon.effect === 'shatterHit' ? getArmorStats().iceDmgMult : 1;
-  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult * elementalMult;
+  const coreDmgMult = 1 + w2Lvl(lvlCoreDamage) * CORE_DAMAGE_PER_LEVEL;
+  const dmg = weapon.dmg * (now < player.damageBoostUntil || now < player.overloadUntil ? 2 : 1) * streakMult * bloodlustBonus * critMult * curseMult * elementalMult * coreDmgMult;
   const effSharpshooter = w1Lvl(lvlSharpshooter);
   const effSharpshooter2 = w2Lvl(lvl2Sharpshooter);
   const speedMult = (weapon.bulletSpeedMult || 1) * (1 + (effSharpshooter > 0 ? SHARPSHOOTER_BONUSES[effSharpshooter - 1] : 0) + (effSharpshooter2 > 0 ? SHARPSHOOTER2_BONUSES[effSharpshooter2 - 1] : 0));
@@ -600,7 +601,9 @@ function applyDamageToPlayer(amount) {
   const effIronSkin = w1Lvl(lvlIronSkin);
   const effIronSkin2 = w2Lvl(lvl2IronSkin);
   const ironSkinReduction = (effIronSkin > 0 ? IRON_SKIN_REDUCTIONS[effIronSkin - 1] : 0) + (effIronSkin2 > 0 ? IRONSKIN2_REDUCTIONS[effIronSkin2 - 1] : 0);
-  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - ironSkinReduction) * (1 - stoneskinReduction);
+  const effCoreShield = w2Lvl(lvlCoreShield);
+  const coreShieldReduction = effCoreShield > 0 ? CORE_SHIELD_REDUCTIONS[effCoreShield - 1] : 0;
+  const totalReduction = 1 - (1 - getArmorStats().reduction) * (1 - ironSkinReduction) * (1 - stoneskinReduction) * (1 - coreShieldReduction);
   player.hp -= amount * (1 - totalReduction);
   return true;
 }

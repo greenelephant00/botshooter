@@ -457,6 +457,123 @@ function showAchievementToast(a) {
 }
 window.showAchievementToast = showAchievementToast;
 
+function buyCoreArmor() {
+  const a = WORLD2_ARMOR.find(x => x.id === 'coreplate');
+  if (!a || ownedArmor.includes('coreplate') || elementalCores < a.corePrice) return;
+  elementalCores -= a.corePrice;
+  ownedArmor.push('coreplate');
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  saveShopState();
+  renderCoreShop();
+}
+window.buyCoreArmor = buyCoreArmor;
+
+function buyCoreWeapon() {
+  const w = WORLD2_SPECIAL_WEAPONS.find(x => x.id === 'coreblaster');
+  if (!w || ownedWeapons.includes('coreblaster') || elementalCores < w.corePrice) return;
+  elementalCores -= w.corePrice;
+  ownedWeapons.push('coreblaster');
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  saveShopState();
+  renderCoreShop();
+}
+window.buyCoreWeapon = buyCoreWeapon;
+
+function buyCoreSkin() {
+  const s = SKINS.find(x => x.id === 'coreessence');
+  if (!s || ownedSkins.includes('coreessence') || elementalCores < s.corePrice) return;
+  elementalCores -= s.corePrice;
+  ownedSkins.push('coreessence');
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  saveShopState();
+  renderCoreShop();
+}
+window.buyCoreSkin = buyCoreSkin;
+
+function buyCoreDamage() {
+  const price = CORE_DAMAGE_LEVELS[lvlCoreDamage];
+  if (price === undefined || elementalCores < price) return;
+  elementalCores -= price;
+  lvlCoreDamage++;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterLvlCoreDamage', lvlCoreDamage);
+  renderCoreShop();
+}
+window.buyCoreDamage = buyCoreDamage;
+
+function buyCoreShield() {
+  const price = CORE_SHIELD_LEVELS[lvlCoreShield];
+  if (price === undefined || elementalCores < price) return;
+  elementalCores -= price;
+  lvlCoreShield++;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterLvlCoreShield', lvlCoreShield);
+  renderCoreShop();
+}
+window.buyCoreShield = buyCoreShield;
+
+function buyCoreHarvest() {
+  if (hasCoreHarvest || elementalCores < CORE_HARVEST_PRICE) return;
+  elementalCores -= CORE_HARVEST_PRICE;
+  hasCoreHarvest = true;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  localStorage.setItem('botShooterHasCoreHarvest', 'true');
+  renderCoreShop();
+}
+window.buyCoreHarvest = buyCoreHarvest;
+
+function renderCoreShop() {
+  document.getElementById('coreShopCores').textContent = elementalCores;
+  const armor = WORLD2_ARMOR.find(x => x.id === 'coreplate');
+  const weapon = WORLD2_SPECIAL_WEAPONS.find(x => x.id === 'coreblaster');
+  const skin = SKINS.find(x => x.id === 'coreessence');
+  const ownedArmorBtn = ownedArmor.includes('coreplate')
+    ? (equippedArmor === 'coreplate' ? `<button class="equipped" disabled>Uitgerust</button>` : `<button class="equip" onclick="equipArmor('coreplate')">Uitrusten</button>`)
+    : `<button class="buy" onclick="buyCoreArmor()" ${elementalCores < armor.corePrice ? 'disabled' : ''}>Koop · 🔮${armor.corePrice}</button>`;
+  const ownedWeaponBtn = ownedWeapons.includes('coreblaster')
+    ? (equippedWeapon === 'coreblaster' ? `<button class="equipped" disabled>Uitgerust</button>` : `<button class="equip" onclick="equipWeapon('coreblaster')">Uitrusten</button>`)
+    : `<button class="buy" onclick="buyCoreWeapon()" ${elementalCores < weapon.corePrice ? 'disabled' : ''}>Koop · 🔮${weapon.corePrice}</button>`;
+  const ownedSkinBtn = ownedSkins.includes('coreessence')
+    ? (equippedSkin === 'coreessence' ? `<button class="equipped" disabled>Uitgerust</button>` : `<button class="equip" onclick="equipSkin('coreessence')">Uitrusten</button>`)
+    : `<button class="buy" onclick="buyCoreSkin()" ${elementalCores < skin.corePrice ? 'disabled' : ''}>Koop · 🔮${skin.corePrice}</button>`;
+
+  const coreDamageMaxed = lvlCoreDamage >= CORE_DAMAGE_LEVELS.length;
+  const coreDamageBtn = coreDamageMaxed
+    ? `<button class="equipped" disabled>Max niveau (${CORE_DAMAGE_LEVELS.length})</button>`
+    : `<button class="buy" onclick="buyCoreDamage()" ${elementalCores < CORE_DAMAGE_LEVELS[lvlCoreDamage] ? 'disabled' : ''}>Koop niveau ${lvlCoreDamage + 1}/${CORE_DAMAGE_LEVELS.length} · 🔮${CORE_DAMAGE_LEVELS[lvlCoreDamage]}</button>`;
+  const coreShieldMaxed = lvlCoreShield >= CORE_SHIELD_LEVELS.length;
+  const coreShieldBtn = coreShieldMaxed
+    ? `<button class="equipped" disabled>Max niveau (${CORE_SHIELD_LEVELS.length})</button>`
+    : `<button class="buy" onclick="buyCoreShield()" ${elementalCores < CORE_SHIELD_LEVELS[lvlCoreShield] ? 'disabled' : ''}>Koop niveau ${lvlCoreShield + 1}/${CORE_SHIELD_LEVELS.length} · 🔮${CORE_SHIELD_LEVELS[lvlCoreShield]}</button>`;
+  const coreHarvestBtn = hasCoreHarvest
+    ? `<button class="equipped" disabled>Ontgrendeld</button>`
+    : `<button class="buy" onclick="buyCoreHarvest()" ${elementalCores < CORE_HARVEST_PRICE ? 'disabled' : ''}>Koop · 🔮${CORE_HARVEST_PRICE}</button>`;
+
+  document.getElementById('coreShopList').innerHTML = [
+    `<div class="shopItem"><div class="info"><div class="name">${armor.name}</div><div class="desc">${armor.desc}</div></div>${ownedArmorBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">${weapon.name}</div><div class="desc">${weapon.desc}</div></div>${ownedWeaponBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">${skin.name}</div><div class="desc">${skin.desc}</div></div>${ownedSkinBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernkracht (Lv. ${lvlCoreDamage}/${CORE_DAMAGE_LEVELS.length})</div><div class="desc">Verhoogt permanent je schade in Wereld 2 met een percentage, bovenop alle andere schadebonussen. Niveau 1: +${Math.round(CORE_DAMAGE_PER_LEVEL*100)}% schade. Niveau 2: +${Math.round(CORE_DAMAGE_PER_LEVEL*200)}%. Niveau 3: +${Math.round(CORE_DAMAGE_PER_LEVEL*300)}%.</div></div>${coreDamageBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernschild (Lv. ${lvlCoreShield}/${CORE_SHIELD_LEVELS.length})</div><div class="desc">Vermindert permanent alle inkomende schade in Wereld 2 met een vast percentage, bovenop pantser en andere reducties. Niveau 1: -${Math.round(CORE_SHIELD_REDUCTIONS[0]*100)}% schade. Niveau 2: -${Math.round(CORE_SHIELD_REDUCTIONS[1]*100)}%. Niveau 3: -${Math.round(CORE_SHIELD_REDUCTIONS[2]*100)}%.</div></div>${coreShieldBtn}</div>`,
+    `<div class="shopItem"><div class="info"><div class="name">Kernoogst</div><div class="desc">Eenmalig te koop: verhoogt permanent hoeveel Elemental Cores je verdient per verslagen boss tijdens Eindbaas Rush in Wereld 2. +${CORE_HARVEST_BONUS} Cores per boss, voor altijd.</div></div>${coreHarvestBtn}</div>`
+  ].join('');
+}
+window.renderCoreShop = renderCoreShop;
+
+function openCoreShop() {
+  if (currentWorld !== 2) return;
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('coreShopScreen').style.display = 'flex';
+  renderCoreShop();
+}
+window.openCoreShop = openCoreShop;
+
+function closeCoreShop() {
+  document.getElementById('coreShopScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeCoreShop = closeCoreShop;
+
 function startPractice(botName) {
   const type = [...BOT_TYPES, ...SPECIAL_BOT_TYPES, ...BOSS_TYPES, ...WORLD2_BOT_TYPES, ...WORLD2_SPECIAL_BOT_TYPES, ...WORLD2_BOSS_TYPES].find(t => t.name === botName);
   if (!type) return;
@@ -939,7 +1056,7 @@ function drawBotPreview(canvasEl, type) {
 
 function buyWeapon(id) {
   const w = WEAPONS.find(x => x.id === id) || SPECIAL_WEAPONS.find(x => x.id === id) || WORLD2_WEAPONS.find(x => x.id === id) || WORLD2_SPECIAL_WEAPONS.find(x => x.id === id);
-  if (!w || ownedWeapons.includes(id) || coins < w.price) return;
+  if (!w || w.coreOnly || ownedWeapons.includes(id) || coins < w.price) return;
   coins -= w.price;
   ownedWeapons.push(id);
   saveShopState();
@@ -957,7 +1074,7 @@ window.equipWeapon = equipWeapon;
 
 function buyArmor(id) {
   const a = ARMOR.find(x => x.id === id) || WORLD2_ARMOR.find(x => x.id === id);
-  if (!a || ownedArmor.includes(id) || coins < a.price) return;
+  if (!a || a.coreOnly || ownedArmor.includes(id) || coins < a.price) return;
   coins -= a.price;
   ownedArmor.push(id);
   saveShopState();
@@ -992,7 +1109,7 @@ window.buyDualArmorSlot = buyDualArmorSlot;
 
 function buySkin(id) {
   const skin = SKINS.find(s => s.id === id);
-  if (!skin || ownedSkins.includes(id) || coins < skin.price) return;
+  if (!skin || skin.coreOnly || ownedSkins.includes(id) || coins < skin.price) return;
   coins -= skin.price;
   ownedSkins.push(id);
   saveShopState();
@@ -1043,10 +1160,10 @@ function renderSkinsShop() {
       </div>
     </div>`;
   };
-  const killstreakSkins = SKINS.filter(s => s.killstreak && !s.element);
-  const elementSkins = SKINS.filter(s => s.element && !s.killstreak);
-  const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak);
-  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element);
+  const killstreakSkins = SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly);
+  const elementSkins = SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly);
+  const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak && !s.coreOnly);
+  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly);
   const elementSections = currentWorld === 2
     ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(renderSkinItem).join('')}</div>` +
       `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>`
@@ -1614,10 +1731,10 @@ function renderShop() {
     document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
-    document.getElementById('shopSpecialWeapons').innerHTML = [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].map(w =>
+    document.getElementById('shopSpecialWeapons').innerHTML = [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].filter(w => !w.coreOnly).map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
-    document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.map(a =>
+    document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.filter(a => !a.coreOnly).map(a =>
       shopItemHtml(a, ownedArmor.includes(a.id), equippedArmor === a.id, 'buyArmor', 'equipArmor')
     ).join('');
     document.getElementById('shopUpgrades').innerHTML = [

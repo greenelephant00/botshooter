@@ -104,6 +104,7 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
     <button class="shopOpenBtn" onclick="openAchievements()">🏆 Prestaties</button>
+    <button class="shopOpenBtn" onclick="openCoreShop()" style="border-color:#9be3ff; color:#9be3ff;">🔮 Kern-winkel</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
@@ -214,6 +215,16 @@
   <button class="backBtn" onclick="closeAchievements()">← Terug</button>
 </div>
 <div id="achievementToast"></div>
+<div id="coreShopScreen">
+  <h1>🔮 Elemental Kern-winkel</h1>
+  <button class="topBackBtn" onclick="closeCoreShop()">← Menu</button>
+  <div class="coinDisplay">🔮 <span id="coreShopCores">0</span> Elemental Cores</div>
+  <div class="shopSection">
+    <h3>Wereld 2-only. Verdien Elemental Cores door bosses te verslaan tijdens Eindbaas Rush in Wereld 2.</h3>
+    <div id="coreShopList"></div>
+  </div>
+  <button class="backBtn" onclick="closeCoreShop()">← Terug</button>
+</div>
 <div id="hud">
   Score: <span class="score" id="scoreVal">0</span> &nbsp;|&nbsp;
   Highscore: <span class="score" id="highScoreVal">0</span> &nbsp;|&nbsp;
