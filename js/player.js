@@ -459,6 +459,8 @@ function initGame() {
   }
   document.getElementById('msg').style.display = 'none';
   document.getElementById('levelHud').style.display = gameMode === 'levels' ? 'inline' : 'none';
+  document.getElementById('sprintHud').style.display = gameMode === 'sprint' ? 'inline' : 'none';
+  if (gameMode === 'sprint') sprintEndTime = performance.now() + SPRINT_DURATION;
   updateHUD();
 }
 
@@ -573,6 +575,26 @@ function startBossRush() {
 }
 window.startBossRush = startBossRush;
 
+function startSprintMode() {
+  // Golfsprint: 3 minuten lang zoveel mogelijk score halen, onkwetsbaar zolang de klok loopt — pure snelheid, geen overleving nodig
+  gameMode = 'sprint';
+  currentLevel = 1;
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  exitSkinPractice();
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'none';
+  initGame();
+  startMusic();
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+}
+window.startSprintMode = startSprintMode;
+
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;
   document.getElementById('scoreVal').textContent = inPracticeSession ? '—' : score;
@@ -585,6 +607,11 @@ function updateHUD() {
   if (gameMode === 'levels') {
     document.getElementById('levelVal').textContent = currentLevel;
     document.getElementById('levelProgressVal').textContent = `${levelKills}/${levelTarget}`;
+  }
+  if (gameMode === 'sprint') {
+    const remainingMs = Math.max(0, sprintEndTime - performance.now());
+    const remainingSec = Math.ceil(remainingMs / 1000);
+    document.getElementById('sprintTimerVal').textContent = `${Math.floor(remainingSec / 60)}:${String(remainingSec % 60).padStart(2, '0')}`;
   }
   const now = performance.now();
   const active = [];

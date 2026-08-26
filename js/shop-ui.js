@@ -235,6 +235,7 @@ function previewPowerup(id) {
   gameMode = 'practice';
   document.getElementById('powerupShopScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
+  document.getElementById('sprintHud').style.display = 'none';
 
   initGame(); // volledige reset + 4 gewone bots, net als een echt potje
 
@@ -872,6 +873,7 @@ function startPractice(botName) {
   exitSkinPractice();
   document.getElementById('botsInfoScreen').style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
+  document.getElementById('sprintHud').style.display = 'none';
 
   resetPlayer();
   bots = [];
@@ -1003,6 +1005,7 @@ function startDodgePractice() {
   exitSkinPractice();
   document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('levelHud').style.display = 'none';
+  document.getElementById('sprintHud').style.display = 'none';
 
   resetPlayer();
   bots = [];

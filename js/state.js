@@ -324,6 +324,10 @@ let gameOver = false;
 let isPaused = false;
 let gameStarted = false;
 let gameMode = 'endless'; // 'endless' or 'levels'
+// ---- Golfsprint: tijdgebonden modus van 3 minuten, geen levens (onkwetsbaar), pure snelheid ----
+const SPRINT_DURATION = 180000;
+let sprintEndTime = 0;
+let highScoreSprint = Number(localStorage.getItem('botShooterHighScoreSprint')) || 0;
 let lastShot = 0;
 const shootCooldown = 120; // ms - hou spatie ingedrukt voor snelvuur
 let lastPowerupSpawn = 0;

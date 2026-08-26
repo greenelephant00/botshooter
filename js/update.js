@@ -3,6 +3,11 @@ function update() {
 
   // Player movement
   const now0 = performance.now();
+
+  if (gameMode === 'sprint' && now0 >= sprintEndTime) {
+    endGame(true);
+    return;
+  }
   player.speed = now0 < player.boostUntil ? player.baseSpeed * 1.8 : player.baseSpeed;
   if (now0 < player.slowUntil) player.speed *= 0.5;
   if (now0 < sandstormUntil) player.speed *= 0.7;
@@ -1444,14 +1449,14 @@ function update() {
       levelComplete();
       return;
     }
-  } else if (gameMode === 'endless' || gameMode === 'hardcore') {
+  } else if (gameMode === 'endless' || gameMode === 'hardcore' || gameMode === 'sprint') {
     if (bots.length < 3 + Math.floor(score / 50)) {
       if (Math.random() < 0.015) spawnBot();
     }
   }
 
-  // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
+  // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen, niet in Golfsprint)
+  if (gameMode !== 'practice' && gameMode !== 'sprint' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
     if (bossRushActive) {
       // Eindbaas Rush: geen score/level-drempel, gewoon de bosses van de gekozen wereld na elkaar
       const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
@@ -1563,6 +1568,20 @@ function endGame(won) {
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen met deze skin.</span>`;
     msgBtn.textContent = 'Opnieuw oefenen';
     msgBtn.onclick = () => { equippedSkin = previousEquippedSkin; startSkinPractice(skinPracticeId); };
+  } else if (gameMode === 'sprint') {
+    recordSessionStats(score);
+    const isNewHigh = score > highScoreSprint;
+    if (isNewHigh) {
+      highScoreSprint = score;
+      localStorage.setItem('botShooterHighScoreSprint', highScoreSprint);
+    }
+    document.getElementById('msgText').innerHTML =
+      `⏱ Tijd is om! Golfsprint-score: ${score}` +
+      (isNewHigh ? `<br><span style="color:#ffd60a; font-size:22px;">Nieuwe highscore!</span>` : `<br><span style="font-size:18px; color:#aaa;">Highscore: ${highScoreSprint}</span>`);
+    checkAchievements();
+    updateHUD();
+    msgBtn.textContent = 'Opnieuw sprinten';
+    msgBtn.onclick = restartGame;
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
     recordSessionStats(score);
     const isHardcore = gameMode === 'hardcore';
