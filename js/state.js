@@ -749,7 +749,7 @@ let lvlCoreShield = Number(localStorage.getItem('botShooterLvlCoreShield')) || 0
 const CORE_SHIELD_LEVELS = [23, 33, 43];
 const CORE_SHIELD_REDUCTIONS = [0.1, 0.18, 0.25];
 let hasCoreHarvest = localStorage.getItem('botShooterHasCoreHarvest') === 'true';
-const CORE_HARVEST_PRICE = 38;
+const CORE_HARVEST_PRICE = 53;
 const CORE_HARVEST_BONUS = 3; // extra Elemental Cores per verslagen boss in Eindbaas Rush
 let lvlCoreSpeed = Number(localStorage.getItem('botShooterLvlCoreSpeed')) || 0;
 const CORE_SPEED_LEVELS = [23, 33, 43];
