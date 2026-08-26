@@ -6,10 +6,12 @@ let powerups = [];
 let explosions = [];
 // Death-animation-op-de-bot wanneer je een prestatie-exclusieve skin draagt (titanchrome/supernova/neonultra) en een bot killt
 let botDeathAnimations = [];
-const EXCLUSIVE_SKIN_IDS = ['titanchrome', 'supernova', 'neonultra'];
+// Elke prestatie-exclusieve skin heeft zijn eigen unieke death animation voor bots die je ermee killt
+const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'novacollapse', neonultra: 'neonoverload' };
 function maybeTriggerExclusiveSkinDeathAnim(bot) {
-  if (!EXCLUSIVE_SKIN_IDS.includes(getSkin())) return;
-  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: equippedDeathAnimation, born: performance.now() });
+  const animType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
+  if (!animType) return;
+  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: animType, born: performance.now() });
 }
 let iceGrenades = [];
 let cryoGrenadeLastUsed = 0;

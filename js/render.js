@@ -4078,6 +4078,103 @@ function drawDeathAnimation(c, type, age, r) {
       c.fillStyle = '#8a2be2';
       c.beginPath(); c.arc(Math.cos(a) * (r + t * 60), Math.sin(a) * (r + t * 60), 2, 0, Math.PI * 2); c.fill();
     }
+  } else if (type === 'chromeshatter') {
+    // Titan Chroom-exclusief: lichaam vloeit even als vloeibaar chroom, rimpelt, en spat dan uiteen in spiegelende scherven met een rondzwenkende lichtflits
+    const rippleT = Math.min(1, age / (DEATH_ANIM_DURATION * 0.35));
+    if (t < 0.35) {
+      c.globalAlpha = 1;
+      const grad = c.createRadialGradient(0, 0, 0, 0, 0, r + 4);
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(0.5, '#b8c6d6');
+      grad.addColorStop(1, '#5a6b7a');
+      c.fillStyle = grad;
+      c.beginPath(); c.arc(0, 0, r + Math.sin(rippleT * Math.PI * 4) * 2, 0, Math.PI * 2); c.fill();
+      const sweepA = rippleT * Math.PI * 2 * 3;
+      c.strokeStyle = 'rgba(255,255,255,0.9)';
+      c.lineWidth = 3;
+      c.beginPath(); c.arc(0, 0, r * 0.7, sweepA, sweepA + 0.9); c.stroke();
+    } else {
+      const pt = (t - 0.35) / 0.65;
+      c.globalAlpha = Math.max(0, 1 - pt);
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - pt) * 1.4), 0, Math.PI * 2); c.fill();
+      const shards = 12;
+      for (let i = 0; i < shards; i++) {
+        const a = (Math.PI * 2 / shards) * i + i * 0.5;
+        const dist = pt * (r + 85);
+        c.save();
+        c.translate(Math.cos(a) * dist, Math.sin(a) * dist);
+        c.rotate(a + pt * 5);
+        const shardGrad = c.createLinearGradient(-4, 0, 4, 0);
+        shardGrad.addColorStop(0, '#ffffff');
+        shardGrad.addColorStop(1, '#7d8b99');
+        c.fillStyle = shardGrad;
+        c.beginPath(); c.moveTo(0, -6); c.lineTo(4, 0); c.lineTo(0, 6); c.lineTo(-4, 0); c.closePath(); c.fill();
+        c.restore();
+      }
+    }
+  } else if (type === 'novacollapse') {
+    // Supernova-exclusief: lichaam gloeit witheet en zwelt op, klapt dan razendsnel in tot een punt en detoneert in een verblindende stersprong
+    const collapseEnd = 0.45;
+    if (t < collapseEnd) {
+      const ct = t / collapseEnd;
+      c.globalAlpha = 1;
+      c.fillStyle = `hsl(${45 - ct * 20}, 100%, ${70 + Math.sin(ct * 20) * 10}%)`;
+      c.beginPath(); c.arc(0, 0, r * (1 + ct * 0.6), 0, Math.PI * 2); c.fill();
+      c.globalAlpha = 0.5;
+      c.fillStyle = '#fff8dc';
+      c.beginPath(); c.arc(0, 0, r * (1 + ct * 0.6) * 0.6, 0, Math.PI * 2); c.fill();
+    } else {
+      const pt = (t - collapseEnd) / (1 - collapseEnd);
+      const flashT = Math.min(1, pt / 0.15);
+      c.globalAlpha = Math.max(0, 1 - Math.max(0, pt - 0.15) / 0.85);
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(0, 0, r * (1 - flashT) * 0.8 + flashT * (r + pt * 100), 0, Math.PI * 2); c.fill();
+      const spikes = 16;
+      for (let i = 0; i < spikes; i++) {
+        const a = (Math.PI * 2 / spikes) * i + pt * 3;
+        const dist = pt * (r + 110);
+        c.strokeStyle = `hsl(${40 + i * 4}, 100%, 70%)`;
+        c.lineWidth = Math.max(0, 3 * (1 - pt));
+        c.beginPath();
+        c.moveTo(Math.cos(a) * dist * 0.4, Math.sin(a) * dist * 0.4);
+        c.lineTo(Math.cos(a) * dist, Math.sin(a) * dist);
+        c.stroke();
+      }
+    }
+  } else if (type === 'neonoverload') {
+    // Neon Ultra-exclusief: de regenboogring versnelt tot een waas, overbelast, en schiet dan ronddraaiende neon-spaken alle kanten op weg
+    const overloadEnd = 0.4;
+    if (t < overloadEnd) {
+      const ot = t / overloadEnd;
+      c.fillStyle = '#050505';
+      c.beginPath(); c.arc(0, 0, r * 0.6, 0, Math.PI * 2); c.fill();
+      const rings = 3;
+      for (let i = 0; i < rings; i++) {
+        const hue = (performance.now() / (6 - i * 1.5) + i * 60) % 360;
+        c.globalAlpha = 0.9;
+        c.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+        c.lineWidth = 3 - i * 0.5;
+        c.beginPath(); c.arc(0, 0, r + i * 4 + ot * 4, 0, Math.PI * 2); c.stroke();
+      }
+    } else {
+      const pt = (t - overloadEnd) / (1 - overloadEnd);
+      c.globalAlpha = Math.max(0, 1 - pt);
+      c.fillStyle = '#ffffff';
+      c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - pt)), 0, Math.PI * 2); c.fill();
+      const spokes = 10;
+      for (let i = 0; i < spokes; i++) {
+        const a = (Math.PI * 2 / spokes) * i + pt * 4;
+        const dist = pt * (r + 95);
+        const hue = (i * 36 + pt * 200) % 360;
+        c.strokeStyle = `hsl(${hue}, 100%, 60%)`;
+        c.lineWidth = 3;
+        c.beginPath();
+        c.moveTo(Math.cos(a) * dist * 0.3, Math.sin(a) * dist * 0.3);
+        c.lineTo(Math.cos(a) * dist, Math.sin(a) * dist);
+        c.stroke();
+      }
+    }
   } else {
     // Standaard: helemaal geen effect — je verdwijnt gewoon zonder animatie
   }
