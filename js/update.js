@@ -1210,6 +1210,7 @@ function update() {
             score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
             if (gameMode === 'levels') levelKills++;
             if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
+            if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
           }
         });
         spawnParticles(player.x, player.y, '#ff8800');

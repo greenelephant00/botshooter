@@ -1147,6 +1147,7 @@ function meleeAttack(bot) {
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
       if (armor.vampireHeal) player.hp = Math.min(player.maxHp, player.hp + armor.vampireHeal);
+      if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
     }
   }
 }
@@ -2211,6 +2212,7 @@ function rootGrabAttack(count) {
       bot.dead = true;
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
+      if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
     }, riseDur + wrapDur);
   });
 }
