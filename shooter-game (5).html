@@ -42,6 +42,10 @@
 <div id="bossAlert">⚠ BOSS NADERT ⚠</div>
 <div id="startScreen">
   <button class="shopOpenBtn" id="world2Btn" onclick="handleWorld2Click()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#ff8800; color:#ff8800;">🔥❄️🪨 Wereld 2</button>
+  <div style="position:absolute; top:64px; left:16px; display:flex; gap:6px;">
+    <input type="number" id="gambleWagerInput" min="10" step="10" value="100" title="Inzet in munten" style="width:70px;">
+    <button class="shopOpenBtn" onclick="startGamble()" style="width:auto; margin:0; border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
+  </div>
   <h1>Bot Shooter</h1>
   <div class="coinDisplay">🪙 <span id="startCoins">0</span></div>
   <p>Kies een spelmodus</p>
@@ -75,13 +79,13 @@
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
   </div>
-  <div class="dodgePracticeRow">
-    <input type="number" id="gambleWagerInput" min="10" step="10" value="100" title="Inzet in munten">
-    <button class="shopOpenBtn" onclick="startGamble()" style="border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
-  </div>
 </div>
 <div id="world2Screen">
   <button class="shopOpenBtn" onclick="goToWorld1()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
+  <div style="position:absolute; top:64px; left:16px; display:flex; gap:6px;">
+    <input type="number" id="gambleWagerInput2" min="10" step="10" value="100" title="Inzet in munten" style="width:70px;">
+    <button class="shopOpenBtn" onclick="startGamble()" style="width:auto; margin:0; border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
+  </div>
   <h1>🔥❄️🪨 Wereld 2: Elementen</h1>
   <div class="coinDisplay">🪙 <span id="world2Coins">0</span> &nbsp; 🔮 <span id="world2Cores">0</span></div>
   <p>Kies een spelmodus</p>
@@ -117,10 +121,6 @@
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
     <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk-oefening</button>
-  </div>
-  <div class="dodgePracticeRow">
-    <input type="number" id="gambleWagerInput2" min="10" step="10" value="100" title="Inzet in munten">
-    <button class="shopOpenBtn" onclick="startGamble()" style="border-color:#4cd964; color:#4cd964;">🎲 Gokje (2x of niks)</button>
   </div>
 </div>
 <div id="shopScreen">
