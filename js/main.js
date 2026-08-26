@@ -4,6 +4,8 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
+menuBgLoop();
+
 // Toon coins op het startscherm bij laden
 document.getElementById('startCoins').textContent = coins;
 updateWorld2Button();

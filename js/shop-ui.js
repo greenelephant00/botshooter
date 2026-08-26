@@ -895,6 +895,53 @@ function closeTrailShop() {
 }
 window.closeTrailShop = closeTrailShop;
 
+function buyMenuBackground(id) {
+  const b = MENU_BACKGROUNDS.find(x => x.id === id);
+  if (!b || ownedMenuBackgrounds.includes(id) || coins < b.price) return;
+  coins -= b.price;
+  ownedMenuBackgrounds.push(id);
+  saveShopState();
+  localStorage.setItem('botShooterOwnedMenuBackgrounds', JSON.stringify(ownedMenuBackgrounds));
+  renderMenuBgShop();
+}
+window.buyMenuBackground = buyMenuBackground;
+
+function equipMenuBackground(id) {
+  if (!ownedMenuBackgrounds.includes(id)) return;
+  equippedMenuBackground = id;
+  localStorage.setItem('botShooterEquippedMenuBackground', equippedMenuBackground);
+  renderMenuBgShop();
+}
+window.equipMenuBackground = equipMenuBackground;
+
+function renderMenuBgShop() {
+  document.getElementById('menuBgShopCoins').textContent = coins;
+  document.getElementById('menuBgShopList').innerHTML = MENU_BACKGROUNDS.map(b => {
+    const owned = ownedMenuBackgrounds.includes(b.id);
+    const equipped = equippedMenuBackground === b.id;
+    const btn = equipped
+      ? `<button class="equipped" disabled>Uitgerust</button>`
+      : owned
+        ? `<button class="equip" onclick="equipMenuBackground('${b.id}')">Uitrusten</button>`
+        : `<button class="buy" onclick="buyMenuBackground('${b.id}')" ${coins < b.price ? 'disabled' : ''}>Koop · 🪙${b.price}</button>`;
+    return `<div class="shopItem"><div class="info"><div class="name">${b.name}</div><div class="desc">${b.desc}</div></div>${btn}</div>`;
+  }).join('');
+}
+window.renderMenuBgShop = renderMenuBgShop;
+
+function openMenuBgShop() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('menuBgShopScreen').style.display = 'flex';
+  renderMenuBgShop();
+}
+window.openMenuBgShop = openMenuBgShop;
+
+function closeMenuBgShop() {
+  document.getElementById('menuBgShopScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeMenuBgShop = closeMenuBgShop;
+
 function openKillCam() {
   if (!bestMomentSnapshot) return;
   document.getElementById('killCamLabel').textContent = bestMomentLabel;

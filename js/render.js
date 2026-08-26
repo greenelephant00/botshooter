@@ -4181,6 +4181,114 @@ function drawDeathAnimation(c, type, age, r) {
   c.globalAlpha = 1;
 }
 
+// ---- Menu-achtergronden: animatie op het aparte menuBgCanvas, achter het hoofdmenu ----
+let menuBgStarsCache = [];
+let menuBgEmbersCache = [];
+let menuBgMatrixCols = [];
+function drawMenuBackground(mc, mctx) {
+  const w = mc.width, h = mc.height;
+  mctx.clearRect(0, 0, w, h);
+  const type = equippedMenuBackground;
+  if (type === 'none' || w === 0 || h === 0) return;
+  const now = performance.now();
+  if (type === 'starfield') {
+    if (menuBgStarsCache.length === 0) {
+      for (let i = 0; i < 150; i++) menuBgStarsCache.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.5 + 0.5, speed: Math.random() * 0.3 + 0.05, phase: Math.random() * Math.PI * 2 });
+    }
+    mctx.fillStyle = '#05050a';
+    mctx.fillRect(0, 0, w, h);
+    menuBgStarsCache.forEach(s => {
+      s.y += s.speed;
+      if (s.y > h) s.y = 0;
+      mctx.globalAlpha = 0.5 + 0.5 * Math.sin(now / 500 + s.phase);
+      mctx.fillStyle = '#fff';
+      mctx.beginPath(); mctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); mctx.fill();
+    });
+    mctx.globalAlpha = 1;
+  } else if (type === 'nebula') {
+    mctx.fillStyle = '#08050f';
+    mctx.fillRect(0, 0, w, h);
+    const blobs = 5;
+    for (let i = 0; i < blobs; i++) {
+      const a = now / 8000 + i * (Math.PI * 2 / blobs);
+      const cx = w / 2 + Math.cos(a) * w * 0.3;
+      const cy = h / 2 + Math.sin(a * 0.7) * h * 0.3;
+      const hue = (i * 70 + now / 50) % 360;
+      const grad = mctx.createRadialGradient(cx, cy, 0, cx, cy, 220);
+      grad.addColorStop(0, `hsla(${hue}, 80%, 55%, 0.35)`);
+      grad.addColorStop(1, 'hsla(0,0%,0%,0)');
+      mctx.fillStyle = grad;
+      mctx.beginPath(); mctx.arc(cx, cy, 220, 0, Math.PI * 2); mctx.fill();
+    }
+  } else if (type === 'matrix') {
+    const colWidth = 18;
+    const cols = Math.ceil(w / colWidth);
+    if (menuBgMatrixCols.length !== cols) menuBgMatrixCols = Array.from({ length: cols }, () => Math.random() * h);
+    mctx.fillStyle = 'rgba(2, 8, 2, 0.15)';
+    mctx.fillRect(0, 0, w, h);
+    mctx.fillStyle = '#3dff6a';
+    mctx.font = '16px monospace';
+    menuBgMatrixCols.forEach((y, i) => {
+      const ch = String.fromCharCode(0x30A0 + Math.floor(Math.random() * 96));
+      mctx.fillText(ch, i * colWidth, y);
+      menuBgMatrixCols[i] += 6 + Math.random() * 4;
+      if (menuBgMatrixCols[i] > h && Math.random() < 0.02) menuBgMatrixCols[i] = 0;
+    });
+  } else if (type === 'lava') {
+    mctx.fillStyle = '#1a0500';
+    mctx.fillRect(0, 0, w, h);
+    const cracks = 6;
+    for (let i = 0; i < cracks; i++) {
+      const cy = (h / cracks) * i + Math.sin(now / 1000 + i) * 20;
+      const glow = 0.4 + 0.3 * Math.sin(now / 400 + i * 2);
+      mctx.strokeStyle = `rgba(255, ${90 + Math.floor(glow * 80)}, 20, ${glow})`;
+      mctx.lineWidth = 6;
+      mctx.beginPath();
+      mctx.moveTo(0, cy);
+      for (let x = 0; x <= w; x += 40) mctx.lineTo(x, cy + Math.sin(x / 80 + now / 800 + i) * 15);
+      mctx.stroke();
+    }
+    if (menuBgEmbersCache.length === 0) {
+      for (let i = 0; i < 40; i++) menuBgEmbersCache.push({ x: Math.random() * w, y: h + Math.random() * h, speed: 0.3 + Math.random() * 0.6, r: 1 + Math.random() * 2 });
+    }
+    mctx.fillStyle = '#ff8c42';
+    menuBgEmbersCache.forEach(p => {
+      p.y -= p.speed;
+      if (p.y < 0) p.y = h;
+      mctx.globalAlpha = 0.7;
+      mctx.beginPath(); mctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); mctx.fill();
+    });
+    mctx.globalAlpha = 1;
+  } else if (type === 'aurora') {
+    mctx.fillStyle = '#03060d';
+    mctx.fillRect(0, 0, w, h);
+    const bands = 3;
+    for (let i = 0; i < bands; i++) {
+      const hue = (140 + i * 60 + now / 50) % 360;
+      mctx.strokeStyle = `hsla(${hue}, 90%, 60%, 0.35)`;
+      mctx.lineWidth = 40;
+      mctx.beginPath();
+      for (let x = 0; x <= w; x += 20) {
+        const y = h * 0.3 + i * 60 + Math.sin(x / 150 + now / 1200 + i) * 50;
+        if (x === 0) mctx.moveTo(x, y); else mctx.lineTo(x, y);
+      }
+      mctx.stroke();
+    }
+  }
+}
+
+function menuBgLoop() {
+  const s1 = document.getElementById('startScreen');
+  const s2 = document.getElementById('world2Screen');
+  const world1Visible = s1 && s1.style.display !== 'none';
+  const world2Visible = s2 && s2.style.display !== 'none';
+  if (world1Visible) drawMenuBackground(menuBgCanvas1, menuBgCtx1);
+  else menuBgCtx1.clearRect(0, 0, menuBgCanvas1.width, menuBgCanvas1.height);
+  if (world2Visible) drawMenuBackground(menuBgCanvas2, menuBgCtx2);
+  else menuBgCtx2.clearRect(0, 0, menuBgCanvas2.width, menuBgCanvas2.height);
+  requestAnimationFrame(menuBgLoop);
+}
+
 function drawTrailParticle(p) {
   const t = 1 - p.life / p.maxLife;
   ctx.save();

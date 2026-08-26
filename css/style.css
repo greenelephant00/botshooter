@@ -10,6 +10,13 @@
     background: #16213e;
     cursor: crosshair;
   }
+  .menuBgCanvas {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    display: block;
+    pointer-events: none;
+  }
   #muteBtn {
     position: absolute;
     top: 12px;
@@ -370,7 +377,7 @@
     font-weight: bold;
     margin-bottom: 6px;
   }
-  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen, #statsScreen, #trailShopScreen {
+  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen, #statsScreen, #trailShopScreen, #menuBgShopScreen {
     position: absolute;
     inset: 0;
     background: rgba(10, 10, 20, 0.96);

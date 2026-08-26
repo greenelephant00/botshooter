@@ -1022,6 +1022,18 @@ const TRAILS = [
   { id: 'rainbow',  name: 'Regenboogspoor',  price: 700, color: '#ff5cf1', desc: 'Laat een kleurwisselend regenboogspoor achter je vallen terwijl je beweegt.' }
 ];
 
+// ---- Menu-achtergronden: animated achtergrond voor het hoofdmenu (Wereld 1 en Wereld 2) ----
+let ownedMenuBackgrounds = JSON.parse(localStorage.getItem('botShooterOwnedMenuBackgrounds') || '["none"]');
+let equippedMenuBackground = localStorage.getItem('botShooterEquippedMenuBackground') || 'none';
+const MENU_BACKGROUNDS = [
+  { id: 'none',      name: 'Geen',          price: 0,   desc: 'Geen animatie, gewoon de standaard donkere achtergrond.' },
+  { id: 'starfield', name: 'Sterrenveld',   price: 400, desc: 'Rustig drijvende, twinkelende sterren op een diepzwarte achtergrond.' },
+  { id: 'nebula',    name: 'Nevelwolk',     price: 500, desc: 'Langzaam kolkende, kleurrijke nevelwolken die zachtjes gloeien en verschuiven.' },
+  { id: 'matrix',    name: 'Codewolk',      price: 500, desc: 'Groene digitale tekens die van boven naar beneden naar beneden vallen, als een regen van code.' },
+  { id: 'lava',      name: 'Lavaveld',      price: 550, desc: 'Pulserende, gebarsten lava met opstijgende gloeiende asdeeltjes.' },
+  { id: 'aurora',    name: 'Poollicht',     price: 600, desc: 'Golvende, kleurwisselende poollicht-banden die rustig over het scherm bewegen.' }
+];
+
 // Elementale pantsers: alleen te koop in de Wereld 2-shop
 const WORLD2_ARMOR = [
   { id: 'fireshield',   name: 'Vuurschild',            price: 1700, hpBonus: 30, reduction: 0, fireResist: 0.6, desc: '+30 max HP. Brandwonden (bv. van Lavagolem/Vulkaanheer) duren 60% korter.' },

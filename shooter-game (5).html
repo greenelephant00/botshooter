@@ -41,6 +41,7 @@
 </div>
 <div id="bossAlert">⚠ BOSS NADERT ⚠</div>
 <div id="startScreen">
+  <canvas id="menuBgCanvas1" class="menuBgCanvas"></canvas>
   <button class="shopOpenBtn" id="world2Btn" onclick="handleWorld2Click()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#ff8800; color:#ff8800;">🔥❄️🪨 Wereld 2</button>
   <h1>Bot Shooter</h1>
   <div class="coinDisplay">🪙 <span id="startCoins">0</span></div>
@@ -77,6 +78,7 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
+    <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
     <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
@@ -85,6 +87,7 @@
   </div>
 </div>
 <div id="world2Screen">
+  <canvas id="menuBgCanvas2" class="menuBgCanvas"></canvas>
   <button class="shopOpenBtn" onclick="goToWorld1()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#4cc9f0; color:#4cc9f0;">🌍 Wereld 1</button>
   <h1>🔥❄️🪨 Wereld 2: Elementen</h1>
   <div class="coinDisplay">🪙 <span id="world2Coins">0</span> &nbsp; 🔮 <span id="world2Cores">0</span></div>
@@ -122,6 +125,9 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
     <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
     <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
@@ -205,6 +211,16 @@
     <div id="trailShopList"></div>
   </div>
   <button class="backBtn" onclick="closeTrailShop()">← Terug</button>
+</div>
+<div id="menuBgShopScreen">
+  <h1>🌌 Menu-achtergronden</h1>
+  <div class="coinDisplay">🪙 <span id="menuBgShopCoins">0</span></div>
+  <button class="topBackBtn" onclick="closeMenuBgShop()">← Menu</button>
+  <div class="shopSection">
+    <h3>Animatie achter het hoofdmenu</h3>
+    <div id="menuBgShopList"></div>
+  </div>
+  <button class="backBtn" onclick="closeMenuBgShop()">← Terug</button>
 </div>
 <div id="transformShopScreen">
   <h1>🔄 Transform</h1>
