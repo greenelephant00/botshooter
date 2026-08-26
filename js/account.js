@@ -28,7 +28,9 @@ const ACCOUNT_KEYS = [
   'botShooterLvlCoreSpeed', 'botShooterLvlCoreRegen', 'botShooterLvlCoreVampire',
   'botShooterHasCoreAura', 'botShooterHasCoreShock', 'botShooterClaimedAchievementRewards',
   'botShooterOwnedWeaponSkins', 'botShooterEquippedWeaponSkins',
-  'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation'
+  'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation',
+  'botShooterTotalLifetimeKills', 'botShooterTotalPlayTimeMs', 'botShooterTotalScoreSum',
+  'botShooterTotalGamesPlayed', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint'
 ];
 
 let currentAccount = null;

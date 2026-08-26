@@ -442,6 +442,7 @@ function initGame() {
   sessionBestStreak = 0;
   killCamRecording = false;
   score = 0;
+  gameSessionStart = performance.now();
   gameOver = false;
   levelTransition = false;
   lastPowerupSpawn = performance.now();

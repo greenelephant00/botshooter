@@ -73,6 +73,8 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
+    <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+    <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
@@ -113,6 +115,10 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
     <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+    <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
     <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
@@ -176,6 +182,15 @@
     <div id="skinsShopList"></div>
   </div>
   <button class="backBtn" onclick="closeSkinsShop()">← Terug</button>
+</div>
+<div id="statsScreen">
+  <h1>📊 Statistieken</h1>
+  <button class="topBackBtn" onclick="closeStatsScreen()">← Menu</button>
+  <div class="shopSection">
+    <h3>Al je speeltijd op een rij</h3>
+    <div id="statsList" class="statsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeStatsScreen()">← Terug</button>
 </div>
 <div id="transformShopScreen">
   <h1>🔄 Transform</h1>

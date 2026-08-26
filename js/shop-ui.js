@@ -804,6 +804,43 @@ function closeDeathAnimShop() {
 }
 window.closeDeathAnimShop = closeDeathAnimShop;
 
+function formatPlayTime(ms) {
+  const totalSec = Math.floor(ms / 1000);
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  if (h > 0) return `${h}u ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function renderStatsScreen() {
+  const avgScore = totalGamesPlayed > 0 ? Math.round(totalScoreSum / totalGamesPlayed) : 0;
+  const rows = [
+    ['Totaal aantal kills', totalLifetimeKills.toLocaleString('nl-NL')],
+    ['Totale speeltijd', formatPlayTime(totalPlayTimeMs)],
+    ['Potjes gespeeld', totalGamesPlayed.toLocaleString('nl-NL')],
+    ['Gemiddelde score per potje', avgScore.toLocaleString('nl-NL')],
+    ['Favoriete wapen', favoriteWeaponName()]
+  ];
+  document.getElementById('statsList').innerHTML = rows.map(([label, value]) =>
+    `<div class="statsRow"><span class="statsLabel">${label}</span><span class="statsValue">${value}</span></div>`
+  ).join('');
+}
+
+function openStatsScreen() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('statsScreen').style.display = 'flex';
+  renderStatsScreen();
+}
+window.openStatsScreen = openStatsScreen;
+
+function closeStatsScreen() {
+  document.getElementById('statsScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeStatsScreen = closeStatsScreen;
+
 function openKillCam() {
   if (!bestMomentSnapshot) return;
   document.getElementById('killCamLabel').textContent = bestMomentLabel;

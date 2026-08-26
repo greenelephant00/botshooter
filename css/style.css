@@ -370,7 +370,7 @@
     font-weight: bold;
     margin-bottom: 6px;
   }
-  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen {
+  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen, #statsScreen {
     position: absolute;
     inset: 0;
     background: rgba(10, 10, 20, 0.96);
@@ -383,7 +383,7 @@
     overflow-y: auto;
     padding: 30px 0 50px;
   }
-  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1, #achievementsScreen h1, #coreShopScreen h1, #weaponSkinsScreen h1, #deathAnimScreen h1 {
+  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1, #achievementsScreen h1, #coreShopScreen h1, #weaponSkinsScreen h1, #deathAnimScreen h1, #statsScreen h1 {
     margin: 0 0 4px;
     font-size: 30px;
   }
@@ -424,6 +424,31 @@
     color: #ffd60a;
     font-weight: bold;
     margin-top: 4px;
+  }
+  .statsList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+  .statsRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 12px 16px;
+  }
+  .statsRow .statsLabel {
+    color: #aaa;
+    font-size: 14px;
+  }
+  .statsRow .statsValue {
+    color: #ffd60a;
+    font-weight: bold;
+    font-size: 16px;
   }
   @keyframes achievementToastIn {
     from { opacity: 0; transform: translateX(30px); }

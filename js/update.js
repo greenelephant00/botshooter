@@ -600,6 +600,7 @@ function update() {
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
           maybeTriggerExclusiveSkinDeathAnim(bot);
+          recordKillStat();
           player.comboStreak = Math.min(20, player.comboStreak + 1);
           player.comboLastKill = performance.now();
           if (player.comboStreak > sessionBestStreak) {
@@ -1094,6 +1095,7 @@ function update() {
           if (bot.dead) return;
           bot.dead = true;
           maybeTriggerExclusiveSkinDeathAnim(bot);
+          recordKillStat();
           score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
           if (gameMode === 'levels') levelKills++;
           spawnParticles(bot.x, bot.y, '#cfe8ee');
@@ -1231,6 +1233,7 @@ function update() {
           if (bot.hp <= 0 && !bot.immortal) {
             bot.dead = true;
             maybeTriggerExclusiveSkinDeathAnim(bot);
+          recordKillStat();
             score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
             if (gameMode === 'levels') levelKills++;
             if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
@@ -1561,6 +1564,7 @@ function endGame(won) {
     msgBtn.textContent = 'Opnieuw oefenen';
     msgBtn.onclick = () => { equippedSkin = previousEquippedSkin; startSkinPractice(skinPracticeId); };
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
+    recordSessionStats(score);
     const isHardcore = gameMode === 'hardcore';
     let currentHigh = currentWorld === 2 ? highScoreWorld2 : (isHardcore ? highScoreHardcore : highScore);
     if (score > currentHigh) {
@@ -1586,6 +1590,7 @@ function endGame(won) {
     msgBtn.textContent = 'Opnieuw spelen';
     msgBtn.onclick = restartGame;
   } else {
+    recordSessionStats(score);
     if (currentLevel > highLevel) {
       highLevel = currentLevel;
       localStorage.setItem('botShooterHighLevel', highLevel);
