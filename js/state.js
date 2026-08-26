@@ -171,7 +171,6 @@ let killCamLastRecordEnd = 0;
 let bossRushActive = false;
 let bossRushIndex = 0;
 let bossRushWorld = 1;
-let bossRushCoresEarned = 0;
 
 // ---- Elemental Cores: aparte valuta, alleen te verdienen in Wereld 2 ----
 // Elke keer dat je in Wereld 2 een boss verslaat (in een gewoon potje Endless/Levels/Hardcore, of tijdens
@@ -300,13 +299,12 @@ function onBossDefeated(bot) {
   if (bossRushActive) {
     bossRushIndex++;
   }
-  if (currentWorld === 2) {
+  if (currentWorld === 2 && !bossRushActive) {
     world2BossKillCount++;
     const table = gameMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
     const pos = Math.min(world2BossKillCount, table.length) - 1;
     const coreReward = table[pos] + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
     elementalCores += coreReward;
-    if (bossRushActive) bossRushCoresEarned += coreReward;
     localStorage.setItem('botShooterElementalCores', elementalCores);
   }
   if (!hasFirstBoss) {

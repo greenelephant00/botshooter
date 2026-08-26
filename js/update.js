@@ -1330,8 +1330,8 @@ function update() {
   });
   powerups = powerups.filter(p => !p.collected);
 
-  // Coins: spawn periodically (niet tijdens oefenen)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
+  // Coins: spawn periodically (niet tijdens oefenen, niet tijdens Eindbaas Rush)
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
     lastCoinSpawn = now;
     spawnCoinPickup();
   }
@@ -1544,19 +1544,15 @@ function endGame(won) {
     bossRushActive = false;
     const bossPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
     const totalBosses = bossPool.length;
-    const coreLine = bossRushWorld === 2
-      ? `<br><span style="color:#9be3ff; font-size:16px;">🔮 +${bossRushCoresEarned} Elemental Cores verdiend (totaal: ${elementalCores})</span>`
-      : '';
     if (won) {
       if (bossRushWorld === 2 && !hasBossRushW2) { hasBossRushW2 = true; localStorage.setItem('botShooterHasBossRushW2', 'true'); }
       if (bossRushWorld === 1 && !hasBossRushW1) { hasBossRushW1 = true; localStorage.setItem('botShooterHasBossRushW1', 'true'); }
       checkAchievements();
       document.getElementById('msgText').innerHTML =
-        `👑 Eindbaas Rush voltooid! Alle ${totalBosses} bosses van Wereld ${bossRushWorld} verslagen.` +
-        (bossRushWorld === 2 ? `<br><span style="color:#9be3ff; font-size:16px;">🔮 +${bossRushCoresEarned} Elemental Cores verdiend (totaal: ${elementalCores})</span>` : '');
+        `👑 Eindbaas Rush voltooid! Alle ${totalBosses} bosses van Wereld ${bossRushWorld} verslagen.`;
     } else {
       document.getElementById('msgText').innerHTML =
-        `Eindbaas Rush mislukt — ${bossRushIndex}/${totalBosses} bosses van Wereld ${bossRushWorld} verslagen voordat je stierf.` + coreLine;
+        `Eindbaas Rush mislukt — ${bossRushIndex}/${totalBosses} bosses van Wereld ${bossRushWorld} verslagen voordat je stierf.`;
     }
     updateHUD();
     msgBtn.textContent = 'Opnieuw proberen';

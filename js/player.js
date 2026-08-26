@@ -554,13 +554,12 @@ window.selectMode = selectMode;
 
 function startBossRush() {
   // Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit zonder dood te gaan.
-  // In Wereld 2 verdien je per verslagen boss Elemental Cores, net als in een gewoon potje.
+  // Tijdens Eindbaas Rush spawnen er geen munten en verdien je geen Elemental Cores — puur de bosses verslaan telt.
   gameMode = 'bossrush';
   currentLevel = 1;
   bossRushActive = true;
   bossRushIndex = 0;
   bossRushWorld = currentWorld;
-  bossRushCoresEarned = 0;
   practiceWeaponId = null;
   weaponPracticeActive = false;
   transformPracticeActive = false;
