@@ -1510,27 +1510,7 @@ function endGame(won) {
   const msgBtn = document.getElementById('msgBtn');
   const killCamBtn = document.getElementById('msgKillCamBtn');
   if (killCamBtn) killCamBtn.style.display = bestMomentSnapshot ? 'inline-block' : 'none';
-  if (gambleActive) {
-    gambleActive = false;
-    let currentHigh = currentWorld === 2 ? highScoreWorld2 : highScore;
-    if (score > currentHigh) {
-      currentHigh = score;
-      if (currentWorld === 2) { highScoreWorld2 = score; localStorage.setItem('botShooterHighScoreWorld2', highScoreWorld2); }
-      else { highScore = score; localStorage.setItem('botShooterHighScore', highScore); }
-    }
-    checkAchievements();
-    const won2 = score >= gambleTarget;
-    if (won2) {
-      coins += gambleWager * 2;
-      saveShopState();
-    }
-    updateHUD();
-    document.getElementById('msgText').innerHTML = won2
-      ? `🎲 Gokje gewonnen! Score ${score} ≥ doel ${gambleTarget}.<br><span style="color:#4cd964; font-size:20px;">+${gambleWager * 2} munten (inzet verdubbeld)</span>`
-      : `🎲 Gokje verloren — score ${score} haalde het doel van ${gambleTarget} niet.<br><span style="color:#ff5c5c; font-size:18px;">-${gambleWager} munten kwijt</span>`;
-    msgBtn.textContent = 'Opnieuw spelen';
-    msgBtn.onclick = restartGame;
-  } else if (bossRushActive) {
+  if (bossRushActive) {
     bossRushActive = false;
     const bossPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
     const totalBosses = bossPool.length;
@@ -1645,7 +1625,6 @@ function goToMenu() {
   powerupPreviewActive = false;
   powerupPreviewId = null;
   bossRushActive = false;
-  gambleActive = false;
   exitSkinPractice();
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';

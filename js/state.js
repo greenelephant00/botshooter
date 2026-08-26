@@ -111,11 +111,6 @@ let highScoreWorld2 = Number(localStorage.getItem('botShooterHighScoreWorld2')) 
 const HARDCORE_MULT = 2;
 let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 
-// ---- Munten-gokje: zet munten in voor een Endless-potje, verdubbel bij het halen van je doelscore of raak ze kwijt ----
-let gambleActive = false;
-let gambleWager = 0;
-let gambleTarget = 0;
-
 // ---- Kill Cam: bewaart een screenshot van je indrukwekkendste moment (boss-kill of hoogste killstreak) dit potje ----
 let bestMomentSnapshot = null;
 let bestMomentLabel = '';
