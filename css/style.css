@@ -325,13 +325,18 @@
   .menuBtnRow {
     display: flex;
     gap: 10px;
-    width: 260px;
+    width: 390px;
+    max-width: 92vw;
     margin: 18px auto 0;
   }
   .menuBtnRow .shopOpenBtn {
     width: auto;
     flex: 1;
     margin: 0;
+    padding: 10px 8px;
+    font-size: 13px;
+    white-space: normal;
+    line-height: 1.25;
   }
   .shopOpenBtn:hover { transform: scale(1.04); }
   .dodgePracticeRow {
