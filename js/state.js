@@ -115,12 +115,14 @@ let highLevel = Number(localStorage.getItem('botShooterHighLevel')) || 1;
 let bossRushActive = false;
 let bossRushIndex = 0;
 let bossRushWorld = 1;
+let bossRushMode = 'endless'; // 'endless' of 'levels' — bepaalt in Wereld 2 hoeveel Elemental Cores elke boss oplevert
 let bossRushCoresEarned = 0;
 
 // ---- Elemental Cores: aparte valuta, alleen te verdienen in Eindbaas Rush in Wereld 2 ----
+// Beloning per verslagen boss (1e/2e/3e/4e), afhankelijk van de gekozen Eindbaas Rush-modus
 let elementalCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-const ELEMENTAL_CORE_PER_BOSS = 5;
-const ELEMENTAL_CORE_COMPLETION_BONUS = 20;
+const BOSSRUSH_CORES_ENDLESS = [5, 10, 15, 20];
+const BOSSRUSH_CORES_LEVELS = [2, 5, 8, 15];
 
 // ---- Prestaties ----
 let hasFirstBoss = localStorage.getItem('botShooterHasFirstBoss') === 'true';
@@ -164,7 +166,8 @@ function onBossDefeated(bot) {
   if (bossRushActive) {
     bossRushIndex++;
     if (bossRushWorld === 2) {
-      const coreReward = ELEMENTAL_CORE_PER_BOSS + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
+      const table = bossRushMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
+      const coreReward = (table[bossRushIndex - 1] || 0) + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
       elementalCores += coreReward;
       bossRushCoresEarned += coreReward;
       localStorage.setItem('botShooterElementalCores', elementalCores);

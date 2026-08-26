@@ -1499,11 +1499,6 @@ function endGame(won) {
       ? `<br><span style="color:#9be3ff; font-size:16px;">🔮 +${bossRushCoresEarned} Elemental Cores verdiend (totaal: ${elementalCores})</span>`
       : '';
     if (won) {
-      bossRushCoresEarned += bossRushWorld === 2 ? ELEMENTAL_CORE_COMPLETION_BONUS : 0;
-      if (bossRushWorld === 2) {
-        elementalCores += ELEMENTAL_CORE_COMPLETION_BONUS;
-        localStorage.setItem('botShooterElementalCores', elementalCores);
-      }
       if (bossRushWorld === 2 && !hasBossRushW2) { hasBossRushW2 = true; localStorage.setItem('botShooterHasBossRushW2', 'true'); }
       if (bossRushWorld === 1 && !hasBossRushW1) { hasBossRushW1 = true; localStorage.setItem('botShooterHasBossRushW1', 'true'); }
       checkAchievements();
@@ -1516,7 +1511,7 @@ function endGame(won) {
     }
     updateHUD();
     msgBtn.textContent = 'Opnieuw proberen';
-    msgBtn.onclick = () => { startBossRush(); };
+    msgBtn.onclick = () => { startBossRush(bossRushMode); };
   } else if (weaponPracticeActive) {
     document.getElementById('msgText').innerHTML =
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen.</span>`;

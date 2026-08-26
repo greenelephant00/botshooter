@@ -536,14 +536,15 @@ function selectMode(mode) {
 }
 window.selectMode = selectMode;
 
-function startBossRush() {
+function startBossRush(mode) {
   // Eindbaas Rush: vecht alle bosses van de huidige wereld na elkaar uit zonder dood te gaan.
-  // In Wereld 2 verdien je per verslagen boss (en een bonus bij voltooien) Elemental Cores.
+  // In Wereld 2 verdien je per verslagen boss Elemental Cores; hoeveel hangt af van de gekozen modus (endless/levels).
   gameMode = 'bossrush';
   currentLevel = 1;
   bossRushActive = true;
   bossRushIndex = 0;
   bossRushWorld = currentWorld;
+  bossRushMode = mode === 'levels' ? 'levels' : 'endless';
   bossRushCoresEarned = 0;
   practiceWeaponId = null;
   weaponPracticeActive = false;
@@ -579,7 +580,8 @@ function updateHUD() {
   if (powerupPreviewActive) active.push('🎬 Voorbeeld — keert vanzelf terug naar het menu');
   if (bossRushActive) {
     const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
-    active.push(`👑 Eindbaas Rush: boss ${Math.min(bossRushIndex + 1, rushPool.length)}/${rushPool.length}`);
+    const modeLabel = bossRushWorld === 2 ? ` (${bossRushMode === 'levels' ? 'Levels' : 'Endless'})` : '';
+    active.push(`👑 Eindbaas Rush${modeLabel}: boss ${Math.min(bossRushIndex + 1, rushPool.length)}/${rushPool.length}`);
   }
   if (now < player.boostUntil) active.push('⚡ Speed');
   if (now < player.fireBoostUntil) active.push('🔥 Snelvuur');
