@@ -4181,6 +4181,37 @@ function drawDeathAnimation(c, type, age, r) {
   c.globalAlpha = 1;
 }
 
+function drawTrailParticle(p) {
+  const t = 1 - p.life / p.maxLife;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, 1 - t);
+  if (p.type === 'rainbow') {
+    ctx.fillStyle = `hsl(${(performance.now() / 4 + p.life * 20) % 360}, 90%, 60%)`;
+  } else {
+    const trail = TRAILS.find(tr => tr.id === p.type);
+    ctx.fillStyle = trail ? trail.color : '#fff';
+  }
+  const size = p.type === 'smoke' ? 3 + t * 5 : p.type === 'stars' ? 2 : 2.5;
+  if (p.type === 'stars') {
+    ctx.translate(p.x, p.y);
+    ctx.rotate(t * 3);
+    for (let i = 0; i < 4; i++) {
+      const a = (Math.PI / 2) * i;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(Math.cos(a) * (size + 2), Math.sin(a) * (size + 2));
+      ctx.strokeStyle = ctx.fillStyle;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+  } else {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x, player.y);
@@ -5249,6 +5280,7 @@ function draw() {
     ctx.restore();
   }
 
+  trailParticles.forEach(drawTrailParticle);
   drawPlayer();
   ctx.restore();
 

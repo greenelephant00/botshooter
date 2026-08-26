@@ -74,6 +74,9 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
     <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
     <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
@@ -118,6 +121,7 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+    <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
     <button class="shopOpenBtn" onclick="startSprintMode()" style="border-color:#ffd60a; color:#ffd60a;">⏱ Golfsprint</button>
   </div>
   <div class="dodgePracticeRow">
@@ -191,6 +195,16 @@
     <div id="statsList" class="statsList"></div>
   </div>
   <button class="backBtn" onclick="closeStatsScreen()">← Terug</button>
+</div>
+<div id="trailShopScreen">
+  <h1>🌠 Trails</h1>
+  <div class="coinDisplay">🪙 <span id="trailShopCoins">0</span></div>
+  <button class="topBackBtn" onclick="closeTrailShop()">← Menu</button>
+  <div class="shopSection">
+    <h3>Bewegingsspoor, los van je skin</h3>
+    <div id="trailShopList"></div>
+  </div>
+  <button class="backBtn" onclick="closeTrailShop()">← Terug</button>
 </div>
 <div id="transformShopScreen">
   <h1>🔄 Transform</h1>

@@ -842,6 +842,59 @@ function closeStatsScreen() {
 }
 window.closeStatsScreen = closeStatsScreen;
 
+function buyTrail(id) {
+  const t = TRAILS.find(x => x.id === id);
+  if (!t || ownedTrails.includes(id) || coins < t.price) return;
+  coins -= t.price;
+  ownedTrails.push(id);
+  saveShopState();
+  localStorage.setItem('botShooterOwnedTrails', JSON.stringify(ownedTrails));
+  renderTrailShop();
+}
+window.buyTrail = buyTrail;
+
+function equipTrail(id) {
+  if (!ownedTrails.includes(id)) return;
+  equippedTrail = id;
+  localStorage.setItem('botShooterEquippedTrail', equippedTrail);
+  renderTrailShop();
+}
+window.equipTrail = equipTrail;
+
+function renderTrailShop() {
+  document.getElementById('trailShopCoins').textContent = coins;
+  document.getElementById('trailShopList').innerHTML = TRAILS.map(t => {
+    const owned = ownedTrails.includes(t.id);
+    const equipped = equippedTrail === t.id;
+    const btn = equipped
+      ? `<button class="equipped" disabled>Uitgerust</button>`
+      : owned
+        ? `<button class="equip" onclick="equipTrail('${t.id}')">Uitrusten</button>`
+        : `<button class="buy" onclick="buyTrail('${t.id}')" ${coins < t.price ? 'disabled' : ''}>Koop · 🪙${t.price}</button>`;
+    return `<div class="shopItem">
+      <div style="width:60px; height:60px; border-radius:8px; margin-right:10px; flex-shrink:0; background:#0a0a14; display:flex; align-items:center; justify-content:center;">
+        <div style="width:22px; height:22px; border-radius:50%; background:${t.color}; box-shadow:0 0 12px ${t.color};"></div>
+      </div>
+      <div class="info"><div class="name">${t.name}</div><div class="desc">${t.desc}</div></div>
+      ${btn}
+    </div>`;
+  }).join('');
+}
+window.renderTrailShop = renderTrailShop;
+
+function openTrailShop() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('trailShopScreen').style.display = 'flex';
+  renderTrailShop();
+}
+window.openTrailShop = openTrailShop;
+
+function closeTrailShop() {
+  document.getElementById('trailShopScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeTrailShop = closeTrailShop;
+
 function openKillCam() {
   if (!bestMomentSnapshot) return;
   document.getElementById('killCamLabel').textContent = bestMomentLabel;
@@ -883,6 +936,7 @@ function startPractice(botName) {
   coinPickups = [];
   explosions = [];
   botDeathAnimations = [];
+  trailParticles = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];
@@ -1015,6 +1069,7 @@ function startDodgePractice() {
   coinPickups = [];
   explosions = [];
   botDeathAnimations = [];
+  trailParticles = [];
   telegraphs = [];
   lightningBolts = [];
   fallingMeteors = [];

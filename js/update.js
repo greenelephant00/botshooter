@@ -944,6 +944,19 @@ function update() {
   particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 1; });
   particles = particles.filter(p => p.life > 0);
 
+  // Bewegingsspoor (Trails-shop): laat achter de speler een spoor van deeltjes vallen terwijl die beweegt
+  if (equippedTrail !== 'none' && !gameOver && (Math.abs(player.slideVX) > 0.3 || Math.abs(player.slideVY) > 0.3) && trailParticles.length < 200) {
+    trailParticles.push({
+      x: player.x, y: player.y,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      life: 26, maxLife: 26,
+      type: equippedTrail
+    });
+  }
+  trailParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 1; });
+  trailParticles = trailParticles.filter(p => p.life > 0);
+
   // Explosies (bomber): korte uitdijende schokgolf
   explosions = explosions.filter(e => now0 - e.born < 400);
   botDeathAnimations = botDeathAnimations.filter(e => now0 - e.born < (e.duration || DEATH_ANIM_DURATION));
