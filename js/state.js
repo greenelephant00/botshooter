@@ -941,6 +941,9 @@ const DEATH_ANIMATIONS = [
   { id: 'ghost',         name: 'Spookverschijning', price: 350, desc: 'Je vervaagt tot een doorschijnende geest die langzaam omhoog wegdrijft.' },
   { id: 'implosion',     name: 'Implosie',         price: 400, desc: 'Je klapt razendsnel in tot een punt, gevolgd door een felle witte flits.' }
 ];
+
+// Elementale pantsers: alleen te koop in de Wereld 2-shop
+const WORLD2_ARMOR = [
   { id: 'fireshield',   name: 'Vuurschild',            price: 1700, hpBonus: 30, reduction: 0, fireResist: 0.6, desc: '+30 max HP. Brandwonden (bv. van Lavagolem/Vulkaanheer) duren 60% korter.' },
   { id: 'iceshield',    name: 'IJsschild',             price: 1700, hpBonus: 30, reduction: 0, iceResist: 0.6, desc: '+30 max HP. Bevriezingen en vertragingen door ijs (Sneeuwjager, Vriesvorst, Kristalreus) duren 60% korter.' },
   { id: 'earthplate',   name: 'Aardharnas',            price: 1800, hpBonus: 80, reduction: 0.3, desc: '+80 max HP, -30% inkomende schade. Zwaar en degelijk, net als de aarde zelf.' },
