@@ -934,7 +934,7 @@ let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeath
 let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
 const DEATH_ANIM_DURATION = 2600;
 const DEATH_ANIMATIONS = [
-  { id: 'default',      name: 'Standaard',        price: 1000, desc: 'Een simpele fade-out met een zachte sprankelring — je klassieke, ingebouwde verdwijning.' },
+  { id: 'default',      name: 'Standaard',        price: 1000, desc: 'Geen enkel effect — je verdwijnt gewoon direct, zonder animatie.' },
   { id: 'explosion',     name: 'Explosie',         price: 1300, desc: 'Je gaat uit elkaar in een felle, uitdijende explosie van vuur, een schokgolfring en wegvliegende vonken.' },
   { id: 'disintegrate',  name: 'Uiteenvallen',     price: 1350, desc: 'Je lichaam trilt even op, dan vallen er 14 blokjes met een sporend spoor alle kanten op uiteen.' },
   { id: 'fireworks',     name: 'Vuurwerk',         price: 1400, desc: 'Er gaan 6 kleurrijke vuurwerk-bursts achter elkaar af, elk met stralen en een dovende ring.' },

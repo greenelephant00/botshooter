@@ -4079,22 +4079,7 @@ function drawDeathAnimation(c, type, age, r) {
       c.beginPath(); c.arc(Math.cos(a) * (r + t * 60), Math.sin(a) * (r + t * 60), 2, 0, Math.PI * 2); c.fill();
     }
   } else {
-    // Standaard: fade + krimp met een zacht uitdijende sprankelring en een draaiende gloed-halo
-    c.globalAlpha = (1 - t) * 0.5;
-    c.strokeStyle = '#4cc9f0';
-    c.lineWidth = 2;
-    c.beginPath(); c.arc(0, 0, r + t * 30, 0, Math.PI * 2); c.stroke();
-    const sparkles = 8;
-    c.fillStyle = '#8ecbff';
-    for (let i = 0; i < sparkles; i++) {
-      const a = (Math.PI * 2 / sparkles) * i + t * 3;
-      const dist = r + t * 40;
-      c.globalAlpha = Math.max(0, (1 - t) * 0.8);
-      c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 1.8, 0, Math.PI * 2); c.fill();
-    }
-    c.globalAlpha = 1 - t;
-    c.fillStyle = '#4cc9f0';
-    c.beginPath(); c.arc(0, 0, r * (1 - t * 0.6), 0, Math.PI * 2); c.fill();
+    // Standaard: helemaal geen effect — je verdwijnt gewoon zonder animatie
   }
   c.globalAlpha = 1;
 }
