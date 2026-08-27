@@ -42,7 +42,7 @@
 <div id="bossAlert">⚠ BOSS NADERT ⚠</div>
 <div id="startScreen">
   <canvas id="menuBgCanvas1" class="menuBgCanvas"></canvas>
-  <button class="shopOpenBtn" id="world2Btn" onclick="handleWorld2Click()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#ff8800; color:#ff8800;">🔥❄️🪨 Wereld 2</button>
+  <button class="shopOpenBtn" id="world2Btn" onclick="handleWorld2Click()" style="position:absolute; top:16px; left:16px; width:auto; margin:0; border-color:#ff006e; color:#ff006e;">🔥❄️🪨 Wereld 2</button>
   <h1>Bot Shooter</h1>
   <div class="coinDisplay">🪙 <span id="startCoins">0</span></div>
   <p>Kies een spelmodus</p>
@@ -61,24 +61,24 @@
     </button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openShop()">🛒 Shop</button>
-    <button class="shopOpenBtn" onclick="openPowerupShop()">⚡ Powerups</button>
+    <button class="shopOpenBtn" onclick="openShop()" style="border-color:#ff4d4d; color:#ff4d4d;">🛒 Shop</button>
+    <button class="shopOpenBtn" onclick="openPowerupShop()" style="border-color:#c3e600; color:#c3e600;">⚡ Powerups</button>
     <button class="shopOpenBtn" onclick="openCosmeticsHub()" style="border-color:#ff5cf1; color:#ff5cf1;">🎨 Customize</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
-    <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
-    <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
+    <button class="shopOpenBtn" onclick="openTransformShop()" style="border-color:#39ff14; color:#39ff14;">🔄 Transform</button>
+    <button class="shopOpenBtn" onclick="openBotsInfo()" style="border-color:#b967ff; color:#b967ff;">🤖 Bots</button>
+    <button class="shopOpenBtn" onclick="openDisastersInfo()" style="border-color:#8a6a3a; color:#c99150;">🌪 Natuurramp</button>
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
-    <button class="shopOpenBtn" onclick="openAchievements()">🏆 Quests</button>
-    <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+    <button class="shopOpenBtn" onclick="openAchievements()" style="border-color:#ffd60a; color:#ffd60a;">🏆 Quests</button>
+    <button class="shopOpenBtn" onclick="openStatsScreen()" style="border-color:#5c7cfa; color:#5c7cfa;">📊 Statistieken</button>
   </div>
   <div class="menuBtnRow">
     <div class="dodgePracticeRow">
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
-      <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk</button>
+      <button class="shopOpenBtn" onclick="startDodgePractice()" style="border-color:#06d6a0; color:#06d6a0;">🏃 Ontwijk</button>
     </div>
   </div>
 </div>
@@ -103,25 +103,25 @@
     </button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openShop()">🛒 Shop</button>
-    <button class="shopOpenBtn" onclick="openPowerupShop()">⚡ Powerups</button>
+    <button class="shopOpenBtn" onclick="openShop()" style="border-color:#ff4d4d; color:#ff4d4d;">🛒 Shop</button>
+    <button class="shopOpenBtn" onclick="openPowerupShop()" style="border-color:#c3e600; color:#c3e600;">⚡ Powerups</button>
     <button class="shopOpenBtn" onclick="openCosmeticsHub()" style="border-color:#ff5cf1; color:#ff5cf1;">🎨 Customize</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
-    <button class="shopOpenBtn" onclick="openBotsInfo()">🤖 Bots</button>
-    <button class="shopOpenBtn" onclick="openDisastersInfo()">🌪 Natuurramp</button>
+    <button class="shopOpenBtn" onclick="openTransformShop()" style="border-color:#39ff14; color:#39ff14;">🔄 Transform</button>
+    <button class="shopOpenBtn" onclick="openBotsInfo()" style="border-color:#b967ff; color:#b967ff;">🤖 Bots</button>
+    <button class="shopOpenBtn" onclick="openDisastersInfo()" style="border-color:#8a6a3a; color:#c99150;">🌪 Natuurramp</button>
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
-    <button class="shopOpenBtn" onclick="openAchievements()">🏆 Quests</button>
+    <button class="shopOpenBtn" onclick="openAchievements()" style="border-color:#ffd60a; color:#ffd60a;">🏆 Quests</button>
     <button class="shopOpenBtn" onclick="openCoreShop()" style="border-color:#9be3ff; color:#9be3ff;">🔮 Kern-winkel</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
+    <button class="shopOpenBtn" onclick="openStatsScreen()" style="border-color:#5c7cfa; color:#5c7cfa;">📊 Statistieken</button>
     <div class="dodgePracticeRow">
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
-      <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk</button>
+      <button class="shopOpenBtn" onclick="startDodgePractice()" style="border-color:#06d6a0; color:#06d6a0;">🏃 Ontwijk</button>
     </div>
   </div>
 </div>
