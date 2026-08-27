@@ -1726,7 +1726,9 @@ function renderSkinsShop() {
     else if (owned) btn = `<button class="equip" onclick="equipSkin('${s.id}')">Uitrusten</button>`;
     else if (s.achievementOnly && !unlockedAchievements.includes(s.requiredAchievement)) btn = `<button class="buy" disabled>🔒 Quest nodig</button>`;
     else btn = `<button class="buy" onclick="buySkin('${s.id}')" ${coins < s.price ? 'disabled' : ''}>Koop · 🪙${s.price}</button>`;
+    const fav = isFavorite(`skin:${s.id}`);
     return `<div class="shopItem">
+      <button class="favStar${fav ? ' active' : ''}" onclick="toggleFavorite('skin:${s.id}'); renderSkinsShop();" title="Favoriet">${fav ? '⭐' : '☆'}</button>
       <canvas class="botPreview" id="skinPreview_${s.id}" width="60" height="60"></canvas>
       <div class="info">
         <div class="name">${s.name}</div>
@@ -1738,11 +1740,11 @@ function renderSkinsShop() {
       </div>
     </div>`;
   };
-  const killstreakSkins = SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly);
-  const elementSkins = SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly && !s.achievementOnly);
-  const elementKillstreakSkins = SKINS.filter(s => s.element && s.killstreak && !s.coreOnly && !s.achievementOnly);
-  const normalSkins = SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly);
-  const exclusiveSkins = SKINS.filter(s => s.achievementOnly);
+  const killstreakSkins = sortFavoritesFirst(SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly), 'skin');
+  const elementSkins = sortFavoritesFirst(SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly && !s.achievementOnly), 'skin');
+  const elementKillstreakSkins = sortFavoritesFirst(SKINS.filter(s => s.element && s.killstreak && !s.coreOnly && !s.achievementOnly), 'skin');
+  const normalSkins = sortFavoritesFirst(SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly), 'skin');
+  const exclusiveSkins = sortFavoritesFirst(SKINS.filter(s => s.achievementOnly), 'skin');
   const elementSections = currentWorld === 2
     ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(renderSkinItem).join('')}</div>` +
       `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>`
@@ -2277,7 +2279,8 @@ function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
   else if (owned) btn = `<button class="equip" onclick="${equipFn}('${item.id}')">Uitrusten</button>`;
   else btn = `<button class="buy" onclick="${buyFn}('${item.id}')" ${coins < item.price ? 'disabled' : ''}>Koop · 🪙${item.price}</button>`;
-  return `<div class="shopItem"><div class="info"><div class="name">${item.name}</div><div class="desc">${weaponStatsLine(item)}</div><div class="desc">${item.desc}</div></div><div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="startWeaponPractice('${item.id}')">🎯 Oefen</button></div></div>`;
+  const fav = isFavorite(`weapon:${item.id}`);
+  return `<div class="shopItem"><button class="favStar${fav ? ' active' : ''}" onclick="toggleFavorite('weapon:${item.id}'); renderShop();" title="Favoriet">${fav ? '⭐' : '☆'}</button><div class="info"><div class="name">${item.name}</div><div class="desc">${weaponStatsLine(item)}</div><div class="desc">${item.desc}</div></div><div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="startWeaponPractice('${item.id}')">🎯 Oefen</button></div></div>`;
 }
 
 function shopItemHtml(item, owned, equipped, buyFn, equipFn) {
@@ -2308,10 +2311,10 @@ function leveledUpgradeItemHtml(name, desc, levels, currentLevel, buyFnName) {
 function renderShop() {
   document.getElementById('shopCoins').textContent = coins;
   if (currentWorld === 2) {
-    document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
+    document.getElementById('shopWeapons').innerHTML = sortFavoritesFirst(WEAPONS, 'weapon').map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
-    document.getElementById('shopSpecialWeapons').innerHTML = [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].filter(w => !w.coreOnly).map(w =>
+    document.getElementById('shopSpecialWeapons').innerHTML = sortFavoritesFirst([...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS].filter(w => !w.coreOnly), 'weapon').map(w =>
       weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
     ).join('');
     document.getElementById('shopArmor').innerHTML = WORLD2_ARMOR.filter(a => !a.coreOnly).map(a =>
@@ -2356,10 +2359,10 @@ function renderShop() {
     }
     return;
   }
-  document.getElementById('shopWeapons').innerHTML = WEAPONS.map(w =>
+  document.getElementById('shopWeapons').innerHTML = sortFavoritesFirst(WEAPONS, 'weapon').map(w =>
     weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
   ).join('');
-  document.getElementById('shopSpecialWeapons').innerHTML = SPECIAL_WEAPONS.map(w =>
+  document.getElementById('shopSpecialWeapons').innerHTML = sortFavoritesFirst(SPECIAL_WEAPONS, 'weapon').map(w =>
     weaponItemHtml(w, ownedWeapons.includes(w.id), equippedWeapon === w.id, 'buyWeapon', 'equipWeapon')
   ).join('');
   document.getElementById('shopArmor').innerHTML = ARMOR.map(a =>

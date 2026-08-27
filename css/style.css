@@ -580,8 +580,19 @@
   .shopItem .info { text-align: left; }
   .shopItem .info .name { font-weight: bold; }
   .shopItem .info .desc { font-size: 12px; color: #999; margin-top: 2px; }
-  #skinsShopList .shopItem { display: grid; grid-template-columns: 60px 1fr auto; }
+  #skinsShopList .shopItem { display: grid; grid-template-columns: auto 60px 1fr auto; }
   #skinsShopList .shopItem .info { min-width: 0; }
+  .favStar {
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+    flex-shrink: 0;
+    color: #ffd60a;
+  }
+  .favStar.active { filter: drop-shadow(0 0 4px #ffd60a); }
   .botPreview {
     flex-shrink: 0;
     width: 60px;

@@ -1,3 +1,15 @@
+// ---- Favorieten: markeer skins/wapens zodat ze bovenaan hun shoplijst verschijnen ----
+let favoriteItems = JSON.parse(localStorage.getItem('botShooterFavoriteItems') || '[]');
+function isFavorite(key) { return favoriteItems.includes(key); }
+function toggleFavorite(key) {
+  const idx = favoriteItems.indexOf(key);
+  if (idx === -1) favoriteItems.push(key); else favoriteItems.splice(idx, 1);
+  localStorage.setItem('botShooterFavoriteItems', JSON.stringify(favoriteItems));
+}
+function sortFavoritesFirst(arr, prefix) {
+  return [...arr].sort((a, b) => (isFavorite(`${prefix}:${b.id}`) ? 1 : 0) - (isFavorite(`${prefix}:${a.id}`) ? 1 : 0));
+}
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];
