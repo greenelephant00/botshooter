@@ -36,7 +36,8 @@ const ACCOUNT_KEYS = [
   'botShooterOwnedBotKillEffects', 'botShooterEquippedBotKillEffect',
   'botShooterFavoriteItems',
   'botShooterOwnedIntroAnimations', 'botShooterEquippedIntroAnimation',
-  'botShooterLastMysteryBoxOpen'
+  'botShooterLastMysteryBoxOpen',
+  'botShooterDroneLevels'
 ];
 
 let currentAccount = null;

@@ -4482,7 +4482,7 @@ function menuBgLoop() {
   requestAnimationFrame(menuBgLoop);
 }
 
-function drawKillstreakDrone(drone, lvl = lvlDroneUpgrade) {
+function drawKillstreakDrone(drone, lvl = 0) {
   const x = drone.x, y = drone.y;
   // Beam naar het laatst geraakte doelwit, dooft snel uit
   if (drone.beam) {
@@ -5636,7 +5636,7 @@ function draw() {
   if (dronePracticeActive) {
     drawKillstreakDrone(dronePracticeDrone, dronePracticeLevel);
   } else {
-    KILLSTREAK_DRONES.forEach(drone => { if (player.comboStreak >= drone.threshold) drawKillstreakDrone(drone); });
+    KILLSTREAK_DRONES.forEach((drone, i) => { if (player.comboStreak >= drone.threshold) drawKillstreakDrone(drone, droneLevels[i]); });
   }
   ctx.restore();
 

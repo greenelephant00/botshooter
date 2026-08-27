@@ -7,7 +7,7 @@ function saveShopState() {
   localStorage.setItem('botShooterEquippedArmor2', equippedArmor2);
   localStorage.setItem('botShooterHasDualArmor', hasDualArmor);
   localStorage.setItem('botShooterHasDualArmor2', hasDualArmor2);
-  localStorage.setItem('botShooterLvlDroneUpgrade', lvlDroneUpgrade);
+  localStorage.setItem('botShooterDroneLevels', JSON.stringify(droneLevels));
   localStorage.setItem('botShooterLvlExtraHp', lvlExtraHp);
   localStorage.setItem('botShooterLvlSprint', lvlSprint);
   localStorage.setItem('botShooterLvlMagnet', lvlMagnet);
@@ -1136,12 +1136,13 @@ function closeKeybindsScreen() {
 }
 window.closeKeybindsScreen = closeKeybindsScreen;
 
-function buyDroneUpgrade() {
-  const price = DRONE_UPGRADE_PRICES[lvlDroneUpgrade];
+function buyDroneUpgrade(index) {
+  const price = DRONE_UPGRADE_PRICES[droneLevels[index]];
   if (price === undefined || coins < price) return;
   coins -= price;
-  lvlDroneUpgrade++;
+  droneLevels[index]++;
   saveShopState();
+  localStorage.setItem('botShooterDroneLevels', JSON.stringify(droneLevels));
   renderDroneInfoList();
 }
 window.buyDroneUpgrade = buyDroneUpgrade;
@@ -1187,28 +1188,26 @@ window.startDronePractice = startDronePractice;
 
 function renderDroneInfoList() {
   const maxLevel = DRONE_UPGRADE_PRICES.length;
-  const maxed = lvlDroneUpgrade >= maxLevel;
-  const nextLevel = Math.min(lvlDroneUpgrade + 1, maxLevel);
-  const upgradeBtn = maxed
-    ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
-    : `<button class="buy" onclick="buyDroneUpgrade()" ${coins < DRONE_UPGRADE_PRICES[lvlDroneUpgrade] ? 'disabled' : ''}>Koop niveau ${lvlDroneUpgrade + 1}/${maxLevel} · 🪙${DRONE_UPGRADE_PRICES[lvlDroneUpgrade]}</button>`;
-  const previewBtn = !maxed
-    ? `<button class="equip" onclick="startDronePractice(${nextLevel})">👁 Bekijk volgend niveau</button>`
-    : '';
   const statsForLevel = lvl => `${droneDmg(lvl)} schade, elke ${(droneCooldown(lvl) / 1000).toFixed(2)}s`;
-  const upgradeDesc = maxed
-    ? `Max niveau bereikt: ${statsForLevel(lvlDroneUpgrade)}.`
-    : `Huidig niveau ${lvlDroneUpgrade} (${statsForLevel(lvlDroneUpgrade)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur. "Bekijk volgend niveau" start een schoon Endless-testpotje (geen bosses/munten/powerups) met de drone al actief.`;
-  document.getElementById('droneInfoList').innerHTML =
-    `<div class="shopItem"><canvas id="droneUpgradePreview" width="70" height="70" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
-      <div class="info"><div class="name">Drone Upgrade (Lv. ${lvlDroneUpgrade}/${maxLevel})</div><div class="desc">${upgradeDesc}</div></div>
+  document.getElementById('droneInfoList').innerHTML = KILLSTREAK_DRONES.map((drone, i) => {
+    const lvl = droneLevels[i];
+    const maxed = lvl >= maxLevel;
+    const nextLevel = Math.min(lvl + 1, maxLevel);
+    const upgradeBtn = maxed
+      ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
+      : `<button class="buy" onclick="buyDroneUpgrade(${i})" ${coins < DRONE_UPGRADE_PRICES[lvl] ? 'disabled' : ''}>Koop niveau ${lvl + 1}/${maxLevel} · 🪙${DRONE_UPGRADE_PRICES[lvl]}</button>`;
+    const previewBtn = !maxed
+      ? `<button class="equip" onclick="startDronePractice(${nextLevel})">👁 Bekijk volgend niveau</button>`
+      : '';
+    const desc = maxed
+      ? `Verschijnt vanaf killstreak ${drone.threshold}. Max niveau bereikt: ${statsForLevel(lvl)}.`
+      : `Verschijnt vanaf killstreak ${drone.threshold}. Huidig niveau ${lvl} (${statsForLevel(lvl)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur. "Bekijk volgend niveau" start een schoon Endless-testpotje (geen bosses/munten/powerups) met de drone al actief.`;
+    return `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
+      <div class="info"><div class="name">Drone ${i + 1} (Lv. ${lvl}/${maxLevel})</div><div class="desc">${desc}</div></div>
       <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${upgradeBtn}${previewBtn}</div>
-    </div>` +
-    KILLSTREAK_DRONES.map((drone, i) =>
-      `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">Drone ${i + 1}</div><div class="desc">Verschijnt vanaf killstreak ${drone.threshold}, verdwijnt zodra je streak weer onder de ${drone.threshold} zakt. Vuurt automatisch op de dichtstbijzijnde bot.</div></div></div>`
-    ).join('');
-  drawDroneCanvasPreview('droneUpgradePreview', lvlDroneUpgrade);
-  KILLSTREAK_DRONES.forEach((drone, i) => drawDroneCanvasPreview(`droneInfoPreview_${i}`, lvlDroneUpgrade));
+    </div>`;
+  }).join('');
+  KILLSTREAK_DRONES.forEach((drone, i) => drawDroneCanvasPreview(`droneInfoPreview_${i}`, droneLevels[i]));
 }
 
 function openDroneInfoScreen() {

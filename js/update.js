@@ -1072,9 +1072,9 @@ function update() {
   if (dronePracticeActive) {
     updateOneDrone(dronePracticeDrone, dronePracticeLevel, now0);
   } else {
-    KILLSTREAK_DRONES.forEach(drone => {
+    KILLSTREAK_DRONES.forEach((drone, i) => {
       if (player.comboStreak < drone.threshold) return;
-      updateOneDrone(drone, lvlDroneUpgrade, now0);
+      updateOneDrone(drone, droneLevels[i], now0);
     });
   }
 
