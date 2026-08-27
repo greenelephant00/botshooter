@@ -55,6 +55,8 @@ const player = {
   fireCageY: 0,
   fireCageRadius: 0,
   jammedUntil: 0,
+  weaponHeat: 0,
+  overheatUntil: 0,
   deathAnimStart: 0,
   introAnimStart: 0,
   killStreak: 0,
@@ -115,6 +117,8 @@ function resetPlayer() {
   player.fireCageY = 0;
   player.fireCageRadius = 0;
   player.jammedUntil = 0;
+  player.weaponHeat = 0;
+  player.overheatUntil = 0;
   player.deathAnimStart = 0;
   player.introAnimStart = 0;
   player.adrenalineUsed = false;
@@ -646,6 +650,8 @@ function updateHUD() {
   if (now < player.curseUntil) active.push('☠ Vervloekt (-50% schade)');
   if (now < player.confuseUntil) active.push('🌀 Verwarring');
   if (now < player.jammedUntil) active.push('📡 EMP — wapen uitgeschakeld');
+  if (now < player.overheatUntil) active.push('🔥 Oververhit — wapen geblokkeerd');
+  else if (player.weaponHeat > WEAPON_HEAT_MAX * 0.7) active.push('🌡️ Wapen wordt heet');
   if (player.activeTransform === 'tank') {
     active.push('🚜 Tank — alleen handgranaten');
   } else if (player.activeTransform === 'berserker') {
