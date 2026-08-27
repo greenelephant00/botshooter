@@ -5201,6 +5201,7 @@ function draw() {
   laserTelegraphs.forEach(drawLaserTelegraph);
   blackHoles.forEach(drawBlackHole);
   explosions.forEach(drawExplosion);
+  const BOT_KILL_EFFECT_SCALE = 0.5; // Bot Kill Effect is bewust kleiner dan dezelfde animatie in Death Animation
   botDeathAnimations.forEach(e => {
     const age = performance.now() - e.born;
     const dur = e.duration || DEATH_ANIM_DURATION;
@@ -5209,8 +5210,22 @@ function draw() {
     const scaledAge = age * (DEATH_ANIM_DURATION / dur);
     ctx.save();
     ctx.translate(e.x, e.y);
+    ctx.scale(BOT_KILL_EFFECT_SCALE, BOT_KILL_EFFECT_SCALE);
     drawDeathAnimation(ctx, e.type, scaledAge, e.r);
     ctx.restore();
+    // Eigen, snelle impact-flits die alleen bij Bot Kill Effect hoort, zodat het duidelijk anders oogt dan Death Animation
+    const impactT = age / 220;
+    if (impactT < 1) {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.globalAlpha = Math.max(0, 1 - impactT);
+      ctx.strokeStyle = '#ffb703';
+      ctx.lineWidth = 3 * (1 - impactT);
+      ctx.beginPath();
+      ctx.arc(0, 0, e.r * 0.6 + impactT * (e.r + 22), 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    }
   });
   lightningBolts.forEach(drawLightningBolt);
   fallingMeteors.forEach(drawFallingMeteor);
