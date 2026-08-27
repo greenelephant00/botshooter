@@ -4395,14 +4395,13 @@ function drawMenuBackground(mc, mctx, type, cacheKey) {
 }
 
 function menuBgLoop() {
-  const s1 = document.getElementById('startScreen');
-  const s2 = document.getElementById('world2Screen');
-  const world1Visible = s1 && s1.style.display !== 'none';
-  const world2Visible = s2 && s2.style.display !== 'none';
-  if (world1Visible) drawMenuBackground(menuBgCanvas1, menuBgCtx1, equippedMenuBackground, 'world1');
-  else menuBgCtx1.clearRect(0, 0, menuBgCanvas1.width, menuBgCanvas1.height);
-  if (world2Visible) drawMenuBackground(menuBgCanvas2, menuBgCtx2, equippedMenuBackground, 'world2');
-  else menuBgCtx2.clearRect(0, 0, menuBgCanvas2.width, menuBgCanvas2.height);
+  // Niet-in-een-potje: nog geen spel gestart, of het huidige potje is afgelopen/verlaten (niet tijdens pauze — dat telt nog als "in een potje" —
+  // en niet op het Game Over-scherm zelf, want daar moet de bevroren eindstand/death animation zichtbaar blijven, niet de menu-achtergrond)
+  const msgEl = document.getElementById('msg');
+  const msgVisible = msgEl && msgEl.style.display === 'flex';
+  const inMenuOrShop = (!loopRunning || gameOver) && !msgVisible;
+  if (inMenuOrShop) drawMenuBackground(menuBgCanvas, menuBgCtx, equippedMenuBackground, 'shared');
+  else menuBgCtx.clearRect(0, 0, menuBgCanvas.width, menuBgCanvas.height);
   requestAnimationFrame(menuBgLoop);
 }
 

@@ -10,10 +10,10 @@
     background: #16213e;
     cursor: crosshair;
   }
-  .menuBgCanvas {
+  #menuBgCanvas {
     position: absolute;
     inset: 0;
-    z-index: -1;
+    z-index: 9;
     display: block;
     pointer-events: none;
   }
@@ -261,6 +261,11 @@
     color: #fff;
     text-align: center;
     z-index: 10;
+  }
+  /* Zodra een Menu-achtergrond is uitgerust, laat alle menu- en shopschermen (nooit tijdens een potje, want dan zijn ze allemaal display:none) het animatie-canvas eronder doorschijnen */
+  body.has-menu-bg #startScreen, body.has-menu-bg #world2Screen,
+  body.has-menu-bg #shopScreen, body.has-menu-bg #powerupShopScreen, body.has-menu-bg #botsInfoScreen, body.has-menu-bg #skinsShopScreen, body.has-menu-bg #transformShopScreen, body.has-menu-bg #disastersInfoScreen, body.has-menu-bg #achievementsScreen, body.has-menu-bg #coreShopScreen, body.has-menu-bg #weaponSkinsScreen, body.has-menu-bg #deathAnimScreen, body.has-menu-bg #statsScreen, body.has-menu-bg #trailShopScreen, body.has-menu-bg #menuBgShopScreen, body.has-menu-bg #cosmeticsScreen, body.has-menu-bg #botKillEffectScreen {
+    background: rgba(10, 10, 20, 0.35);
   }
   #world2Screen { display: none; }
   #world2Screen h1 { background: linear-gradient(90deg, #ff5a1f, #7fd9ff, #8a6a3a); -webkit-background-clip: text; background-clip: text; color: transparent; }

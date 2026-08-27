@@ -5,6 +5,7 @@ function loop() {
 }
 
 menuBgLoop();
+applyMenuBgBodyClass();
 
 // Toon coins op het startscherm bij laden
 document.getElementById('startCoins').textContent = coins;

@@ -1044,10 +1044,15 @@ function buyMenuBackground(id) {
 }
 window.buyMenuBackground = buyMenuBackground;
 
+function applyMenuBgBodyClass() {
+  document.body.classList.toggle('has-menu-bg', equippedMenuBackground !== 'none');
+}
+
 function equipMenuBackground(id) {
   if (!ownedMenuBackgrounds.includes(id)) return;
   equippedMenuBackground = id;
   localStorage.setItem('botShooterEquippedMenuBackground', equippedMenuBackground);
+  applyMenuBgBodyClass();
   renderMenuBgShop();
 }
 window.equipMenuBackground = equipMenuBackground;
