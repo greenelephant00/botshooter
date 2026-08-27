@@ -80,6 +80,8 @@
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
       <button class="shopOpenBtn" onclick="startDodgePractice()" style="border-color:#06d6a0; color:#06d6a0;">🏃 Ontwijk</button>
     </div>
+    <button class="shopOpenBtn" onclick="openKeybindsScreen()" style="border-color:#00b8a9; color:#00b8a9;">⌨️ Sneltoetsen</button>
+    <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
   </div>
 </div>
 <div id="world2Screen">
@@ -122,6 +124,10 @@
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
       <button class="shopOpenBtn" onclick="startDodgePractice()" style="border-color:#06d6a0; color:#06d6a0;">🏃 Ontwijk</button>
     </div>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openKeybindsScreen()" style="border-color:#00b8a9; color:#00b8a9;">⌨️ Sneltoetsen</button>
+    <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
   </div>
 </div>
 <div id="shopScreen">
@@ -186,6 +192,9 @@
     <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
     <button class="shopOpenBtn" onclick="openBotKillEffectShop()">💥 Bot Kill Effect</button>
   </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openIntroAnimShop()">🎬 Intro Animatie</button>
+  </div>
   <button class="backBtn" onclick="closeCosmeticsHub()">← Terug</button>
 </div>
 <div id="skinsShopScreen">
@@ -206,6 +215,32 @@
     <div id="statsList" class="statsList"></div>
   </div>
   <button class="backBtn" onclick="closeStatsScreen()">← Terug</button>
+</div>
+<div id="keybindsScreen">
+  <h1>⌨️ Sneltoetsen</h1>
+  <button class="topBackBtn" onclick="closeKeybindsScreen()">← Menu</button>
+  <div class="shopSection">
+    <h3>Besturing</h3>
+    <div class="statsList">
+      <div class="statsRow"><span class="statsLabel">Bewegen</span><span class="statsValue">WASD of pijltjestoetsen</span></div>
+      <div class="statsRow"><span class="statsLabel">Richten</span><span class="statsValue">Muis</span></div>
+      <div class="statsRow"><span class="statsLabel">Schieten</span><span class="statsValue">Linkermuisknop of Spatie</span></div>
+      <div class="statsRow"><span class="statsLabel">Speciale aanval (E)</span><span class="statsValue">E-toets (per wapen verschillend, niet tijdens een Transform)</span></div>
+      <div class="statsRow"><span class="statsLabel">Pauzeren</span><span class="statsValue">⏸ Pauze-knop rechtsboven</span></div>
+      <div class="statsRow"><span class="statsLabel">Potje stoppen</span><span class="statsValue">⏹ Stop-knop rechtsboven</span></div>
+    </div>
+  </div>
+  <button class="backBtn" onclick="closeKeybindsScreen()">← Terug</button>
+</div>
+<div id="mysteryBoxScreen">
+  <h1>🎁 Mysterie-doos</h1>
+  <div class="coinDisplay">🪙 <span id="mysteryBoxCoins">0</span></div>
+  <button class="topBackBtn" onclick="closeMysteryBoxScreen()">← Menu</button>
+  <div class="shopSection">
+    <h3>Koop een verrassing — willekeurige munten, cores, of een skin/trail/effect</h3>
+    <div id="mysteryBoxContent"></div>
+  </div>
+  <button class="backBtn" onclick="closeMysteryBoxScreen()">← Terug</button>
 </div>
 <div id="trailShopScreen">
   <h1>🌠 Trails</h1>
@@ -316,6 +351,16 @@
     <div id="botKillEffectList"></div>
   </div>
   <button class="backBtn" onclick="closeBotKillEffectShop()">← Terug</button>
+</div>
+<div id="introAnimScreen">
+  <h1>🎬 Intro Animatie</h1>
+  <button class="topBackBtn" onclick="closeIntroAnimShop()">← Menu</button>
+  <div class="coinDisplay">🪙 <span id="introAnimCoins">0</span></div>
+  <div class="shopSection">
+    <h3>Kies hoe je verschijnt bij het begin van een potje.</h3>
+    <div id="introAnimList"></div>
+  </div>
+  <button class="backBtn" onclick="closeIntroAnimShop()">← Terug</button>
 </div>
 <div id="killCamScreen">
   <h2>🎬 Kill Cam</h2>

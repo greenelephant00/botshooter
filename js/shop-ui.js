@@ -980,6 +980,18 @@ function closeStatsScreen() {
 }
 window.closeStatsScreen = closeStatsScreen;
 
+function openKeybindsScreen() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('keybindsScreen').style.display = 'flex';
+}
+window.openKeybindsScreen = openKeybindsScreen;
+
+function closeKeybindsScreen() {
+  document.getElementById('keybindsScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeKeybindsScreen = closeKeybindsScreen;
+
 function buyTrail(id) {
   const t = TRAILS.find(x => x.id === id);
   if (!t || ownedTrails.includes(id) || coins < t.price) return;
