@@ -24,6 +24,31 @@ const INTRO_ANIMATIONS = [
   { id: 'spin',        name: 'Duizelspawn',   price: 400,  desc: 'Je tolt razendsnel rond en komt tot stilstand zodra je verschijnt.' }
 ];
 
+// ---- Mysterie-doos: koop een verrassing, maar maar 1x per uur ----
+const MYSTERY_BOX_PRICE = 500;
+const MYSTERY_BOX_COOLDOWN = 3600000; // 1 uur
+let lastMysteryBoxOpen = Number(localStorage.getItem('botShooterLastMysteryBoxOpen')) || 0;
+function mysteryBoxReady() { return Date.now() - lastMysteryBoxOpen >= MYSTERY_BOX_COOLDOWN; }
+function mysteryBoxTimeLeft() { return Math.max(0, MYSTERY_BOX_COOLDOWN - (Date.now() - lastMysteryBoxOpen)); }
+function getMysteryBoxCosmeticPool() {
+  const pool = [];
+  SKINS.filter(s => !s.achievementOnly && !s.coreOnly && !ownedSkins.includes(s.id)).forEach(s =>
+    pool.push({ name: `Skin: ${s.name}`, apply: () => ownedSkins.push(s.id) }));
+  TRAILS.filter(t => t.id !== 'none' && !ownedTrails.includes(t.id)).forEach(t =>
+    pool.push({ name: `Trail: ${t.name}`, apply: () => ownedTrails.push(t.id) }));
+  BOT_KILL_EFFECTS.filter(e => e.id !== 'none' && !ownedBotKillEffects.includes(e.id)).forEach(e =>
+    pool.push({ name: `Bot Kill Effect: ${e.name}`, apply: () => ownedBotKillEffects.push(e.id) }));
+  DEATH_ANIMATIONS.filter(d => d.id !== 'default' && !ownedDeathAnimations.includes(d.id)).forEach(d =>
+    pool.push({ name: `Death Animation: ${d.name}`, apply: () => ownedDeathAnimations.push(d.id) }));
+  INTRO_ANIMATIONS.filter(i => i.id !== 'none' && !ownedIntroAnimations.includes(i.id)).forEach(i =>
+    pool.push({ name: `Intro Animatie: ${i.name}`, apply: () => ownedIntroAnimations.push(i.id) }));
+  MENU_BACKGROUNDS.filter(b => b.id !== 'none' && !ownedMenuBackgrounds.includes(b.id)).forEach(b =>
+    pool.push({ name: `Achtergrond: ${b.name}`, apply: () => ownedMenuBackgrounds.push(b.id) }));
+  WEAPON_SKINS.filter(w => !ownedWeaponSkins.includes(w.id)).forEach(w =>
+    pool.push({ name: `Wapenskin: ${w.name}`, apply: () => ownedWeaponSkins.push(w.id) }));
+  return pool;
+}
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];
