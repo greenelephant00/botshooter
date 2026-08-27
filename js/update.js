@@ -1074,7 +1074,7 @@ function update() {
     drone.angle += 0.05;
     drone.x = player.x + Math.cos(drone.angle) * drone.radius;
     drone.y = player.y + Math.sin(drone.angle) * drone.radius - 14;
-    if (now0 - drone.lastShot > KILLSTREAK_DRONE_COOLDOWN) {
+    if (now0 - drone.lastShot > droneCooldown()) {
       let nearestDrone = null, nearestDroneDist = KILLSTREAK_DRONE_RANGE;
       bots.forEach(b => {
         if (b.dead) return;
@@ -1083,8 +1083,8 @@ function update() {
       });
       if (nearestDrone) {
         drone.lastShot = now0;
-        drone.beam = { x1: drone.x, y1: drone.y, x2: nearestDrone.x, y2: nearestDrone.y, bornAt: now0 };
-        damageBotSimple(nearestDrone, KILLSTREAK_DRONE_DMG, '#4cc9f0');
+        drone.beam = { x1: drone.x, y1: drone.y, x2: nearestDrone.x, y2: nearestDrone.y, bornAt: now0, color: droneColor() };
+        damageBotSimple(nearestDrone, droneDmg(), droneColor());
       }
     }
   });

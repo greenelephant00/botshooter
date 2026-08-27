@@ -4490,7 +4490,7 @@ function drawKillstreakDrone(drone) {
     if (age < 150) {
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - age / 150);
-      ctx.strokeStyle = '#4cc9f0';
+      ctx.strokeStyle = drone.beam.color || '#4cc9f0';
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(drone.beam.x1, drone.beam.y1);
@@ -4502,21 +4502,24 @@ function drawKillstreakDrone(drone) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(drone.angle);
-  drawDroneShape(ctx);
+  drawDroneShape(ctx, droneScale(), droneColor());
   ctx.restore();
 }
 
-function drawDroneShape(c) {
+function drawDroneShape(c, scale = 1, color = '#4cc9f0') {
+  c.save();
+  c.scale(scale, scale);
   c.fillStyle = '#2a2a3e';
   c.beginPath(); c.arc(0, 0, 8, 0, Math.PI * 2); c.fill();
-  c.strokeStyle = '#4cc9f0';
+  c.strokeStyle = color;
   c.lineWidth = 2;
   c.beginPath(); c.arc(0, 0, 8, 0, Math.PI * 2); c.stroke();
-  c.fillStyle = '#4cc9f0';
+  c.fillStyle = color;
   c.beginPath(); c.moveTo(-14, 0); c.lineTo(-6, -3); c.lineTo(-6, 3); c.closePath(); c.fill();
   c.beginPath(); c.moveTo(14, 0); c.lineTo(6, -3); c.lineTo(6, 3); c.closePath(); c.fill();
   c.fillStyle = '#dfffff';
   c.beginPath(); c.arc(0, 0, 3, 0, Math.PI * 2); c.fill();
+  c.restore();
 }
 
 function drawTrailParticle(p) {

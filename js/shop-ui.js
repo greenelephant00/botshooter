@@ -7,6 +7,7 @@ function saveShopState() {
   localStorage.setItem('botShooterEquippedArmor2', equippedArmor2);
   localStorage.setItem('botShooterHasDualArmor', hasDualArmor);
   localStorage.setItem('botShooterHasDualArmor2', hasDualArmor2);
+  localStorage.setItem('botShooterLvlDroneUpgrade', lvlDroneUpgrade);
   localStorage.setItem('botShooterLvlExtraHp', lvlExtraHp);
   localStorage.setItem('botShooterLvlSprint', lvlSprint);
   localStorage.setItem('botShooterLvlMagnet', lvlMagnet);
@@ -1135,20 +1136,60 @@ function closeKeybindsScreen() {
 }
 window.closeKeybindsScreen = closeKeybindsScreen;
 
+function buyDroneUpgrade() {
+  const price = DRONE_UPGRADE_PRICES[lvlDroneUpgrade];
+  if (price === undefined || coins < price) return;
+  coins -= price;
+  lvlDroneUpgrade++;
+  saveShopState();
+  renderDroneInfoList();
+}
+window.buyDroneUpgrade = buyDroneUpgrade;
+
+let droneShowNextLevelPreview = false;
+function toggleDroneNextLevelPreview() {
+  droneShowNextLevelPreview = !droneShowNextLevelPreview;
+  renderDroneInfoList();
+}
+window.toggleDroneNextLevelPreview = toggleDroneNextLevelPreview;
+
+function drawDroneCanvasPreview(canvasId, lvl) {
+  const canvasEl = document.getElementById(canvasId);
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  c.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  c.save();
+  c.translate(canvasEl.width / 2, canvasEl.height / 2);
+  drawDroneShape(c, droneScale(lvl), droneColor(lvl));
+  c.restore();
+}
+
 function renderDroneInfoList() {
-  document.getElementById('droneInfoList').innerHTML = KILLSTREAK_DRONES.map((drone, i) =>
-    `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">Drone ${i + 1}</div><div class="desc">Verschijnt vanaf killstreak ${drone.threshold}, verdwijnt zodra je streak weer onder de ${drone.threshold} zakt. Vuurt automatisch op de dichtstbijzijnde bot.</div></div></div>`
-  ).join('');
-  KILLSTREAK_DRONES.forEach((drone, i) => {
-    const canvasEl = document.getElementById(`droneInfoPreview_${i}`);
-    if (!canvasEl) return;
-    const c = canvasEl.getContext('2d');
-    c.clearRect(0, 0, canvasEl.width, canvasEl.height);
-    c.save();
-    c.translate(canvasEl.width / 2, canvasEl.height / 2);
-    drawDroneShape(c);
-    c.restore();
-  });
+  const maxLevel = DRONE_UPGRADE_PRICES.length;
+  const maxed = lvlDroneUpgrade >= maxLevel;
+  const nextLevel = Math.min(lvlDroneUpgrade + 1, maxLevel);
+  const canPreviewNext = !maxed;
+  const previewLevel = (droneShowNextLevelPreview && canPreviewNext) ? nextLevel : lvlDroneUpgrade;
+  const upgradeBtn = maxed
+    ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
+    : `<button class="buy" onclick="buyDroneUpgrade()" ${coins < DRONE_UPGRADE_PRICES[lvlDroneUpgrade] ? 'disabled' : ''}>Koop niveau ${lvlDroneUpgrade + 1}/${maxLevel} · 🪙${DRONE_UPGRADE_PRICES[lvlDroneUpgrade]}</button>`;
+  const previewBtn = canPreviewNext
+    ? `<button class="equip" onclick="toggleDroneNextLevelPreview()">${droneShowNextLevelPreview ? '👁 Toon huidig niveau' : '👁 Bekijk volgend niveau'}</button>`
+    : '';
+  const statsForLevel = lvl => `${droneDmg(lvl)} schade, elke ${(droneCooldown(lvl) / 1000).toFixed(2)}s`;
+  const upgradeDesc = maxed
+    ? `Max niveau bereikt: ${statsForLevel(lvlDroneUpgrade)}.`
+    : `Huidig niveau ${lvlDroneUpgrade} (${statsForLevel(lvlDroneUpgrade)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur.`;
+  document.getElementById('droneInfoList').innerHTML =
+    `<div class="shopItem"><canvas id="droneUpgradePreview" width="70" height="70" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
+      <div class="info"><div class="name">Drone Upgrade (Lv. ${lvlDroneUpgrade}/${maxLevel})</div><div class="desc">${upgradeDesc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${upgradeBtn}${previewBtn}</div>
+    </div>` +
+    KILLSTREAK_DRONES.map((drone, i) =>
+      `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">Drone ${i + 1}</div><div class="desc">Verschijnt vanaf killstreak ${drone.threshold}, verdwijnt zodra je streak weer onder de ${drone.threshold} zakt. Vuurt automatisch op de dichtstbijzijnde bot.</div></div></div>`
+    ).join('');
+  drawDroneCanvasPreview('droneUpgradePreview', previewLevel);
+  KILLSTREAK_DRONES.forEach((drone, i) => drawDroneCanvasPreview(`droneInfoPreview_${i}`, lvlDroneUpgrade));
 }
 
 function openDroneInfoScreen() {
@@ -1159,6 +1200,7 @@ function openDroneInfoScreen() {
 window.openDroneInfoScreen = openDroneInfoScreen;
 
 function closeDroneInfoScreen() {
+  droneShowNextLevelPreview = false;
   document.getElementById('droneInfoScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
 }

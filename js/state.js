@@ -12,8 +12,6 @@ function sortFavoritesFirst(arr, prefix) {
 
 // ---- Killstreak-drones: verschijnen één voor één naarmate je killstreak oploopt, helpen bots doden, verdwijnen als de streak weer daaronder zakt ----
 const KILLSTREAK_DRONE_THRESHOLDS = [30, 50, 70, 100];
-const KILLSTREAK_DRONE_DMG = 4;
-const KILLSTREAK_DRONE_COOLDOWN = 450;
 const KILLSTREAK_DRONE_RANGE = 260;
 const KILLSTREAK_DRONE_ORBIT_RADIUS = 42;
 const KILLSTREAK_DRONES = KILLSTREAK_DRONE_THRESHOLDS.map((threshold, i) => ({
@@ -22,6 +20,17 @@ const KILLSTREAK_DRONES = KILLSTREAK_DRONE_THRESHOLDS.map((threshold, i) => ({
   radius: KILLSTREAK_DRONE_ORBIT_RADIUS + i * 16,
   x: 0, y: 0, lastShot: 0, beam: null
 }));
+// Drone Upgrade: 1 gedeeld upgrade-niveau voor alle drones tegelijk — meer schade, sneller vuren, groter en feller uiterlijk
+let lvlDroneUpgrade = Number(localStorage.getItem('botShooterLvlDroneUpgrade')) || 0;
+const DRONE_UPGRADE_PRICES = [1500, 2500, 4000];
+const DRONE_DMG_LEVELS = [4, 7, 10, 14];
+const DRONE_COOLDOWN_LEVELS = [450, 380, 320, 260];
+const DRONE_SCALE_LEVELS = [1, 1.15, 1.3, 1.45];
+const DRONE_COLOR_LEVELS = ['#4cc9f0', '#4cd964', '#ffb703', '#ff4d4d'];
+function droneDmg(lvl = lvlDroneUpgrade) { return DRONE_DMG_LEVELS[lvl]; }
+function droneCooldown(lvl = lvlDroneUpgrade) { return DRONE_COOLDOWN_LEVELS[lvl]; }
+function droneScale(lvl = lvlDroneUpgrade) { return DRONE_SCALE_LEVELS[lvl]; }
+function droneColor(lvl = lvlDroneUpgrade) { return DRONE_COLOR_LEVELS[lvl]; }
 
 // ---- Intro Animatie: koop hoe je verschijnt bij het begin van een potje ----
 let ownedIntroAnimations = JSON.parse(localStorage.getItem('botShooterOwnedIntroAnimations') || '["none"]');
