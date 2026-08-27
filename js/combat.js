@@ -1399,7 +1399,7 @@ function startRandomDisaster() {
     iceFloorUntil = disasterEndAt;
     showDisasterAlert('🧊 IJSVLOER — de hele vloer is spekglad!');
   } else if (type === 'sandstorm') {
-    disasterEndAt = now + 14000;
+    disasterEndAt = now + 7000;
     sandstormUntil = disasterEndAt;
     showDisasterAlert('🌪 ZANDSTORM — minder zicht en snelheid!');
   } else if (type === 'lightningStorm') {
