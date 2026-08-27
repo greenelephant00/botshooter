@@ -606,7 +606,7 @@ function update() {
           bot.dead = true;
           maybeTriggerExclusiveSkinDeathAnim(bot);
           recordKillStat();
-          player.comboStreak = Math.min(20, player.comboStreak + 1);
+          player.comboStreak = Math.min(50, player.comboStreak + 1);
           player.comboLastKill = performance.now();
           if (player.comboStreak > sessionBestStreak) {
             sessionBestStreak = player.comboStreak;

@@ -247,7 +247,7 @@ const ACHIEVEMENTS = [
   { id: 'max_extrahp2', category: 'w2', name: 'Elementaire Conditie Voltooid', icon: '💪', desc: 'Koop alle 5 niveaus van Elementaire Conditie bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 400 }, check: () => lvl2ExtraHp >= EXTRAHP2_LEVELS.length },
   { id: 'max_vengeance', category: 'w2', name: 'Elementaire Wraak Voltooid', icon: '💢', desc: 'Koop alle 3 niveaus van Elementaire Wraak bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Vengeance >= VENGEANCE_LEVELS.length },
   { id: 'master_both_worlds', category: 'w1', name: 'Meester van Beide Werelden', icon: '🌐', desc: 'Voltooi de Eindbaas Rush in zowel Wereld 1 als Wereld 2.', reward: { type: 'skin', skinId: 'titanchrome' }, check: () => hasBossRushW1 && hasBossRushW2 },
-  { id: 'killstreak_legend', category: 'w1', name: 'Killstreak Legende', icon: '🔥', desc: 'Bereik ooit de maximale killstreak van 20 op rij, in Wereld 1 of Wereld 2.', reward: { type: 'skin', skinId: 'supernova' }, check: () => highestComboStreak >= 20 },
+  { id: 'killstreak_legend', category: 'w1', name: 'Killstreak Legende', icon: '🔥', desc: 'Bereik ooit de nieuwe maximale killstreak van 50 op rij, in Wereld 1 of Wereld 2.', reward: { type: 'skin', skinId: 'supernova' }, check: () => highestComboStreak >= 50 },
   { id: 'neon_master', category: 'w1', name: 'Neon Meester', icon: '🌈', desc: 'Koop alle 6 neon-skins in de Skins-shop: Neon Roze, Neon Cyaan, Neon Limoen en hun 3 killstreak-combo-varianten.', reward: { type: 'skin', skinId: 'neonultra' }, check: () => ['neonpink', 'neoncyan', 'neonlime', 'comboneonpink', 'comboneoncyan', 'comboneonlime'].every(id => ownedSkins.includes(id)) }
 ];
 
