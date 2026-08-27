@@ -601,7 +601,7 @@ window.startSprintMode = startSprintMode;
 function updateHUD() {
   const inPracticeSession = weaponPracticeActive || transformPracticeActive;
   document.getElementById('scoreVal').textContent = inPracticeSession ? '—' : score;
-  document.getElementById('highScoreVal').textContent = inPracticeSession ? '—' : (currentWorld === 2 ? highScoreWorld2 : (gameMode === 'hardcore' ? highScoreHardcore : highScore));
+  document.getElementById('highScoreVal').textContent = inPracticeSession ? '—' : (gameMode === 'sprint' ? highScoreSprint : currentWorld === 2 ? highScoreWorld2 : (gameMode === 'hardcore' ? highScoreHardcore : highScore));
   document.getElementById('hpVal').textContent = Math.max(0, Math.round(player.hp));
   document.getElementById('coinsVal').textContent = inPracticeSession ? '—' : coins;
   const coresEl = document.getElementById('coresVal');
