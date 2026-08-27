@@ -1188,7 +1188,7 @@ window.startDronePractice = startDronePractice;
 
 function renderDroneInfoList() {
   const maxLevel = DRONE_UPGRADE_PRICES.length;
-  const statsForLevel = lvl => `${droneDmg(lvl)} schade, elke ${(droneCooldown(lvl) / 1000).toFixed(2)}s`;
+  const statsForLevel = lvl => `${droneDmg(lvl)} schade, elke ${(droneCooldown(lvl) / 1000).toFixed(2)}s, bereik ${droneRange(lvl)}px`;
   document.getElementById('droneInfoList').innerHTML = KILLSTREAK_DRONES.map((drone, i) => {
     const lvl = droneLevels[i];
     const maxed = lvl >= maxLevel;

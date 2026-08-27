@@ -12,7 +12,6 @@ function sortFavoritesFirst(arr, prefix) {
 
 // ---- Killstreak-drones: verschijnen één voor één naarmate je killstreak oploopt, helpen bots doden, verdwijnen als de streak weer daaronder zakt ----
 const KILLSTREAK_DRONE_THRESHOLDS = [30, 50, 70, 100];
-const KILLSTREAK_DRONE_RANGE = 260;
 const KILLSTREAK_DRONE_ORBIT_RADIUS = 42;
 const KILLSTREAK_DRONES = KILLSTREAK_DRONE_THRESHOLDS.map((threshold, i) => ({
   threshold,
@@ -27,10 +26,12 @@ const DRONE_DMG_LEVELS = [2, 4, 6, 8];
 const DRONE_COOLDOWN_LEVELS = [700, 550, 450, 380];
 const DRONE_SCALE_LEVELS = [0.8, 0.95, 1.1, 1.25];
 const DRONE_COLOR_LEVELS = ['#4cc9f0', '#4cd964', '#ffb703', '#ff4d4d'];
+const DRONE_RANGE_LEVELS = [150, 190, 230, 260];
 function droneDmg(lvl) { return DRONE_DMG_LEVELS[lvl]; }
 function droneCooldown(lvl) { return DRONE_COOLDOWN_LEVELS[lvl]; }
 function droneScale(lvl) { return DRONE_SCALE_LEVELS[lvl]; }
 function droneColor(lvl) { return DRONE_COLOR_LEVELS[lvl]; }
+function droneRange(lvl) { return DRONE_RANGE_LEVELS[lvl]; }
 // Drone-testpotje: "Bekijk volgend niveau" start een schoon Endless-potje met de drone al actief, zonder killstreak nodig, zonder bosses/munten/powerups
 let dronePracticeActive = false;
 let dronePracticeLevel = 0;
@@ -40,7 +41,7 @@ function updateOneDrone(drone, lvl, now0) {
   drone.x = player.x + Math.cos(drone.angle) * drone.radius;
   drone.y = player.y + Math.sin(drone.angle) * drone.radius - 14;
   if (now0 - drone.lastShot > droneCooldown(lvl)) {
-    let nearestDrone = null, nearestDroneDist = KILLSTREAK_DRONE_RANGE;
+    let nearestDrone = null, nearestDroneDist = droneRange(lvl);
     bots.forEach(b => {
       if (b.dead) return;
       const dd = Math.hypot(b.x - drone.x, b.y - drone.y);
