@@ -4482,7 +4482,7 @@ function menuBgLoop() {
   requestAnimationFrame(menuBgLoop);
 }
 
-function drawKillstreakDrone(drone) {
+function drawKillstreakDrone(drone, lvl = lvlDroneUpgrade) {
   const x = drone.x, y = drone.y;
   // Beam naar het laatst geraakte doelwit, dooft snel uit
   if (drone.beam) {
@@ -4502,7 +4502,7 @@ function drawKillstreakDrone(drone) {
   ctx.save();
   ctx.translate(x, y);
   ctx.rotate(drone.angle);
-  drawDroneShape(ctx, droneScale(), droneColor());
+  drawDroneShape(ctx, droneScale(lvl), droneColor(lvl));
   ctx.restore();
 }
 
@@ -5633,7 +5633,11 @@ function draw() {
 
   trailParticles.forEach(drawTrailParticle);
   drawPlayer();
-  KILLSTREAK_DRONES.forEach(drone => { if (player.comboStreak >= drone.threshold) drawKillstreakDrone(drone); });
+  if (dronePracticeActive) {
+    drawKillstreakDrone(dronePracticeDrone, dronePracticeLevel);
+  } else {
+    KILLSTREAK_DRONES.forEach(drone => { if (player.comboStreak >= drone.threshold) drawKillstreakDrone(drone); });
+  }
   ctx.restore();
 
   if (nowShake < sandstormUntil) drawSandstormOverlay();

@@ -1146,13 +1146,6 @@ function buyDroneUpgrade() {
 }
 window.buyDroneUpgrade = buyDroneUpgrade;
 
-let droneShowNextLevelPreview = false;
-function toggleDroneNextLevelPreview() {
-  droneShowNextLevelPreview = !droneShowNextLevelPreview;
-  renderDroneInfoList();
-}
-window.toggleDroneNextLevelPreview = toggleDroneNextLevelPreview;
-
 function drawDroneCanvasPreview(canvasId, lvl) {
   const canvasEl = document.getElementById(canvasId);
   if (!canvasEl) return;
@@ -1164,22 +1157,48 @@ function drawDroneCanvasPreview(canvasId, lvl) {
   c.restore();
 }
 
+function startDronePractice(level) {
+  // Testpotje voor de Drone Upgrade: schoon Endless-potje, drone al actief zonder killstreak, geen bosses/munten/powerups
+  dronePracticeActive = true;
+  dronePracticeLevel = level;
+  dronePracticeDrone.angle = 0;
+  dronePracticeDrone.lastShot = 0;
+  dronePracticeDrone.beam = null;
+  practiceWeaponId = null;
+  weaponPracticeActive = false;
+  transformPracticeActive = false;
+  disasterPracticeActive = false;
+  disasterPracticeType = null;
+  exitSkinPractice();
+  gameMode = 'endless';
+  document.getElementById('droneInfoScreen').style.display = 'none';
+  initGame();
+  updateHUD();
+  document.getElementById('pauseOverlay').style.display = 'none';
+  document.getElementById('msg').style.display = 'none';
+
+  if (!loopRunning) {
+    loopRunning = true;
+    loop();
+  }
+  startMusic();
+}
+window.startDronePractice = startDronePractice;
+
 function renderDroneInfoList() {
   const maxLevel = DRONE_UPGRADE_PRICES.length;
   const maxed = lvlDroneUpgrade >= maxLevel;
   const nextLevel = Math.min(lvlDroneUpgrade + 1, maxLevel);
-  const canPreviewNext = !maxed;
-  const previewLevel = (droneShowNextLevelPreview && canPreviewNext) ? nextLevel : lvlDroneUpgrade;
   const upgradeBtn = maxed
     ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
     : `<button class="buy" onclick="buyDroneUpgrade()" ${coins < DRONE_UPGRADE_PRICES[lvlDroneUpgrade] ? 'disabled' : ''}>Koop niveau ${lvlDroneUpgrade + 1}/${maxLevel} · 🪙${DRONE_UPGRADE_PRICES[lvlDroneUpgrade]}</button>`;
-  const previewBtn = canPreviewNext
-    ? `<button class="equip" onclick="toggleDroneNextLevelPreview()">${droneShowNextLevelPreview ? '👁 Toon huidig niveau' : '👁 Bekijk volgend niveau'}</button>`
+  const previewBtn = !maxed
+    ? `<button class="equip" onclick="startDronePractice(${nextLevel})">👁 Bekijk volgend niveau</button>`
     : '';
   const statsForLevel = lvl => `${droneDmg(lvl)} schade, elke ${(droneCooldown(lvl) / 1000).toFixed(2)}s`;
   const upgradeDesc = maxed
     ? `Max niveau bereikt: ${statsForLevel(lvlDroneUpgrade)}.`
-    : `Huidig niveau ${lvlDroneUpgrade} (${statsForLevel(lvlDroneUpgrade)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur.`;
+    : `Huidig niveau ${lvlDroneUpgrade} (${statsForLevel(lvlDroneUpgrade)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur. "Bekijk volgend niveau" start een schoon Endless-testpotje (geen bosses/munten/powerups) met de drone al actief.`;
   document.getElementById('droneInfoList').innerHTML =
     `<div class="shopItem"><canvas id="droneUpgradePreview" width="70" height="70" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
       <div class="info"><div class="name">Drone Upgrade (Lv. ${lvlDroneUpgrade}/${maxLevel})</div><div class="desc">${upgradeDesc}</div></div>
@@ -1188,7 +1207,7 @@ function renderDroneInfoList() {
     KILLSTREAK_DRONES.map((drone, i) =>
       `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">Drone ${i + 1}</div><div class="desc">Verschijnt vanaf killstreak ${drone.threshold}, verdwijnt zodra je streak weer onder de ${drone.threshold} zakt. Vuurt automatisch op de dichtstbijzijnde bot.</div></div></div>`
     ).join('');
-  drawDroneCanvasPreview('droneUpgradePreview', previewLevel);
+  drawDroneCanvasPreview('droneUpgradePreview', lvlDroneUpgrade);
   KILLSTREAK_DRONES.forEach((drone, i) => drawDroneCanvasPreview(`droneInfoPreview_${i}`, lvlDroneUpgrade));
 }
 
@@ -1200,7 +1219,6 @@ function openDroneInfoScreen() {
 window.openDroneInfoScreen = openDroneInfoScreen;
 
 function closeDroneInfoScreen() {
-  droneShowNextLevelPreview = false;
   document.getElementById('droneInfoScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
 }

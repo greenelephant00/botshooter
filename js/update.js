@@ -1069,25 +1069,14 @@ function update() {
   }
 
   // Killstreak-drones: elke drone verschijnt vanaf zijn eigen killstreak-drempel en helpt bots doden, verdwijnt eronder weer
-  KILLSTREAK_DRONES.forEach(drone => {
-    if (player.comboStreak < drone.threshold) return;
-    drone.angle += 0.05;
-    drone.x = player.x + Math.cos(drone.angle) * drone.radius;
-    drone.y = player.y + Math.sin(drone.angle) * drone.radius - 14;
-    if (now0 - drone.lastShot > droneCooldown()) {
-      let nearestDrone = null, nearestDroneDist = KILLSTREAK_DRONE_RANGE;
-      bots.forEach(b => {
-        if (b.dead) return;
-        const dd = Math.hypot(b.x - drone.x, b.y - drone.y);
-        if (dd < nearestDroneDist) { nearestDrone = b; nearestDroneDist = dd; }
-      });
-      if (nearestDrone) {
-        drone.lastShot = now0;
-        drone.beam = { x1: drone.x, y1: drone.y, x2: nearestDrone.x, y2: nearestDrone.y, bornAt: now0, color: droneColor() };
-        damageBotSimple(nearestDrone, droneDmg(), droneColor());
-      }
-    }
-  });
+  if (dronePracticeActive) {
+    updateOneDrone(dronePracticeDrone, dronePracticeLevel, now0);
+  } else {
+    KILLSTREAK_DRONES.forEach(drone => {
+      if (player.comboStreak < drone.threshold) return;
+      updateOneDrone(drone, lvlDroneUpgrade, now0);
+    });
+  }
 
   // In brand (Lavagolem): 3 sec lang elke sec 4 schade
   if (now0 < player.burnUntil) {
@@ -1215,7 +1204,7 @@ function update() {
   const effLuckyDrop = w1Lvl(lvlLuckyDrop);
   const effLuckyDrop2 = w2Lvl(lvl2LuckyDrop);
   const powerupInterval = effLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[effLuckyDrop - 1] : (effLuckyDrop2 > 0 ? LUCKYDROP2_INTERVALS[effLuckyDrop2 - 1] : 6000);
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && !dronePracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
@@ -1352,7 +1341,7 @@ function update() {
   powerups = powerups.filter(p => !p.collected);
 
   // Coins: spawn periodically (niet tijdens oefenen, niet tijdens Eindbaas Rush)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && !dronePracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
     lastCoinSpawn = now;
     spawnCoinPickup();
   }
@@ -1373,7 +1362,7 @@ function update() {
   // Natuurrampen: af en toe een willekeurige ramp (niet tijdens oefenen)
   if (disasterPracticeActive) {
     sustainDisasterPractice();
-  } else if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive) {
+  } else if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !dronePracticeActive) {
     if (!activeDisasterType && nextDisasterAt && now > nextDisasterAt) {
       startRandomDisaster();
     }
@@ -1490,7 +1479,7 @@ function update() {
   }
 
   // Bosses: verschijnen elk precies één keer per potje, in endless via score en in levels via level (niet tijdens oefenen, niet in Golfsprint)
-  if (gameMode !== 'practice' && gameMode !== 'sprint' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossAlive && !bossWarningActive) {
+  if (gameMode !== 'practice' && gameMode !== 'sprint' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !dronePracticeActive && !bossAlive && !bossWarningActive) {
     if (bossRushActive) {
       // Eindbaas Rush: geen score/level-drempel, gewoon de bosses van de gekozen wereld na elkaar
       const rushPool = bossRushWorld === 2 ? WORLD2_BOSS_TYPES : BOSS_TYPES;
@@ -1578,6 +1567,11 @@ function endGame(won) {
     updateHUD();
     msgBtn.textContent = 'Opnieuw proberen';
     msgBtn.onclick = () => { startBossRush(); };
+  } else if (dronePracticeActive) {
+    document.getElementById('msgText').innerHTML =
+      `Drone-testpotje beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur de drone bekijken.</span>`;
+    msgBtn.textContent = 'Opnieuw testen';
+    msgBtn.onclick = () => { startDronePractice(dronePracticeLevel); };
   } else if (weaponPracticeActive) {
     document.getElementById('msgText').innerHTML =
       `Oefensessie beëindigd<br><span style="font-size:18px; color:#aaa;">Geen score, geen bosses, geen munten — puur oefenen.</span>`;
@@ -1682,6 +1676,7 @@ function goToMenu() {
   transformPracticeActive = false;
   disasterPracticeActive = false;
   disasterPracticeType = null;
+  dronePracticeActive = false;
   powerupPreviewActive = false;
   powerupPreviewId = null;
   bossRushActive = false;
