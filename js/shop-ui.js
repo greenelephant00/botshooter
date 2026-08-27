@@ -871,7 +871,8 @@ function renderStatsScreen() {
     ['Totale speeltijd', formatPlayTime(totalPlayTimeMs)],
     ['Potjes gespeeld', totalGamesPlayed.toLocaleString('nl-NL')],
     ['Gemiddelde score per potje', avgScore.toLocaleString('nl-NL')],
-    ['Favoriete wapen', favoriteWeaponName()]
+    ['Favoriete wapen', favoriteWeaponName()],
+    ['Hoogste killstreak', highestComboStreak.toLocaleString('nl-NL')]
   ];
   document.getElementById('statsList').innerHTML = rows.map(([label, value]) =>
     `<div class="statsRow"><span class="statsLabel">${label}</span><span class="statsValue">${value}</span></div>`
