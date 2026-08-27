@@ -11,7 +11,7 @@ function sortFavoritesFirst(arr, prefix) {
 }
 
 // ---- Killstreak-drone: verschijnt bij killstreak 50+, helpt bots doden, verdwijnt zodra de streak weer onder de 50 zakt ----
-const KILLSTREAK_DRONE_THRESHOLD = 50;
+const KILLSTREAK_DRONE_THRESHOLD = 30;
 const KILLSTREAK_DRONE_DMG = 4;
 const KILLSTREAK_DRONE_COOLDOWN = 450;
 const KILLSTREAK_DRONE_RANGE = 260;
