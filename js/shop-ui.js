@@ -1861,7 +1861,7 @@ window.closeSkinsShop = closeSkinsShop;
 
 function renderSkinsShop() {
   document.getElementById('skinsShopCoins').textContent = coins;
-  const renderSkinItem = s => {
+  const renderSkinItem = (s, idSuffix = '') => {
     const owned = ownedSkins.includes(s.id);
     const equipped = equippedSkin === s.id;
     let btn;
@@ -1872,7 +1872,7 @@ function renderSkinsShop() {
     const fav = isFavorite(`skin:${s.id}`);
     return `<div class="shopItem">
       <button class="favStar${fav ? ' active' : ''}" onclick="toggleFavorite('skin:${s.id}'); renderSkinsShop();" title="Favoriet">${fav ? '⭐' : '☆'}</button>
-      <canvas class="botPreview" id="skinPreview_${s.id}" width="60" height="60"></canvas>
+      <canvas class="botPreview" id="skinPreview_${s.id}${idSuffix}" width="60" height="60"></canvas>
       <div class="info">
         <div class="name">${s.name}</div>
         <div class="desc">${s.desc}</div>
@@ -1889,16 +1889,26 @@ function renderSkinsShop() {
   const normalSkins = sortFavoritesFirst(SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly), 'skin');
   const exclusiveSkins = sortFavoritesFirst(SKINS.filter(s => s.achievementOnly), 'skin');
   const elementSections = currentWorld === 2
-    ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(renderSkinItem).join('')}</div>` +
-      `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(renderSkinItem).join('')}</div>`
+    ? `<div class="shopSection"><h3>🔥🌍 Elementen Kill Streak</h3>${elementKillstreakSkins.map(s => renderSkinItem(s)).join('')}</div>` +
+      `<div class="shopSection"><h3>🌍 Elementen Skins</h3>${elementSkins.map(s => renderSkinItem(s)).join('')}</div>`
+    : '';
+  const allShownSkins = [...killstreakSkins, ...(currentWorld === 2 ? [...elementKillstreakSkins, ...elementSkins] : []), ...normalSkins, ...exclusiveSkins];
+  const favoriteSkins = allShownSkins.filter(s => isFavorite(`skin:${s.id}`));
+  const favoriteSection = favoriteSkins.length > 0
+    ? `<div class="shopSection"><h3>⭐ Favorieten</h3>${favoriteSkins.map(s => renderSkinItem(s, '_fav')).join('')}</div>`
     : '';
   document.getElementById('skinsShopList').innerHTML =
-    `<div class="shopSection"><h3>🔥 Kill Streak</h3>${killstreakSkins.map(renderSkinItem).join('')}</div>` +
+    favoriteSection +
+    `<div class="shopSection"><h3>🔥 Kill Streak</h3>${killstreakSkins.map(s => renderSkinItem(s)).join('')}</div>` +
     elementSections +
-    normalSkins.map(renderSkinItem).join('') +
-    `<div class="shopSection"><h3>🏆 Exclusieve Skins</h3>${exclusiveSkins.map(renderSkinItem).join('')}</div>`;
+    normalSkins.map(s => renderSkinItem(s)).join('') +
+    `<div class="shopSection"><h3>🏆 Exclusieve Skins</h3>${exclusiveSkins.map(s => renderSkinItem(s)).join('')}</div>`;
   SKINS.forEach(s => {
     const canvasEl = document.getElementById(`skinPreview_${s.id}`);
+    if (canvasEl) drawSkinPreview(canvasEl, s.id);
+  });
+  favoriteSkins.forEach(s => {
+    const canvasEl = document.getElementById(`skinPreview_${s.id}_fav`);
     if (canvasEl) drawSkinPreview(canvasEl, s.id);
   });
 }
