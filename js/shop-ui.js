@@ -429,9 +429,9 @@ function renderAchievementCard(a) {
 
 function renderAchievements() {
   checkAchievements();
-  const skinRewards = ACHIEVEMENTS.filter(a => a.reward.type === 'skin');
+  const skinRewards = ACHIEVEMENTS.filter(a => a.reward.type === 'unlockSkin');
   const hardRewards = ACHIEVEMENTS.filter(a => a.reward.type === 'coins' && a.reward.amount >= 1000);
-  const isSpecial = a => a.reward.type === 'skin' || (a.reward.type === 'coins' && a.reward.amount >= 1000);
+  const isSpecial = a => a.reward.type === 'unlockSkin' || (a.reward.type === 'coins' && a.reward.amount >= 1000);
   const w1 = ACHIEVEMENTS.filter(a => a.category === 'w1' && !isSpecial(a));
   const w2 = ACHIEVEMENTS.filter(a => a.category === 'w2' && !isSpecial(a));
   const skinCount = skinRewards.filter(a => unlockedAchievements.includes(a.id)).length;
@@ -1573,7 +1573,8 @@ window.buyDualArmorSlot2 = buyDualArmorSlot2;
 
 function buySkin(id) {
   const skin = SKINS.find(s => s.id === id);
-  if (!skin || skin.coreOnly || skin.achievementOnly || ownedSkins.includes(id) || coins < skin.price) return;
+  if (!skin || skin.coreOnly || ownedSkins.includes(id) || coins < skin.price) return;
+  if (skin.achievementOnly && !unlockedAchievements.includes(skin.requiredAchievement)) return;
   coins -= skin.price;
   ownedSkins.push(id);
   saveShopState();
@@ -1611,7 +1612,7 @@ function renderSkinsShop() {
     let btn;
     if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
     else if (owned) btn = `<button class="equip" onclick="equipSkin('${s.id}')">Uitrusten</button>`;
-    else if (s.achievementOnly) btn = `<button class="buy" disabled>🔒 Quest nodig</button>`;
+    else if (s.achievementOnly && !unlockedAchievements.includes(s.requiredAchievement)) btn = `<button class="buy" disabled>🔒 Quest nodig</button>`;
     else btn = `<button class="buy" onclick="buySkin('${s.id}')" ${coins < s.price ? 'disabled' : ''}>Koop · 🪙${s.price}</button>`;
     return `<div class="shopItem">
       <canvas class="botPreview" id="skinPreview_${s.id}" width="60" height="60"></canvas>

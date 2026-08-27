@@ -178,7 +178,10 @@ let claimedAchievementRewards = JSON.parse(localStorage.getItem('botShooterClaim
 
 function rewardText(r) {
   if (r.type === 'cores') return `🔮 ${r.amount} Elemental Cores`;
-  if (r.type === 'skin') return `🎨 Exclusieve skin: ${(SKINS.find(s => s.id === r.skinId) || {}).name || r.skinId}`;
+  if (r.type === 'unlockSkin') {
+    const s = SKINS.find(s => s.id === r.skinId) || {};
+    return `🔓 Ontgrendelt: ${s.name || r.skinId} (koop daarna voor 🪙${s.price || '?'})`;
+  }
   return `🪙 ${r.amount} munten`;
 }
 
@@ -232,9 +235,9 @@ const ACHIEVEMENTS = [
   { id: 'max_steadfast', category: 'w2', name: 'Aardvastheid Voltooid', icon: '🪨', desc: 'Koop alle 3 niveaus van Aardvastheid bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Steadfast >= STEADFAST_LEVELS.length },
   { id: 'max_extrahp2', category: 'w2', name: 'Elementaire Conditie Voltooid', icon: '💪', desc: 'Koop alle 5 niveaus van Elementaire Conditie bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 400 }, check: () => lvl2ExtraHp >= EXTRAHP2_LEVELS.length },
   { id: 'max_vengeance', category: 'w2', name: 'Elementaire Wraak Voltooid', icon: '💢', desc: 'Koop alle 3 niveaus van Elementaire Wraak bij de Wereld 2-upgrades in de shop.', reward: { type: 'coins', amount: 300 }, check: () => lvl2Vengeance >= VENGEANCE_LEVELS.length },
-  { id: 'master_both_worlds', category: 'w1', name: 'Meester van Beide Werelden', icon: '🌐', desc: 'Voltooi de Eindbaas Rush in zowel Wereld 1 als Wereld 2.', reward: { type: 'skin', skinId: 'titanchrome' }, check: () => hasBossRushW1 && hasBossRushW2 },
-  { id: 'killstreak_legend', category: 'w1', name: 'Killstreak Legende', icon: '🔥', desc: 'Bereik ooit een killstreak van 80 op rij, in Wereld 1 of Wereld 2.', reward: { type: 'skin', skinId: 'supernova' }, check: () => highestComboStreak >= 80 },
-  { id: 'neon_master', category: 'w1', name: 'Neon Meester', icon: '🌈', desc: 'Koop alle 6 neon-skins in de Skins-shop: Neon Roze, Neon Cyaan, Neon Limoen en hun 3 killstreak-combo-varianten.', reward: { type: 'skin', skinId: 'neonultra' }, check: () => ['neonpink', 'neoncyan', 'neonlime', 'comboneonpink', 'comboneoncyan', 'comboneonlime'].every(id => ownedSkins.includes(id)) },
+  { id: 'master_both_worlds', category: 'w1', name: 'Meester van Beide Werelden', icon: '🌐', desc: 'Voltooi de Eindbaas Rush in zowel Wereld 1 als Wereld 2.', reward: { type: 'unlockSkin', skinId: 'titanchrome' }, check: () => hasBossRushW1 && hasBossRushW2 },
+  { id: 'killstreak_legend', category: 'w1', name: 'Killstreak Legende', icon: '🔥', desc: 'Bereik ooit een killstreak van 80 op rij, in Wereld 1 of Wereld 2.', reward: { type: 'unlockSkin', skinId: 'supernova' }, check: () => highestComboStreak >= 80 },
+  { id: 'neon_master', category: 'w1', name: 'Neon Meester', icon: '🌈', desc: 'Koop alle 6 neon-skins in de Skins-shop: Neon Roze, Neon Cyaan, Neon Limoen en hun 3 killstreak-combo-varianten.', reward: { type: 'unlockSkin', skinId: 'neonultra' }, check: () => ['neonpink', 'neoncyan', 'neonlime', 'comboneonpink', 'comboneoncyan', 'comboneonlime'].every(id => ownedSkins.includes(id)) },
   { id: 'score_75000', category: 'w1', name: 'Ongenaakbaar', icon: '🌠', desc: 'Behaal in één potje een score van minstens 75.000 — bijna niemand overleeft zo lang.', reward: { type: 'coins', amount: 3000 }, check: () => highScore >= 75000 || highScoreWorld2 >= 75000 || highScoreHardcore >= 75000 },
   { id: 'hardcore_10000', category: 'w1', name: 'Hardcore Titaan', icon: '💀', desc: 'Behaal in de Hardcore-modus (2x HP en 2x schade voor bots) een score van minstens 10.000 in één potje.', reward: { type: 'coins', amount: 2500 }, check: () => highScoreHardcore >= 10000 },
   { id: 'highlevel_100', category: 'w1', name: 'Eeuwige Klimmer', icon: '🗻', desc: 'Rond in Levels-modus level 100 af — een marathon van steeds zwaardere golven.', reward: { type: 'coins', amount: 3000 }, check: () => highLevel >= 100 },
@@ -246,9 +249,8 @@ function grantAchievementReward(a) {
   if (a.reward.type === 'cores') {
     elementalCores += a.reward.amount;
     localStorage.setItem('botShooterElementalCores', elementalCores);
-  } else if (a.reward.type === 'skin') {
-    if (!ownedSkins.includes(a.reward.skinId)) ownedSkins.push(a.reward.skinId);
-    if (typeof saveShopState === 'function') saveShopState();
+  } else if (a.reward.type === 'unlockSkin') {
+    // Geen directe beloning: de quest ontgrendelt alleen de mogelijkheid om de skin te kopen in de Skins-shop
   } else {
     coins += a.reward.amount;
     if (typeof saveShopState === 'function') saveShopState();
@@ -476,9 +478,9 @@ const SKINS = [
   { id: 'elemcrystal', name: 'Kristalwezen', price: 1750, desc: 'Wereld 2-exclusief. Facet-geslepen edelsteen-lichaam dat schittert. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemthunder', name: 'Donderwezen',  price: 1750, desc: 'Wereld 2-exclusief. Donkere onweerswolk met een felle bliksemschicht erdoorheen. Werkt alleen in Wereld 2.', element: true },
   { id: 'elemtide',    name: 'Getijwezen',   price: 1750, desc: 'Wereld 2-exclusief. Diepblauw lichaam van kolkende zee met witte schuimkoppen. Werkt alleen in Wereld 2.', element: true },
-  { id: 'titanchrome', name: 'Titan Chroom', achievementOnly: true, desc: 'Quest-exclusief. Een gepolijst, spiegelend chroom-lichaam met een rondzwenkende lichtglans en gelaagde titan-pantserplaten. Niet te koop — alleen te verdienen.' },
-  { id: 'supernova',   name: 'Supernova',    achievementOnly: true, desc: 'Quest-exclusief. Een verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen. Niet te koop — alleen te verdienen.' },
-  { id: 'neonultra',   name: 'Neon Ultra',   achievementOnly: true, desc: 'Quest-exclusief. Een zwarte kern omringd door een volledig kleurwisselende regenboog-neonring met ronddraaiende neon-spaken. Niet te koop — alleen te verdienen.' }
+  { id: 'titanchrome', name: 'Titan Chroom', achievementOnly: true, requiredAchievement: 'master_both_worlds', price: 2500, desc: 'Quest-exclusief. Een gepolijst, spiegelend chroom-lichaam met een rondzwenkende lichtglans en gelaagde titan-pantserplaten. Ontgrendel de quest "Meester van Beide Werelden", koop hem dan voor 2500 munten.' },
+  { id: 'supernova',   name: 'Supernova',    achievementOnly: true, requiredAchievement: 'killstreak_legend', price: 2500, desc: 'Quest-exclusief. Een verblindend witheet sterrenlichaam met pulserende, ronddraaiende vlamstralen. Ontgrendel de quest "Killstreak Legende", koop hem dan voor 2500 munten.' },
+  { id: 'neonultra',   name: 'Neon Ultra',   achievementOnly: true, requiredAchievement: 'neon_master', price: 2500, desc: 'Quest-exclusief. Een zwarte kern omringd door een volledig kleurwisselende regenboog-neonring met ronddraaiende neon-spaken. Ontgrendel de quest "Neon Meester", koop hem dan voor 2500 munten.' }
 ];
 
 // Elementen Skins werken alleen in Wereld 2 — val in Wereld 1 terug op de standaard-skin, net als wapens/pantsers/transformaties
