@@ -30,23 +30,24 @@ const MYSTERY_BOX_COOLDOWN = 3600000; // 1 uur
 let lastMysteryBoxOpen = Number(localStorage.getItem('botShooterLastMysteryBoxOpen')) || 0;
 function mysteryBoxReady() { return Date.now() - lastMysteryBoxOpen >= MYSTERY_BOX_COOLDOWN; }
 function mysteryBoxTimeLeft() { return Math.max(0, MYSTERY_BOX_COOLDOWN - (Date.now() - lastMysteryBoxOpen)); }
-function getMysteryBoxCosmeticPool() {
-  const pool = [];
-  SKINS.filter(s => !s.achievementOnly && !s.coreOnly && !ownedSkins.includes(s.id)).forEach(s =>
-    pool.push({ name: `Skin: ${s.name}`, apply: () => ownedSkins.push(s.id) }));
-  TRAILS.filter(t => t.id !== 'none' && !ownedTrails.includes(t.id)).forEach(t =>
-    pool.push({ name: `Trail: ${t.name}`, apply: () => ownedTrails.push(t.id) }));
-  BOT_KILL_EFFECTS.filter(e => e.id !== 'none' && !ownedBotKillEffects.includes(e.id)).forEach(e =>
-    pool.push({ name: `Bot Kill Effect: ${e.name}`, apply: () => ownedBotKillEffects.push(e.id) }));
-  DEATH_ANIMATIONS.filter(d => d.id !== 'default' && !ownedDeathAnimations.includes(d.id)).forEach(d =>
-    pool.push({ name: `Death Animation: ${d.name}`, apply: () => ownedDeathAnimations.push(d.id) }));
-  INTRO_ANIMATIONS.filter(i => i.id !== 'none' && !ownedIntroAnimations.includes(i.id)).forEach(i =>
-    pool.push({ name: `Intro Animatie: ${i.name}`, apply: () => ownedIntroAnimations.push(i.id) }));
-  MENU_BACKGROUNDS.filter(b => b.id !== 'none' && !ownedMenuBackgrounds.includes(b.id)).forEach(b =>
-    pool.push({ name: `Achtergrond: ${b.name}`, apply: () => ownedMenuBackgrounds.push(b.id) }));
-  WEAPON_SKINS.filter(w => !ownedWeaponSkins.includes(w.id)).forEach(w =>
-    pool.push({ name: `Wapenskin: ${w.name}`, apply: () => ownedWeaponSkins.push(w.id) }));
-  return pool;
+const MYSTERY_BOX_TABLE = [
+  { chance: 0.10, amount: 100 },
+  { chance: 0.20, amount: 200 },
+  { chance: 0.20, amount: 300 },
+  { chance: 0.20, amount: 400 },
+  { chance: 0.15, amount: 500 },
+  { chance: 0.10, amount: 900 },
+  { chance: 0.03, amount: 1200 },
+  { chance: 0.02, amount: 2000 }
+];
+function rollMysteryBoxReward() {
+  const roll = Math.random();
+  let cumulative = 0;
+  for (const entry of MYSTERY_BOX_TABLE) {
+    cumulative += entry.chance;
+    if (roll < cumulative) return entry.amount;
+  }
+  return MYSTERY_BOX_TABLE[MYSTERY_BOX_TABLE.length - 1].amount;
 }
 
 // ---- Game state ----

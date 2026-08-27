@@ -1054,36 +1054,10 @@ function openMysteryBox() {
   coins -= MYSTERY_BOX_PRICE;
   lastMysteryBoxOpen = Date.now();
   localStorage.setItem('botShooterLastMysteryBoxOpen', lastMysteryBoxOpen);
-  const roll = Math.random();
-  if (roll < 0.2) {
-    const pool = getMysteryBoxCosmeticPool();
-    if (pool.length > 0) {
-      const item = pool[Math.floor(Math.random() * pool.length)];
-      item.apply();
-      mysteryBoxLastResult = `🎉 Je wint: ${item.name}!`;
-    } else {
-      const amount = 500 + Math.floor(Math.random() * 1000);
-      coins += amount;
-      mysteryBoxLastResult = `🪙 Je wint ${amount} munten! (je hebt al alles in bezit)`;
-    }
-  } else if (roll < 0.4) {
-    const amount = 5 + Math.floor(Math.random() * 20);
-    elementalCores += amount;
-    localStorage.setItem('botShooterElementalCores', elementalCores);
-    mysteryBoxLastResult = `🔮 Je wint ${amount} Elemental Cores!`;
-  } else {
-    const amount = 200 + Math.floor(Math.random() * 1300);
-    coins += amount;
-    mysteryBoxLastResult = `🪙 Je wint ${amount} munten!`;
-  }
+  const amount = rollMysteryBoxReward();
+  coins += amount;
+  mysteryBoxLastResult = `🪙 Je wint ${amount} munten!`;
   saveShopState();
-  localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
-  localStorage.setItem('botShooterOwnedTrails', JSON.stringify(ownedTrails));
-  localStorage.setItem('botShooterOwnedBotKillEffects', JSON.stringify(ownedBotKillEffects));
-  localStorage.setItem('botShooterOwnedDeathAnimations', JSON.stringify(ownedDeathAnimations));
-  localStorage.setItem('botShooterOwnedIntroAnimations', JSON.stringify(ownedIntroAnimations));
-  localStorage.setItem('botShooterOwnedMenuBackgrounds', JSON.stringify(ownedMenuBackgrounds));
-  localStorage.setItem('botShooterOwnedWeaponSkins', JSON.stringify(ownedWeaponSkins));
   renderMysteryBoxScreen();
 }
 window.openMysteryBox = openMysteryBox;
@@ -1095,9 +1069,14 @@ function renderMysteryBoxScreen() {
     ? `<button class="buy" onclick="openMysteryBox()" ${coins < MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🪙${MYSTERY_BOX_PRICE}</button>`
     : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(mysteryBoxTimeLeft())}</button>`;
   const resultHtml = mysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${mysteryBoxLastResult}</span></div>` : '';
+  const oddsRows = MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🪙 ${e.amount}</td></tr>`).join('');
   document.getElementById('mysteryBoxContent').innerHTML = `
-    <div class="shopItem"><div class="info"><div class="name">Mysterie-doos</div><div class="desc">Munten, Elemental Cores, of (zeldzaam) een gratis skin/trail/effect dat je nog niet hebt. Eén keer per uur te openen.</div></div>${btn}</div>
+    <div class="shopItem"><div class="info"><div class="name">Mysterie-doos</div><div class="desc">Munten volgens onderstaande kanstabel. Eén keer per uur te openen.</div></div>${btn}</div>
     ${resultHtml}
+    <table class="mysteryOddsTable">
+      <tr><th>Kans</th><th>Munten</th></tr>
+      ${oddsRows}
+    </table>
   `;
 }
 window.renderMysteryBoxScreen = renderMysteryBoxScreen;

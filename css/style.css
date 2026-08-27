@@ -72,16 +72,17 @@
   #keybindsBtn {
     position: absolute;
     top: 54px;
-    left: 12px;
+    right: 12px;
     z-index: 20;
     background: rgba(0,0,0,0.5);
     color: #fff;
     border: 1px solid #555;
     border-radius: 8px;
     padding: 8px 12px;
-    font-size: 18px;
+    font-size: 14px;
     cursor: pointer;
     line-height: 1;
+    white-space: nowrap;
   }
   #keybindsBtn:hover { background: rgba(0,0,0,0.7); }
   #musicPanel {
@@ -487,6 +488,29 @@
     font-weight: bold;
     font-size: 16px;
   }
+  .mysteryOddsTable {
+    max-width: 420px;
+    margin: 16px auto 0;
+    width: 100%;
+    border-collapse: collapse;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .mysteryOddsTable th, .mysteryOddsTable td {
+    padding: 8px 16px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .mysteryOddsTable th {
+    color: #aaa;
+    font-size: 13px;
+  }
+  .mysteryOddsTable td {
+    color: #ffd60a;
+    font-weight: bold;
+  }
+  .mysteryOddsTable tr:last-child td { border-bottom: none; }
   @keyframes achievementToastIn {
     from { opacity: 0; transform: translateX(30px); }
     to   { opacity: 1; transform: translateX(0); }
