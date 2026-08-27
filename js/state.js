@@ -23,9 +23,9 @@ const KILLSTREAK_DRONES = KILLSTREAK_DRONE_THRESHOLDS.map((threshold, i) => ({
 // Drone Upgrade: elke drone heeft zijn eigen, aparte upgrade-niveau — meer schade, sneller vuren, groter en feller uiterlijk
 let droneLevels = JSON.parse(localStorage.getItem('botShooterDroneLevels') || JSON.stringify(KILLSTREAK_DRONE_THRESHOLDS.map(() => 0)));
 const DRONE_UPGRADE_PRICES = [1500, 2500, 4000];
-const DRONE_DMG_LEVELS = [4, 7, 10, 14];
-const DRONE_COOLDOWN_LEVELS = [450, 380, 320, 260];
-const DRONE_SCALE_LEVELS = [1, 1.15, 1.3, 1.45];
+const DRONE_DMG_LEVELS = [2, 4, 6, 8];
+const DRONE_COOLDOWN_LEVELS = [700, 550, 450, 380];
+const DRONE_SCALE_LEVELS = [0.8, 0.95, 1.1, 1.25];
 const DRONE_COLOR_LEVELS = ['#4cc9f0', '#4cd964', '#ffb703', '#ff4d4d'];
 function droneDmg(lvl) { return DRONE_DMG_LEVELS[lvl]; }
 function droneCooldown(lvl) { return DRONE_COOLDOWN_LEVELS[lvl]; }
