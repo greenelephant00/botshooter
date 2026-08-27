@@ -34,7 +34,8 @@ const ACCOUNT_KEYS = [
   'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground',
   'botShooterHasDualArmor2',
   'botShooterOwnedBotKillEffects', 'botShooterEquippedBotKillEffect',
-  'botShooterFavoriteItems'
+  'botShooterFavoriteItems',
+  'botShooterOwnedIntroAnimations', 'botShooterEquippedIntroAnimation'
 ];
 
 let currentAccount = null;

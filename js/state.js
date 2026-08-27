@@ -10,6 +10,20 @@ function sortFavoritesFirst(arr, prefix) {
   return [...arr].sort((a, b) => (isFavorite(`${prefix}:${b.id}`) ? 1 : 0) - (isFavorite(`${prefix}:${a.id}`) ? 1 : 0));
 }
 
+// ---- Intro Animatie: koop hoe je verschijnt bij het begin van een potje ----
+let ownedIntroAnimations = JSON.parse(localStorage.getItem('botShooterOwnedIntroAnimations') || '["none"]');
+let equippedIntroAnimation = localStorage.getItem('botShooterEquippedIntroAnimation') || 'none';
+const INTRO_ANIM_DURATION = 800;
+const INTRO_ANIMATIONS = [
+  { id: 'none',        name: 'Geen',          price: 0,    desc: 'Geen intro — je verschijnt gewoon meteen.' },
+  { id: 'beam',        name: 'Lichtbundel',   price: 400,  desc: 'Een felle lichtbundel daalt neer van boven en je materialiseert erin.' },
+  { id: 'portal',      name: 'Portaalstap',   price: 450,  desc: 'Je stapt uit een kolkend portaal dat achter je weer dichttrekt.' },
+  { id: 'materialize', name: 'Materialisatie', price: 450, desc: 'Je lichaam bouwt zich op uit deeltjes die van alle kanten naar binnen vliegen.' },
+  { id: 'dropin',      name: 'Luchtlanding',  price: 400,  desc: 'Je valt van boven neer en landt met een korte schokgolf.' },
+  { id: 'flash',       name: 'Flitsinstap',   price: 350,  desc: 'Een felle witte lichtflits en daar sta je.' },
+  { id: 'spin',        name: 'Duizelspawn',   price: 400,  desc: 'Je tolt razendsnel rond en komt tot stilstand zodra je verschijnt.' }
+];
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];

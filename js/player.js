@@ -56,6 +56,7 @@ const player = {
   fireCageRadius: 0,
   jammedUntil: 0,
   deathAnimStart: 0,
+  introAnimStart: 0,
   killStreak: 0,
   killStreakLastKill: 0,
   comboStreak: 0,
@@ -115,6 +116,7 @@ function resetPlayer() {
   player.fireCageRadius = 0;
   player.jammedUntil = 0;
   player.deathAnimStart = 0;
+  player.introAnimStart = 0;
   player.adrenalineUsed = false;
   player.reviveUsed = false;
   player.killStreak = 0;
@@ -379,6 +381,7 @@ function triggerBossWarning(type) {
 
 function initGame() {
   resetPlayer();
+  if (equippedIntroAnimation !== 'none') player.introAnimStart = performance.now();
   isPaused = false;
   const pauseOverlayEl = document.getElementById('pauseOverlay');
   if (pauseOverlayEl) pauseOverlayEl.style.display = 'none';

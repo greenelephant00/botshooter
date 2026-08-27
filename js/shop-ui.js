@@ -956,6 +956,91 @@ function closeBotKillEffectShop() {
 }
 window.closeBotKillEffectShop = closeBotKillEffectShop;
 
+function buyIntroAnimation(id) {
+  const d = INTRO_ANIMATIONS.find(x => x.id === id);
+  if (!d || ownedIntroAnimations.includes(id) || coins < d.price) return;
+  coins -= d.price;
+  ownedIntroAnimations.push(id);
+  saveShopState();
+  localStorage.setItem('botShooterOwnedIntroAnimations', JSON.stringify(ownedIntroAnimations));
+  renderIntroAnimShop();
+}
+window.buyIntroAnimation = buyIntroAnimation;
+
+function equipIntroAnimation(id) {
+  if (!ownedIntroAnimations.includes(id)) return;
+  equippedIntroAnimation = id;
+  localStorage.setItem('botShooterEquippedIntroAnimation', equippedIntroAnimation);
+  renderIntroAnimShop();
+}
+window.equipIntroAnimation = equipIntroAnimation;
+
+function renderIntroAnimShop() {
+  document.getElementById('introAnimCoins').textContent = coins;
+  document.getElementById('introAnimList').innerHTML = INTRO_ANIMATIONS.map(d => {
+    const owned = ownedIntroAnimations.includes(d.id);
+    const equipped = equippedIntroAnimation === d.id;
+    const btn = equipped
+      ? `<button class="equipped" disabled>Uitgerust</button>`
+      : owned
+        ? `<button class="equip" onclick="equipIntroAnimation('${d.id}')">Uitrusten</button>`
+        : `<button class="buy" onclick="buyIntroAnimation('${d.id}')" ${coins < d.price ? 'disabled' : ''}>Koop · 🪙${d.price}</button>`;
+    return `<div class="shopItem"><canvas id="introAnimPreview_${d.id}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewIntroAnimation('${d.id}')">👁 Bekijk</button></div></div>`;
+  }).join('');
+  INTRO_ANIMATIONS.forEach(d => {
+    const canvasEl = document.getElementById(`introAnimPreview_${d.id}`);
+    if (!canvasEl) return;
+    const c = canvasEl.getContext('2d');
+    c.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    c.save();
+    c.translate(canvasEl.width / 2, canvasEl.height / 2);
+    drawPlayerSkin(c, getSkin(), 16);
+    c.restore();
+  });
+}
+window.renderIntroAnimShop = renderIntroAnimShop;
+
+let introAnimPreviewRAF = null;
+function previewIntroAnimation(id) {
+  if (introAnimPreviewRAF) cancelAnimationFrame(introAnimPreviewRAF);
+  const canvasEl = document.getElementById(`introAnimPreview_${id}`);
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  const w = canvasEl.width, h = canvasEl.height;
+  const start = performance.now();
+  const loopDur = INTRO_ANIM_DURATION + 600;
+  function frame() {
+    const elapsed = (performance.now() - start) % loopDur;
+    c.clearRect(0, 0, w, h);
+    c.save();
+    c.translate(w / 2, h / 2);
+    if (elapsed < INTRO_ANIM_DURATION) {
+      drawIntroAnimation(c, id, elapsed, 16);
+    } else {
+      drawPlayerSkin(c, getSkin(), 16);
+    }
+    c.restore();
+    introAnimPreviewRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+window.previewIntroAnimation = previewIntroAnimation;
+
+function openIntroAnimShop() {
+  document.getElementById('cosmeticsScreen').style.display = 'none';
+  document.getElementById('introAnimScreen').style.display = 'flex';
+  renderIntroAnimShop();
+}
+window.openIntroAnimShop = openIntroAnimShop;
+
+function closeIntroAnimShop() {
+  if (introAnimPreviewRAF) { cancelAnimationFrame(introAnimPreviewRAF); introAnimPreviewRAF = null; }
+  document.getElementById('introAnimScreen').style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
+}
+window.closeIntroAnimShop = closeIntroAnimShop;
+
 function renderStatsScreen() {
   const rows = [
     ['Totaal aantal kills', totalLifetimeKills.toLocaleString('nl-NL')],

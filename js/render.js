@@ -3689,6 +3689,83 @@ function drawPlayerWaterForm(c, r) {
   c.stroke();
 }
 
+function drawIntroAnimation(c, type, age, r) {
+  const dur = INTRO_ANIM_DURATION;
+  const t = Math.min(1, age / dur);
+  if (type === 'beam') {
+    c.save();
+    c.globalAlpha = Math.max(0, 1 - t);
+    const grad = c.createLinearGradient(0, -200, 0, r);
+    grad.addColorStop(0, 'rgba(255,255,255,0)');
+    grad.addColorStop(1, 'rgba(255,255,255,0.9)');
+    c.fillStyle = grad;
+    c.fillRect(-r * 0.8, -200, r * 1.6, 200 + r);
+    c.restore();
+    c.globalAlpha = Math.min(1, t * 1.8);
+    c.fillStyle = '#dfe9ff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+  } else if (type === 'portal') {
+    const spin = age / 5;
+    c.globalAlpha = Math.max(0, 1 - t);
+    c.strokeStyle = '#8a2be2';
+    c.lineWidth = 4;
+    c.beginPath(); c.arc(0, 0, r + 10 + (1 - t) * 20, spin, spin + Math.PI * 1.4); c.stroke();
+    c.strokeStyle = '#c77dff';
+    c.beginPath(); c.arc(0, 0, r + 4 + (1 - t) * 12, -spin, -spin + Math.PI * 1.1); c.stroke();
+    c.globalAlpha = Math.min(1, t * 1.6);
+    c.fillStyle = '#999';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+  } else if (type === 'materialize') {
+    const pieces = 12;
+    c.globalAlpha = Math.min(1, t * 1.5);
+    c.fillStyle = '#8ecbff';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    for (let i = 0; i < pieces; i++) {
+      const a = (Math.PI * 2 / pieces) * i;
+      const dist = (1 - t) * (r + 60);
+      c.globalAlpha = Math.max(0, 1 - t);
+      c.fillStyle = '#4cc9f0';
+      c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist, 3, 0, Math.PI * 2); c.fill();
+    }
+  } else if (type === 'dropin') {
+    const fallT = Math.min(1, age / (dur * 0.7));
+    const dropY = -(1 - fallT) * (1 - fallT) * 180;
+    c.save();
+    c.translate(0, dropY);
+    c.globalAlpha = 1;
+    c.fillStyle = '#cfd8dc';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.restore();
+    if (fallT >= 1) {
+      const st = (age - dur * 0.7) / (dur * 0.3);
+      c.globalAlpha = Math.max(0, 1 - st);
+      c.strokeStyle = '#fff';
+      c.lineWidth = 3 * (1 - st);
+      c.beginPath(); c.arc(0, 0, r + st * 30, 0, Math.PI * 2); c.stroke();
+    }
+  } else if (type === 'flash') {
+    const flashT = Math.min(1, age / 250);
+    c.globalAlpha = Math.max(0, 1 - flashT);
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, r + (1 - flashT) * 40, 0, Math.PI * 2); c.fill();
+    c.globalAlpha = Math.min(1, age / 250);
+    c.fillStyle = '#eee';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+  } else if (type === 'spin') {
+    const spinSpeed = (1 - t) * 40;
+    c.save();
+    c.rotate(age / 20 * (0.2 + spinSpeed * 0.05));
+    c.globalAlpha = Math.min(1, t * 1.5);
+    c.fillStyle = '#ffb703';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#fff';
+    c.lineWidth = 2;
+    c.beginPath(); c.moveTo(0, 0); c.lineTo(r + 10, 0); c.stroke();
+    c.restore();
+  }
+  c.globalAlpha = 1;
+}
+
 function drawBotKillEffect(c, type, age, r) {
   if (type === 'pixelpop') {
     const dur = 550, t = Math.min(1, age / dur);
@@ -4443,6 +4520,8 @@ function drawPlayer() {
   if (player.deathAnimStart) {
     const age = performance.now() - player.deathAnimStart;
     if (age < DEATH_ANIM_DURATION) drawDeathAnimation(ctx, equippedDeathAnimation, age, player.r);
+  } else if (player.introAnimStart && performance.now() - player.introAnimStart < INTRO_ANIM_DURATION) {
+    drawIntroAnimation(ctx, equippedIntroAnimation, performance.now() - player.introAnimStart, player.r);
   } else if (player.activeTransform === 'tank') drawPlayerTank(ctx, player.r);
   else if (player.activeTransform === 'berserker') drawPlayerBerserker(ctx, player.r);
   else if (player.activeTransform === 'sniper') drawPlayerSniperMech(ctx, player.r);
