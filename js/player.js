@@ -605,6 +605,7 @@ function updateHUD() {
   const coresEl = document.getElementById('coresVal');
   if (coresEl) coresEl.textContent = elementalCores;
   document.getElementById('botsVal').textContent = bots.length;
+  document.getElementById('killstreakVal').textContent = player.comboStreak;
   if (gameMode === 'levels') {
     document.getElementById('levelVal').textContent = currentLevel;
     document.getElementById('levelProgressVal').textContent = `${levelKills}/${levelTarget}`;
