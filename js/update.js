@@ -1190,11 +1190,11 @@ function update() {
     }
   }
 
-  // Powerups: spawn periodically (niet tijdens oefenen)
+  // Powerups: spawn periodically (niet tijdens oefenen, niet tijdens Eindbaas Rush)
   const effLuckyDrop = w1Lvl(lvlLuckyDrop);
   const effLuckyDrop2 = w2Lvl(lvl2LuckyDrop);
   const powerupInterval = effLuckyDrop > 0 ? LUCKY_DROP_INTERVALS[effLuckyDrop - 1] : (effLuckyDrop2 > 0 ? LUCKYDROP2_INTERVALS[effLuckyDrop2 - 1] : 6000);
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && now - lastPowerupSpawn > powerupInterval && powerups.length < 2) {
     lastPowerupSpawn = now;
     if (Math.random() < 0.7) spawnPowerup();
   }
