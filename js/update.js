@@ -1063,9 +1063,6 @@ function update() {
     player.killStreak = 0;
   }
 
-  // Wapen-hitte koelt af zolang je niet schiet (oververhitting blokkeert vuren 2 sec, zie shoot())
-  if (player.weaponHeat > 0) player.weaponHeat = Math.max(0, player.weaponHeat - HEAT_DECAY_PER_SEC / 60);
-
   // Combo-killstreak (voor combo-skins): telt elke kill, ongeacht wapen, vervalt na 3 sec zonder kill
   if (player.comboStreak > 0 && now0 - player.comboLastKill > 3000) {
     player.comboStreak = 0;

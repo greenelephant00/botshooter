@@ -10,12 +10,6 @@ function sortFavoritesFirst(arr, prefix) {
   return [...arr].sort((a, b) => (isFavorite(`${prefix}:${b.id}`) ? 1 : 0) - (isFavorite(`${prefix}:${a.id}`) ? 1 : 0));
 }
 
-// ---- Overheat: elk wapen krijgt een verborgen hitte-balk die oploopt bij aanhoudend vuren en bij oververhitting het wapen even blokkeert ----
-const WEAPON_HEAT_MAX = 100;
-const HEAT_PER_SHOT = WEAPON_HEAT_MAX / 50; // exact 50 schoten om te oververhitten
-const HEAT_DECAY_PER_SEC = 40;
-const OVERHEAT_DURATION = 2000;
-
 // ---- Killstreak-drones: verschijnen één voor één naarmate je killstreak oploopt, helpen bots doden, verdwijnen als de streak weer daaronder zakt ----
 const KILLSTREAK_DRONE_THRESHOLDS = [30, 50, 70, 100];
 const KILLSTREAK_DRONE_ORBIT_RADIUS = 42;

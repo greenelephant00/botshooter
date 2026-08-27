@@ -2,7 +2,6 @@ function shoot() {
   if (gameOver || isPaused) return;
   if (performance.now() < player.rootedUntil || performance.now() < player.mireUntil) return; // bevroren of vastgezogen, kan niet schieten
   if (performance.now() < player.jammedUntil) return; // Stormvorst EMP: wapen tijdelijk uitgeschakeld
-  if (performance.now() < player.overheatUntil) return; // Oververhit: even geen schot mogelijk
   if (player.activeTransform === 'tank') { shootTankGrenade(); return; }
   if (player.activeTransform === 'berserker') { berserkerSlash(); return; }
   if (player.activeTransform === 'sniper') { sniperMechShot(); return; }
@@ -26,12 +25,6 @@ function shoot() {
   const activeCooldown = shootCooldown * weapon.cooldownMult * fireRateMult * reloadMult;
   if (now - lastShot < activeCooldown) return;
   lastShot = now;
-  player.weaponHeat += HEAT_PER_SHOT;
-  if (player.weaponHeat >= WEAPON_HEAT_MAX) {
-    player.weaponHeat = 0;
-    player.overheatUntil = now + OVERHEAT_DURATION;
-    spawnParticles(player.x, player.y, '#ff5c5c');
-  }
   const dx = mouse.x - player.x;
   const dy = mouse.y - player.y;
   const baseAngle = Math.atan2(dy, dx);
