@@ -4482,37 +4482,41 @@ function menuBgLoop() {
   requestAnimationFrame(menuBgLoop);
 }
 
-function drawKillstreakDrone() {
-  const x = killstreakDroneX, y = killstreakDroneY;
+function drawKillstreakDrone(drone) {
+  const x = drone.x, y = drone.y;
   // Beam naar het laatst geraakte doelwit, dooft snel uit
-  if (killstreakDroneBeam) {
-    const age = performance.now() - killstreakDroneBeam.bornAt;
+  if (drone.beam) {
+    const age = performance.now() - drone.beam.bornAt;
     if (age < 150) {
       ctx.save();
       ctx.globalAlpha = Math.max(0, 1 - age / 150);
       ctx.strokeStyle = '#4cc9f0';
       ctx.lineWidth = 2;
       ctx.beginPath();
-      ctx.moveTo(killstreakDroneBeam.x1, killstreakDroneBeam.y1);
-      ctx.lineTo(killstreakDroneBeam.x2, killstreakDroneBeam.y2);
+      ctx.moveTo(drone.beam.x1, drone.beam.y1);
+      ctx.lineTo(drone.beam.x2, drone.beam.y2);
       ctx.stroke();
       ctx.restore();
     }
   }
   ctx.save();
   ctx.translate(x, y);
-  ctx.rotate(killstreakDroneAngle);
-  ctx.fillStyle = '#2a2a3e';
-  ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = '#4cc9f0';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.stroke();
-  ctx.fillStyle = '#4cc9f0';
-  ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-6, -3); ctx.lineTo(-6, 3); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(6, -3); ctx.lineTo(6, 3); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#dfffff';
-  ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.rotate(drone.angle);
+  drawDroneShape(ctx);
   ctx.restore();
+}
+
+function drawDroneShape(c) {
+  c.fillStyle = '#2a2a3e';
+  c.beginPath(); c.arc(0, 0, 8, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = '#4cc9f0';
+  c.lineWidth = 2;
+  c.beginPath(); c.arc(0, 0, 8, 0, Math.PI * 2); c.stroke();
+  c.fillStyle = '#4cc9f0';
+  c.beginPath(); c.moveTo(-14, 0); c.lineTo(-6, -3); c.lineTo(-6, 3); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(14, 0); c.lineTo(6, -3); c.lineTo(6, 3); c.closePath(); c.fill();
+  c.fillStyle = '#dfffff';
+  c.beginPath(); c.arc(0, 0, 3, 0, Math.PI * 2); c.fill();
 }
 
 function drawTrailParticle(p) {
@@ -5626,7 +5630,7 @@ function draw() {
 
   trailParticles.forEach(drawTrailParticle);
   drawPlayer();
-  if (player.comboStreak >= KILLSTREAK_DRONE_THRESHOLD) drawKillstreakDrone();
+  KILLSTREAK_DRONES.forEach(drone => { if (player.comboStreak >= drone.threshold) drawKillstreakDrone(drone); });
   ctx.restore();
 
   if (nowShake < sandstormUntil) drawSandstormOverlay();

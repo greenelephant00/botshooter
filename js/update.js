@@ -1068,25 +1068,26 @@ function update() {
     player.comboStreak = 0;
   }
 
-  // Killstreak-drone: vliegt vanaf killstreak 50 met je mee en helpt bots doden, verdwijnt zodra de killstreak weer onder de 50 zakt
-  if (player.comboStreak >= KILLSTREAK_DRONE_THRESHOLD) {
-    killstreakDroneAngle += 0.05;
-    killstreakDroneX = player.x + Math.cos(killstreakDroneAngle) * 42;
-    killstreakDroneY = player.y + Math.sin(killstreakDroneAngle) * 42 - 14;
-    if (now0 - killstreakDroneLastShot > KILLSTREAK_DRONE_COOLDOWN) {
+  // Killstreak-drones: elke drone verschijnt vanaf zijn eigen killstreak-drempel en helpt bots doden, verdwijnt eronder weer
+  KILLSTREAK_DRONES.forEach(drone => {
+    if (player.comboStreak < drone.threshold) return;
+    drone.angle += 0.05;
+    drone.x = player.x + Math.cos(drone.angle) * drone.radius;
+    drone.y = player.y + Math.sin(drone.angle) * drone.radius - 14;
+    if (now0 - drone.lastShot > KILLSTREAK_DRONE_COOLDOWN) {
       let nearestDrone = null, nearestDroneDist = KILLSTREAK_DRONE_RANGE;
       bots.forEach(b => {
         if (b.dead) return;
-        const dd = Math.hypot(b.x - killstreakDroneX, b.y - killstreakDroneY);
+        const dd = Math.hypot(b.x - drone.x, b.y - drone.y);
         if (dd < nearestDroneDist) { nearestDrone = b; nearestDroneDist = dd; }
       });
       if (nearestDrone) {
-        killstreakDroneLastShot = now0;
-        killstreakDroneBeam = { x1: killstreakDroneX, y1: killstreakDroneY, x2: nearestDrone.x, y2: nearestDrone.y, bornAt: now0 };
+        drone.lastShot = now0;
+        drone.beam = { x1: drone.x, y1: drone.y, x2: nearestDrone.x, y2: nearestDrone.y, bornAt: now0 };
         damageBotSimple(nearestDrone, KILLSTREAK_DRONE_DMG, '#4cc9f0');
       }
     }
-  }
+  });
 
   // In brand (Lavagolem): 3 sec lang elke sec 4 schade
   if (now0 < player.burnUntil) {

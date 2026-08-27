@@ -78,6 +78,7 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
+    <button class="shopOpenBtn" onclick="openDroneInfoScreen()" style="border-color:#4cc9f0; color:#4cc9f0;">🤖 Drones</button>
   </div>
 </div>
 <div id="world2Screen">
@@ -117,6 +118,7 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openStatsScreen()" style="border-color:#5c7cfa; color:#5c7cfa;">📊 Statistieken</button>
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
+    <button class="shopOpenBtn" onclick="openDroneInfoScreen()" style="border-color:#4cc9f0; color:#4cc9f0;">🤖 Drones</button>
   </div>
 </div>
 <div id="shopScreen">
@@ -224,10 +226,19 @@
   <div class="coinDisplay">🪙 <span id="mysteryBoxCoins">0</span></div>
   <button class="topBackBtn" onclick="closeMysteryBoxScreen()">← Menu</button>
   <div class="shopSection">
-    <h3>Koop een verrassing — willekeurige munten, cores, of een skin/trail/effect</h3>
+    <h3>Koop een verrassing — een willekeurig muntenbedrag volgens de kanstabel</h3>
     <div id="mysteryBoxContent"></div>
   </div>
   <button class="backBtn" onclick="closeMysteryBoxScreen()">← Terug</button>
+</div>
+<div id="droneInfoScreen">
+  <h1>🤖 Drones</h1>
+  <button class="topBackBtn" onclick="closeDroneInfoScreen()">← Menu</button>
+  <div class="shopSection">
+    <h3>Killstreak-drones — verschijnen vanzelf tijdens een potje, geen aankoop nodig</h3>
+    <div id="droneInfoList"></div>
+  </div>
+  <button class="backBtn" onclick="closeDroneInfoScreen()">← Terug</button>
 </div>
 <div id="trailShopScreen">
   <h1>🌠 Trails</h1>

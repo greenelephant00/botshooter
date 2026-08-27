@@ -1135,6 +1135,35 @@ function closeKeybindsScreen() {
 }
 window.closeKeybindsScreen = closeKeybindsScreen;
 
+function renderDroneInfoList() {
+  document.getElementById('droneInfoList').innerHTML = KILLSTREAK_DRONES.map((drone, i) =>
+    `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">Drone ${i + 1}</div><div class="desc">Verschijnt vanaf killstreak ${drone.threshold}, verdwijnt zodra je streak weer onder de ${drone.threshold} zakt. Vuurt automatisch op de dichtstbijzijnde bot.</div></div></div>`
+  ).join('');
+  KILLSTREAK_DRONES.forEach((drone, i) => {
+    const canvasEl = document.getElementById(`droneInfoPreview_${i}`);
+    if (!canvasEl) return;
+    const c = canvasEl.getContext('2d');
+    c.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    c.save();
+    c.translate(canvasEl.width / 2, canvasEl.height / 2);
+    drawDroneShape(c);
+    c.restore();
+  });
+}
+
+function openDroneInfoScreen() {
+  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('droneInfoScreen').style.display = 'flex';
+  renderDroneInfoList();
+}
+window.openDroneInfoScreen = openDroneInfoScreen;
+
+function closeDroneInfoScreen() {
+  document.getElementById('droneInfoScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeDroneInfoScreen = closeDroneInfoScreen;
+
 function buyTrail(id) {
   const t = TRAILS.find(x => x.id === id);
   if (!t || ownedTrails.includes(id) || coins < t.price) return;
