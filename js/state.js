@@ -8,7 +8,7 @@ let explosions = [];
 let botDeathAnimations = [];
 // Elke prestatie-exclusieve skin heeft zijn eigen unieke death animation voor bots die je ermee killt
 const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'novacollapse', neonultra: 'neonoverload' };
-// Sommige exclusieve kill-effecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
+// Sommige exclusieve player killeffecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
 const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
 function maybeTriggerExclusiveSkinDeathAnim(bot) {
   const animType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];

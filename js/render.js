@@ -5205,7 +5205,7 @@ function draw() {
     const age = performance.now() - e.born;
     const dur = e.duration || DEATH_ANIM_DURATION;
     if (age >= dur) return;
-    // Kortere kill-effecten spelen versneld af zodat ze alle fases nog volledig doorlopen binnen hun eigen (kortere) duur
+    // Kortere player killeffecten spelen versneld af zodat ze alle fases nog volledig doorlopen binnen hun eigen (kortere) duur
     const scaledAge = age * (DEATH_ANIM_DURATION / dur);
     ctx.save();
     ctx.translate(e.x, e.y);
