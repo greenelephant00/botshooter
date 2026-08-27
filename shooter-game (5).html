@@ -34,6 +34,7 @@
 <canvas id="menuBgCanvas"></canvas>
 <button id="muteBtn" onclick="toggleMute()">🔊</button>
 <button id="musicBtn" onclick="toggleMusicPanel()">🎵</button>
+<button id="keybindsBtn" onclick="openKeybindsScreen()">⌨️</button>
 <div id="musicPanel">
   <div class="musicOption" data-idx="0" onclick="selectMusicTrack(0)">Pulse</div>
   <div class="musicOption" data-idx="1" onclick="selectMusicTrack(1)">Driftwave</div>
@@ -80,7 +81,6 @@
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
       <button class="shopOpenBtn" onclick="startDodgePractice()" style="border-color:#06d6a0; color:#06d6a0;">🏃 Ontwijk</button>
     </div>
-    <button class="shopOpenBtn" onclick="openKeybindsScreen()" style="border-color:#00b8a9; color:#00b8a9;">⌨️ Sneltoetsen</button>
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
   </div>
 </div>
@@ -126,7 +126,6 @@
     </div>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openKeybindsScreen()" style="border-color:#00b8a9; color:#00b8a9;">⌨️ Sneltoetsen</button>
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
   </div>
 </div>
@@ -217,7 +216,7 @@
   <button class="backBtn" onclick="closeStatsScreen()">← Terug</button>
 </div>
 <div id="keybindsScreen">
-  <h1>⌨️ Sneltoetsen</h1>
+  <h1>⌨️ Besturing</h1>
   <button class="topBackBtn" onclick="closeKeybindsScreen()">← Menu</button>
   <div class="shopSection">
     <h3>Besturing</h3>

@@ -1144,14 +1144,15 @@ function closeStatsScreen() {
 window.closeStatsScreen = closeStatsScreen;
 
 function openKeybindsScreen() {
-  document.getElementById(menuScreenId()).style.display = 'none';
+  // Nu ook bereikbaar via de vaste knop linksboven, dus mogelijk tijdens een lopend potje — laat het menuscherm dan met rust
+  if (!(loopRunning && !gameOver)) document.getElementById(menuScreenId()).style.display = 'none';
   document.getElementById('keybindsScreen').style.display = 'flex';
 }
 window.openKeybindsScreen = openKeybindsScreen;
 
 function closeKeybindsScreen() {
   document.getElementById('keybindsScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  if (!(loopRunning && !gameOver)) document.getElementById(menuScreenId()).style.display = 'flex';
 }
 window.closeKeybindsScreen = closeKeybindsScreen;
 
