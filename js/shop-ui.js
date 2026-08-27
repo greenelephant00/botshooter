@@ -1192,22 +1192,25 @@ function renderDroneInfoList() {
   document.getElementById('droneInfoList').innerHTML = KILLSTREAK_DRONES.map((drone, i) => {
     const lvl = droneLevels[i];
     const maxed = lvl >= maxLevel;
-    const nextLevel = Math.min(lvl + 1, maxLevel);
     const upgradeBtn = maxed
       ? `<button class="equipped" disabled>Max niveau (${maxLevel})</button>`
       : `<button class="buy" onclick="buyDroneUpgrade(${i})" ${coins < DRONE_UPGRADE_PRICES[lvl] ? 'disabled' : ''}>Koop niveau ${lvl + 1}/${maxLevel} · 🪙${DRONE_UPGRADE_PRICES[lvl]}</button>`;
-    const previewBtn = !maxed
-      ? `<button class="equip" onclick="startDronePractice(${nextLevel})">👁 Bekijk volgend niveau</button>`
-      : '';
-    const desc = maxed
-      ? `Verschijnt vanaf killstreak ${drone.threshold}. Max niveau bereikt: ${statsForLevel(lvl)}.`
-      : `Verschijnt vanaf killstreak ${drone.threshold}. Huidig niveau ${lvl} (${statsForLevel(lvl)}). Volgend niveau ${nextLevel}: ${statsForLevel(nextLevel)} — ook groter en feller van kleur. "Bekijk volgend niveau" start een schoon Endless-testpotje (geen bosses/munten/powerups) met de drone al actief.`;
+    const desc = `Verschijnt vanaf killstreak ${drone.threshold}. Huidig niveau ${lvl} (${statsForLevel(lvl)}).`;
     return `<div class="shopItem"><canvas id="droneInfoPreview_${i}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
       <div class="info"><div class="name">Drone ${i + 1} (Lv. ${lvl}/${maxLevel})</div><div class="desc">${desc}</div></div>
-      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${upgradeBtn}${previewBtn}</div>
+      ${upgradeBtn}
     </div>`;
   }).join('');
   KILLSTREAK_DRONES.forEach((drone, i) => drawDroneCanvasPreview(`droneInfoPreview_${i}`, droneLevels[i]));
+
+  const levelCount = DRONE_SCALE_LEVELS.length;
+  document.getElementById('droneLevelPreviewList').innerHTML = DRONE_SCALE_LEVELS.map((_, lvl) =>
+    `<div class="shopItem"><canvas id="droneLevelPreview_${lvl}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas>
+      <div class="info"><div class="name">Niveau ${lvl + 1}</div><div class="desc">${statsForLevel(lvl)}</div></div>
+      <button class="equip" onclick="startDronePractice(${lvl})">👁 Bekijk niveau ${lvl + 1}</button>
+    </div>`
+  ).join('');
+  for (let lvl = 0; lvl < levelCount; lvl++) drawDroneCanvasPreview(`droneLevelPreview_${lvl}`, lvl);
 }
 
 function openDroneInfoScreen() {
