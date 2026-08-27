@@ -14,16 +14,16 @@ const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
 let ownedBotKillEffects = JSON.parse(localStorage.getItem('botShooterOwnedBotKillEffects') || '["none"]');
 let equippedBotKillEffect = localStorage.getItem('botShooterEquippedBotKillEffect') || 'none';
 const BOT_KILL_EFFECTS = [
-  { id: 'none',       name: 'Geen',        price: 0,   duration: 0,   desc: 'Geen extra effect op de bot.' },
-  { id: 'pixelpop',   name: 'Pixelpop',    price: 350, duration: 550, desc: 'De bot valt uiteen in blokkerige pixels die naar buiten ploffen.' },
-  { id: 'sparkburst', name: 'Vonkenbarst', price: 400, duration: 400, desc: 'Een felle witte flits gevolgd door metalige vonken die alle kanten op schieten.' },
-  { id: 'poof',       name: 'Rookpoef',    price: 300, duration: 450, desc: 'Een korte, snel uitdijende rookring — en de bot is meteen weg.' },
-  { id: 'shrinkpop',  name: 'Krimppop',    price: 300, duration: 350, desc: 'De bot krimpt razendsnel ineen en verdwijnt met een klein lichtflitsje.' },
-  { id: 'coinburst',  name: 'Muntbarst',   price: 450, duration: 550, desc: 'De bot barst uiteen in kleine gouden muntjes die wegstuiteren.' },
-  { id: 'dustcloud',  name: 'Stofwolk',    price: 300, duration: 500, desc: 'Een lage stofwolk poeft op waar de bot stond.' },
-  { id: 'splinter',   name: 'Splinterhout', price: 350, duration: 500, desc: 'De bot spat uiteen in houten splinters.' },
-  { id: 'ragdoll',    name: 'Tuimelval',   price: 400, duration: 500, desc: 'De bot tolt rond terwijl hij ineenkrimpt en vervaagt.' },
-  { id: 'voidsuck',   name: 'Nietsvortex', price: 450, duration: 400, desc: 'Een piepklein zwart gaatje zuigt de bot in een oogwenk naar binnen.' }
+  { id: 'none',       name: 'Geen',        price: 0,    duration: 0,   desc: 'Geen extra effect op de bot.' },
+  { id: 'pixelpop',   name: 'Pixelpop',    price: 1850, duration: 550, desc: 'De bot valt uiteen in blokkerige pixels die naar buiten ploffen.' },
+  { id: 'sparkburst', name: 'Vonkenbarst', price: 1900, duration: 400, desc: 'Een felle witte flits gevolgd door metalige vonken die alle kanten op schieten.' },
+  { id: 'poof',       name: 'Rookpoef',    price: 1800, duration: 450, desc: 'Een korte, snel uitdijende rookring — en de bot is meteen weg.' },
+  { id: 'shrinkpop',  name: 'Krimppop',    price: 1800, duration: 350, desc: 'De bot krimpt razendsnel ineen en verdwijnt met een klein lichtflitsje.' },
+  { id: 'coinburst',  name: 'Muntbarst',   price: 1950, duration: 550, desc: 'De bot barst uiteen in kleine gouden muntjes die wegstuiteren.' },
+  { id: 'dustcloud',  name: 'Stofwolk',    price: 1800, duration: 500, desc: 'Een lage stofwolk poeft op waar de bot stond.' },
+  { id: 'splinter',   name: 'Splinterhout', price: 1850, duration: 500, desc: 'De bot spat uiteen in houten splinters.' },
+  { id: 'ragdoll',    name: 'Tuimelval',   price: 1900, duration: 500, desc: 'De bot tolt rond terwijl hij ineenkrimpt en vervaagt.' },
+  { id: 'voidsuck',   name: 'Nietsvortex', price: 1950, duration: 400, desc: 'Een piepklein zwart gaatje zuigt de bot in een oogwenk naar binnen.' }
 ];
 function maybeTriggerPlayerKillEffect(bot) {
   const exclusiveType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
