@@ -62,8 +62,8 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openShop()">🛒 Shop</button>
-    <button class="shopOpenBtn" onclick="openSkinsShop()">🎨 Skins</button>
     <button class="shopOpenBtn" onclick="openPowerupShop()">⚡ Powerups</button>
+    <button class="shopOpenBtn" onclick="openCosmeticsHub()" style="border-color:#ff5cf1; color:#ff5cf1;">🎨 Cosmetica</button>
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
@@ -73,15 +73,9 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="startBossRush()" style="border-color:#ff8800; color:#ff8800;">👑 Eindbaas Rush</button>
     <button class="shopOpenBtn" onclick="openAchievements()">🏆 Quests</button>
-  </div>
-  <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
-    <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
     <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
-    <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
     <div class="dodgePracticeRow">
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
       <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk</button>
@@ -110,8 +104,8 @@
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openShop()">🛒 Shop</button>
-    <button class="shopOpenBtn" onclick="openSkinsShop()">🎨 Skins</button>
     <button class="shopOpenBtn" onclick="openPowerupShop()">⚡ Powerups</button>
+    <button class="shopOpenBtn" onclick="openCosmeticsHub()" style="border-color:#ff5cf1; color:#ff5cf1;">🎨 Cosmetica</button>
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openTransformShop()">🔄 Transform</button>
@@ -124,13 +118,7 @@
     <button class="shopOpenBtn" onclick="openCoreShop()" style="border-color:#9be3ff; color:#9be3ff;">🔮 Kern-winkel</button>
   </div>
   <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
-    <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
     <button class="shopOpenBtn" onclick="openStatsScreen()">📊 Statistieken</button>
-  </div>
-  <div class="menuBtnRow">
-    <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
-    <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
     <div class="dodgePracticeRow">
       <input type="number" id="dodgeTurretCount" min="1" max="10" value="4" title="Aantal turrets (max 10)">
       <button class="shopOpenBtn" onclick="startDodgePractice()">🏃 Ontwijk</button>
@@ -184,6 +172,21 @@
     <div id="powerupShopList"></div>
   </div>
   <button class="backBtn" onclick="closePowerupShop()">← Terug</button>
+</div>
+<div id="cosmeticsScreen">
+  <h1>🎨 Cosmetica</h1>
+  <button class="topBackBtn" onclick="closeCosmeticsHub()">← Menu</button>
+  <p>Alles om je poppetje en menu naar je hand te zetten</p>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openSkinsShop()">🎨 Skins</button>
+    <button class="shopOpenBtn" onclick="openWeaponSkinsShop()">🎨 Wapenskins</button>
+    <button class="shopOpenBtn" onclick="openTrailShop()">🌠 Trails</button>
+  </div>
+  <div class="menuBtnRow">
+    <button class="shopOpenBtn" onclick="openDeathAnimShop()">💀 Death Animation</button>
+    <button class="shopOpenBtn" onclick="openMenuBgShop()">🌌 Achtergronden</button>
+  </div>
+  <button class="backBtn" onclick="closeCosmeticsHub()">← Terug</button>
 </div>
 <div id="skinsShopScreen">
   <h1>🎨 Skins</h1>

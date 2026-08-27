@@ -743,8 +743,20 @@ function previewWeaponSkin(id) {
 }
 window.previewWeaponSkin = previewWeaponSkin;
 
-function openWeaponSkinsShop() {
+function openCosmeticsHub() {
   document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
+}
+window.openCosmeticsHub = openCosmeticsHub;
+
+function closeCosmeticsHub() {
+  document.getElementById('cosmeticsScreen').style.display = 'none';
+  document.getElementById(menuScreenId()).style.display = 'flex';
+}
+window.closeCosmeticsHub = closeCosmeticsHub;
+
+function openWeaponSkinsShop() {
+  document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById('weaponSkinsScreen').style.display = 'flex';
   renderWeaponSkinsShop();
 }
@@ -753,7 +765,7 @@ window.openWeaponSkinsShop = openWeaponSkinsShop;
 function closeWeaponSkinsShop() {
   if (weaponSkinPreviewRAF) { cancelAnimationFrame(weaponSkinPreviewRAF); weaponSkinPreviewRAF = null; }
   document.getElementById('weaponSkinsScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
 }
 window.closeWeaponSkinsShop = closeWeaponSkinsShop;
 
@@ -829,7 +841,7 @@ function previewDeathAnimation(id) {
 window.previewDeathAnimation = previewDeathAnimation;
 
 function openDeathAnimShop() {
-  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById('deathAnimScreen').style.display = 'flex';
   renderDeathAnimShop();
 }
@@ -838,7 +850,7 @@ window.openDeathAnimShop = openDeathAnimShop;
 function closeDeathAnimShop() {
   if (deathAnimPreviewRAF) { cancelAnimationFrame(deathAnimPreviewRAF); deathAnimPreviewRAF = null; }
   document.getElementById('deathAnimScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
 }
 window.closeDeathAnimShop = closeDeathAnimShop;
 
@@ -920,7 +932,7 @@ function renderTrailShop() {
 window.renderTrailShop = renderTrailShop;
 
 function openTrailShop() {
-  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById('trailShopScreen').style.display = 'flex';
   renderTrailShop();
 }
@@ -928,7 +940,7 @@ window.openTrailShop = openTrailShop;
 
 function closeTrailShop() {
   document.getElementById('trailShopScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
 }
 window.closeTrailShop = closeTrailShop;
 
@@ -985,7 +997,7 @@ function previewMenuBackground(id) {
 window.previewMenuBackground = previewMenuBackground;
 
 function openMenuBgShop() {
-  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById('menuBgShopScreen').style.display = 'flex';
   renderMenuBgShop();
 }
@@ -994,7 +1006,7 @@ window.openMenuBgShop = openMenuBgShop;
 function closeMenuBgShop() {
   if (menuBgPreviewRAF) { cancelAnimationFrame(menuBgPreviewRAF); menuBgPreviewRAF = null; }
   document.getElementById('menuBgShopScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
 }
 window.closeMenuBgShop = closeMenuBgShop;
 
@@ -1584,7 +1596,7 @@ function equipSkin(id) {
 window.equipSkin = equipSkin;
 
 function openSkinsShop() {
-  document.getElementById(menuScreenId()).style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById('skinsShopScreen').style.display = 'flex';
   renderSkinsShop();
 }
@@ -1592,7 +1604,7 @@ window.openSkinsShop = openSkinsShop;
 
 function closeSkinsShop() {
   document.getElementById('skinsShopScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
   document.getElementById(menuCoinsId()).textContent = coins;
 }
 window.closeSkinsShop = closeSkinsShop;
