@@ -3689,6 +3689,119 @@ function drawPlayerWaterForm(c, r) {
   c.stroke();
 }
 
+function drawBotKillEffect(c, type, age, r) {
+  if (type === 'pixelpop') {
+    const dur = 550, t = Math.min(1, age / dur);
+    const pieces = 8;
+    for (let i = 0; i < pieces; i++) {
+      const a = (Math.PI * 2 / pieces) * i + i * 0.7;
+      const dist = t * (r + 20);
+      c.save();
+      c.globalAlpha = Math.max(0, 1 - t);
+      c.translate(Math.cos(a) * dist, Math.sin(a) * dist);
+      c.rotate(t * 6);
+      c.fillStyle = i % 2 === 0 ? '#e05c5c' : '#a83232';
+      c.fillRect(-3, -3, 6, 6);
+      c.restore();
+    }
+  } else if (type === 'sparkburst') {
+    const dur = 400, t = Math.min(1, age / dur);
+    c.globalAlpha = Math.max(0, 1 - t * 1.5);
+    c.fillStyle = '#fff';
+    c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - t)), 0, Math.PI * 2); c.fill();
+    const sparks = 10;
+    c.strokeStyle = '#ffe066';
+    c.lineWidth = 2;
+    for (let i = 0; i < sparks; i++) {
+      const a = (Math.PI * 2 / sparks) * i;
+      const dist = t * (r + 26);
+      c.globalAlpha = Math.max(0, 1 - t);
+      c.beginPath();
+      c.moveTo(Math.cos(a) * dist * 0.4, Math.sin(a) * dist * 0.4);
+      c.lineTo(Math.cos(a) * dist, Math.sin(a) * dist);
+      c.stroke();
+    }
+  } else if (type === 'poof') {
+    const dur = 450, t = Math.min(1, age / dur);
+    c.globalAlpha = Math.max(0, 1 - t);
+    c.strokeStyle = '#ccc';
+    c.lineWidth = 3 * (1 - t);
+    c.beginPath(); c.arc(0, 0, r + t * 24, 0, Math.PI * 2); c.stroke();
+    c.fillStyle = '#eee';
+    c.globalAlpha = Math.max(0, (1 - t) * 0.5);
+    c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - t * 0.5)), 0, Math.PI * 2); c.fill();
+  } else if (type === 'shrinkpop') {
+    const dur = 350, t = Math.min(1, age / dur);
+    if (t < 0.8) {
+      const st = t / 0.8;
+      c.fillStyle = '#ddd';
+      c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - st)), 0, Math.PI * 2); c.fill();
+    } else {
+      const pt = (t - 0.8) / 0.2;
+      c.globalAlpha = Math.max(0, 1 - pt);
+      c.strokeStyle = '#fff';
+      c.lineWidth = 2;
+      c.beginPath(); c.arc(0, 0, pt * 14, 0, Math.PI * 2); c.stroke();
+    }
+  } else if (type === 'coinburst') {
+    const dur = 550, t = Math.min(1, age / dur);
+    const coins = 6;
+    for (let i = 0; i < coins; i++) {
+      const a = (Math.PI * 2 / coins) * i + i * 0.4;
+      const dist = t * (r + 22);
+      const grav = t * t * 10;
+      c.save();
+      c.globalAlpha = Math.max(0, 1 - t);
+      c.translate(Math.cos(a) * dist, Math.sin(a) * dist + grav);
+      c.fillStyle = '#ffd60a';
+      c.beginPath(); c.arc(0, 0, 3, 0, Math.PI * 2); c.fill();
+      c.restore();
+    }
+  } else if (type === 'dustcloud') {
+    const dur = 500, t = Math.min(1, age / dur);
+    const puffs = 5;
+    for (let i = 0; i < puffs; i++) {
+      const a = (Math.PI * 2 / puffs) * i;
+      const dist = t * (r * 0.8);
+      c.globalAlpha = Math.max(0, (1 - t) * 0.6);
+      c.fillStyle = '#8a7048';
+      c.beginPath(); c.arc(Math.cos(a) * dist, Math.sin(a) * dist * 0.5 + r * 0.3, 4 + t * 4, 0, Math.PI * 2); c.fill();
+    }
+  } else if (type === 'splinter') {
+    const dur = 500, t = Math.min(1, age / dur);
+    const pieces = 7;
+    for (let i = 0; i < pieces; i++) {
+      const a = (Math.PI * 2 / pieces) * i + i * 0.5;
+      const dist = t * (r + 18);
+      c.save();
+      c.globalAlpha = Math.max(0, 1 - t);
+      c.translate(Math.cos(a) * dist, Math.sin(a) * dist);
+      c.rotate(a);
+      c.fillStyle = '#a97c50';
+      c.fillRect(-1.5, -5, 3, 10);
+      c.restore();
+    }
+  } else if (type === 'ragdoll') {
+    const dur = 500, t = Math.min(1, age / dur);
+    c.save();
+    c.globalAlpha = Math.max(0, 1 - t);
+    c.rotate(t * Math.PI * 4);
+    c.scale(Math.max(0.001, 1 - t * 0.9), Math.max(0.001, 1 - t * 0.9));
+    c.fillStyle = '#999';
+    c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+    c.restore();
+  } else if (type === 'voidsuck') {
+    const dur = 400, t = Math.min(1, age / dur);
+    c.globalAlpha = Math.max(0, 1 - t);
+    c.fillStyle = '#000';
+    c.beginPath(); c.arc(0, 0, Math.max(0, r * (1 - t)), 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#4b0082';
+    c.lineWidth = Math.max(0, 2 * (1 - t));
+    c.beginPath(); c.arc(0, 0, r * (1 - t) + 4, 0, Math.PI * 2); c.stroke();
+  }
+  c.globalAlpha = 1;
+}
+
 function drawDeathAnimation(c, type, age, r) {
   const t = Math.min(1, age / DEATH_ANIM_DURATION);
   if (type === 'explosion') {
@@ -5201,29 +5314,22 @@ function draw() {
   laserTelegraphs.forEach(drawLaserTelegraph);
   blackHoles.forEach(drawBlackHole);
   explosions.forEach(drawExplosion);
-  const BOT_KILL_EFFECT_SCALE = 0.5; // Bot Kill Effect is bewust kleiner dan dezelfde animatie in Death Animation
   botDeathAnimations.forEach(e => {
     const age = performance.now() - e.born;
     const dur = e.duration || DEATH_ANIM_DURATION;
     if (age >= dur) return;
-    // Kortere player killeffecten spelen versneld af zodat ze alle fases nog volledig doorlopen binnen hun eigen (kortere) duur
-    const scaledAge = age * (DEATH_ANIM_DURATION / dur);
-    ctx.save();
-    ctx.translate(e.x, e.y);
-    ctx.scale(BOT_KILL_EFFECT_SCALE, BOT_KILL_EFFECT_SCALE);
-    drawDeathAnimation(ctx, e.type, scaledAge, e.r);
-    ctx.restore();
-    // Eigen, snelle impact-flits die alleen bij Bot Kill Effect hoort, zodat het duidelijk anders oogt dan Death Animation
-    const impactT = age / 220;
-    if (impactT < 1) {
+    if (e.kind === 'exclusive') {
+      // Prestatie-exclusieve skins behouden hun eigen, grotere signature-animatie (via drawDeathAnimation)
+      const scaledAge = age * (DEATH_ANIM_DURATION / dur);
       ctx.save();
       ctx.translate(e.x, e.y);
-      ctx.globalAlpha = Math.max(0, 1 - impactT);
-      ctx.strokeStyle = '#ffb703';
-      ctx.lineWidth = 3 * (1 - impactT);
-      ctx.beginPath();
-      ctx.arc(0, 0, e.r * 0.6 + impactT * (e.r + 22), 0, Math.PI * 2);
-      ctx.stroke();
+      drawDeathAnimation(ctx, e.type, scaledAge, e.r);
+      ctx.restore();
+    } else {
+      // Bot Kill Effect: eigen, compacte animatiecatalogus, los van Death Animation
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      drawBotKillEffect(ctx, e.type, age, e.r);
       ctx.restore();
     }
   });

@@ -10,15 +10,32 @@ let botDeathAnimations = [];
 const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'novacollapse', neonultra: 'neonoverload' };
 // Sommige player killeffecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
 const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
-// Bot Kill Effect-shop: hergebruikt dezelfde animatiecatalogus als Death Animation (DEATH_ANIMATIONS), maar los bezit/uitgerust
-let ownedBotKillEffects = JSON.parse(localStorage.getItem('botShooterOwnedBotKillEffects') || '["default"]');
-let equippedBotKillEffect = localStorage.getItem('botShooterEquippedBotKillEffect') || 'default';
+// Bot Kill Effect-shop: eigen, kortere en compactere animaties dan Death Animation, los bezit/uitgerust
+let ownedBotKillEffects = JSON.parse(localStorage.getItem('botShooterOwnedBotKillEffects') || '["none"]');
+let equippedBotKillEffect = localStorage.getItem('botShooterEquippedBotKillEffect') || 'none';
+const BOT_KILL_EFFECTS = [
+  { id: 'none',       name: 'Geen',        price: 0,   duration: 0,   desc: 'Geen extra effect op de bot.' },
+  { id: 'pixelpop',   name: 'Pixelpop',    price: 350, duration: 550, desc: 'De bot valt uiteen in blokkerige pixels die naar buiten ploffen.' },
+  { id: 'sparkburst', name: 'Vonkenbarst', price: 400, duration: 400, desc: 'Een felle witte flits gevolgd door metalige vonken die alle kanten op schieten.' },
+  { id: 'poof',       name: 'Rookpoef',    price: 300, duration: 450, desc: 'Een korte, snel uitdijende rookring — en de bot is meteen weg.' },
+  { id: 'shrinkpop',  name: 'Krimppop',    price: 300, duration: 350, desc: 'De bot krimpt razendsnel ineen en verdwijnt met een klein lichtflitsje.' },
+  { id: 'coinburst',  name: 'Muntbarst',   price: 450, duration: 550, desc: 'De bot barst uiteen in kleine gouden muntjes die wegstuiteren.' },
+  { id: 'dustcloud',  name: 'Stofwolk',    price: 300, duration: 500, desc: 'Een lage stofwolk poeft op waar de bot stond.' },
+  { id: 'splinter',   name: 'Splinterhout', price: 350, duration: 500, desc: 'De bot spat uiteen in houten splinters.' },
+  { id: 'ragdoll',    name: 'Tuimelval',   price: 400, duration: 500, desc: 'De bot tolt rond terwijl hij ineenkrimpt en vervaagt.' },
+  { id: 'voidsuck',   name: 'Nietsvortex', price: 450, duration: 400, desc: 'Een piepklein zwart gaatje zuigt de bot in een oogwenk naar binnen.' }
+];
 function maybeTriggerPlayerKillEffect(bot) {
   const exclusiveType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
-  const animType = exclusiveType || (equippedBotKillEffect !== 'default' ? equippedBotKillEffect : null);
-  if (!animType) return;
-  const duration = EXCLUSIVE_SKIN_DEATH_ANIM_DURATION[animType] || DEATH_ANIM_DURATION;
-  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: animType, duration, born: performance.now() });
+  if (exclusiveType) {
+    const duration = EXCLUSIVE_SKIN_DEATH_ANIM_DURATION[exclusiveType] || DEATH_ANIM_DURATION;
+    botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: exclusiveType, kind: 'exclusive', duration, born: performance.now() });
+    return;
+  }
+  if (equippedBotKillEffect === 'none') return;
+  const effect = BOT_KILL_EFFECTS.find(e => e.id === equippedBotKillEffect);
+  if (!effect) return;
+  botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: effect.id, kind: 'botkill', duration: effect.duration, born: performance.now() });
 }
 
 // ---- Lifetime statistieken (Statistieken-scherm) ----

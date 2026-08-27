@@ -870,7 +870,7 @@ function drawBotKillEffectIdle(c, r) {
 }
 
 function buyBotKillEffect(id) {
-  const d = DEATH_ANIMATIONS.find(x => x.id === id);
+  const d = BOT_KILL_EFFECTS.find(x => x.id === id);
   if (!d || ownedBotKillEffects.includes(id) || coins < d.price) return;
   coins -= d.price;
   ownedBotKillEffects.push(id);
@@ -890,7 +890,7 @@ window.equipBotKillEffect = equipBotKillEffect;
 
 function renderBotKillEffectShop() {
   document.getElementById('botKillEffectCoins').textContent = coins;
-  document.getElementById('botKillEffectList').innerHTML = DEATH_ANIMATIONS.map(d => {
+  document.getElementById('botKillEffectList').innerHTML = BOT_KILL_EFFECTS.map(d => {
     const owned = ownedBotKillEffects.includes(d.id);
     const equipped = equippedBotKillEffect === d.id;
     const btn = equipped
@@ -901,7 +901,7 @@ function renderBotKillEffectShop() {
     return `<div class="shopItem"><canvas id="botKillEffectPreview_${d.id}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
       <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewBotKillEffect('${d.id}')">👁 Bekijk</button></div></div>`;
   }).join('');
-  DEATH_ANIMATIONS.forEach(d => {
+  BOT_KILL_EFFECTS.forEach(d => {
     const canvasEl = document.getElementById(`botKillEffectPreview_${d.id}`);
     if (!canvasEl) return;
     const c = canvasEl.getContext('2d');
@@ -921,15 +921,17 @@ function previewBotKillEffect(id) {
   if (!canvasEl) return;
   const c = canvasEl.getContext('2d');
   const w = canvasEl.width, h = canvasEl.height;
+  const effect = BOT_KILL_EFFECTS.find(x => x.id === id);
+  const effDur = (effect && effect.duration) || 500;
   const start = performance.now();
-  const loopDur = DEATH_ANIM_DURATION + 600;
+  const loopDur = effDur + 500;
   function frame() {
     const elapsed = (performance.now() - start) % loopDur;
     c.clearRect(0, 0, w, h);
     c.save();
     c.translate(w / 2, h / 2);
-    if (elapsed < DEATH_ANIM_DURATION) {
-      drawDeathAnimation(c, id, elapsed, 16);
+    if (elapsed < effDur) {
+      drawBotKillEffect(c, id, elapsed, 16);
     } else {
       drawBotKillEffectIdle(c, 16);
     }
