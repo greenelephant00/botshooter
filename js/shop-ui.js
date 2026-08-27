@@ -861,6 +861,99 @@ function closeDeathAnimShop() {
 }
 window.closeDeathAnimShop = closeDeathAnimShop;
 
+function drawBotKillEffectIdle(c, r) {
+  c.fillStyle = '#e05c5c';
+  c.beginPath(); c.arc(0, 0, r, 0, Math.PI * 2); c.fill();
+  c.strokeStyle = '#8a2f2f';
+  c.lineWidth = 2;
+  c.stroke();
+}
+
+function buyBotKillEffect(id) {
+  const d = DEATH_ANIMATIONS.find(x => x.id === id);
+  if (!d || ownedBotKillEffects.includes(id) || coins < d.price) return;
+  coins -= d.price;
+  ownedBotKillEffects.push(id);
+  saveShopState();
+  localStorage.setItem('botShooterOwnedBotKillEffects', JSON.stringify(ownedBotKillEffects));
+  renderBotKillEffectShop();
+}
+window.buyBotKillEffect = buyBotKillEffect;
+
+function equipBotKillEffect(id) {
+  if (!ownedBotKillEffects.includes(id)) return;
+  equippedBotKillEffect = id;
+  localStorage.setItem('botShooterEquippedBotKillEffect', equippedBotKillEffect);
+  renderBotKillEffectShop();
+}
+window.equipBotKillEffect = equipBotKillEffect;
+
+function renderBotKillEffectShop() {
+  document.getElementById('botKillEffectCoins').textContent = coins;
+  document.getElementById('botKillEffectList').innerHTML = DEATH_ANIMATIONS.map(d => {
+    const owned = ownedBotKillEffects.includes(d.id);
+    const equipped = equippedBotKillEffect === d.id;
+    const btn = equipped
+      ? `<button class="equipped" disabled>Uitgerust</button>`
+      : owned
+        ? `<button class="equip" onclick="equipBotKillEffect('${d.id}')">Uitrusten</button>`
+        : `<button class="buy" onclick="buyBotKillEffect('${d.id}')" ${coins < d.price ? 'disabled' : ''}>Koop · 🪙${d.price}</button>`;
+    return `<div class="shopItem"><canvas id="botKillEffectPreview_${d.id}" width="60" height="60" style="background:#0a0a14; border-radius:8px; margin-right:10px; flex-shrink:0;"></canvas><div class="info"><div class="name">${d.name}</div><div class="desc">${d.desc}</div></div>
+      <div style="display:flex; flex-direction:column; gap:6px; align-items:stretch;">${btn}<button class="equip" onclick="previewBotKillEffect('${d.id}')">👁 Bekijk</button></div></div>`;
+  }).join('');
+  DEATH_ANIMATIONS.forEach(d => {
+    const canvasEl = document.getElementById(`botKillEffectPreview_${d.id}`);
+    if (!canvasEl) return;
+    const c = canvasEl.getContext('2d');
+    c.clearRect(0, 0, canvasEl.width, canvasEl.height);
+    c.save();
+    c.translate(canvasEl.width / 2, canvasEl.height / 2);
+    drawBotKillEffectIdle(c, 16);
+    c.restore();
+  });
+}
+window.renderBotKillEffectShop = renderBotKillEffectShop;
+
+let botKillEffectPreviewRAF = null;
+function previewBotKillEffect(id) {
+  if (botKillEffectPreviewRAF) cancelAnimationFrame(botKillEffectPreviewRAF);
+  const canvasEl = document.getElementById(`botKillEffectPreview_${id}`);
+  if (!canvasEl) return;
+  const c = canvasEl.getContext('2d');
+  const w = canvasEl.width, h = canvasEl.height;
+  const start = performance.now();
+  const loopDur = DEATH_ANIM_DURATION + 600;
+  function frame() {
+    const elapsed = (performance.now() - start) % loopDur;
+    c.clearRect(0, 0, w, h);
+    c.save();
+    c.translate(w / 2, h / 2);
+    if (elapsed < DEATH_ANIM_DURATION) {
+      drawDeathAnimation(c, id, elapsed, 16);
+    } else {
+      drawBotKillEffectIdle(c, 16);
+    }
+    c.restore();
+    botKillEffectPreviewRAF = requestAnimationFrame(frame);
+  }
+  frame();
+}
+window.previewBotKillEffect = previewBotKillEffect;
+
+function openBotKillEffectShop() {
+  document.getElementById('cosmeticsScreen').style.display = 'none';
+  document.getElementById('botKillEffectScreen').style.display = 'flex';
+  renderBotKillEffectShop();
+}
+window.openBotKillEffectShop = openBotKillEffectShop;
+
+function closeBotKillEffectShop() {
+  if (botKillEffectPreviewRAF) { cancelAnimationFrame(botKillEffectPreviewRAF); botKillEffectPreviewRAF = null; }
+  document.getElementById('botKillEffectScreen').style.display = 'none';
+  document.getElementById('cosmeticsScreen').style.display = 'flex';
+}
+window.closeBotKillEffectShop = closeBotKillEffectShop;
+
 function renderStatsScreen() {
   const rows = [
     ['Totaal aantal kills', totalLifetimeKills.toLocaleString('nl-NL')],

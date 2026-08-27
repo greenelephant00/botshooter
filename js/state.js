@@ -4,14 +4,18 @@ let bots = [];
 let particles = [];
 let powerups = [];
 let explosions = [];
-// Death-animation-op-de-bot wanneer je een prestatie-exclusieve skin draagt (titanchrome/supernova/neonultra) en een bot killt
+// Player killeffect: een animatie op de bot zelf op het moment dat jij hem killt (los van je Death Animation, die pas afspeelt als JIJ doodgaat)
 let botDeathAnimations = [];
-// Elke prestatie-exclusieve skin heeft zijn eigen unieke death animation voor bots die je ermee killt
+// Elke prestatie-exclusieve skin heeft zijn eigen vaste, unieke player killeffect — overschrijft je gekozen Bot Kill Effect zolang die skin uitgerust is
 const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'novacollapse', neonultra: 'neonoverload' };
-// Sommige exclusieve player killeffecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
+// Sommige player killeffecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
 const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
-function maybeTriggerExclusiveSkinDeathAnim(bot) {
-  const animType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
+// Bot Kill Effect-shop: hergebruikt dezelfde animatiecatalogus als Death Animation (DEATH_ANIMATIONS), maar los bezit/uitgerust
+let ownedBotKillEffects = JSON.parse(localStorage.getItem('botShooterOwnedBotKillEffects') || '["default"]');
+let equippedBotKillEffect = localStorage.getItem('botShooterEquippedBotKillEffect') || 'default';
+function maybeTriggerPlayerKillEffect(bot) {
+  const exclusiveType = EXCLUSIVE_SKIN_DEATH_ANIM[getSkin()];
+  const animType = exclusiveType || (equippedBotKillEffect !== 'default' ? equippedBotKillEffect : null);
   if (!animType) return;
   const duration = EXCLUSIVE_SKIN_DEATH_ANIM_DURATION[animType] || DEATH_ANIM_DURATION;
   botDeathAnimations.push({ x: bot.x, y: bot.y, r: bot.r, type: animType, duration, born: performance.now() });

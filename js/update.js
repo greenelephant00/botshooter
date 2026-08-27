@@ -604,7 +604,7 @@ function update() {
 
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
-          maybeTriggerExclusiveSkinDeathAnim(bot);
+          maybeTriggerPlayerKillEffect(bot);
           recordKillStat();
           player.comboStreak = Math.min(1000, player.comboStreak + 1);
           player.comboLastKill = performance.now();
@@ -1112,7 +1112,7 @@ function update() {
         t.captured.forEach(bot => {
           if (bot.dead) return;
           bot.dead = true;
-          maybeTriggerExclusiveSkinDeathAnim(bot);
+          maybeTriggerPlayerKillEffect(bot);
           recordKillStat();
           score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
           if (gameMode === 'levels') levelKills++;
@@ -1250,7 +1250,7 @@ function update() {
           spawnParticles(bot.x, bot.y, '#ff8800');
           if (bot.hp <= 0 && !bot.immortal) {
             bot.dead = true;
-            maybeTriggerExclusiveSkinDeathAnim(bot);
+            maybeTriggerPlayerKillEffect(bot);
           recordKillStat();
             score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
             if (gameMode === 'levels') levelKills++;
