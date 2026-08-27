@@ -1578,7 +1578,6 @@ function endGame(won) {
     msgBtn.textContent = 'Opnieuw oefenen';
     msgBtn.onclick = () => { equippedSkin = previousEquippedSkin; startSkinPractice(skinPracticeId); };
   } else if (gameMode === 'sprint') {
-    recordSessionStats(score);
     const isNewHigh = score > highScoreSprint;
     if (isNewHigh) {
       highScoreSprint = score;
@@ -1592,7 +1591,6 @@ function endGame(won) {
     msgBtn.textContent = 'Opnieuw sprinten';
     msgBtn.onclick = restartGame;
   } else if (gameMode === 'endless' || gameMode === 'hardcore') {
-    recordSessionStats(score);
     const isHardcore = gameMode === 'hardcore';
     let currentHigh = currentWorld === 2 ? highScoreWorld2 : (isHardcore ? highScoreHardcore : highScore);
     if (score > currentHigh) {
@@ -1618,7 +1616,6 @@ function endGame(won) {
     msgBtn.textContent = 'Opnieuw spelen';
     msgBtn.onclick = restartGame;
   } else {
-    recordSessionStats(score);
     if (currentLevel > highLevel) {
       highLevel = currentLevel;
       localStorage.setItem('botShooterHighLevel', highLevel);

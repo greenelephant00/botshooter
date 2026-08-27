@@ -29,8 +29,7 @@ const ACCOUNT_KEYS = [
   'botShooterHasCoreAura', 'botShooterHasCoreShock', 'botShooterClaimedAchievementRewards',
   'botShooterOwnedWeaponSkins', 'botShooterEquippedWeaponSkins',
   'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation',
-  'botShooterTotalLifetimeKills', 'botShooterTotalPlayTimeMs', 'botShooterTotalScoreSum',
-  'botShooterTotalGamesPlayed', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint',
+  'botShooterTotalLifetimeKills', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint',
   'botShooterOwnedTrails', 'botShooterEquippedTrail',
   'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground',
   'botShooterHasDualArmor2'

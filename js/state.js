@@ -19,27 +19,13 @@ function maybeTriggerExclusiveSkinDeathAnim(bot) {
 
 // ---- Lifetime statistieken (Statistieken-scherm) ----
 let totalLifetimeKills = Number(localStorage.getItem('botShooterTotalLifetimeKills')) || 0;
-let totalPlayTimeMs = Number(localStorage.getItem('botShooterTotalPlayTimeMs')) || 0;
-let totalScoreSum = Number(localStorage.getItem('botShooterTotalScoreSum')) || 0;
-let totalGamesPlayed = Number(localStorage.getItem('botShooterTotalGamesPlayed')) || 0;
 let weaponKillCounts = JSON.parse(localStorage.getItem('botShooterWeaponKillCounts') || '{}');
-let gameSessionStart = 0;
 function recordKillStat() {
   totalLifetimeKills++;
   localStorage.setItem('botShooterTotalLifetimeKills', totalLifetimeKills);
   const wid = getWeapon().id;
   weaponKillCounts[wid] = (weaponKillCounts[wid] || 0) + 1;
   localStorage.setItem('botShooterWeaponKillCounts', JSON.stringify(weaponKillCounts));
-}
-function recordSessionStats(finalScore) {
-  if (!gameSessionStart) return;
-  totalPlayTimeMs += performance.now() - gameSessionStart;
-  totalScoreSum += finalScore;
-  totalGamesPlayed++;
-  gameSessionStart = 0;
-  localStorage.setItem('botShooterTotalPlayTimeMs', totalPlayTimeMs);
-  localStorage.setItem('botShooterTotalScoreSum', totalScoreSum);
-  localStorage.setItem('botShooterTotalGamesPlayed', totalGamesPlayed);
 }
 function favoriteWeaponName() {
   let bestId = null, bestCount = 0;
