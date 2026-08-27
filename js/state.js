@@ -903,14 +903,14 @@ const WEAPONS = [
 
 // Speciale wapens: eigen categorie, elk met een uniek hit- of kill-effect
 const SPECIAL_WEAPONS = [
-  { id: 'cryorifle',   name: 'Cryo Rifle',        price: 1350, cooldownMult: 0.95, dmg: 2, pellets: 1, spread: 0, effect: 'freezeKill',     desc: 'Bij elke kill bevriest een ijsgolf alle bots in de buurt 2 sec.' },
-  { id: 'vampcannon',  name: 'Vamp Cannon',       price: 1300, cooldownMult: 1.2,  dmg: 2, pellets: 1, spread: 0, effect: 'lifestealKill',  desc: 'Elke kill geneest je direct 3 HP.' },
-  { id: 'voltcaster',  name: 'Volt Caster',       price: 1500, cooldownMult: 1,    dmg: 2, pellets: 1, spread: 0, effect: 'chainLightning', desc: 'Elke kogel slaat over als bliksem naar een nabije bot voor extra schade.' },
-  { id: 'singularity', name: 'Singularity Gun',   price: 2200, cooldownMult: 1.6,  dmg: 2, pellets: 1, spread: 0, effect: 'blackholeKill',  desc: 'Elke kill opent een kolkend zwart gat dat bots naar binnen zuigt, geleidelijk schade doet, en na ~1,2 sec imploderend nog een flinke schadeburst uitdeelt.' },
-  { id: 'stickybomb',  name: 'Kleefbom Werper',   price: 1800, cooldownMult: 1.7,  dmg: 1, pellets: 1, spread: 0, effect: 'stickyBomb',     desc: 'Kogels blijven kleven op de bot die je raakt en ontploffen na een korte waarschuwing (rode telegraph-cirkel) met een grote explosie.' },
-  { id: 'toxiccannon', name: 'Toxic Cannon',      price: 1900, cooldownMult: 1.1,  dmg: 1, pellets: 1, spread: 0, effect: 'poison',         desc: 'Vergiftigt bots met schade-over-tijd, en verspreidt het gif automatisch naar bots in de buurt zodra een vergiftigde bot sterft.' },
-  { id: 'executioner', name: 'Executioner Rifle', price: 2000, cooldownMult: 1.3,  dmg: 2, pellets: 1, spread: 0, effect: 'execute',        desc: 'Maakt bots die onder 25% HP zitten altijd direct af, ongeacht hun resterende HP — perfect om net-niet-dode bots snel op te ruimen.' },
-  { id: 'momentum',    name: 'Momentum Blade',    price: 2100, cooldownMult: 0.8,  dmg: 1, pellets: 1, spread: 0, effect: 'killstreak',     desc: 'Bouwt een killstreak op (zichtbaar in de HUD) die je schade tot +150% verhoogt bij 10 kills op rij, maar reset als je 2,5 sec geen kill maakt.' }
+  { id: 'cryorifle',   name: 'Cryo Rifle',        price: 2350, cooldownMult: 0.95, dmg: 2, pellets: 1, spread: 0, effect: 'freezeKill',     desc: 'Bij elke kill bevriest een ijsgolf alle bots in de buurt 2 sec.' },
+  { id: 'vampcannon',  name: 'Vamp Cannon',       price: 2300, cooldownMult: 1.2,  dmg: 2, pellets: 1, spread: 0, effect: 'lifestealKill',  desc: 'Elke kill geneest je direct 3 HP.' },
+  { id: 'voltcaster',  name: 'Volt Caster',       price: 2500, cooldownMult: 1,    dmg: 2, pellets: 1, spread: 0, effect: 'chainLightning', desc: 'Elke kogel slaat over als bliksem naar een nabije bot voor extra schade.' },
+  { id: 'singularity', name: 'Singularity Gun',   price: 3200, cooldownMult: 1.6,  dmg: 2, pellets: 1, spread: 0, effect: 'blackholeKill',  desc: 'Elke kill opent een kolkend zwart gat dat bots naar binnen zuigt, geleidelijk schade doet, en na ~1,2 sec imploderend nog een flinke schadeburst uitdeelt.' },
+  { id: 'stickybomb',  name: 'Kleefbom Werper',   price: 2800, cooldownMult: 1.7,  dmg: 1, pellets: 1, spread: 0, effect: 'stickyBomb',     desc: 'Kogels blijven kleven op de bot die je raakt en ontploffen na een korte waarschuwing (rode telegraph-cirkel) met een grote explosie.' },
+  { id: 'toxiccannon', name: 'Toxic Cannon',      price: 2900, cooldownMult: 1.1,  dmg: 1, pellets: 1, spread: 0, effect: 'poison',         desc: 'Vergiftigt bots met schade-over-tijd, en verspreidt het gif automatisch naar bots in de buurt zodra een vergiftigde bot sterft.' },
+  { id: 'executioner', name: 'Executioner Rifle', price: 3000, cooldownMult: 1.3,  dmg: 2, pellets: 1, spread: 0, effect: 'execute',        desc: 'Maakt bots die onder 25% HP zitten altijd direct af, ongeacht hun resterende HP — perfect om net-niet-dode bots snel op te ruimen.' },
+  { id: 'momentum',    name: 'Momentum Blade',    price: 3100, cooldownMult: 0.8,  dmg: 1, pellets: 1, spread: 0, effect: 'killstreak',     desc: 'Bouwt een killstreak op (zichtbaar in de HUD) die je schade tot +150% verhoogt bij 10 kills op rij, maar reset als je 2,5 sec geen kill maakt.' }
 ];
 
 const ARMOR = [
