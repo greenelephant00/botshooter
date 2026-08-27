@@ -24,9 +24,9 @@ const INTRO_ANIMATIONS = [
   { id: 'spin',        name: 'Duizelspawn',   price: 1900, desc: 'Je tolt razendsnel rond en komt tot stilstand zodra je verschijnt.' }
 ];
 
-// ---- Mysterie-doos: koop een verrassing, maar maar 1x per uur ----
+// ---- Mysterie-doos: koop een verrassing, maar maar 1x per half uur ----
 const MYSTERY_BOX_PRICE = 500;
-const MYSTERY_BOX_COOLDOWN = 3600000; // 1 uur
+const MYSTERY_BOX_COOLDOWN = 1800000; // half uur
 let lastMysteryBoxOpen = Number(localStorage.getItem('botShooterLastMysteryBoxOpen')) || 0;
 function mysteryBoxReady() { return Date.now() - lastMysteryBoxOpen >= MYSTERY_BOX_COOLDOWN; }
 function mysteryBoxTimeLeft() { return Math.max(0, MYSTERY_BOX_COOLDOWN - (Date.now() - lastMysteryBoxOpen)); }

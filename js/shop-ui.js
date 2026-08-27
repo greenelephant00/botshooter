@@ -1071,7 +1071,7 @@ function renderMysteryBoxScreen() {
   const resultHtml = mysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${mysteryBoxLastResult}</span></div>` : '';
   const oddsRows = MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🪙 ${e.amount}</td></tr>`).join('');
   document.getElementById('mysteryBoxContent').innerHTML = `
-    <div class="shopItem"><div class="info"><div class="name">Mysterie-doos</div><div class="desc">Munten volgens onderstaande kanstabel. Eén keer per uur te openen.</div></div>${btn}</div>
+    <div class="shopItem"><div class="info"><div class="name">Mysterie-doos</div><div class="desc">Munten volgens onderstaande kanstabel. Eén keer per half uur te openen.</div></div>${btn}</div>
     ${resultHtml}
     <table class="mysteryOddsTable">
       <tr><th>Kans</th><th>Munten</th></tr>
