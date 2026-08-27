@@ -4553,6 +4553,19 @@ function drawTrailParticle(p) {
   ctx.restore();
 }
 
+function drawWeaponHeatBar() {
+  if (player.weaponHeat <= 0 && performance.now() >= player.overheatUntil) return;
+  const barW = player.r * 2;
+  const barX = player.x - player.r;
+  const barY = player.y - player.r - 16;
+  const overheated = performance.now() < player.overheatUntil;
+  const pct = overheated ? 1 : player.weaponHeat / WEAPON_HEAT_MAX;
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  ctx.fillRect(barX, barY, barW, 4);
+  ctx.fillStyle = overheated ? (Math.floor(performance.now() / 150) % 2 === 0 ? '#ff5c5c' : '#ffb703') : '#ff5c5c';
+  ctx.fillRect(barX, barY, barW * pct, 4);
+}
+
 function drawPlayer() {
   ctx.save();
   ctx.translate(player.x, player.y);
@@ -5633,6 +5646,7 @@ function draw() {
 
   trailParticles.forEach(drawTrailParticle);
   drawPlayer();
+  drawWeaponHeatBar();
   if (dronePracticeActive) {
     drawKillstreakDrone(dronePracticeDrone, dronePracticeLevel);
   } else {

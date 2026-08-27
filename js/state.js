@@ -12,7 +12,7 @@ function sortFavoritesFirst(arr, prefix) {
 
 // ---- Overheat: elk wapen krijgt een verborgen hitte-balk die oploopt bij aanhoudend vuren en bij oververhitting het wapen even blokkeert ----
 const WEAPON_HEAT_MAX = 100;
-const HEAT_PER_SHOT = 12;
+const HEAT_PER_SHOT = WEAPON_HEAT_MAX / 50; // exact 50 schoten om te oververhitten
 const HEAT_DECAY_PER_SEC = 40;
 const OVERHEAT_DURATION = 2000;
 
