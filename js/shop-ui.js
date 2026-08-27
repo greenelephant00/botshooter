@@ -429,19 +429,22 @@ function renderAchievementCard(a) {
 
 function renderAchievements() {
   checkAchievements();
-  const w1 = ACHIEVEMENTS.filter(a => a.category === 'w1');
-  const w2 = ACHIEVEMENTS.filter(a => a.category === 'w2');
+  const skinRewards = ACHIEVEMENTS.filter(a => a.reward.type === 'skin');
+  const w1 = ACHIEVEMENTS.filter(a => a.category === 'w1' && a.reward.type !== 'skin');
+  const w2 = ACHIEVEMENTS.filter(a => a.category === 'w2' && a.reward.type !== 'skin');
+  const skinCount = skinRewards.filter(a => unlockedAchievements.includes(a.id)).length;
   const w1Count = w1.filter(a => unlockedAchievements.includes(a.id)).length;
   const w2Count = w2.filter(a => unlockedAchievements.includes(a.id)).length;
   const w2Section = currentWorld === 2
     ? `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${w2.map(renderAchievementCard).join('')}</div>`
     : '';
-  const totalShown = currentWorld === 2 ? w1.length + w2.length : w1.length;
-  const unlockedShown = currentWorld === 2 ? w1Count + w2Count : w1Count;
+  const totalShown = (currentWorld === 2 ? w1.length + w2.length : w1.length) + skinRewards.length;
+  const unlockedShown = (currentWorld === 2 ? w1Count + w2Count : w1Count) + skinCount;
   document.getElementById('achievementsProgress').textContent = `${unlockedShown}/${totalShown} behaald`;
   document.getElementById('achievementsList').innerHTML =
     `<div class="shopSection"><h3>🌍 Wereld 1 (${w1Count}/${w1.length})</h3>${w1.map(renderAchievementCard).join('')}</div>` +
-    w2Section;
+    w2Section +
+    `<div class="shopSection"><h3>🎨 Exclusieve Skins (${skinCount}/${skinRewards.length})</h3>${skinRewards.map(renderAchievementCard).join('')}</div>`;
 }
 
 function openAchievements() {
