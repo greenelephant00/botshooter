@@ -10,6 +10,17 @@ function sortFavoritesFirst(arr, prefix) {
   return [...arr].sort((a, b) => (isFavorite(`${prefix}:${b.id}`) ? 1 : 0) - (isFavorite(`${prefix}:${a.id}`) ? 1 : 0));
 }
 
+// ---- Killstreak-drone: verschijnt bij killstreak 50+, helpt bots doden, verdwijnt zodra de streak weer onder de 50 zakt ----
+const KILLSTREAK_DRONE_THRESHOLD = 50;
+const KILLSTREAK_DRONE_DMG = 4;
+const KILLSTREAK_DRONE_COOLDOWN = 450;
+const KILLSTREAK_DRONE_RANGE = 260;
+let killstreakDroneAngle = 0;
+let killstreakDroneX = 0;
+let killstreakDroneY = 0;
+let killstreakDroneLastShot = 0;
+let killstreakDroneBeam = null;
+
 // ---- Intro Animatie: koop hoe je verschijnt bij het begin van een potje ----
 let ownedIntroAnimations = JSON.parse(localStorage.getItem('botShooterOwnedIntroAnimations') || '["none"]');
 let equippedIntroAnimation = localStorage.getItem('botShooterEquippedIntroAnimation') || 'none';

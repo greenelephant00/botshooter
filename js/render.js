@@ -4482,6 +4482,39 @@ function menuBgLoop() {
   requestAnimationFrame(menuBgLoop);
 }
 
+function drawKillstreakDrone() {
+  const x = killstreakDroneX, y = killstreakDroneY;
+  // Beam naar het laatst geraakte doelwit, dooft snel uit
+  if (killstreakDroneBeam) {
+    const age = performance.now() - killstreakDroneBeam.bornAt;
+    if (age < 150) {
+      ctx.save();
+      ctx.globalAlpha = Math.max(0, 1 - age / 150);
+      ctx.strokeStyle = '#4cc9f0';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(killstreakDroneBeam.x1, killstreakDroneBeam.y1);
+      ctx.lineTo(killstreakDroneBeam.x2, killstreakDroneBeam.y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(killstreakDroneAngle);
+  ctx.fillStyle = '#2a2a3e';
+  ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+  ctx.strokeStyle = '#4cc9f0';
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.stroke();
+  ctx.fillStyle = '#4cc9f0';
+  ctx.beginPath(); ctx.moveTo(-14, 0); ctx.lineTo(-6, -3); ctx.lineTo(-6, 3); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(14, 0); ctx.lineTo(6, -3); ctx.lineTo(6, 3); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#dfffff';
+  ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
 function drawTrailParticle(p) {
   const t = 1 - p.life / p.maxLife;
   ctx.save();
@@ -5593,6 +5626,7 @@ function draw() {
 
   trailParticles.forEach(drawTrailParticle);
   drawPlayer();
+  if (player.comboStreak >= KILLSTREAK_DRONE_THRESHOLD) drawKillstreakDrone();
   ctx.restore();
 
   if (nowShake < sandstormUntil) drawSandstormOverlay();
