@@ -1050,6 +1050,7 @@ function formatCooldown(ms) {
 }
 
 let mysteryBoxLastResult = null;
+let mysteryBoxResultTimeout = null;
 function openMysteryBox() {
   if (!mysteryBoxReady() || coins < MYSTERY_BOX_PRICE) return;
   coins -= MYSTERY_BOX_PRICE;
@@ -1060,6 +1061,12 @@ function openMysteryBox() {
   mysteryBoxLastResult = `🪙 Je wint ${amount} munten!`;
   saveShopState();
   renderMysteryBoxScreen();
+  if (mysteryBoxResultTimeout) clearTimeout(mysteryBoxResultTimeout);
+  mysteryBoxResultTimeout = setTimeout(() => {
+    mysteryBoxLastResult = null;
+    mysteryBoxResultTimeout = null;
+    renderMysteryBoxScreen();
+  }, 20000);
 }
 window.openMysteryBox = openMysteryBox;
 
