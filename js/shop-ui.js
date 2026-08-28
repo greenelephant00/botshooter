@@ -1143,6 +1143,37 @@ function openDoubleOrNothing() {
 }
 window.openDoubleOrNothing = openDoubleOrNothing;
 
+function setCoreDoubleOrNothingStake(value) {
+  let v = Math.floor(Number(value)) || 0;
+  v = Math.max(0, Math.min(CORE_DOUBLE_OR_NOTHING_MAX_STAKE, v));
+  coreDoubleOrNothingStake = v;
+  localStorage.setItem('botShooterCoreDoubleOrNothingStake', coreDoubleOrNothingStake);
+  renderMysteryBoxScreen();
+}
+window.setCoreDoubleOrNothingStake = setCoreDoubleOrNothingStake;
+
+let coreDoubleOrNothingLastResult = null;
+let coreDoubleOrNothingResultTimeout = null;
+function openCoreDoubleOrNothing() {
+  const stake = coreDoubleOrNothingStake;
+  if (stake <= 0 || elementalCores < stake) return;
+  elementalCores -= stake;
+  const win = Math.random() < 0.4;
+  const amount = win ? stake * 2 : 0;
+  elementalCores += amount;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  coreDoubleOrNothingLastResult = win ? `🎉 Verdubbeld! Je wint ${amount} Elemental Cores!` : `😬 Helaas, je bent ${stake} Elemental Cores kwijt!`;
+  saveShopState();
+  renderMysteryBoxScreen();
+  if (coreDoubleOrNothingResultTimeout) clearTimeout(coreDoubleOrNothingResultTimeout);
+  coreDoubleOrNothingResultTimeout = setTimeout(() => {
+    coreDoubleOrNothingLastResult = null;
+    coreDoubleOrNothingResultTimeout = null;
+    renderMysteryBoxScreen();
+  }, 20000);
+}
+window.openCoreDoubleOrNothing = openCoreDoubleOrNothing;
+
 function renderMysteryBoxScreen() {
   document.getElementById('mysteryBoxCoins').textContent = coins;
   const coresEl = document.getElementById('mysteryBoxCores');
@@ -1175,6 +1206,17 @@ function renderMysteryBoxScreen() {
         <tr><th>Kans</th><th>Cores</th></tr>
         ${world2OddsRows}
       </table>
+    `;
+    const coreDonResultHtml = coreDoubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${coreDoubleOrNothingLastResult}</span></div>` : '';
+    const coreDonDisabled = (coreDoubleOrNothingStake <= 0 || elementalCores < coreDoubleOrNothingStake) ? 'disabled' : '';
+    html += `
+      <div class="shopItem"><div class="info"><div class="name">🎯 Kern-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${CORE_DOUBLE_OR_NOTHING_MAX_STAKE} Elemental Cores). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
+      <div class="statsRow">
+        <span class="statsLabel">Inzet:</span>
+        <input type="number" class="doubleOrNothingInput" min="0" max="${CORE_DOUBLE_OR_NOTHING_MAX_STAKE}" step="1" value="${coreDoubleOrNothingStake}" onchange="setCoreDoubleOrNothingStake(this.value)">
+        <button class="buy" onclick="openCoreDoubleOrNothing()" ${coreDonDisabled}>🎯 Gok · 🔮${coreDoubleOrNothingStake}</button>
+      </div>
+      ${coreDonResultHtml}
     `;
   }
   const riskReady = riskBoxReady();

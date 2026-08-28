@@ -145,9 +145,13 @@ function rollRiskBoxReward() {
   return RISK_BOX_TABLE[RISK_BOX_TABLE.length - 1].amount;
 }
 
-// ---- Dubbel-of-niets-doos: zelf gekozen inzet (max 500 munten), 50% kans om te verdubbelen ----
+// ---- Dubbel-of-niets-doos: zelf gekozen inzet (max 500 munten), 40% kans om te verdubbelen ----
 const DOUBLE_OR_NOTHING_MAX_STAKE = 500;
 let doubleOrNothingStake = Math.max(0, Math.min(DOUBLE_OR_NOTHING_MAX_STAKE, Number(localStorage.getItem('botShooterDoubleOrNothingStake')) || 100));
+
+// ---- Kern-dubbel-of-niets-doos: zelfde principe maar met Elemental Cores (alleen Wereld 2) ----
+const CORE_DOUBLE_OR_NOTHING_MAX_STAKE = 25;
+let coreDoubleOrNothingStake = Math.max(0, Math.min(CORE_DOUBLE_OR_NOTHING_MAX_STAKE, Number(localStorage.getItem('botShooterCoreDoubleOrNothingStake')) || 5));
 
 // ---- Game state ----
 let bullets = [];
