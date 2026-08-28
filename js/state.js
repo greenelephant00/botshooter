@@ -196,12 +196,17 @@ function maybeTriggerPlayerKillEffect(bot) {
 // ---- Lifetime statistieken (Statistieken-scherm) ----
 let totalLifetimeKills = Number(localStorage.getItem('botShooterTotalLifetimeKills')) || 0;
 let weaponKillCounts = JSON.parse(localStorage.getItem('botShooterWeaponKillCounts') || '{}');
-function recordKillStat() {
+let botKillCounts = JSON.parse(localStorage.getItem('botShooterBotKillCounts') || '{}');
+function recordKillStat(bot) {
   totalLifetimeKills++;
   localStorage.setItem('botShooterTotalLifetimeKills', totalLifetimeKills);
   const wid = getWeapon().id;
   weaponKillCounts[wid] = (weaponKillCounts[wid] || 0) + 1;
   localStorage.setItem('botShooterWeaponKillCounts', JSON.stringify(weaponKillCounts));
+  if (bot && bot.type) {
+    botKillCounts[bot.type] = (botKillCounts[bot.type] || 0) + 1;
+    localStorage.setItem('botShooterBotKillCounts', JSON.stringify(botKillCounts));
+  }
 }
 function favoriteWeaponName() {
   let bestId = null, bestCount = 0;

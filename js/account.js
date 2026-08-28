@@ -31,6 +31,7 @@ const ACCOUNT_KEYS = [
   'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation',
   'botShooterTotalLifetimeKills', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint',
   'botShooterOwnedTrails', 'botShooterEquippedTrail',
+  'botShooterBotKillCounts',
   'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground',
   'botShooterHasDualArmor2',
   'botShooterOwnedBotKillEffects', 'botShooterEquippedBotKillEffect',

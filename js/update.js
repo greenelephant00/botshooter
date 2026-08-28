@@ -605,7 +605,7 @@ function update() {
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
           maybeTriggerPlayerKillEffect(bot);
-          recordKillStat();
+          recordKillStat(bot);
           player.comboStreak = Math.min(1000, player.comboStreak + 1);
           player.comboLastKill = performance.now();
           if (player.comboStreak > sessionBestStreak) {
@@ -1123,7 +1123,7 @@ function update() {
           if (bot.dead) return;
           bot.dead = true;
           maybeTriggerPlayerKillEffect(bot);
-          recordKillStat();
+          recordKillStat(bot);
           score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
           if (gameMode === 'levels') levelKills++;
           spawnParticles(bot.x, bot.y, '#cfe8ee');
@@ -1261,7 +1261,7 @@ function update() {
           if (bot.hp <= 0 && !bot.immortal) {
             bot.dead = true;
             maybeTriggerPlayerKillEffect(bot);
-          recordKillStat();
+          recordKillStat(bot);
             score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
             if (gameMode === 'levels') levelKills++;
             if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);

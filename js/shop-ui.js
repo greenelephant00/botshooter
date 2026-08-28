@@ -1803,6 +1803,7 @@ function botCardHtml(type) {
       <div class="speedBar"><div class="speedBarFill" style="width:${speedPct}%"></div></div>
       <div class="desc">${patternDesc}</div>
       <div class="desc" style="color:#777;">${unlockText}</div>
+      <div class="desc" style="color:#ffd60a;">Gedood: ${(botKillCounts[type.name] || 0).toLocaleString('nl-NL')}</div>
     </div>
     <button class="equip" onclick="startPractice('${type.name}')">🎯 Oefen</button>
   </div>`;
@@ -1822,6 +1823,7 @@ function world2BotCardHtml(type) {
       <div class="speedBar"><div class="speedBarFill" style="width:${speedPct}%"></div></div>
       <div class="desc">${BOT_PATTERN_INFO[type.pattern] || ''}</div>
       <div class="desc" style="color:#777;">Verschijnt altijd in Wereld 2</div>
+      <div class="desc" style="color:#ffd60a;">Gedood: ${(botKillCounts[type.name] || 0).toLocaleString('nl-NL')}</div>
     </div>
     <button class="equip" onclick="startPractice('${type.name}')">🎯 Oefen</button>
   </div>`;

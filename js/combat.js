@@ -622,7 +622,7 @@ function damageBotSimple(bot, dmg, color) {
   if (bot.hp <= 0 && !bot.immortal) {
     bot.dead = true;
     maybeTriggerPlayerKillEffect(bot);
-    recordKillStat();
+    recordKillStat(bot);
     player.comboStreak = Math.min(1000, player.comboStreak + 1);
     player.comboLastKill = performance.now();
     if (player.comboStreak > sessionBestStreak) {
@@ -1156,7 +1156,7 @@ function meleeAttack(bot) {
     if (bot.hp <= 0 && !bot.immortal) {
       bot.dead = true;
       maybeTriggerPlayerKillEffect(bot);
-    recordKillStat();
+    recordKillStat(bot);
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
       if (armor.vampireHeal) player.hp = Math.min(player.maxHp, player.hp + armor.vampireHeal);
@@ -2224,7 +2224,7 @@ function rootGrabAttack(count) {
       spawnParticles(tx, ty, '#2f7d3c');
       bot.dead = true;
       maybeTriggerPlayerKillEffect(bot);
-    recordKillStat();
+    recordKillStat(bot);
       score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
       if (gameMode === 'levels') levelKills++;
       if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
@@ -2259,7 +2259,7 @@ function rootDragNearest(x, y, maxRange) {
     spawnParticles(tx, ty, '#2f7d3c');
     bot.dead = true;
     maybeTriggerPlayerKillEffect(bot);
-    recordKillStat();
+    recordKillStat(bot);
     score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
     if (gameMode === 'levels') levelKills++;
   }, riseDur + wrapDur);
