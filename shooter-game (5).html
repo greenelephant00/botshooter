@@ -389,8 +389,15 @@
   <h2>⏸ GEPAUZEERD</h2>
   <div>
     <button onclick="togglePause()">Doorgaan</button>
+    <button id="weaponSwitchBtn" class="secondary" onclick="openWeaponSwitchScreen()">🔄 Wapen wisselen</button>
     <button class="secondary" onclick="goToMenu()">Naar menu</button>
   </div>
+</div>
+<div id="weaponSwitchScreen">
+  <h1>🔄 Wapen wisselen</h1>
+  <p style="color:#999; margin-bottom:14px;">Je kunt dit potje één keer van wapen wisselen. Kies een wapen en bevestig.</p>
+  <div id="weaponSwitchList" style="width:600px; max-width:92vw;"></div>
+  <button class="backBtn" onclick="closeWeaponSwitchScreen()">← Terug naar pauze</button>
 </div>
 <div id="instructions">WASD = lopen · Muis = mikken · Klik/Spatie = schieten</div>
 <div id="msg">

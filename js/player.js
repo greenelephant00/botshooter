@@ -383,6 +383,9 @@ function initGame() {
   resetPlayer();
   if (equippedIntroAnimation !== 'none') player.introAnimStart = performance.now();
   isPaused = false;
+  matchWeaponOverride = null;
+  matchWeaponSwitchUsed = false;
+  weaponSwitchPendingId = null;
   const pauseOverlayEl = document.getElementById('pauseOverlay');
   if (pauseOverlayEl) pauseOverlayEl.style.display = 'none';
   const pauseBtnEl = document.getElementById('pauseBtn');

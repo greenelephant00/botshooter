@@ -1706,6 +1706,7 @@ function togglePause() {
   if (isPaused) {
     overlay.style.display = 'flex';
     if (btn) btn.textContent = '▶ Hervat';
+    renderPauseWeaponSwitchBtn();
   } else {
     overlay.style.display = 'none';
     if (btn) btn.textContent = '⏸ Pauze';

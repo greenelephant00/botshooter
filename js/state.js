@@ -1219,9 +1219,11 @@ const WORLD2_ARMOR = [
 ];
 
 let practiceWeaponId = null; // overschrijft equippedWeapon tijdens een wapen-oefensessie
+let matchWeaponOverride = null; // overschrijft equippedWeapon voor de rest van het huidige potje, na een wapenwissel via het pauzemenu
+let matchWeaponSwitchUsed = false; // of je dit potje je ene toegestane wapenwissel al hebt gebruikt
 
 function getWeapon() {
-  const id = practiceWeaponId || equippedWeapon;
+  const id = practiceWeaponId || matchWeaponOverride || equippedWeapon;
   const w = WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WORLD2_SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
   // Speciale wapens van de ene wereld werken niet in de andere wereld — val dan terug op het standaard pistool
   if (currentWorld === 2 && SPECIAL_WEAPONS.some(sw => sw.id === w.id)) return WEAPONS[0];

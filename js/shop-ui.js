@@ -2558,6 +2558,71 @@ function weaponStatsLine(w) {
   return `${dmgText} &nbsp;·&nbsp; ${shotsPerSec.toFixed(1)} schoten/sec`;
 }
 
+let weaponSwitchPendingId = null;
+
+function matchWeaponSwitchItemHtml(item) {
+  const activeId = matchWeaponOverride || equippedWeapon;
+  let btn;
+  if (item.id === activeId) {
+    btn = `<button class="equipped" disabled>Actief</button>`;
+  } else if (weaponSwitchPendingId === item.id) {
+    btn = `<button class="buy" onclick="confirmMatchWeaponSwitch()">Bevestig wisselen</button>`;
+  } else {
+    btn = `<button class="equip" onclick="selectMatchWeaponSwitch('${item.id}')">Wissel</button>`;
+  }
+  return `<div class="shopItem"><div class="info"><div class="name">${item.name}</div><div class="desc">${weaponStatsLine(item)}</div><div class="desc">${item.desc}</div></div>${btn}</div>`;
+}
+
+function renderWeaponSwitchScreen() {
+  const normalList = WEAPONS.filter(w => ownedWeapons.includes(w.id));
+  const specialSource = currentWorld === 2 ? [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS] : SPECIAL_WEAPONS;
+  const specialList = specialSource.filter(w => ownedWeapons.includes(w.id));
+  document.getElementById('weaponSwitchList').innerHTML = `
+    <div class="shopSection"><h3>Wapens</h3>${normalList.map(matchWeaponSwitchItemHtml).join('')}</div>
+    <div class="shopSection"><h3>Speciale wapens</h3>${specialList.map(matchWeaponSwitchItemHtml).join('')}</div>
+  `;
+}
+window.renderWeaponSwitchScreen = renderWeaponSwitchScreen;
+
+function selectMatchWeaponSwitch(weaponId) {
+  weaponSwitchPendingId = weaponId;
+  renderWeaponSwitchScreen();
+}
+window.selectMatchWeaponSwitch = selectMatchWeaponSwitch;
+
+function confirmMatchWeaponSwitch() {
+  if (!weaponSwitchPendingId || matchWeaponSwitchUsed) return;
+  matchWeaponOverride = weaponSwitchPendingId;
+  matchWeaponSwitchUsed = true;
+  weaponSwitchPendingId = null;
+  closeWeaponSwitchScreen();
+}
+window.confirmMatchWeaponSwitch = confirmMatchWeaponSwitch;
+
+function renderPauseWeaponSwitchBtn() {
+  const btn = document.getElementById('weaponSwitchBtn');
+  if (!btn) return;
+  btn.disabled = matchWeaponSwitchUsed;
+  btn.textContent = matchWeaponSwitchUsed ? '🔄 Wapen al gewisseld' : '🔄 Wapen wisselen';
+}
+window.renderPauseWeaponSwitchBtn = renderPauseWeaponSwitchBtn;
+
+function openWeaponSwitchScreen() {
+  if (matchWeaponSwitchUsed) return;
+  weaponSwitchPendingId = null;
+  document.getElementById('pauseOverlay').style.display = 'none';
+  document.getElementById('weaponSwitchScreen').style.display = 'flex';
+  renderWeaponSwitchScreen();
+}
+window.openWeaponSwitchScreen = openWeaponSwitchScreen;
+
+function closeWeaponSwitchScreen() {
+  document.getElementById('weaponSwitchScreen').style.display = 'none';
+  document.getElementById('pauseOverlay').style.display = 'flex';
+  renderPauseWeaponSwitchBtn();
+}
+window.closeWeaponSwitchScreen = closeWeaponSwitchScreen;
+
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
