@@ -122,7 +122,7 @@ function rollWorld2MysteryBoxReward() {
 }
 
 // ---- Risico-doos: goedkoop, maar een flinke kans op niets — gecompenseerd door een kleine kans op een grote uitbetaling ----
-const RISK_BOX_PRICE = 300;
+const RISK_BOX_PRICE = 600;
 const RISK_BOX_COOLDOWN = 1800000; // half uur
 let lastRiskBoxOpen = Number(localStorage.getItem('botShooterLastRiskBoxOpen')) || 0;
 function riskBoxReady() { return Date.now() - lastRiskBoxOpen >= RISK_BOX_COOLDOWN; }
