@@ -95,6 +95,32 @@ function rollMysteryBoxReward() {
   return MYSTERY_BOX_TABLE[MYSTERY_BOX_TABLE.length - 1].amount;
 }
 
+// ---- Wereld 2 Mysterie-doos: zelfde principe, maar beloont Elemental Cores i.p.v. munten (kost wel munten) ----
+const WORLD2_MYSTERY_BOX_PRICE = 800;
+const WORLD2_MYSTERY_BOX_COOLDOWN = 1800000; // half uur
+let lastWorld2MysteryBoxOpen = Number(localStorage.getItem('botShooterLastWorld2MysteryBoxOpen')) || 0;
+function world2MysteryBoxReady() { return Date.now() - lastWorld2MysteryBoxOpen >= WORLD2_MYSTERY_BOX_COOLDOWN; }
+function world2MysteryBoxTimeLeft() { return Math.max(0, WORLD2_MYSTERY_BOX_COOLDOWN - (Date.now() - lastWorld2MysteryBoxOpen)); }
+const WORLD2_MYSTERY_BOX_TABLE = [
+  { chance: 0.10, amount: 2 },
+  { chance: 0.20, amount: 3 },
+  { chance: 0.20, amount: 4 },
+  { chance: 0.20, amount: 5 },
+  { chance: 0.15, amount: 7 },
+  { chance: 0.10, amount: 10 },
+  { chance: 0.03, amount: 15 },
+  { chance: 0.02, amount: 25 }
+];
+function rollWorld2MysteryBoxReward() {
+  const roll = Math.random();
+  let cumulative = 0;
+  for (const entry of WORLD2_MYSTERY_BOX_TABLE) {
+    cumulative += entry.chance;
+    if (roll < cumulative) return entry.amount;
+  }
+  return WORLD2_MYSTERY_BOX_TABLE[WORLD2_MYSTERY_BOX_TABLE.length - 1].amount;
+}
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];

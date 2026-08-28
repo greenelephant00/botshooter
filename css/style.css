@@ -280,7 +280,7 @@
   }
   /* Zodra een Menu-achtergrond is uitgerust, laat alle menu- en shopschermen (nooit tijdens een potje, want dan zijn ze allemaal display:none) het animatie-canvas eronder doorschijnen */
   body.has-menu-bg #startScreen, body.has-menu-bg #world2Screen,
-  body.has-menu-bg #shopScreen, body.has-menu-bg #powerupShopScreen, body.has-menu-bg #botsInfoScreen, body.has-menu-bg #skinsShopScreen, body.has-menu-bg #transformShopScreen, body.has-menu-bg #disastersInfoScreen, body.has-menu-bg #achievementsScreen, body.has-menu-bg #coreShopScreen, body.has-menu-bg #weaponSkinsScreen, body.has-menu-bg #deathAnimScreen, body.has-menu-bg #statsScreen, body.has-menu-bg #trailShopScreen, body.has-menu-bg #menuBgShopScreen, body.has-menu-bg #cosmeticsScreen, body.has-menu-bg #botKillEffectScreen, body.has-menu-bg #keybindsScreen, body.has-menu-bg #mysteryBoxScreen, body.has-menu-bg #introAnimScreen, body.has-menu-bg #droneInfoScreen {
+  body.has-menu-bg #shopScreen, body.has-menu-bg #powerupShopScreen, body.has-menu-bg #botsInfoScreen, body.has-menu-bg #skinsShopScreen, body.has-menu-bg #transformShopScreen, body.has-menu-bg #disastersInfoScreen, body.has-menu-bg #achievementsScreen, body.has-menu-bg #coreShopScreen, body.has-menu-bg #weaponSkinsScreen, body.has-menu-bg #deathAnimScreen, body.has-menu-bg #statsScreen, body.has-menu-bg #trailShopScreen, body.has-menu-bg #menuBgShopScreen, body.has-menu-bg #cosmeticsScreen, body.has-menu-bg #botKillEffectScreen, body.has-menu-bg #keybindsScreen, body.has-menu-bg #mysteryBoxScreen, body.has-menu-bg #introAnimScreen, body.has-menu-bg #droneInfoScreen, body.has-menu-bg #world2MysteryBoxScreen {
     background: rgba(10, 10, 20, 0.35);
   }
   #world2Screen { display: none; }
@@ -378,7 +378,7 @@
     font-weight: bold;
     margin-bottom: 6px;
   }
-  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen, #statsScreen, #trailShopScreen, #menuBgShopScreen, #cosmeticsScreen, #botKillEffectScreen, #keybindsScreen, #mysteryBoxScreen, #introAnimScreen, #droneInfoScreen {
+  #shopScreen, #powerupShopScreen, #botsInfoScreen, #skinsShopScreen, #transformShopScreen, #disastersInfoScreen, #achievementsScreen, #coreShopScreen, #weaponSkinsScreen, #deathAnimScreen, #statsScreen, #trailShopScreen, #menuBgShopScreen, #cosmeticsScreen, #botKillEffectScreen, #keybindsScreen, #mysteryBoxScreen, #introAnimScreen, #droneInfoScreen, #world2MysteryBoxScreen {
     position: absolute;
     inset: 0;
     background: rgba(10, 10, 20, 0.96);
@@ -391,7 +391,7 @@
     overflow-y: auto;
     padding: 30px 0 50px;
   }
-  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1, #achievementsScreen h1, #coreShopScreen h1, #weaponSkinsScreen h1, #deathAnimScreen h1, #statsScreen h1, #trailShopScreen h1, #menuBgShopScreen h1, #cosmeticsScreen h1, #botKillEffectScreen h1, #keybindsScreen h1, #mysteryBoxScreen h1, #introAnimScreen h1, #droneInfoScreen h1 {
+  #shopScreen h1, #powerupShopScreen h1, #botsInfoScreen h1, #skinsShopScreen h1, #transformShopScreen h1, #disastersInfoScreen h1, #achievementsScreen h1, #coreShopScreen h1, #weaponSkinsScreen h1, #deathAnimScreen h1, #statsScreen h1, #trailShopScreen h1, #menuBgShopScreen h1, #cosmeticsScreen h1, #botKillEffectScreen h1, #keybindsScreen h1, #mysteryBoxScreen h1, #introAnimScreen h1, #droneInfoScreen h1, #world2MysteryBoxScreen h1 {
     margin: 0 0 4px;
     font-size: 30px;
   }
