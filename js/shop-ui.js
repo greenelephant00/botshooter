@@ -1128,7 +1128,7 @@ function openDoubleOrNothing() {
   const stake = doubleOrNothingStake;
   if (stake <= 0 || coins < stake) return;
   coins -= stake;
-  const win = Math.random() < 0.5;
+  const win = Math.random() < 0.4;
   const amount = win ? stake * 2 : 0;
   coins += amount;
   doubleOrNothingLastResult = win ? `🎉 Verdubbeld! Je wint ${amount} munten!` : `😬 Helaas, je bent ${stake} munten kwijt!`;
@@ -1194,7 +1194,7 @@ function renderMysteryBoxScreen() {
   const donResultHtml = doubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${doubleOrNothingLastResult}</span></div>` : '';
   const donDisabled = (doubleOrNothingStake <= 0 || coins < doubleOrNothingStake) ? 'disabled' : '';
   html += `
-    <div class="shopItem"><div class="info"><div class="name">🎯 Dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${DOUBLE_OR_NOTHING_MAX_STAKE} munten). 50% kans om je inzet te verdubbelen, 50% kans om alles kwijt te raken.</div></div></div>
+    <div class="shopItem"><div class="info"><div class="name">🎯 Dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${DOUBLE_OR_NOTHING_MAX_STAKE} munten). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
     <div class="statsRow">
       <span class="statsLabel">Inzet:</span>
       <input type="number" class="doubleOrNothingInput" min="0" max="${DOUBLE_OR_NOTHING_MAX_STAKE}" step="10" value="${doubleOrNothingStake}" onchange="setDoubleOrNothingStake(this.value)">
