@@ -202,3 +202,25 @@ if (sessionStillValid) {
 setInterval(syncCurrentAccountSave, 3000);
 window.addEventListener('beforeunload', syncCurrentAccountSave);
 
+function formatLoginSessionTimeLeft(ms) {
+  const totalSec = Math.max(0, Math.ceil(ms / 1000));
+  const h = Math.floor(totalSec / 3600);
+  const m = Math.floor((totalSec % 3600) / 60);
+  const s = totalSec % 60;
+  return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function updateLoginSessionTimer() {
+  const el = document.getElementById('loginSessionTimer');
+  if (!el) return;
+  if (!currentAccount) {
+    el.style.display = 'none';
+    return;
+  }
+  const timeLeft = LOGIN_SESSION_DURATION - (Date.now() - lastLoginTimestamp);
+  el.style.display = 'block';
+  el.textContent = `Opnieuw inloggen in ${formatLoginSessionTimeLeft(timeLeft)}`;
+}
+updateLoginSessionTimer();
+setInterval(updateLoginSessionTimer, 1000);
+
