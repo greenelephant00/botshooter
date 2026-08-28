@@ -145,6 +145,10 @@ function rollRiskBoxReward() {
   return RISK_BOX_TABLE[RISK_BOX_TABLE.length - 1].amount;
 }
 
+// ---- Dubbel-of-niets-doos: zelf gekozen inzet (max 500 munten), 50% kans om te verdubbelen ----
+const DOUBLE_OR_NOTHING_MAX_STAKE = 500;
+let doubleOrNothingStake = Math.max(0, Math.min(DOUBLE_OR_NOTHING_MAX_STAKE, Number(localStorage.getItem('botShooterDoubleOrNothingStake')) || 100));
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];

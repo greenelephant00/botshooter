@@ -1113,6 +1113,36 @@ function openRiskBox() {
 }
 window.openRiskBox = openRiskBox;
 
+function setDoubleOrNothingStake(value) {
+  let v = Math.floor(Number(value)) || 0;
+  v = Math.max(0, Math.min(DOUBLE_OR_NOTHING_MAX_STAKE, v));
+  doubleOrNothingStake = v;
+  localStorage.setItem('botShooterDoubleOrNothingStake', doubleOrNothingStake);
+  renderMysteryBoxScreen();
+}
+window.setDoubleOrNothingStake = setDoubleOrNothingStake;
+
+let doubleOrNothingLastResult = null;
+let doubleOrNothingResultTimeout = null;
+function openDoubleOrNothing() {
+  const stake = doubleOrNothingStake;
+  if (stake <= 0 || coins < stake) return;
+  coins -= stake;
+  const win = Math.random() < 0.5;
+  const amount = win ? stake * 2 : 0;
+  coins += amount;
+  doubleOrNothingLastResult = win ? `🎉 Verdubbeld! Je wint ${amount} munten!` : `😬 Helaas, je bent ${stake} munten kwijt!`;
+  saveShopState();
+  renderMysteryBoxScreen();
+  if (doubleOrNothingResultTimeout) clearTimeout(doubleOrNothingResultTimeout);
+  doubleOrNothingResultTimeout = setTimeout(() => {
+    doubleOrNothingLastResult = null;
+    doubleOrNothingResultTimeout = null;
+    renderMysteryBoxScreen();
+  }, 20000);
+}
+window.openDoubleOrNothing = openDoubleOrNothing;
+
 function renderMysteryBoxScreen() {
   document.getElementById('mysteryBoxCoins').textContent = coins;
   const coresEl = document.getElementById('mysteryBoxCores');
@@ -1160,6 +1190,17 @@ function renderMysteryBoxScreen() {
       <tr><th>Kans</th><th>Munten</th></tr>
       ${riskOddsRows}
     </table>
+  `;
+  const donResultHtml = doubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${doubleOrNothingLastResult}</span></div>` : '';
+  const donDisabled = (doubleOrNothingStake <= 0 || coins < doubleOrNothingStake) ? 'disabled' : '';
+  html += `
+    <div class="shopItem"><div class="info"><div class="name">🎯 Dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${DOUBLE_OR_NOTHING_MAX_STAKE} munten). 50% kans om je inzet te verdubbelen, 50% kans om alles kwijt te raken.</div></div></div>
+    <div class="statsRow">
+      <span class="statsLabel">Inzet:</span>
+      <input type="number" class="doubleOrNothingInput" min="0" max="${DOUBLE_OR_NOTHING_MAX_STAKE}" step="10" value="${doubleOrNothingStake}" onchange="setDoubleOrNothingStake(this.value)">
+      <button class="buy" onclick="openDoubleOrNothing()" ${donDisabled}>🎯 Gok · 🪙${doubleOrNothingStake}</button>
+    </div>
+    ${donResultHtml}
   `;
   document.getElementById('mysteryBoxContent').innerHTML = html;
 }

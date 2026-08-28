@@ -481,6 +481,16 @@
     font-weight: bold;
   }
   .mysteryOddsTable tr:last-child td { border-bottom: none; }
+  .doubleOrNothingInput {
+    width: 80px;
+    padding: 8px 10px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #1a1a2e;
+    color: #fff;
+    box-sizing: border-box;
+  }
   @keyframes achievementToastIn {
     from { opacity: 0; transform: translateX(30px); }
     to   { opacity: 1; transform: translateX(0); }
