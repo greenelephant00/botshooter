@@ -1073,8 +1073,8 @@ window.openMysteryBox = openMysteryBox;
 let world2MysteryBoxLastResult = null;
 let world2MysteryBoxResultTimeout = null;
 function openWorld2MysteryBox() {
-  if (!world2MysteryBoxReady() || coins < WORLD2_MYSTERY_BOX_PRICE) return;
-  coins -= WORLD2_MYSTERY_BOX_PRICE;
+  if (!world2MysteryBoxReady() || elementalCores < WORLD2_MYSTERY_BOX_PRICE) return;
+  elementalCores -= WORLD2_MYSTERY_BOX_PRICE;
   lastWorld2MysteryBoxOpen = Date.now();
   localStorage.setItem('botShooterLastWorld2MysteryBoxOpen', lastWorld2MysteryBoxOpen);
   const amount = rollWorld2MysteryBoxReward();
@@ -1113,12 +1113,12 @@ function renderMysteryBoxScreen() {
   if (currentWorld === 2) {
     const world2Ready = world2MysteryBoxReady();
     const world2Btn = world2Ready
-      ? `<button class="buy" onclick="openWorld2MysteryBox()" ${coins < WORLD2_MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🪙${WORLD2_MYSTERY_BOX_PRICE}</button>`
+      ? `<button class="buy" onclick="openWorld2MysteryBox()" ${elementalCores < WORLD2_MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🔮${WORLD2_MYSTERY_BOX_PRICE}</button>`
       : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(world2MysteryBoxTimeLeft())}</button>`;
     const world2ResultHtml = world2MysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${world2MysteryBoxLastResult}</span></div>` : '';
     const world2OddsRows = WORLD2_MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🔮 ${e.amount}</td></tr>`).join('');
     html += `
-      <div class="shopItem"><div class="info"><div class="name">Kern-mysterie-doos</div><div class="desc">Elemental Cores volgens onderstaande kanstabel, kost munten. Eén keer per half uur te openen.</div></div>${world2Btn}</div>
+      <div class="shopItem"><div class="info"><div class="name">Kern-mysterie-doos</div><div class="desc">Elemental Cores volgens onderstaande kanstabel, kost ${WORLD2_MYSTERY_BOX_PRICE} Elemental Cores. Eén keer per half uur te openen.</div></div>${world2Btn}</div>
       ${world2ResultHtml}
       <table class="mysteryOddsTable">
         <tr><th>Kans</th><th>Cores</th></tr>

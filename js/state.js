@@ -96,7 +96,7 @@ function rollMysteryBoxReward() {
 }
 
 // ---- Wereld 2 Mysterie-doos: zelfde principe, maar beloont Elemental Cores i.p.v. munten (kost wel munten) ----
-const WORLD2_MYSTERY_BOX_PRICE = 800;
+const WORLD2_MYSTERY_BOX_PRICE = 6; // kost Elemental Cores, niet munten
 const WORLD2_MYSTERY_BOX_COOLDOWN = 1800000; // half uur
 let lastWorld2MysteryBoxOpen = Number(localStorage.getItem('botShooterLastWorld2MysteryBoxOpen')) || 0;
 function world2MysteryBoxReady() { return Date.now() - lastWorld2MysteryBoxOpen >= WORLD2_MYSTERY_BOX_COOLDOWN; }
