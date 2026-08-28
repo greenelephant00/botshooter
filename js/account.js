@@ -212,15 +212,31 @@ function formatLoginSessionTimeLeft(ms) {
 
 function updateLoginSessionTimer() {
   const el = document.getElementById('loginSessionTimer');
-  if (!el) return;
+  const switchBtn = document.getElementById('switchAccountBtn');
   if (!currentAccount) {
-    el.style.display = 'none';
+    if (el) el.style.display = 'none';
+    if (switchBtn) switchBtn.style.display = 'none';
     return;
   }
+  if (switchBtn) switchBtn.style.display = 'block';
+  if (!el) return;
   const timeLeft = LOGIN_SESSION_DURATION - (Date.now() - lastLoginTimestamp);
   el.style.display = 'block';
   el.textContent = `Opnieuw inloggen in ${formatLoginSessionTimeLeft(timeLeft)}`;
 }
 updateLoginSessionTimer();
 setInterval(updateLoginSessionTimer, 1000);
+
+function switchAccount() {
+  goToMenu();
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('world2Screen').style.display = 'none';
+  currentAccount = null;
+  localStorage.removeItem('botShooterActiveAccount');
+  localStorage.removeItem('botShooterLoginTimestamp');
+  showAuthView('gate');
+  document.getElementById('authScreen').style.display = 'flex';
+  updateLoginSessionTimer();
+}
+window.switchAccount = switchAccount;
 
