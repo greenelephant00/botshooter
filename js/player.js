@@ -386,6 +386,7 @@ function initGame() {
   matchWeaponOverride = null;
   matchWeaponSwitchUsed = false;
   weaponSwitchPendingId = null;
+  matchBotKillCounts = {};
   const pauseOverlayEl = document.getElementById('pauseOverlay');
   if (pauseOverlayEl) pauseOverlayEl.style.display = 'none';
   const pauseBtnEl = document.getElementById('pauseBtn');

@@ -2625,6 +2625,29 @@ function closeWeaponSwitchScreen() {
 }
 window.closeWeaponSwitchScreen = closeWeaponSwitchScreen;
 
+function renderMatchKillsScreen() {
+  const entries = Object.entries(matchBotKillCounts).sort((a, b) => b[1] - a[1]);
+  document.getElementById('matchKillsList').innerHTML = entries.length
+    ? entries.map(([type, count]) =>
+        `<div class="statsRow"><span class="statsLabel">${BOT_DISPLAY_NAMES[type] || type}</span><span class="statsValue">${count}</span></div>`
+      ).join('')
+    : `<div class="statsRow"><span class="statsLabel">Je hebt dit potje nog geen bots gedood.</span></div>`;
+}
+window.renderMatchKillsScreen = renderMatchKillsScreen;
+
+function openMatchKillsScreen() {
+  document.getElementById('msg').style.display = 'none';
+  document.getElementById('matchKillsScreen').style.display = 'flex';
+  renderMatchKillsScreen();
+}
+window.openMatchKillsScreen = openMatchKillsScreen;
+
+function closeMatchKillsScreen() {
+  document.getElementById('matchKillsScreen').style.display = 'none';
+  document.getElementById('msg').style.display = 'flex';
+}
+window.closeMatchKillsScreen = closeMatchKillsScreen;
+
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;

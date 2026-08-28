@@ -405,7 +405,17 @@
   <div id="msgText"></div>
   <button id="msgBtn" onclick="restartGame()">Opnieuw spelen</button>
   <button id="msgKillCamBtn" onclick="openKillCam()" style="display:none; margin-top:10px;">🎬 Bekijk Kill Cam</button>
+  <button id="msgKillsBtn" onclick="openMatchKillsScreen()" style="margin-top:10px;">🎯 Kills</button>
   <button id="msgMenuBtn" onclick="goToMenu()" style="display:none; margin-top:10px; margin-left:0;">Menu</button>
+</div>
+<div id="matchKillsScreen">
+  <h1>🎯 Kills dit potje</h1>
+  <button class="topBackBtn" onclick="closeMatchKillsScreen()">← Terug</button>
+  <div class="shopSection">
+    <h3>Hoeveel van elk bot-type je dit potje hebt gedood</h3>
+    <div id="matchKillsList" class="statsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeMatchKillsScreen()">← Terug</button>
 </div>
 
 <script src="js/canvas.js"></script>

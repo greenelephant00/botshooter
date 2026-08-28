@@ -197,6 +197,7 @@ function maybeTriggerPlayerKillEffect(bot) {
 let totalLifetimeKills = Number(localStorage.getItem('botShooterTotalLifetimeKills')) || 0;
 let weaponKillCounts = JSON.parse(localStorage.getItem('botShooterWeaponKillCounts') || '{}');
 let botKillCounts = JSON.parse(localStorage.getItem('botShooterBotKillCounts') || '{}');
+let matchBotKillCounts = {}; // per-potje kill-telling per bot-type, te zien via de Kills-knop op het Game Over-scherm
 function recordKillStat(bot) {
   totalLifetimeKills++;
   localStorage.setItem('botShooterTotalLifetimeKills', totalLifetimeKills);
@@ -206,6 +207,7 @@ function recordKillStat(bot) {
   if (bot && bot.type) {
     botKillCounts[bot.type] = (botKillCounts[bot.type] || 0) + 1;
     localStorage.setItem('botShooterBotKillCounts', JSON.stringify(botKillCounts));
+    matchBotKillCounts[bot.type] = (matchBotKillCounts[bot.type] || 0) + 1;
   }
 }
 function favoriteWeaponName() {
