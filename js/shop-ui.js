@@ -1236,7 +1236,7 @@ function renderMysteryBoxScreen() {
   const donResultHtml = doubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${doubleOrNothingLastResult}</span></div>` : '';
   const donDisabled = (doubleOrNothingStake <= 0 || coins < doubleOrNothingStake) ? 'disabled' : '';
   html += `
-    <div class="shopItem"><div class="info"><div class="name">🎯 Dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${DOUBLE_OR_NOTHING_MAX_STAKE} munten). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
+    <div class="shopItem"><div class="info"><div class="name">🎯 Munten-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${DOUBLE_OR_NOTHING_MAX_STAKE} munten). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
     <div class="statsRow">
       <span class="statsLabel">Inzet:</span>
       <input type="number" class="doubleOrNothingInput" min="0" max="${DOUBLE_OR_NOTHING_MAX_STAKE}" step="10" value="${doubleOrNothingStake}" onchange="setDoubleOrNothingStake(this.value)">
