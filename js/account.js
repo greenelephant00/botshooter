@@ -152,6 +152,7 @@ function attemptLogin() {
   hydrateFromSnapshot(snapshot);
   currentAccount = username;
   localStorage.setItem('botShooterActiveAccount', username);
+  localStorage.setItem('botShooterLoginTimestamp', Date.now());
   document.getElementById('authScreen').style.display = 'none';
   document.getElementById('startScreen').style.display = 'flex';
   location.reload();
@@ -178,15 +179,20 @@ function attemptCreateAccount() {
   hydrateFromSnapshot(snapshot);
   currentAccount = username;
   localStorage.setItem('botShooterActiveAccount', username);
+  localStorage.setItem('botShooterLoginTimestamp', Date.now());
   document.getElementById('authScreen').style.display = 'none';
   location.reload();
 }
 window.attemptCreateAccount = attemptCreateAccount;
 
 // Blijf ingelogd: het laatst gebruikte account wordt onthouden, dus je hoeft niet
-// elke keer opnieuw in te loggen wanneer het spel (opnieuw) geladen wordt.
+// elke keer opnieuw in te loggen wanneer het spel (opnieuw) geladen wordt — maar wel
+// opnieuw na 24 uur, dan moet je je naam en wachtwoord weer invullen.
+const LOGIN_SESSION_DURATION = 24 * 60 * 60 * 1000;
 const rememberedAccount = localStorage.getItem('botShooterActiveAccount');
-if (rememberedAccount) {
+const lastLoginTimestamp = Number(localStorage.getItem('botShooterLoginTimestamp')) || 0;
+const sessionStillValid = rememberedAccount && (Date.now() - lastLoginTimestamp < LOGIN_SESSION_DURATION);
+if (sessionStillValid) {
   currentAccount = rememberedAccount;
   document.getElementById('authScreen').style.display = 'none';
 } else {
