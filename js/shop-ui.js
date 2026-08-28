@@ -1092,6 +1092,27 @@ function openWorld2MysteryBox() {
 }
 window.openWorld2MysteryBox = openWorld2MysteryBox;
 
+let riskBoxLastResult = null;
+let riskBoxResultTimeout = null;
+function openRiskBox() {
+  if (!riskBoxReady() || coins < RISK_BOX_PRICE) return;
+  coins -= RISK_BOX_PRICE;
+  lastRiskBoxOpen = Date.now();
+  localStorage.setItem('botShooterLastRiskBoxOpen', lastRiskBoxOpen);
+  const amount = rollRiskBoxReward();
+  coins += amount;
+  riskBoxLastResult = amount > 0 ? `🪙 Je wint ${amount} munten!` : `😬 Helaas, niets deze keer!`;
+  saveShopState();
+  renderMysteryBoxScreen();
+  if (riskBoxResultTimeout) clearTimeout(riskBoxResultTimeout);
+  riskBoxResultTimeout = setTimeout(() => {
+    riskBoxLastResult = null;
+    riskBoxResultTimeout = null;
+    renderMysteryBoxScreen();
+  }, 20000);
+}
+window.openRiskBox = openRiskBox;
+
 function renderMysteryBoxScreen() {
   document.getElementById('mysteryBoxCoins').textContent = coins;
   const coresEl = document.getElementById('mysteryBoxCores');
@@ -1126,6 +1147,20 @@ function renderMysteryBoxScreen() {
       </table>
     `;
   }
+  const riskReady = riskBoxReady();
+  const riskBtn = riskReady
+    ? `<button class="buy" onclick="openRiskBox()" ${coins < RISK_BOX_PRICE ? 'disabled' : ''}>🎲 Open · 🪙${RISK_BOX_PRICE}</button>`
+    : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(riskBoxTimeLeft())}</button>`;
+  const riskResultHtml = riskBoxLastResult ? `<div class="statsRow"><span class="statsValue">${riskBoxLastResult}</span></div>` : '';
+  const riskOddsRows = RISK_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>${e.amount > 0 ? `🪙 ${e.amount}` : 'Niets'}</td></tr>`).join('');
+  html += `
+    <div class="shopItem"><div class="info"><div class="name">🎲 Risico-doos</div><div class="desc">Goedkoop, maar een flinke kans op niets — met een kleine kans op een grote uitbetaling. Eén keer per half uur te openen.</div></div>${riskBtn}</div>
+    ${riskResultHtml}
+    <table class="mysteryOddsTable">
+      <tr><th>Kans</th><th>Munten</th></tr>
+      ${riskOddsRows}
+    </table>
+  `;
   document.getElementById('mysteryBoxContent').innerHTML = html;
 }
 window.renderMysteryBoxScreen = renderMysteryBoxScreen;

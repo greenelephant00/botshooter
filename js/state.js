@@ -121,6 +121,30 @@ function rollWorld2MysteryBoxReward() {
   return WORLD2_MYSTERY_BOX_TABLE[WORLD2_MYSTERY_BOX_TABLE.length - 1].amount;
 }
 
+// ---- Risico-doos: goedkoop, maar een flinke kans op niets — gecompenseerd door een kleine kans op een grote uitbetaling ----
+const RISK_BOX_PRICE = 300;
+const RISK_BOX_COOLDOWN = 1800000; // half uur
+let lastRiskBoxOpen = Number(localStorage.getItem('botShooterLastRiskBoxOpen')) || 0;
+function riskBoxReady() { return Date.now() - lastRiskBoxOpen >= RISK_BOX_COOLDOWN; }
+function riskBoxTimeLeft() { return Math.max(0, RISK_BOX_COOLDOWN - (Date.now() - lastRiskBoxOpen)); }
+const RISK_BOX_TABLE = [
+  { chance: 0.30, amount: 0 },
+  { chance: 0.25, amount: 150 },
+  { chance: 0.20, amount: 400 },
+  { chance: 0.15, amount: 800 },
+  { chance: 0.07, amount: 1800 },
+  { chance: 0.03, amount: 3000 }
+];
+function rollRiskBoxReward() {
+  const roll = Math.random();
+  let cumulative = 0;
+  for (const entry of RISK_BOX_TABLE) {
+    cumulative += entry.chance;
+    if (roll < cumulative) return entry.amount;
+  }
+  return RISK_BOX_TABLE[RISK_BOX_TABLE.length - 1].amount;
+}
+
 // ---- Game state ----
 let bullets = [];
 let bots = [];
