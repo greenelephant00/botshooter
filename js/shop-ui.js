@@ -1070,15 +1070,39 @@ function openMysteryBox() {
 }
 window.openMysteryBox = openMysteryBox;
 
+let world2MysteryBoxLastResult = null;
+let world2MysteryBoxResultTimeout = null;
+function openWorld2MysteryBox() {
+  if (!world2MysteryBoxReady() || coins < WORLD2_MYSTERY_BOX_PRICE) return;
+  coins -= WORLD2_MYSTERY_BOX_PRICE;
+  lastWorld2MysteryBoxOpen = Date.now();
+  localStorage.setItem('botShooterLastWorld2MysteryBoxOpen', lastWorld2MysteryBoxOpen);
+  const amount = rollWorld2MysteryBoxReward();
+  elementalCores += amount;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  world2MysteryBoxLastResult = `🔮 Je wint ${amount} Elemental Cores!`;
+  saveShopState();
+  renderMysteryBoxScreen();
+  if (world2MysteryBoxResultTimeout) clearTimeout(world2MysteryBoxResultTimeout);
+  world2MysteryBoxResultTimeout = setTimeout(() => {
+    world2MysteryBoxLastResult = null;
+    world2MysteryBoxResultTimeout = null;
+    renderMysteryBoxScreen();
+  }, 20000);
+}
+window.openWorld2MysteryBox = openWorld2MysteryBox;
+
 function renderMysteryBoxScreen() {
   document.getElementById('mysteryBoxCoins').textContent = coins;
+  const coresEl = document.getElementById('mysteryBoxCores');
+  if (coresEl) coresEl.textContent = elementalCores;
   const ready = mysteryBoxReady();
   const btn = ready
     ? `<button class="buy" onclick="openMysteryBox()" ${coins < MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🪙${MYSTERY_BOX_PRICE}</button>`
     : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(mysteryBoxTimeLeft())}</button>`;
   const resultHtml = mysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${mysteryBoxLastResult}</span></div>` : '';
   const oddsRows = MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🪙 ${e.amount}</td></tr>`).join('');
-  document.getElementById('mysteryBoxContent').innerHTML = `
+  let html = `
     <div class="shopItem"><div class="info"><div class="name">Mysterie-doos</div><div class="desc">Munten volgens onderstaande kanstabel. Eén keer per half uur te openen.</div></div>${btn}</div>
     ${resultHtml}
     <table class="mysteryOddsTable">
@@ -1086,6 +1110,23 @@ function renderMysteryBoxScreen() {
       ${oddsRows}
     </table>
   `;
+  if (currentWorld === 2) {
+    const world2Ready = world2MysteryBoxReady();
+    const world2Btn = world2Ready
+      ? `<button class="buy" onclick="openWorld2MysteryBox()" ${coins < WORLD2_MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🪙${WORLD2_MYSTERY_BOX_PRICE}</button>`
+      : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(world2MysteryBoxTimeLeft())}</button>`;
+    const world2ResultHtml = world2MysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${world2MysteryBoxLastResult}</span></div>` : '';
+    const world2OddsRows = WORLD2_MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🔮 ${e.amount}</td></tr>`).join('');
+    html += `
+      <div class="shopItem"><div class="info"><div class="name">Kern-mysterie-doos</div><div class="desc">Elemental Cores volgens onderstaande kanstabel, kost munten. Eén keer per half uur te openen.</div></div>${world2Btn}</div>
+      ${world2ResultHtml}
+      <table class="mysteryOddsTable">
+        <tr><th>Kans</th><th>Cores</th></tr>
+        ${world2OddsRows}
+      </table>
+    `;
+  }
+  document.getElementById('mysteryBoxContent').innerHTML = html;
 }
 window.renderMysteryBoxScreen = renderMysteryBoxScreen;
 
@@ -1105,65 +1146,6 @@ function closeMysteryBoxScreen() {
   document.getElementById(menuScreenId()).style.display = 'flex';
 }
 window.closeMysteryBoxScreen = closeMysteryBoxScreen;
-
-let world2MysteryBoxLastResult = null;
-let world2MysteryBoxResultTimeout = null;
-function openWorld2MysteryBox() {
-  if (!world2MysteryBoxReady() || coins < WORLD2_MYSTERY_BOX_PRICE) return;
-  coins -= WORLD2_MYSTERY_BOX_PRICE;
-  lastWorld2MysteryBoxOpen = Date.now();
-  localStorage.setItem('botShooterLastWorld2MysteryBoxOpen', lastWorld2MysteryBoxOpen);
-  const amount = rollWorld2MysteryBoxReward();
-  elementalCores += amount;
-  localStorage.setItem('botShooterElementalCores', elementalCores);
-  world2MysteryBoxLastResult = `🔮 Je wint ${amount} Elemental Cores!`;
-  saveShopState();
-  renderWorld2MysteryBoxScreen();
-  if (world2MysteryBoxResultTimeout) clearTimeout(world2MysteryBoxResultTimeout);
-  world2MysteryBoxResultTimeout = setTimeout(() => {
-    world2MysteryBoxLastResult = null;
-    world2MysteryBoxResultTimeout = null;
-    renderWorld2MysteryBoxScreen();
-  }, 20000);
-}
-window.openWorld2MysteryBox = openWorld2MysteryBox;
-
-function renderWorld2MysteryBoxScreen() {
-  document.getElementById('world2MysteryBoxCoins').textContent = coins;
-  document.getElementById('world2MysteryBoxCores').textContent = elementalCores;
-  const ready = world2MysteryBoxReady();
-  const btn = ready
-    ? `<button class="buy" onclick="openWorld2MysteryBox()" ${coins < WORLD2_MYSTERY_BOX_PRICE ? 'disabled' : ''}>🎁 Open · 🪙${WORLD2_MYSTERY_BOX_PRICE}</button>`
-    : `<button class="buy" disabled>⏳ Weer beschikbaar over ${formatCooldown(world2MysteryBoxTimeLeft())}</button>`;
-  const resultHtml = world2MysteryBoxLastResult ? `<div class="statsRow"><span class="statsValue">${world2MysteryBoxLastResult}</span></div>` : '';
-  const oddsRows = WORLD2_MYSTERY_BOX_TABLE.map(e => `<tr><td>${Math.round(e.chance * 100)}%</td><td>🔮 ${e.amount}</td></tr>`).join('');
-  document.getElementById('world2MysteryBoxContent').innerHTML = `
-    <div class="shopItem"><div class="info"><div class="name">Kern-mysterie-doos</div><div class="desc">Elemental Cores volgens onderstaande kanstabel, kost munten. Eén keer per half uur te openen.</div></div>${btn}</div>
-    ${resultHtml}
-    <table class="mysteryOddsTable">
-      <tr><th>Kans</th><th>Cores</th></tr>
-      ${oddsRows}
-    </table>
-  `;
-}
-window.renderWorld2MysteryBoxScreen = renderWorld2MysteryBoxScreen;
-
-let world2MysteryBoxTickInterval = null;
-function openWorld2MysteryBoxScreen() {
-  document.getElementById(menuScreenId()).style.display = 'none';
-  document.getElementById('world2MysteryBoxScreen').style.display = 'flex';
-  renderWorld2MysteryBoxScreen();
-  if (world2MysteryBoxTickInterval) clearInterval(world2MysteryBoxTickInterval);
-  world2MysteryBoxTickInterval = setInterval(renderWorld2MysteryBoxScreen, 1000);
-}
-window.openWorld2MysteryBoxScreen = openWorld2MysteryBoxScreen;
-
-function closeWorld2MysteryBoxScreen() {
-  if (world2MysteryBoxTickInterval) { clearInterval(world2MysteryBoxTickInterval); world2MysteryBoxTickInterval = null; }
-  document.getElementById('world2MysteryBoxScreen').style.display = 'none';
-  document.getElementById(menuScreenId()).style.display = 'flex';
-}
-window.closeWorld2MysteryBoxScreen = closeWorld2MysteryBoxScreen;
 
 function renderStatsScreen() {
   const rows = [

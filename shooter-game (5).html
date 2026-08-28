@@ -118,9 +118,6 @@
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openStatsScreen()" style="border-color:#5c7cfa; color:#5c7cfa;">📊 Statistieken</button>
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
-    <button class="shopOpenBtn" onclick="openWorld2MysteryBoxScreen()" style="border-color:#9be3ff; color:#9be3ff;">🔮 Kern-mysterie-doos</button>
-  </div>
-  <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openDroneInfoScreen()" style="border-color:#4cc9f0; color:#4cc9f0;">🤖 Drones</button>
   </div>
 </div>
@@ -226,23 +223,13 @@
 </div>
 <div id="mysteryBoxScreen">
   <h1>🎁 Mysterie-doos</h1>
-  <div class="coinDisplay">🪙 <span id="mysteryBoxCoins">0</span></div>
+  <div class="coinDisplay">🪙 <span id="mysteryBoxCoins">0</span> &nbsp; 🔮 <span id="mysteryBoxCores">0</span></div>
   <button class="topBackBtn" onclick="closeMysteryBoxScreen()">← Menu</button>
   <div class="shopSection">
-    <h3>Koop een verrassing — een willekeurig muntenbedrag volgens de kanstabel</h3>
+    <h3>Koop een verrassing volgens de kanstabel</h3>
     <div id="mysteryBoxContent"></div>
   </div>
   <button class="backBtn" onclick="closeMysteryBoxScreen()">← Terug</button>
-</div>
-<div id="world2MysteryBoxScreen">
-  <h1>🔮 Kern-mysterie-doos</h1>
-  <div class="coinDisplay">🪙 <span id="world2MysteryBoxCoins">0</span> &nbsp; 🔮 <span id="world2MysteryBoxCores">0</span></div>
-  <button class="topBackBtn" onclick="closeWorld2MysteryBoxScreen()">← Menu</button>
-  <div class="shopSection">
-    <h3>Koop een verrassing — een willekeurig aantal Elemental Cores volgens de kanstabel</h3>
-    <div id="world2MysteryBoxContent"></div>
-  </div>
-  <button class="backBtn" onclick="closeWorld2MysteryBoxScreen()">← Terug</button>
 </div>
 <div id="droneInfoScreen">
   <h1>🤖 Drones</h1>
