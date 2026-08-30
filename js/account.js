@@ -1,6 +1,9 @@
-// ---- Account-systeem (lokaal, browser-only — geen echte server-beveiliging) ----
-// Sleutels die per account worden opgeslagen/hersteld. Instellingen als geluid/muziektrack
-// blijven bewust apart (device-voorkeur, geen spelvoortgang).
+// ---- Account-systeem ----
+// Accounts (gebruikersnaam + wachtwoord) en spelvoortgang staan in de cloud (Firebase Auth + Firestore,
+// zie firebase-config.js), zodat je op elk apparaat met dezelfde zelfverzonnen gebruikersnaam kunt inloggen.
+// Firebase Auth werkt intern met e-mailadressen, dus elke gebruikersnaam wordt hieronder omgezet naar een
+// verzonnen "e-mailadres" (nooit getoond, puur intern) — je logt zelf gewoon in met een eigen bedachte naam.
+// Instellingen als geluid/muziektrack blijven bewust apart (device-voorkeur, geen spelvoortgang).
 const ACCOUNT_KEYS = [
   'botShooterCoins', 'botShooterOwnedWeapons', 'botShooterOwnedArmor',
   'botShooterEquippedWeapon', 'botShooterEquippedArmor', 'botShooterEquippedArmor2',
@@ -46,12 +49,13 @@ const ACCOUNT_KEYS = [
 ];
 
 let currentAccount = null;
+let currentUid = null;
 
-function loadAccounts() {
-  return JSON.parse(localStorage.getItem('botShooterAccounts') || '{}');
+function usernameToFakeEmail(username) {
+  return username.trim().toLowerCase() + '@botshooter.local';
 }
-function saveAccounts(accounts) {
-  localStorage.setItem('botShooterAccounts', JSON.stringify(accounts));
+function isValidUsername(username) {
+  return /^[a-zA-Z0-9_-]{3,20}$/.test(username);
 }
 
 function defaultAccountSnapshot() {
@@ -97,11 +101,27 @@ function hydrateFromSnapshot(snapshot) {
   });
 }
 
-function syncCurrentAccountSave() {
-  if (!currentAccount) return;
+async function loadAccountFromCloud(uid) {
+  const doc = await db.collection('users').doc(uid).get();
+  const snapshot = (doc.exists && doc.data().save) ? doc.data().save : defaultAccountSnapshot();
+  hydrateFromSnapshot(snapshot);
+}
+
+async function syncCurrentAccountSave() {
+  if (!currentAccount || !currentUid) return;
   const snapshot = {};
   ACCOUNT_KEYS.forEach(k => { snapshot[k] = localStorage.getItem(k); });
-  localStorage.setItem('botShooterAccount_' + currentAccount, JSON.stringify(snapshot));
+  try {
+    await db.collection('users').doc(currentUid).set({ username: currentAccount, save: snapshot }, { merge: true });
+  } catch (e) {
+    // Netwerkfout of offline: geen probleem, de eerstvolgende poging probeert het gewoon opnieuw.
+    // Met enablePersistence() (firebase-config.js) staat de laatste save ook al lokaal in de wachtrij.
+  }
+}
+
+function setAuthMessage(el, text, isError) {
+  el.textContent = text;
+  el.style.color = isError ? '#ff5c5c' : '#aaa';
 }
 
 function showAuthView(view) {
@@ -113,72 +133,104 @@ function showAuthView(view) {
 }
 window.showAuthView = showAuthView;
 
-function attemptLogin() {
+async function attemptLogin() {
   const username = document.getElementById('loginUsername').value.trim();
   const password = document.getElementById('loginPassword').value;
   const errEl = document.getElementById('authLoginError');
   if (!username || !password) {
-    errEl.textContent = 'Vul een naam en wachtwoord in.';
+    setAuthMessage(errEl, 'Vul een naam en wachtwoord in.', true);
     return;
   }
-  const accounts = loadAccounts();
-  if (!accounts[username] || accounts[username] !== password) {
-    errEl.textContent = 'Onjuiste naam of wachtwoord.';
+  if (!isValidUsername(username)) {
+    setAuthMessage(errEl, 'Gebruikersnaam: 3-20 tekens, alleen letters, cijfers, _ of -.', true);
     return;
   }
-  const raw = localStorage.getItem('botShooterAccount_' + username);
-  const snapshot = raw ? JSON.parse(raw) : defaultAccountSnapshot();
-  hydrateFromSnapshot(snapshot);
-  currentAccount = username;
-  localStorage.setItem('botShooterActiveAccount', username);
-  localStorage.setItem('botShooterLoginTimestamp', Date.now());
-  document.getElementById('authScreen').style.display = 'none';
-  document.getElementById('startScreen').style.display = 'flex';
-  location.reload();
+  setAuthMessage(errEl, 'Bezig met inloggen...', false);
+  try {
+    const cred = await auth.signInWithEmailAndPassword(usernameToFakeEmail(username), password);
+    await loadAccountFromCloud(cred.user.uid);
+    currentAccount = username;
+    currentUid = cred.user.uid;
+    localStorage.setItem('botShooterActiveAccount', username);
+    localStorage.setItem('botShooterActiveUid', cred.user.uid);
+    localStorage.setItem('botShooterLoginTimestamp', Date.now());
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('startScreen').style.display = 'flex';
+    location.reload();
+  } catch (e) {
+    setAuthMessage(errEl, 'Onjuiste naam of wachtwoord.', true);
+  }
 }
 window.attemptLogin = attemptLogin;
 
-function attemptCreateAccount() {
+async function attemptCreateAccount() {
   const username = document.getElementById('createUsername').value.trim();
   const password = document.getElementById('createPassword').value;
   const errEl = document.getElementById('authCreateError');
   if (!username || !password) {
-    errEl.textContent = 'Vul een naam en wachtwoord in.';
+    setAuthMessage(errEl, 'Vul een naam en wachtwoord in.', true);
     return;
   }
-  const accounts = loadAccounts();
-  if (accounts[username]) {
-    errEl.textContent = 'Deze naam bestaat al.';
+  if (!isValidUsername(username)) {
+    setAuthMessage(errEl, 'Gebruikersnaam: 3-20 tekens, alleen letters, cijfers, _ of -.', true);
     return;
   }
-  accounts[username] = password;
-  saveAccounts(accounts);
-  const snapshot = defaultAccountSnapshot();
-  localStorage.setItem('botShooterAccount_' + username, JSON.stringify(snapshot));
-  hydrateFromSnapshot(snapshot);
-  currentAccount = username;
-  localStorage.setItem('botShooterActiveAccount', username);
-  localStorage.setItem('botShooterLoginTimestamp', Date.now());
-  document.getElementById('authScreen').style.display = 'none';
-  location.reload();
+  if (password.length < 6) {
+    setAuthMessage(errEl, 'Wachtwoord moet minstens 6 tekens zijn.', true);
+    return;
+  }
+  setAuthMessage(errEl, 'Bezig met aanmaken...', false);
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(usernameToFakeEmail(username), password);
+    const snapshot = defaultAccountSnapshot();
+    await db.collection('users').doc(cred.user.uid).set({ username, save: snapshot });
+    hydrateFromSnapshot(snapshot);
+    currentAccount = username;
+    currentUid = cred.user.uid;
+    localStorage.setItem('botShooterActiveAccount', username);
+    localStorage.setItem('botShooterActiveUid', cred.user.uid);
+    localStorage.setItem('botShooterLoginTimestamp', Date.now());
+    document.getElementById('authScreen').style.display = 'none';
+    location.reload();
+  } catch (e) {
+    if (e.code === 'auth/email-already-in-use') {
+      setAuthMessage(errEl, 'Deze naam bestaat al.', true);
+    } else if (e.code === 'auth/weak-password') {
+      setAuthMessage(errEl, 'Wachtwoord moet minstens 6 tekens zijn.', true);
+    } else {
+      setAuthMessage(errEl, 'Er ging iets mis, probeer het opnieuw.', true);
+    }
+  }
 }
 window.attemptCreateAccount = attemptCreateAccount;
 
-// Blijf ingelogd: het laatst gebruikte account wordt onthouden, dus je hoeft niet
-// elke keer opnieuw in te loggen wanneer het spel (opnieuw) geladen wordt — maar wel
-// opnieuw na 24 uur, dan moet je je naam en wachtwoord weer invullen.
+// Blijf ingelogd: Firebase Auth onthoudt je sessie zelf, dus je hoeft niet elke keer opnieuw in te
+// loggen wanneer het spel (opnieuw) geladen wordt — maar wel opnieuw na 24 uur, dan moet je je naam
+// en wachtwoord weer invullen (wij dwingen dat zelf af, los van Firebase's eigen sessie-duur).
 const LOGIN_SESSION_DURATION = 24 * 60 * 60 * 1000;
-const rememberedAccount = localStorage.getItem('botShooterActiveAccount');
-const lastLoginTimestamp = Number(localStorage.getItem('botShooterLoginTimestamp')) || 0;
-const sessionStillValid = rememberedAccount && (Date.now() - lastLoginTimestamp < LOGIN_SESSION_DURATION);
-if (sessionStillValid) {
-  currentAccount = rememberedAccount;
+let lastLoginTimestamp = Number(localStorage.getItem('botShooterLoginTimestamp')) || 0;
+
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    currentAccount = null;
+    currentUid = null;
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+    updateLoginSessionTimer();
+    return;
+  }
+  lastLoginTimestamp = Number(localStorage.getItem('botShooterLoginTimestamp')) || 0;
+  if (Date.now() - lastLoginTimestamp >= LOGIN_SESSION_DURATION) {
+    await auth.signOut(); // dwingt na 24 uur een nieuwe login af, triggert deze functie opnieuw met user=null
+    return;
+  }
+  currentAccount = localStorage.getItem('botShooterActiveAccount');
+  currentUid = user.uid;
   document.getElementById('authScreen').style.display = 'none';
-} else {
-  document.getElementById('startScreen').style.display = 'none';
-  document.getElementById('authScreen').style.display = 'flex';
-}
-setInterval(syncCurrentAccountSave, 3000);
+  updateLoginSessionTimer();
+});
+
+setInterval(syncCurrentAccountSave, 8000);
 window.addEventListener('beforeunload', syncCurrentAccountSave);
 
 function formatLoginSessionTimeLeft(ms) {
@@ -206,16 +258,15 @@ function updateLoginSessionTimer() {
 updateLoginSessionTimer();
 setInterval(updateLoginSessionTimer, 1000);
 
-function switchAccount() {
+async function switchAccount() {
   goToMenu();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('world2Screen').style.display = 'none';
-  currentAccount = null;
+  await syncCurrentAccountSave(); // laatste stand nog even wegschrijven voordat we uitloggen
   localStorage.removeItem('botShooterActiveAccount');
+  localStorage.removeItem('botShooterActiveUid');
   localStorage.removeItem('botShooterLoginTimestamp');
+  await auth.signOut(); // triggert onAuthStateChanged, die het authScreen weer toont
   showAuthView('gate');
-  document.getElementById('authScreen').style.display = 'flex';
-  updateLoginSessionTimer();
 }
 window.switchAccount = switchAccount;
-
