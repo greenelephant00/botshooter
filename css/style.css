@@ -789,18 +789,27 @@
     background: rgba(255,255,255,0.35);
     border: 2px solid rgba(255,255,255,0.5);
   }
-  #touchAimIndicator {
-    display: none;
-    position: fixed;
-    width: 60px;
-    height: 60px;
-    margin-left: -30px;
-    margin-top: -30px;
+  #touchAimBase {
+    position: absolute;
+    right: 30px;
+    bottom: 30px;
+    width: 110px;
+    height: 110px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.5);
     background: rgba(255,255,255,0.08);
-    z-index: 7;
-    pointer-events: none;
+    border: 2px solid rgba(255,255,255,0.25);
+  }
+  #touchAimStick {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    border-radius: 50%;
+    background: rgba(255,140,140,0.35);
+    border: 2px solid rgba(255,140,140,0.6);
   }
   #rotateDeviceOverlay {
     display: none;

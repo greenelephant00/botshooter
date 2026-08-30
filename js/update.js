@@ -66,6 +66,12 @@ function update() {
     }
   }
 
+  if (isTouchDevice) {
+    // Sleep-om-te-richten geeft een richting aan (net als de bewegingsknop), geen exacte schermlocatie —
+    // dus elke frame opnieuw een virtueel mikpunt ver weg in die richting, relatief aan de huidige spelerpositie.
+    mouse.x = player.x + aimDX * AIM_DISTANCE;
+    mouse.y = player.y + aimDY * AIM_DISTANCE;
+  }
   player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
   if (keys[' '] || keys['mouse']) shoot();

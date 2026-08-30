@@ -56,46 +56,56 @@ function setupTouchJoystick() {
   zone.addEventListener('touchcancel', resetStick);
 }
 
+// Laatst aangegeven richtrichting (eenheidsvector) — blijft staan nadat je loslaat,
+// zodat het automatisch vuren gewoon in die richting doorgaat.
+let aimDX = 1;
+let aimDY = 0;
+const AIM_JOYSTICK_MAX_RADIUS = 50;
+const AIM_DISTANCE = 3000; // ver genoeg zodat alleen de richting telt, niet de exacte afstand
+
 function setupTouchAim() {
   const zone = document.getElementById('touchAimZone');
-  const indicator = document.getElementById('touchAimIndicator');
-  if (!zone) return;
+  const stick = document.getElementById('touchAimStick');
+  if (!zone || !stick) return;
   let activeTouchId = null;
 
-  function updateAim(touch) {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = touch.clientX - rect.left;
-    mouse.y = touch.clientY - rect.top;
-    if (indicator) {
-      indicator.style.left = `${touch.clientX}px`;
-      indicator.style.top = `${touch.clientY}px`;
-      indicator.style.display = 'block';
-    }
+  function updateStick(touch) {
+    const rect = zone.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
+    let dx = touch.clientX - originX;
+    let dy = touch.clientY - originY;
+    const dist = Math.hypot(dx, dy);
+    if (dist < 1) return; // te dicht bij het midden om een betrouwbare richting te bepalen
+    aimDX = dx / dist;
+    aimDY = dy / dist;
+    const clampedDist = Math.min(dist, AIM_JOYSTICK_MAX_RADIUS);
+    stick.style.transform = `translate(${aimDX * clampedDist}px, ${aimDY * clampedDist}px)`;
   }
-  function hideIndicator() {
+  function resetStick() {
     activeTouchId = null;
-    if (indicator) indicator.style.display = 'none';
+    stick.style.transform = 'translate(0px, 0px)'; // de knop veert terug, maar de richting (aimDX/aimDY) blijft staan
   }
 
   zone.addEventListener('touchstart', e => {
     e.preventDefault();
     const t = e.changedTouches[0];
     activeTouchId = t.identifier;
-    updateAim(t);
+    updateStick(t);
   }, { passive: false });
   zone.addEventListener('touchmove', e => {
     e.preventDefault();
     for (const t of e.changedTouches) {
-      if (t.identifier === activeTouchId) updateAim(t);
+      if (t.identifier === activeTouchId) updateStick(t);
     }
   }, { passive: false });
   zone.addEventListener('touchend', e => {
     e.preventDefault();
     for (const t of e.changedTouches) {
-      if (t.identifier === activeTouchId) hideIndicator();
+      if (t.identifier === activeTouchId) resetStick();
     }
   }, { passive: false });
-  zone.addEventListener('touchcancel', hideIndicator);
+  zone.addEventListener('touchcancel', resetStick);
 }
 
 if (isTouchDevice) {
