@@ -2,6 +2,7 @@
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>Bot Shooter</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
@@ -32,6 +33,17 @@
 </div>
 <canvas id="gameCanvas"></canvas>
 <canvas id="menuBgCanvas"></canvas>
+<div id="touchJoystickZone">
+  <div id="touchJoystickBase">
+    <div id="touchJoystickStick"></div>
+  </div>
+</div>
+<div id="touchAimZone"></div>
+<div id="touchAimIndicator"></div>
+<div id="rotateDeviceOverlay">
+  <div class="icon">📱</div>
+  <div>Draai je telefoon naar liggend om te spelen</div>
+</div>
 <button id="muteBtn" onclick="toggleMute()">🔊</button>
 <button id="musicBtn" onclick="toggleMusicPanel()">🎵</button>
 <button id="keybindsBtn" onclick="openKeybindsScreen()">⌨️ Besturing</button>
@@ -422,6 +434,7 @@
 <script src="js/account.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/input.js"></script>
+<script src="js/touch.js"></script>
 <script src="js/state.js"></script>
 <script src="js/shop-ui.js"></script>
 <script src="js/player.js"></script>

@@ -1,5 +1,9 @@
 function update() {
-  if (gameOver || levelTransition || isPaused) return;
+  if (gameOver || levelTransition || isPaused) {
+    document.body.classList.remove('gameplay-active');
+    return;
+  }
+  document.body.classList.add('gameplay-active');
 
   // Player movement
   const now0 = performance.now();
@@ -31,6 +35,8 @@ function update() {
     if (keys['s'] || keys['arrowdown']) dy += 1;
     if (keys['a'] || keys['arrowleft']) dx -= 1;
     if (keys['d'] || keys['arrowright']) dx += 1;
+    dx += joystickDX;
+    dy += joystickDY;
   }
   const len = Math.hypot(dx, dy) || 1;
   const desiredVX = (dx / len) * player.speed;
