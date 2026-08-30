@@ -539,6 +539,39 @@ function setupNextLevel() {
   updateHUD();
 }
 
+function openControlSchemeScreen(mode) {
+  pendingGameStart = mode;
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'none';
+  document.getElementById('controlSchemeScreen').style.display = 'flex';
+}
+window.openControlSchemeScreen = openControlSchemeScreen;
+
+function cancelControlSchemeScreen() {
+  pendingGameStart = null;
+  document.getElementById('controlSchemeScreen').style.display = 'none';
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'flex';
+}
+window.cancelControlSchemeScreen = cancelControlSchemeScreen;
+
+function chooseControlScheme(scheme) {
+  activeControlScheme = scheme;
+  document.body.classList.toggle('touch-controls-active', scheme === 'touch');
+  keys['mouse'] = scheme === 'touch'; // touch: continu automatisch vuren; pc: normale muisknop-besturing
+  if (scheme !== 'touch') {
+    joystickDX = 0;
+    joystickDY = 0;
+  }
+  document.getElementById('controlSchemeScreen').style.display = 'none';
+  const mode = pendingGameStart;
+  pendingGameStart = null;
+  if (mode === 'sprint') {
+    startSprintMode();
+  } else {
+    selectMode(mode);
+  }
+}
+window.chooseControlScheme = chooseControlScheme;
+
 function selectMode(mode) {
   gameMode = mode;
   currentLevel = 1;

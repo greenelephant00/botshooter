@@ -66,7 +66,7 @@ function update() {
     }
   }
 
-  if (isTouchDevice) {
+  if (activeControlScheme === 'touch') {
     // Sleep-om-te-richten geeft een richting aan (net als de bewegingsknop), geen exacte schermlocatie —
     // dus elke frame opnieuw een virtueel mikpunt ver weg in die richting, relatief aan de huidige spelerpositie.
     mouse.x = player.x + aimDX * AIM_DISTANCE;

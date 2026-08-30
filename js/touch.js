@@ -1,7 +1,7 @@
-// ---- Touch-besturing voor mobiel: virtuele joystick (bewegen) + sleep-om-te-richten zone (rechts) ----
-// Op een touchscreen wordt er de hele tijd automatisch geschoten; je hoeft alleen te richten.
-const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-if (isTouchDevice) document.body.classList.add('touch-device');
+// ---- Touch-besturing: virtuele joystick (bewegen) + sleep-om-te-richten zone (rechts) ----
+// Je kiest per potje (via het scherm dat verschijnt bij Levels/Endless/Hardcore/Golfsprint) of je
+// met PC (muis) of Touchscreen (joysticks) speelt — zie chooseControlScheme() in player.js.
+// Bij Touchscreen wordt er de hele tijd automatisch geschoten; je hoeft dan alleen te richten.
 
 let joystickDX = 0;
 let joystickDY = 0;
@@ -108,9 +108,8 @@ function setupTouchAim() {
   zone.addEventListener('touchcancel', resetStick);
 }
 
-if (isTouchDevice) {
-  setupTouchJoystick();
-  setupTouchAim();
-  // Automatisch en continu vuren op touch-apparaten: je hoeft alleen te richten door te slepen
-  keys['mouse'] = true;
-}
+// De luisteraars staan altijd klaar; de zones zijn alleen zichtbaar/aanklikbaar (CSS) als
+// activeControlScheme === 'touch', dus er komt sowieso nooit een touch op deze zones binnen
+// zolang er met PC/muis wordt gespeeld.
+setupTouchJoystick();
+setupTouchAim();

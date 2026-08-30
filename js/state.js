@@ -506,6 +506,8 @@ let lastShot = 0;
 const shootCooldown = 120; // ms - hou spatie ingedrukt voor snelvuur
 let lastPowerupSpawn = 0;
 let loopRunning = false;
+let pendingGameStart = null; // 'levels' | 'endless' | 'hardcore' | 'sprint' — staat klaar terwijl je in het besturingskeuzescherm zit
+let activeControlScheme = 'pc'; // 'pc' (muis) of 'touch' (virtuele joysticks) — per potje gekozen vóór het starten
 
 // ---- Coins & shop state ----
 let coins = Number(localStorage.getItem('botShooterCoins')) || 0;
