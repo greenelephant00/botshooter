@@ -568,13 +568,6 @@ if (!localStorage.getItem('botShooterCoinGrant_10000')) {
   localStorage.setItem('botShooterCoinGrant_10000', 'true');
 }
 
-// Eenmalige bonus: +2000 munten, alleen voor account 'ben'
-if (currentAccount === 'ben' && !localStorage.getItem('botShooterCoinGrant_2000_ben')) {
-  coins += 2000;
-  localStorage.setItem('botShooterCoins', coins);
-  localStorage.setItem('botShooterCoinGrant_2000_ben', 'true');
-}
-
 // Eenmalige bonus: nog eens +2000 munten, wordt maar één keer uitgekeerd
 if (!localStorage.getItem('botShooterCoinGrant_2000b')) {
   coins += 2000;

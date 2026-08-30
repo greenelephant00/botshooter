@@ -14,7 +14,7 @@ const ACCOUNT_KEYS = [
   'botShooterHighScore', 'botShooterHighScoreHardcore', 'botShooterHighScoreWorld2', 'botShooterHighLevel',
   'botShooterCoinGrant_3500', 'botShooterCoinGrant_500', 'botShooterCoinGrant_600',
   'botShooterCoinGrant_1000', 'botShooterCoinGrant_1000b', 'botShooterCoinGrant_2500',
-  'botShooterCoinGrant_200', 'botShooterCoinGrant_10000', 'botShooterCoinGrant_2000_ben',
+  'botShooterCoinGrant_200', 'botShooterCoinGrant_10000',
   'botShooterCoinGrant_2000b', 'botShooterCoinGrant_15000', 'botShooterWorld2Unlocked',
   'botShooterLvl2FireCore', 'botShooterLvl2FrostBlood', 'botShooterLvl2Steadfast',
   'botShooterLvl2FastReload', 'botShooterLvl2LongBoosts', 'botShooterLvl2Magnet',
@@ -54,27 +54,6 @@ function saveAccounts(accounts) {
   localStorage.setItem('botShooterAccounts', JSON.stringify(accounts));
 }
 
-// Eerste keer dat deze versie draait: bestaat er nog geen account-systeem,
-// dan wordt de huidige (bestaande) voortgang in deze browser bewaard onder het account BEN.
-(function seedInitialAccount() {
-  const accounts = loadAccounts();
-  if (Object.keys(accounts).length > 0) return; // account-systeem bestaat al
-  const snapshot = {};
-  ACCOUNT_KEYS.forEach(k => { snapshot[k] = localStorage.getItem(k); });
-  localStorage.setItem('botShooterAccount_ben', JSON.stringify(snapshot));
-  accounts['ben'] = '123';
-  saveAccounts(accounts);
-})();
-
-// Eenmalige wachtwoord-migratie voor account ben
-(function migrateBenPassword() {
-  const accounts = loadAccounts();
-  if (accounts['ben'] === '123') {
-    accounts['ben'] = '123';
-    saveAccounts(accounts);
-  }
-})();
-
 function defaultAccountSnapshot() {
   const snap = {};
   ACCOUNT_KEYS.forEach(k => { snap[k] = null; });
@@ -102,7 +81,6 @@ function defaultAccountSnapshot() {
   snap['botShooterCoinGrant_2500'] = 'true';
   snap['botShooterCoinGrant_200'] = 'true';
   snap['botShooterCoinGrant_10000'] = 'true';
-  snap['botShooterCoinGrant_2000_ben'] = 'true';
   snap['botShooterCoinGrant_2000b'] = 'true';
   snap['botShooterCoinGrant_15000'] = 'true';
   return snap;
