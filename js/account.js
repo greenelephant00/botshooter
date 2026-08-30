@@ -146,6 +146,10 @@ async function attemptLogin() {
     return;
   }
   setAuthMessage(errEl, 'Bezig met inloggen...', false);
+  // Vóór de Firebase-call gezet: zodra signIn slaagt, vuurt onAuthStateChanged bijna meteen af en
+  // checkt deze timestamp — stond hij nog op oud/leeg, dan werd de net ingelogde gebruiker weer
+  // direct uitgelogd (race condition). Mislukt het inloggen alsnog, dan zetten we 'm in de catch terug.
+  localStorage.setItem('botShooterLoginTimestamp', Date.now());
   try {
     const cred = await auth.signInWithEmailAndPassword(usernameToFakeEmail(username), password);
     await loadAccountFromCloud(cred.user.uid);
@@ -153,11 +157,11 @@ async function attemptLogin() {
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
     localStorage.setItem('botShooterActiveUid', cred.user.uid);
-    localStorage.setItem('botShooterLoginTimestamp', Date.now());
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'flex';
     location.reload();
   } catch (e) {
+    localStorage.removeItem('botShooterLoginTimestamp');
     setAuthMessage(errEl, 'Onjuiste naam of wachtwoord.', true);
   }
 }
@@ -180,6 +184,8 @@ async function attemptCreateAccount() {
     return;
   }
   setAuthMessage(errEl, 'Bezig met aanmaken...', false);
+  // Zie attemptLogin() hierboven voor waarom dit vóór de Firebase-call moet gebeuren.
+  localStorage.setItem('botShooterLoginTimestamp', Date.now());
   try {
     const cred = await auth.createUserWithEmailAndPassword(usernameToFakeEmail(username), password);
     const snapshot = defaultAccountSnapshot();
@@ -189,10 +195,10 @@ async function attemptCreateAccount() {
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
     localStorage.setItem('botShooterActiveUid', cred.user.uid);
-    localStorage.setItem('botShooterLoginTimestamp', Date.now());
     document.getElementById('authScreen').style.display = 'none';
     location.reload();
   } catch (e) {
+    localStorage.removeItem('botShooterLoginTimestamp');
     if (e.code === 'auth/email-already-in-use') {
       setAuthMessage(errEl, 'Deze naam bestaat al.', true);
     } else if (e.code === 'auth/weak-password') {
