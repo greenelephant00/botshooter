@@ -526,12 +526,19 @@ function onBossDefeated(bot) {
     bossRushIndex++;
   }
   if (currentWorld === 2) {
-    world2BossKillCount++;
-    const table = gameMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
-    const pos = Math.min(world2BossKillCount, table.length) - 1;
-    const coreReward = table[pos] + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
-    elementalCores += coreReward;
-    localStorage.setItem('botShooterElementalCores', elementalCores);
+    if (bossRushActive) {
+      // Tijdens Eindbaas Rush altijd precies 1 kern-munt per boss, niet de oplopende tabel hieronder
+      // (die is bedoeld voor normale potjes, waar bosses zeldzamer zijn).
+      elementalCores += 1;
+      localStorage.setItem('botShooterElementalCores', elementalCores);
+    } else {
+      world2BossKillCount++;
+      const table = gameMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
+      const pos = Math.min(world2BossKillCount, table.length) - 1;
+      const coreReward = table[pos] + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
+      elementalCores += coreReward;
+      localStorage.setItem('botShooterElementalCores', elementalCores);
+    }
   }
   if (!hasFirstBoss) {
     hasFirstBoss = true;
