@@ -146,11 +146,53 @@ function rollRiskBoxReward() {
 }
 
 // ---- Dubbel-of-niets-doos: zelf gekozen inzet (geen maximum), 40% kans om te verdubbelen ----
+// Max 3 keer per half uur te gebruiken, om te voorkomen dat je 'm eindeloos achter elkaar speelt.
 let doubleOrNothingStake = Math.max(0, Number(localStorage.getItem('botShooterDoubleOrNothingStake')) || 100);
+const DOUBLE_OR_NOTHING_LIMIT = 3;
+const DOUBLE_OR_NOTHING_WINDOW = 30 * 60 * 1000;
+let doubleOrNothingWindowStart = Number(localStorage.getItem('botShooterDoubleOrNothingWindowStart')) || 0;
+let doubleOrNothingUsesThisWindow = Number(localStorage.getItem('botShooterDoubleOrNothingUsesThisWindow')) || 0;
+function doubleOrNothingUsesLeft() {
+  if (Date.now() - doubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) return DOUBLE_OR_NOTHING_LIMIT;
+  return Math.max(0, DOUBLE_OR_NOTHING_LIMIT - doubleOrNothingUsesThisWindow);
+}
+function doubleOrNothingWindowTimeLeft() {
+  if (Date.now() - doubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) return 0;
+  return Math.max(0, DOUBLE_OR_NOTHING_WINDOW - (Date.now() - doubleOrNothingWindowStart));
+}
+function registerDoubleOrNothingUse() {
+  if (Date.now() - doubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) {
+    doubleOrNothingWindowStart = Date.now();
+    doubleOrNothingUsesThisWindow = 0;
+  }
+  doubleOrNothingUsesThisWindow++;
+  localStorage.setItem('botShooterDoubleOrNothingWindowStart', doubleOrNothingWindowStart);
+  localStorage.setItem('botShooterDoubleOrNothingUsesThisWindow', doubleOrNothingUsesThisWindow);
+}
 
 // ---- Kern-dubbel-of-niets-doos: zelfde principe maar met Elemental Cores (alleen Wereld 2) ----
+// Ook hier: max 3 keer per half uur.
 const CORE_DOUBLE_OR_NOTHING_MAX_STAKE = 25;
 let coreDoubleOrNothingStake = Math.max(0, Math.min(CORE_DOUBLE_OR_NOTHING_MAX_STAKE, Number(localStorage.getItem('botShooterCoreDoubleOrNothingStake')) || 5));
+let coreDoubleOrNothingWindowStart = Number(localStorage.getItem('botShooterCoreDoubleOrNothingWindowStart')) || 0;
+let coreDoubleOrNothingUsesThisWindow = Number(localStorage.getItem('botShooterCoreDoubleOrNothingUsesThisWindow')) || 0;
+function coreDoubleOrNothingUsesLeft() {
+  if (Date.now() - coreDoubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) return DOUBLE_OR_NOTHING_LIMIT;
+  return Math.max(0, DOUBLE_OR_NOTHING_LIMIT - coreDoubleOrNothingUsesThisWindow);
+}
+function coreDoubleOrNothingWindowTimeLeft() {
+  if (Date.now() - coreDoubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) return 0;
+  return Math.max(0, DOUBLE_OR_NOTHING_WINDOW - (Date.now() - coreDoubleOrNothingWindowStart));
+}
+function registerCoreDoubleOrNothingUse() {
+  if (Date.now() - coreDoubleOrNothingWindowStart >= DOUBLE_OR_NOTHING_WINDOW) {
+    coreDoubleOrNothingWindowStart = Date.now();
+    coreDoubleOrNothingUsesThisWindow = 0;
+  }
+  coreDoubleOrNothingUsesThisWindow++;
+  localStorage.setItem('botShooterCoreDoubleOrNothingWindowStart', coreDoubleOrNothingWindowStart);
+  localStorage.setItem('botShooterCoreDoubleOrNothingUsesThisWindow', coreDoubleOrNothingUsesThisWindow);
+}
 
 // ---- Game state ----
 let bullets = [];

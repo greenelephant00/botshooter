@@ -1130,7 +1130,8 @@ let doubleOrNothingLastResult = null;
 let doubleOrNothingResultTimeout = null;
 function openDoubleOrNothing() {
   const stake = doubleOrNothingStake;
-  if (stake <= 0 || coins < stake) return;
+  if (stake <= 0 || coins < stake || doubleOrNothingUsesLeft() <= 0) return;
+  registerDoubleOrNothingUse();
   coins -= stake;
   const win = Math.random() < 0.4;
   const amount = win ? stake * 2 : 0;
@@ -1160,7 +1161,8 @@ let coreDoubleOrNothingLastResult = null;
 let coreDoubleOrNothingResultTimeout = null;
 function openCoreDoubleOrNothing() {
   const stake = coreDoubleOrNothingStake;
-  if (stake <= 0 || elementalCores < stake) return;
+  if (stake <= 0 || elementalCores < stake || coreDoubleOrNothingUsesLeft() <= 0) return;
+  registerCoreDoubleOrNothingUse();
   elementalCores -= stake;
   const win = Math.random() < 0.4;
   const amount = win ? stake * 2 : 0;
@@ -1215,10 +1217,14 @@ function renderMysteryBoxScreen() {
         ${world2OddsRows}
       </table>
     `;
+    const coreDonUsesLeft = coreDoubleOrNothingUsesLeft();
     const coreDonResultHtml = coreDoubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${coreDoubleOrNothingLastResult}</span></div>` : '';
-    const coreDonDisabled = (coreDoubleOrNothingStake <= 0 || elementalCores < coreDoubleOrNothingStake) ? 'disabled' : '';
+    const coreDonDisabled = (coreDoubleOrNothingStake <= 0 || elementalCores < coreDoubleOrNothingStake || coreDonUsesLeft <= 0) ? 'disabled' : '';
+    const coreDonLimitText = coreDonUsesLeft > 0
+      ? `Nog ${coreDonUsesLeft}/${DOUBLE_OR_NOTHING_LIMIT} keer te gokken dit half uur.`
+      : `Geen gokjes meer over — weer beschikbaar over ${formatCooldown(coreDoubleOrNothingWindowTimeLeft())}.`;
     html += `
-      <div class="shopItem"><div class="info"><div class="name">🎯 Kern-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${CORE_DOUBLE_OR_NOTHING_MAX_STAKE} Elemental Cores). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
+      <div class="shopItem"><div class="info"><div class="name">🎯 Kern-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${CORE_DOUBLE_OR_NOTHING_MAX_STAKE} Elemental Cores). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken. ${coreDonLimitText}</div></div></div>
       <div class="statsRow">
         <span class="statsLabel">Inzet:</span>
         <input type="number" id="coreDoubleOrNothingStakeInput" class="doubleOrNothingInput" min="0" max="${CORE_DOUBLE_OR_NOTHING_MAX_STAKE}" step="1" value="${coreDoubleOrNothingStake}" oninput="setCoreDoubleOrNothingStake(this.value)">
@@ -1241,10 +1247,14 @@ function renderMysteryBoxScreen() {
       ${riskOddsRows}
     </table>
   `;
+  const donUsesLeft = doubleOrNothingUsesLeft();
   const donResultHtml = doubleOrNothingLastResult ? `<div class="statsRow"><span class="statsValue">${doubleOrNothingLastResult}</span></div>` : '';
-  const donDisabled = (doubleOrNothingStake <= 0 || coins < doubleOrNothingStake) ? 'disabled' : '';
+  const donDisabled = (doubleOrNothingStake <= 0 || coins < doubleOrNothingStake || donUsesLeft <= 0) ? 'disabled' : '';
+  const donLimitText = donUsesLeft > 0
+    ? `Nog ${donUsesLeft}/${DOUBLE_OR_NOTHING_LIMIT} keer te gokken dit half uur.`
+    : `Geen gokjes meer over — weer beschikbaar over ${formatCooldown(doubleOrNothingWindowTimeLeft())}.`;
   html += `
-    <div class="shopItem"><div class="info"><div class="name">🎯 Munten-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet. 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
+    <div class="shopItem"><div class="info"><div class="name">🎯 Munten-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet. 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken. ${donLimitText}</div></div></div>
     <div class="statsRow">
       <span class="statsLabel">Inzet:</span>
       <input type="number" id="doubleOrNothingStakeInput" class="doubleOrNothingInput" min="0" step="10" value="${doubleOrNothingStake}" oninput="setDoubleOrNothingStake(this.value)">

@@ -42,7 +42,9 @@ const ACCOUNT_KEYS = [
   'botShooterLastWorld2MysteryBoxOpen',
   'botShooterLastRiskBoxOpen',
   'botShooterDoubleOrNothingStake',
-  'botShooterCoreDoubleOrNothingStake'
+  'botShooterCoreDoubleOrNothingStake',
+  'botShooterDoubleOrNothingWindowStart', 'botShooterDoubleOrNothingUsesThisWindow',
+  'botShooterCoreDoubleOrNothingWindowStart', 'botShooterCoreDoubleOrNothingUsesThisWindow'
 ];
 
 let currentAccount = null;
