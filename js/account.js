@@ -30,6 +30,7 @@ const ACCOUNT_KEYS = [
   'botShooterOwnedWeaponSkins', 'botShooterEquippedWeaponSkins',
   'botShooterOwnedDeathAnimations', 'botShooterEquippedDeathAnimation',
   'botShooterTotalLifetimeKills', 'botShooterWeaponKillCounts', 'botShooterHighScoreSprint',
+  'botShooterHighestComboStreak',
   'botShooterOwnedTrails', 'botShooterEquippedTrail',
   'botShooterBotKillCounts',
   'botShooterOwnedMenuBackgrounds', 'botShooterEquippedMenuBackground',
@@ -75,6 +76,8 @@ function defaultAccountSnapshot() {
   snap['botShooterHighScoreWorld2'] = '0';
   snap['botShooterHighLevel'] = '1';
   snap['botShooterPowerupLevels'] = '{}';
+  snap['botShooterHighestComboStreak'] = '0';
+  snap['botShooterTotalLifetimeKills'] = '0';
   return snap;
 }
 
