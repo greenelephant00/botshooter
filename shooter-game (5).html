@@ -52,6 +52,28 @@
 <button id="keybindsBtn" onclick="openKeybindsScreen()">⌨️ Besturing</button>
 <button id="switchAccountBtn" onclick="switchAccount()">👤 Account wisselen</button>
 <div id="loginSessionTimer"></div>
+<button id="adminCodeBtn" onclick="promptAdminCode()">🔑</button>
+<button id="adminCommandsBtn" onclick="openAdminCommandsScreen()" style="display:none;">🛠️ Admin Commands</button>
+<div id="adminCommandsScreen">
+  <h1>🛠️ Admin Commands</h1>
+  <div class="shopSection">
+    <h3>Munten</h3>
+    <div class="statsRow">
+      <input type="number" id="adminCoinsInput" class="doubleOrNothingInput" value="1000" min="0">
+      <button class="buy" onclick="adminAddCoins()">➕ Toevoegen</button>
+      <button class="buy" onclick="adminRemoveCoins()">➖ Verwijderen</button>
+    </div>
+  </div>
+  <div class="shopSection">
+    <h3>Elemental Cores</h3>
+    <div class="statsRow">
+      <input type="number" id="adminCoresInput" class="doubleOrNothingInput" value="100" min="0">
+      <button class="buy" onclick="adminAddCores()">➕ Toevoegen</button>
+      <button class="buy" onclick="adminRemoveCores()">➖ Verwijderen</button>
+    </div>
+  </div>
+  <button class="backBtn" onclick="closeAdminCommandsScreen()">← Terug</button>
+</div>
 <div id="musicPanel">
   <div class="musicOption" data-idx="0" onclick="selectMusicTrack(0)">Pulse</div>
   <div class="musicOption" data-idx="1" onclick="selectMusicTrack(1)">Driftwave</div>

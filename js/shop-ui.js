@@ -2648,6 +2648,76 @@ function closeMatchKillsScreen() {
 }
 window.closeMatchKillsScreen = closeMatchKillsScreen;
 
+// ---- Admin Commands: verborgen knop rechtsonder, alleen bereikbaar met de juiste code ----
+const ADMIN_UNLOCK_CODE = '1010';
+
+function promptAdminCode() {
+  const code = prompt('Voer de code in:');
+  if (code === null) return;
+  if (code.trim() === ADMIN_UNLOCK_CODE) {
+    localStorage.setItem('botShooterAdminUnlocked', 'true');
+    document.getElementById('adminCommandsBtn').style.display = 'block';
+  } else {
+    alert('Onjuiste code.');
+  }
+}
+window.promptAdminCode = promptAdminCode;
+
+function openAdminCommandsScreen() {
+  document.getElementById('adminCommandsScreen').style.display = 'flex';
+}
+window.openAdminCommandsScreen = openAdminCommandsScreen;
+
+function closeAdminCommandsScreen() {
+  document.getElementById('adminCommandsScreen').style.display = 'none';
+}
+window.closeAdminCommandsScreen = closeAdminCommandsScreen;
+
+function refreshCurrencyDisplays() {
+  const startCoinsEl = document.getElementById('startCoins');
+  if (startCoinsEl) startCoinsEl.textContent = coins;
+  const world2CoinsEl = document.getElementById('world2Coins');
+  if (world2CoinsEl) world2CoinsEl.textContent = coins;
+  const world2CoresEl = document.getElementById('world2Cores');
+  if (world2CoresEl) world2CoresEl.textContent = elementalCores;
+}
+
+function adminAddCoins() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminCoinsInput').value)) || 0);
+  coins += amount;
+  saveShopState();
+  updateHUD();
+  refreshCurrencyDisplays();
+}
+window.adminAddCoins = adminAddCoins;
+
+function adminRemoveCoins() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminCoinsInput').value)) || 0);
+  coins = Math.max(0, coins - amount);
+  saveShopState();
+  updateHUD();
+  refreshCurrencyDisplays();
+}
+window.adminRemoveCoins = adminRemoveCoins;
+
+function adminAddCores() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminCoresInput').value)) || 0);
+  elementalCores += amount;
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  updateHUD();
+  refreshCurrencyDisplays();
+}
+window.adminAddCores = adminAddCores;
+
+function adminRemoveCores() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminCoresInput').value)) || 0);
+  elementalCores = Math.max(0, elementalCores - amount);
+  localStorage.setItem('botShooterElementalCores', elementalCores);
+  updateHUD();
+  refreshCurrencyDisplays();
+}
+window.adminRemoveCores = adminRemoveCores;
+
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
