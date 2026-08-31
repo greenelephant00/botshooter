@@ -11,6 +11,13 @@ canvas.addEventListener('mousemove', e => {
 });
 canvas.addEventListener('mousedown', () => keys['mouse'] = true);
 canvas.addEventListener('mouseup', () => keys['mouse'] = false);
+
+// Verliest het venster de focus (alt-tab, een browser-prompt die de aandacht steelt, enz.) terwijl een
+// toets of de muisknop nog ingedrukt is, dan komt de bijbehorende keyup/mouseup nooit binnen — zonder
+// deze reset zou je personage dan voor altijd blijven bewegen/schieten in die richting.
+window.addEventListener('blur', () => {
+  for (const k in keys) keys[k] = false;
+});
 window.addEventListener('keydown', e => {
   if (e.key === ' ') e.preventDefault(); // voorkom scrollen
   if (e.key.toLowerCase() === 'e' && player.activeTransform === 'none') {

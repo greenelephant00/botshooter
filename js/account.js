@@ -12,6 +12,8 @@ const ACCOUNT_KEYS = [
   'botShooterLvlFastReload', 'botShooterLvlIronSkin', 'botShooterLvlLuckyDrop',
   'botShooterLvlPiercingRounds', 'botShooterLvlCoinRain', 'botShooterLvlSecondWind',
   'botShooterLvlSharpshooter', 'botShooterLvlFlyingStart', 'botShooterPowerupLevels',
+  'botShooterLvlCriticalHit', 'botShooterLvlSplinterShot', 'botShooterLvlShockwave',
+  'botShooterLvlMultiShield', 'botShooterLvlGoldRush', 'botShooterLvlOverkill', 'botShooterLvlBloodlust',
   'botShooterOwnedSkins', 'botShooterEquippedSkin',
   'botShooterOwnedTransforms', 'botShooterEquippedTransform',
   'botShooterHighScore', 'botShooterHighScoreHardcore', 'botShooterHighScoreWorld2', 'botShooterHighLevel',
@@ -191,6 +193,9 @@ async function attemptLogin() {
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
     localStorage.setItem('botShooterActiveUid', cred.user.uid);
+    // Zie toelichting bij SESSION_SYNCED_FLAG hieronder: dit voorkomt dat onAuthStateChanged na de
+    // reload hieronder nog eens onnodig een extra reload doet.
+    sessionStorage.setItem(SESSION_SYNCED_FLAG, 'true');
     document.getElementById('authScreen').style.display = 'none';
     document.getElementById('startScreen').style.display = 'flex';
     location.reload();
@@ -229,6 +234,7 @@ async function attemptCreateAccount() {
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
     localStorage.setItem('botShooterActiveUid', cred.user.uid);
+    sessionStorage.setItem(SESSION_SYNCED_FLAG, 'true');
     document.getElementById('authScreen').style.display = 'none';
     location.reload();
   } catch (e) {
@@ -249,6 +255,19 @@ window.attemptCreateAccount = attemptCreateAccount;
 // en wachtwoord weer invullen (wij dwingen dat zelf af, los van Firebase's eigen sessie-duur).
 const LOGIN_SESSION_DURATION = 24 * 60 * 60 * 1000;
 let lastLoginTimestamp = Number(localStorage.getItem('botShooterLoginTimestamp')) || 0;
+
+// hydrateFromSnapshot() alleen bijwerkt localStorage, niet de allang-geïnitialiseerde spelvariabelen
+// (coins, elementalCores, ownedWeapons, enz. — die staan al vast sinds het begin van deze paginalaad-
+// beurt). Dat is onschadelijk vlak na attemptLogin()/attemptCreateAccount(), want die herladen daarna
+// altijd meteen de pagina. Maar bij een sessie die al eerder was ingelogd (bv. je opent een tabblad
+// dat nog van eerder openstond, of een ander apparaat), haalt onAuthStateChanged hieronder wél verse
+// cloud-data op zonder te herladen — waardoor de spelvariabelen stiekem achterlopen op wat er nu in
+// localStorage staat. Een volgende aankoop zou dan die verouderde waarde teruggeschreven hebben naar
+// de cloud, en zo bijvoorbeeld voortgang van een ander apparaat weer ongedaan maken. Daarom: precies
+// één keer per browsersessie (bijgehouden via sessionStorage, dat overleeft een reload maar niet het
+// sluiten van het tabblad) herladen we na de eerste keer ophalen, zodat alle spelvariabelen sowieso
+// een keer vers geïnitialiseerd worden vanuit de zojuist bijgewerkte localStorage.
+const SESSION_SYNCED_FLAG = 'botShooterSessionSynced';
 
 auth.onAuthStateChanged(async user => {
   if (!user) {
@@ -280,6 +299,13 @@ auth.onAuthStateChanged(async user => {
     // Kon de save niet bij Firestore ophalen (bv. even geen verbinding) — val terug op wat er al
     // lokaal staat. Belangrijk: hierna gaan we altijd door, anders blijft het hoofdmenu verborgen
     // omdat de rest van deze functie nooit bereikt wordt.
+  }
+  if (sessionStorage.getItem(SESSION_SYNCED_FLAG) !== 'true') {
+    // Zie toelichting bij SESSION_SYNCED_FLAG hierboven — eenmalige herlading zodat alle spelvariabelen
+    // gegarandeerd vers zijn, niet alleen localStorage.
+    sessionStorage.setItem(SESSION_SYNCED_FLAG, 'true');
+    location.reload();
+    return;
   }
   currentAccount = resolvedAccount;
   localStorage.setItem('botShooterActiveAccount', currentAccount);

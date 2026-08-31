@@ -516,6 +516,7 @@ function update() {
   bullets.forEach(b => {
     if (b.owner !== 'player') return;
     bots.forEach(bot => {
+      if (b.hit) return; // deze kogel heeft z'n treffer(s) al verbruikt (geen doorboring meer over) — niet nóg een bot in dezelfde tick raken
       if (bot.dead) return;
       if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // tijdelijk onsterfelijk (bv. net gespawnde Splitter-kinderen)
       if (b.hitBots && b.hitBots.includes(bot)) return; // al geraakt door deze doorborende kogel
@@ -609,39 +610,14 @@ function update() {
             spawnParticles(nearest.x, nearest.y, '#7df9ff');
             if (nearest.hp <= 0 && !nearest.dead && !nearest.immortal) {
               nearest.dead = true;
-              score += nearest.isBoss ? 500 : (nearest.maxHp >= 10 ? 40 : nearest.maxHp >= 6 ? 25 : nearest.maxHp >= 3 ? 15 : 10);
-              if (gameMode === 'levels') levelKills++;
-              if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-              if (nearest.isBoss) { bossAlive = false; onBossDefeated(nearest); }
+              handleBotDeath(nearest, chainDmg);
             }
           }
         }
 
         if (bot.hp <= 0 && !bot.immortal) {
           bot.dead = true;
-          maybeTriggerPlayerKillEffect(bot);
-          recordKillStat(bot);
-          player.comboStreak = Math.min(1000, player.comboStreak + 1);
-          player.comboLastKill = performance.now();
-          if (player.comboStreak > sessionBestStreak) {
-            sessionBestStreak = player.comboStreak;
-            if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
-          }
-          if (player.comboStreak > highestComboStreak) {
-            highestComboStreak = player.comboStreak;
-            localStorage.setItem('botShooterHighestComboStreak', highestComboStreak);
-          }
-          score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
-          spawnParticles(bot.x, bot.y, bot.color);
-          if (gameMode === 'levels') levelKills++;
-          if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-          if (bot.isBoss) {
-            bossAlive = false;
-            onBossDefeated(bot);
-            spawnParticles(bot.x, bot.y, '#ffaa00');
-            spawnParticles(bot.x, bot.y, '#ff3838');
-          }
-          if (bot.poisonSpread) spreadPoison(bot);
+          handleBotDeath(bot, b.dmg || 1);
 
           // Cryo Rifle: ijsgolf bevriest bots in de buurt
           if (b.effect === 'freezeKill') {
@@ -676,91 +652,6 @@ function update() {
             player.killStreak = Math.min(10, player.killStreak + 1);
             player.killStreakLastKill = performance.now();
           }
-
-          // Bomber ontploft ook als je hem doodschiet: schade aan bots eromheen
-          if (bot.pattern === 'suicide') {
-            const boomRadius = 65;
-            const boomDmg = 4;
-            explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: boomRadius });
-            spawnParticles(bot.x, bot.y, '#ff8800');
-            spawnParticles(bot.x, bot.y, '#ffcc00');
-            bots.forEach(other => {
-              if (other === bot || other.dead) return;
-              const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
-              if (dd < boomRadius) {
-                other.hp -= boomDmg;
-                spawnParticles(other.x, other.y, other.color);
-                if (other.hp <= 0) {
-                  other.dead = true;
-                  score += other.isBoss ? 500 : (other.maxHp >= 10 ? 40 : other.maxHp >= 6 ? 25 : other.maxHp >= 3 ? 15 : 10);
-                  if (gameMode === 'levels') levelKills++;
-                  if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-                  if (other.isBoss) { bossAlive = false; onBossDefeated(other); }
-                }
-              }
-            });
-          }
-
-          // Swarmqueen splitst bij dood in 2 zwakke minions
-          if (bot.splits) {
-            for (let i = 0; i < 2; i++) {
-              const ang = Math.random() * Math.PI * 2;
-              const dist = 20 + Math.random() * 15;
-              bots.push({
-                x: Math.max(10, Math.min(canvas.width - 10, bot.x + Math.cos(ang) * dist)),
-                y: Math.max(10, Math.min(canvas.height - 10, bot.y + Math.sin(ang) * dist)),
-                r: 10, speed: 2.2, hp: 1, maxHp: 1, lastShot: 0, shootCooldown: 1400,
-                color: bot.color, type: 'swarmling', pattern: 'single', bulletSpeed: 5,
-                meleeDamage: 0, splits: false, spiralAngle: 0, frozenUntil: 0, slashUntil: 0
-              });
-            }
-            spawnParticles(bot.x, bot.y, bot.color);
-          }
-
-          // Splitter: splitst 3 sec na zijn dood in kleinere versies van zichzelf
-          if (bot.splitsSelf && !bot.isSplitChild) {
-            const count = bot.splitsSelf;
-            const deathX = bot.x, deathY = bot.y, deathR = bot.r, deathSpeed = bot.speed, deathMaxHp = bot.maxHp,
-              deathCooldown = bot.shootCooldown, deathColor = bot.color, deathType = bot.type, deathPattern = bot.pattern,
-              deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
-            setTimeout(() => {
-              if (gameOver || levelTransition) return;
-              const aliveSplitters = bots.filter(b => !b.dead && b.type === 'splitter').length;
-              const spawnCount = Math.min(count, Math.max(0, MAX_SPLITTERS_ALIVE - aliveSplitters));
-              for (let i = 0; i < spawnCount; i++) {
-                const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
-                const dist = 130 + Math.random() * 60;
-                bots.push({
-                  x: Math.max(9, Math.min(canvas.width - 9, deathX + Math.cos(ang) * dist)),
-                  y: Math.max(9, Math.min(canvas.height - 9, deathY + Math.sin(ang) * dist)),
-                  r: Math.max(9, Math.round(deathR * 0.55)),
-                  speed: deathSpeed * 1.25,
-                  hp: Math.max(2, Math.round(deathMaxHp * 0.35)),
-                  maxHp: Math.max(2, Math.round(deathMaxHp * 0.35)),
-                  lastShot: 0,
-                  shootCooldown: deathCooldown,
-                  color: deathColor,
-                  type: deathType,
-                  pattern: deathPattern,
-                  bulletSpeed: deathBulletSpeed,
-                  bulletDmg: deathBulletDmg,
-                  swapOnHit: false,
-                  meleeDamage: 0,
-                  specialDmg: 0,
-                  specialLastUsed: 0,
-                  splits: false,
-                  splitsSelf: 0,
-                  isSplitChild: true,
-                  bornAt: performance.now(),
-                  invulnUntil: performance.now() + 2000,
-                  spiralAngle: 0,
-                  frozenUntil: 0,
-                  slashUntil: 0
-                });
-              }
-              spawnParticles(deathX, deathY, deathColor);
-            }, 3000);
-          }
         }
 
         // Splash damage voor explosieve wapens
@@ -774,12 +665,9 @@ function update() {
             if (dd < b.splashRadius) {
               other.hp -= b.splashDmg;
               spawnParticles(other.x, other.y, other.color);
-              if (other.hp <= 0) {
+              if (other.hp <= 0 && !other.immortal) {
                 other.dead = true;
-                score += other.isBoss ? 500 : (other.maxHp >= 10 ? 40 : other.maxHp >= 6 ? 25 : other.maxHp >= 3 ? 15 : 10);
-                if (gameMode === 'levels') levelKills++;
-                if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-                if (other.isBoss) { bossAlive = false; onBossDefeated(other); }
+                handleBotDeath(other, b.splashDmg);
               }
             }
           });
@@ -1137,10 +1025,7 @@ function update() {
         t.captured.forEach(bot => {
           if (bot.dead) return;
           bot.dead = true;
-          maybeTriggerPlayerKillEffect(bot);
-          recordKillStat(bot);
-          score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
-          if (gameMode === 'levels') levelKills++;
+          handleBotDeath(bot, bot.maxHp);
           spawnParticles(bot.x, bot.y, '#cfe8ee');
         });
       } else {
@@ -1275,12 +1160,7 @@ function update() {
           spawnParticles(bot.x, bot.y, '#ff8800');
           if (bot.hp <= 0 && !bot.immortal) {
             bot.dead = true;
-            maybeTriggerPlayerKillEffect(bot);
-          recordKillStat(bot);
-            score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
-            if (gameMode === 'levels') levelKills++;
-            if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-            if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
+            handleBotDeath(bot, nukeDmg);
           }
         });
         spawnParticles(player.x, player.y, '#ff8800');

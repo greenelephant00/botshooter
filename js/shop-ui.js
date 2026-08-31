@@ -466,6 +466,7 @@ window.openAchievements = openAchievements;
 function closeAchievements() {
   document.getElementById('achievementsScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
+  refreshCurrencyDisplays();
 }
 window.closeAchievements = closeAchievements;
 
@@ -673,6 +674,7 @@ window.openCoreShop = openCoreShop;
 function closeCoreShop() {
   document.getElementById('coreShopScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
+  refreshCurrencyDisplays();
 }
 window.closeCoreShop = closeCoreShop;
 
@@ -764,6 +766,7 @@ window.openCosmeticsHub = openCosmeticsHub;
 function closeCosmeticsHub() {
   document.getElementById('cosmeticsScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
+  refreshCurrencyDisplays();
 }
 window.closeCosmeticsHub = closeCosmeticsHub;
 
@@ -1280,6 +1283,7 @@ function closeMysteryBoxScreen() {
   if (mysteryBoxTickInterval) { clearInterval(mysteryBoxTickInterval); mysteryBoxTickInterval = null; }
   document.getElementById('mysteryBoxScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
+  refreshCurrencyDisplays();
 }
 window.closeMysteryBoxScreen = closeMysteryBoxScreen;
 
@@ -1407,6 +1411,7 @@ window.openDroneInfoScreen = openDroneInfoScreen;
 function closeDroneInfoScreen() {
   document.getElementById('droneInfoScreen').style.display = 'none';
   document.getElementById(menuScreenId()).style.display = 'flex';
+  refreshCurrencyDisplays();
 }
 window.closeDroneInfoScreen = closeDroneInfoScreen;
 

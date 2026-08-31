@@ -609,8 +609,179 @@ function applyDamageToPlayer(amount) {
   return true;
 }
 
-// Gedeelde helper: schade toebrengen aan een bot + score/kill-boekhouding, gebruikt door
-// effecten die buiten de normale kogel-botsing om schade doen (gif, zwart gat, enz.)
+// Gedeelde afhandeling van "deze bot is net gedood" — ongeacht de schadebron (kogel, gif, zwart gat,
+// splash-schade, kettingbliksem, nuke-powerup, tornado, melee, transform, enz.). Vroeger had elke
+// schadebron zijn eigen met de hand gekopieerde versie van deze logica, waardoor kill-boekhouding en
+// vooral de kill-upgrades (Schokgolf, Splinter-schoten, Overkill, Elementaire Wraak) alleen werkten bij
+// sommige manieren om een bot te doden en niet bij andere (bv. amper bij gewone kogels). Zet bot.dead =
+// true VOORDAT je dit aanroept; dmg is de schade van de dodende klap (voor de Overkill-berekening).
+function handleBotDeath(bot, dmg) {
+  maybeTriggerPlayerKillEffect(bot);
+  recordKillStat(bot);
+  player.comboStreak = Math.min(1000, player.comboStreak + 1);
+  player.comboLastKill = performance.now();
+  if (player.comboStreak > sessionBestStreak) {
+    sessionBestStreak = player.comboStreak;
+    if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
+  }
+  if (player.comboStreak > highestComboStreak) {
+    highestComboStreak = player.comboStreak;
+    localStorage.setItem('botShooterHighestComboStreak', highestComboStreak);
+  }
+  score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
+  spawnParticles(bot.x, bot.y, bot.color);
+  if (gameMode === 'levels') levelKills++;
+  if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
+  if (bot.isBoss) {
+    bossAlive = false;
+    onBossDefeated(bot);
+    spawnParticles(bot.x, bot.y, '#ffaa00');
+    spawnParticles(bot.x, bot.y, '#ff3838');
+  }
+  if (bot.poisonSpread) spreadPoison(bot);
+
+  // Shockwave bij kills
+  const effShockwave = w1Lvl(lvlShockwave);
+  if (effShockwave > 0) {
+    const radius = SHOCKWAVE_RADII[effShockwave - 1];
+    const shockDmg = 5 + effShockwave * 2;
+    bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+      if (dd < radius) damageBotSimple(other, shockDmg, '#ff8800');
+    });
+    explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
+  }
+
+  // Splinter-schoten bij kills
+  const effSplinterShot = w1Lvl(lvlSplinterShot);
+  const effSplinterShot2 = w2Lvl(lvl2SplinterShot);
+  if (effSplinterShot > 0 || effSplinterShot2 > 0) {
+    const splinterCount = effSplinterShot > 0 ? [3, 5, 7][effSplinterShot - 1] : [3, 5, 7][effSplinterShot2 - 1];
+    for (let i = 0; i < splinterCount; i++) {
+      const angle = (Math.PI * 2 / splinterCount) * i;
+      bullets.push({
+        x: bot.x + Math.cos(angle) * 10,
+        y: bot.y + Math.sin(angle) * 10,
+        vx: Math.cos(angle) * 6,
+        vy: Math.sin(angle) * 6,
+        r: 3,
+        owner: 'player',
+        dmg: 3,
+        pierce: 0,
+        hitBots: null,
+        splashRadius: 0,
+        splashDmg: 0,
+        effect: null
+      });
+    }
+  }
+
+  // Overkill-explosies
+  const effOverkill = w1Lvl(lvlOverkill);
+  const effOverkill2 = w2Lvl(lvl2Overkill);
+  if ((effOverkill > 0 || effOverkill2 > 0) && dmg > bot.maxHp * 0.2) {
+    const overkillDmg = dmg - bot.maxHp;
+    const radius = 60 + (effOverkill > 0 ? effOverkill : effOverkill2) * 30;
+    bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+      if (dd < radius) damageBotSimple(other, Math.max(3, Math.round(overkillDmg * 0.3)), '#ff3838');
+    });
+    explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
+  }
+
+  // Elementaire Wraak (Wereld 2-upgrade): bij kills een kleine elementale schokgolf
+  const effVengeance = w2Lvl(lvl2Vengeance);
+  if (effVengeance > 0) {
+    const vRadius = VENGEANCE_RADII[effVengeance - 1];
+    const vDmg = VENGEANCE_DMGS[effVengeance - 1];
+    bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+      if (dd < vRadius) damageBotSimple(other, vDmg, '#9be3ff');
+    });
+    shockRings.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: vRadius, duration: 350, color: '#9be3ff' });
+  }
+
+  // Bomber ontploft ook als hij op een andere manier dan zijn eigen aanval sterft: schade aan bots eromheen
+  if (bot.pattern === 'suicide') {
+    const boomRadius = 65;
+    const boomDmg = 4;
+    explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: boomRadius });
+    spawnParticles(bot.x, bot.y, '#ff8800');
+    spawnParticles(bot.x, bot.y, '#ffcc00');
+    bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
+      if (dd < boomRadius) damageBotSimple(other, boomDmg, other.color);
+    });
+  }
+
+  // Swarmqueen splitst bij dood in 2 zwakke minions
+  if (bot.splits) {
+    for (let i = 0; i < 2; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 15;
+      bots.push({
+        x: Math.max(10, Math.min(canvas.width - 10, bot.x + Math.cos(ang) * dist)),
+        y: Math.max(10, Math.min(canvas.height - 10, bot.y + Math.sin(ang) * dist)),
+        r: 10, speed: 2.2, hp: 1, maxHp: 1, lastShot: 0, shootCooldown: 1400,
+        color: bot.color, type: 'swarmling', pattern: 'single', bulletSpeed: 5,
+        meleeDamage: 0, splits: false, spiralAngle: 0, frozenUntil: 0, slashUntil: 0
+      });
+    }
+    spawnParticles(bot.x, bot.y, bot.color);
+  }
+
+  // Splitter: splitst 3 sec na zijn dood in kleinere versies van zichzelf
+  if (bot.splitsSelf && !bot.isSplitChild) {
+    const count = bot.splitsSelf;
+    const deathX = bot.x, deathY = bot.y, deathR = bot.r, deathSpeed = bot.speed, deathMaxHp = bot.maxHp,
+      deathCooldown = bot.shootCooldown, deathColor = bot.color, deathType = bot.type, deathPattern = bot.pattern,
+      deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
+    setTimeout(() => {
+      if (gameOver || levelTransition) return;
+      const aliveSplitters = bots.filter(b => !b.dead && b.type === 'splitter').length;
+      const spawnCount = Math.min(count, Math.max(0, MAX_SPLITTERS_ALIVE - aliveSplitters));
+      for (let i = 0; i < spawnCount; i++) {
+        const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
+        const dist = 130 + Math.random() * 60;
+        bots.push({
+          x: Math.max(9, Math.min(canvas.width - 9, deathX + Math.cos(ang) * dist)),
+          y: Math.max(9, Math.min(canvas.height - 9, deathY + Math.sin(ang) * dist)),
+          r: Math.max(9, Math.round(deathR * 0.55)),
+          speed: deathSpeed * 1.25,
+          hp: Math.max(2, Math.round(deathMaxHp * 0.35)),
+          maxHp: Math.max(2, Math.round(deathMaxHp * 0.35)),
+          lastShot: 0,
+          shootCooldown: deathCooldown,
+          color: deathColor,
+          type: deathType,
+          pattern: deathPattern,
+          bulletSpeed: deathBulletSpeed,
+          bulletDmg: deathBulletDmg,
+          swapOnHit: false,
+          meleeDamage: 0,
+          specialDmg: 0,
+          specialLastUsed: 0,
+          splits: false,
+          splitsSelf: 0,
+          isSplitChild: true,
+          bornAt: performance.now(),
+          invulnUntil: performance.now() + 2000,
+          spiralAngle: 0,
+          frozenUntil: 0,
+          slashUntil: 0
+        });
+      }
+      spawnParticles(deathX, deathY, deathColor);
+    }, 3000);
+  }
+}
+
+// Gedeelde helper: schade toebrengen aan een bot + volledige kill-afhandeling via handleBotDeath(),
+// gebruikt door effecten die buiten de normale kogel-botsing om schade doen (gif, zwart gat, enz.)
 function damageBotSimple(bot, dmg, color) {
   if (bot.dead) return;
   if (bot.invulnUntil && performance.now() < bot.invulnUntil) {
@@ -621,132 +792,7 @@ function damageBotSimple(bot, dmg, color) {
   spawnParticles(bot.x, bot.y, color || bot.color);
   if (bot.hp <= 0 && !bot.immortal) {
     bot.dead = true;
-    maybeTriggerPlayerKillEffect(bot);
-    recordKillStat(bot);
-    player.comboStreak = Math.min(1000, player.comboStreak + 1);
-    player.comboLastKill = performance.now();
-    if (player.comboStreak > sessionBestStreak) {
-      sessionBestStreak = player.comboStreak;
-      if (sessionBestStreak >= 5 && typeof recordMoment === 'function') recordMoment(sessionBestStreak * 5, `🔥 ${sessionBestStreak}x Killstreak!`);
-    }
-    if (player.comboStreak > highestComboStreak) {
-      highestComboStreak = player.comboStreak;
-      localStorage.setItem('botShooterHighestComboStreak', highestComboStreak);
-    }
-    score += bot.isBoss ? 500 : (bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10);
-    if (gameMode === 'levels') levelKills++;
-    if (getArmorStats().vampireHeal) player.hp = Math.min(player.maxHp, player.hp + getArmorStats().vampireHeal);
-    if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
-    if (bot.poisonSpread) spreadPoison(bot);
-
-    // Shockwave bij kills
-    const effShockwave = w1Lvl(lvlShockwave);
-    if (effShockwave > 0) {
-      const radius = SHOCKWAVE_RADII[effShockwave - 1];
-      const shockDmg = 5 + effShockwave * 2;
-      bots.forEach(other => {
-        if (other === bot || other.dead) return;
-        const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
-        if (dd < radius) damageBotSimple(other, shockDmg, '#ff8800');
-      });
-      explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
-    }
-
-    // Splinter-schoten bij kills
-    const effSplinterShot = w1Lvl(lvlSplinterShot);
-    const effSplinterShot2 = w2Lvl(lvl2SplinterShot);
-    if (effSplinterShot > 0 || effSplinterShot2 > 0) {
-      const splinterCount = effSplinterShot > 0 ? [3, 5, 7][effSplinterShot - 1] : [3, 5, 7][effSplinterShot2 - 1];
-      for (let i = 0; i < splinterCount; i++) {
-        const angle = (Math.PI * 2 / splinterCount) * i;
-        bullets.push({
-          x: bot.x + Math.cos(angle) * 10,
-          y: bot.y + Math.sin(angle) * 10,
-          vx: Math.cos(angle) * 6,
-          vy: Math.sin(angle) * 6,
-          r: 3,
-          owner: 'player',
-          dmg: 3,
-          pierce: 0,
-          hitBots: null,
-          splashRadius: 0,
-          splashDmg: 0,
-          effect: null
-        });
-      }
-    }
-
-    // Overkill-explosies
-    const effOverkill = w1Lvl(lvlOverkill);
-    const effOverkill2 = w2Lvl(lvl2Overkill);
-    if ((effOverkill > 0 || effOverkill2 > 0) && dmg > bot.maxHp * 0.2) {
-      const overkillDmg = dmg - bot.maxHp;
-      const radius = 60 + (effOverkill > 0 ? effOverkill : effOverkill2) * 30;
-      bots.forEach(other => {
-        if (other === bot || other.dead) return;
-        const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
-        if (dd < radius) damageBotSimple(other, Math.max(3, Math.round(overkillDmg * 0.3)), '#ff3838');
-      });
-      explosions.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: radius });
-    }
-
-    // Elementaire Wraak (Wereld 2-upgrade): bij kills een kleine elementale schokgolf
-    const effVengeance = w2Lvl(lvl2Vengeance);
-    if (effVengeance > 0) {
-      const vRadius = VENGEANCE_RADII[effVengeance - 1];
-      const vDmg = VENGEANCE_DMGS[effVengeance - 1];
-      bots.forEach(other => {
-        if (other === bot || other.dead) return;
-        const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
-        if (dd < vRadius) damageBotSimple(other, vDmg, '#9be3ff');
-      });
-      shockRings.push({ x: bot.x, y: bot.y, born: performance.now(), maxR: vRadius, duration: 350, color: '#9be3ff' });
-    }
-
-    // Splitter: splitst 3 sec na zijn dood in kleinere versies van zichzelf
-    if (bot.splitsSelf && !bot.isSplitChild) {
-      const count = bot.splitsSelf;
-      const deathX = bot.x, deathY = bot.y, deathR = bot.r, deathSpeed = bot.speed, deathMaxHp = bot.maxHp,
-        deathCooldown = bot.shootCooldown, deathColor = bot.color, deathType = bot.type, deathPattern = bot.pattern,
-        deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
-      setTimeout(() => {
-        if (gameOver || levelTransition) return;
-        const aliveSplitters = bots.filter(b => !b.dead && b.type === 'splitter').length;
-        const spawnCount = Math.min(count, Math.max(0, MAX_SPLITTERS_ALIVE - aliveSplitters));
-        for (let i = 0; i < spawnCount; i++) {
-          const ang = (Math.PI * 2 / count) * i + Math.random() * 0.4;
-          const dist = 130 + Math.random() * 60;
-          bots.push({
-            x: Math.max(9, Math.min(canvas.width - 9, deathX + Math.cos(ang) * dist)),
-            y: Math.max(9, Math.min(canvas.height - 9, deathY + Math.sin(ang) * dist)),
-            r: Math.max(9, Math.round(deathR * 0.55)),
-            speed: deathSpeed * 1.25,
-            hp: Math.max(2, Math.round(deathMaxHp * 0.35)),
-            maxHp: Math.max(2, Math.round(deathMaxHp * 0.35)),
-            lastShot: 0,
-            shootCooldown: deathCooldown,
-            color: deathColor,
-            type: deathType,
-            pattern: deathPattern,
-            bulletSpeed: deathBulletSpeed,
-            bulletDmg: deathBulletDmg,
-            swapOnHit: false,
-            meleeDamage: 0,
-            specialDmg: 0,
-            specialLastUsed: 0,
-            splits: false,
-            splitsSelf: 0,
-            isSplitChild: true,
-            bornAt: performance.now(),
-            invulnUntil: performance.now() + 2000,
-            spiralAngle: 0,
-            frozenUntil: 0,
-            slashUntil: 0
-          });
-        }
-        spawnParticles(deathX, deathY, deathColor);
-      }, 3000);
-    }
+    handleBotDeath(bot, dmg);
   }
 }
 
@@ -1129,9 +1175,11 @@ function meleeAttack(bot) {
   const thorns = armor.thorns;
 
   if (notBlocked && !bot.dead) {
+    let reflectedDmg = 0;
     // Thorns
     if (thorns) {
       bot.hp -= thorns;
+      reflectedDmg += thorns;
       spawnParticles(bot.x, bot.y, '#ffbb33');
     }
 
@@ -1139,6 +1187,7 @@ function meleeAttack(bot) {
     if (armor.reflection > 0) {
       const reflectDmg = Math.ceil(dmg * armor.reflection);
       bot.hp -= reflectDmg;
+      reflectedDmg += reflectDmg;
       spawnParticles(bot.x, bot.y, '#ffff00');
     }
 
@@ -1155,12 +1204,7 @@ function meleeAttack(bot) {
 
     if (bot.hp <= 0 && !bot.immortal) {
       bot.dead = true;
-      maybeTriggerPlayerKillEffect(bot);
-    recordKillStat(bot);
-      score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
-      if (gameMode === 'levels') levelKills++;
-      if (armor.vampireHeal) player.hp = Math.min(player.maxHp, player.hp + armor.vampireHeal);
-      if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
+      handleBotDeath(bot, reflectedDmg);
     }
   }
 }
@@ -2223,11 +2267,7 @@ function rootGrabAttack(count) {
       spawnParticles(tx, ty, '#3fa34d');
       spawnParticles(tx, ty, '#2f7d3c');
       bot.dead = true;
-      maybeTriggerPlayerKillEffect(bot);
-    recordKillStat(bot);
-      score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
-      if (gameMode === 'levels') levelKills++;
-      if (bot.isBoss) { bossAlive = false; onBossDefeated(bot); }
+      handleBotDeath(bot, bot.maxHp);
     }, riseDur + wrapDur);
   });
 }
@@ -2258,10 +2298,7 @@ function rootDragNearest(x, y, maxRange) {
     spawnParticles(tx, ty, '#3fa34d');
     spawnParticles(tx, ty, '#2f7d3c');
     bot.dead = true;
-    maybeTriggerPlayerKillEffect(bot);
-    recordKillStat(bot);
-    score += bot.maxHp >= 10 ? 40 : bot.maxHp >= 6 ? 25 : bot.maxHp >= 3 ? 15 : 10;
-    if (gameMode === 'levels') levelKills++;
+    handleBotDeath(bot, bot.maxHp);
   }, riseDur + wrapDur);
 }
 

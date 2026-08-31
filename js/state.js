@@ -147,7 +147,12 @@ function rollRiskBoxReward() {
 
 // ---- Dubbel-of-niets-doos: zelf gekozen inzet (geen maximum), 40% kans om te verdubbelen ----
 // Max 3 keer per half uur te gebruiken, om te voorkomen dat je 'm eindeloos achter elkaar speelt.
-let doubleOrNothingStake = Math.max(0, Number(localStorage.getItem('botShooterDoubleOrNothingStake')) || 100);
+// Number(x) || 100 zou een bewust ingestelde inzet van 0 stiekem terugzetten naar 100 (want 0 is falsy) —
+// daarom expliciet op null checken (localStorage.getItem geeft alleen null als er nog nooit iets is opgeslagen).
+let doubleOrNothingStake = (() => {
+  const stored = localStorage.getItem('botShooterDoubleOrNothingStake');
+  return Math.max(0, stored === null ? 100 : Number(stored));
+})();
 const DOUBLE_OR_NOTHING_LIMIT = 3;
 const DOUBLE_OR_NOTHING_WINDOW = 30 * 60 * 1000;
 let doubleOrNothingWindowStart = Number(localStorage.getItem('botShooterDoubleOrNothingWindowStart')) || 0;
@@ -173,7 +178,11 @@ function registerDoubleOrNothingUse() {
 // ---- Kern-dubbel-of-niets-doos: zelfde principe maar met Elemental Cores (alleen Wereld 2) ----
 // Ook hier: max 3 keer per half uur.
 const CORE_DOUBLE_OR_NOTHING_MAX_STAKE = 25;
-let coreDoubleOrNothingStake = Math.max(0, Math.min(CORE_DOUBLE_OR_NOTHING_MAX_STAKE, Number(localStorage.getItem('botShooterCoreDoubleOrNothingStake')) || 5));
+let coreDoubleOrNothingStake = (() => {
+  const stored = localStorage.getItem('botShooterCoreDoubleOrNothingStake');
+  const val = stored === null ? 5 : Number(stored);
+  return Math.max(0, Math.min(CORE_DOUBLE_OR_NOTHING_MAX_STAKE, val));
+})();
 let coreDoubleOrNothingWindowStart = Number(localStorage.getItem('botShooterCoreDoubleOrNothingWindowStart')) || 0;
 let coreDoubleOrNothingUsesThisWindow = Number(localStorage.getItem('botShooterCoreDoubleOrNothingUsesThisWindow')) || 0;
 function coreDoubleOrNothingUsesLeft() {
@@ -516,7 +525,7 @@ function onBossDefeated(bot) {
   if (bossRushActive) {
     bossRushIndex++;
   }
-  if (currentWorld === 2 && !bossRushActive) {
+  if (currentWorld === 2) {
     world2BossKillCount++;
     const table = gameMode === 'levels' ? BOSSRUSH_CORES_LEVELS : BOSSRUSH_CORES_ENDLESS;
     const pos = Math.min(world2BossKillCount, table.length) - 1;
