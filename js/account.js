@@ -244,12 +244,25 @@ auth.onAuthStateChanged(async user => {
   // plaats van uit een losse localStorage-vlag — die kon door een race met deze functie soms nog de
   // naam van een vorig account bevatten, waardoor je in het verkeerde account leek te belanden.
   currentUid = user.uid;
-  const userDoc = await db.collection('users').doc(user.uid).get();
-  currentAccount = userDoc.exists ? userDoc.data().username : localStorage.getItem('botShooterActiveAccount');
+  let resolvedAccount = localStorage.getItem('botShooterActiveAccount');
+  try {
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    if (userDoc.exists && userDoc.data().username) resolvedAccount = userDoc.data().username;
+  } catch (e) {
+    // Kon de gebruikersnaam niet bij Firestore verifiëren (bv. even geen verbinding) — val terug op
+    // de laatst bekende naam. Belangrijk: hierna gaan we altijd door, anders blijft het hoofdmenu
+    // verborgen omdat de rest van deze functie nooit bereikt wordt.
+  }
+  currentAccount = resolvedAccount;
   localStorage.setItem('botShooterActiveAccount', currentAccount);
   document.getElementById('authScreen').style.display = 'none';
+  document.getElementById(currentWorld === 2 ? 'world2Screen' : 'startScreen').style.display = 'flex';
   updateLoginSessionTimer();
-  await applyPendingGrants(user.uid);
+  try {
+    await applyPendingGrants(user.uid);
+  } catch (e) {
+    // Idem: een mislukte wachtrij-check mag de rest van het inloggen niet blokkeren.
+  }
   refreshCurrencyDisplays();
   updateHUD();
 });
