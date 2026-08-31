@@ -254,8 +254,13 @@ auth.onAuthStateChanged(async user => {
     await auth.signOut(); // dwingt na 24 uur een nieuwe login af, triggert deze functie opnieuw met user=null
     return;
   }
-  currentAccount = localStorage.getItem('botShooterActiveAccount');
+  // Gebruikersnaam altijd uit Firestore halen (gekoppeld aan het echte, actief ingelogde uid) in
+  // plaats van uit een losse localStorage-vlag — die kon door een race met deze functie soms nog de
+  // naam van een vorig account bevatten, waardoor je in het verkeerde account leek te belanden.
   currentUid = user.uid;
+  const userDoc = await db.collection('users').doc(user.uid).get();
+  currentAccount = userDoc.exists ? userDoc.data().username : localStorage.getItem('botShooterActiveAccount');
+  localStorage.setItem('botShooterActiveAccount', currentAccount);
   document.getElementById('authScreen').style.display = 'none';
   updateLoginSessionTimer();
   await applyPendingGrants(user.uid);
@@ -299,7 +304,8 @@ async function switchAccount() {
   localStorage.removeItem('botShooterActiveAccount');
   localStorage.removeItem('botShooterActiveUid');
   localStorage.removeItem('botShooterLoginTimestamp');
-  await auth.signOut(); // triggert onAuthStateChanged, die het authScreen weer toont
-  showAuthView('gate');
+  ACCOUNT_KEYS.forEach(k => localStorage.removeItem(k)); // geen restjes spelvoortgang van dit account laten hangen
+  await auth.signOut();
+  location.reload(); // volledig verse pagina, net als na inloggen/aanmaken — voorkomt dat oude sessiestatus blijft hangen
 }
 window.switchAccount = switchAccount;
