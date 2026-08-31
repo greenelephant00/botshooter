@@ -300,25 +300,9 @@
     line-height: 1;
   }
   #switchAccountBtn:hover { background: rgba(0,0,0,0.7); }
-  #adminCodeBtn {
+  #adminCommandsBtn {
     position: absolute;
     bottom: 12px;
-    right: 12px;
-    z-index: 20;
-    background: rgba(0,0,0,0.5);
-    color: #fff;
-    border: 1px solid #555;
-    border-radius: 8px;
-    padding: 8px 12px;
-    font-size: 16px;
-    cursor: pointer;
-    line-height: 1;
-  }
-  #adminCodeBtn:hover { background: rgba(0,0,0,0.7); }
-  #adminCommandsBtn {
-    display: none;
-    position: absolute;
-    bottom: 54px;
     right: 12px;
     z-index: 20;
     background: rgba(255,56,56,0.2);

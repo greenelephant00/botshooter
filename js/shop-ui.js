@@ -2658,15 +2658,14 @@ function closeMatchKillsScreen() {
 }
 window.closeMatchKillsScreen = closeMatchKillsScreen;
 
-// ---- Admin Commands: verborgen knop rechtsonder, alleen bereikbaar met de juiste code ----
-const ADMIN_UNLOCK_CODE = '1010';
+// ---- Admin Commands: knop rechtsonder, vraagt elke keer opnieuw om de code ----
+const ADMIN_UNLOCK_CODE = '1515';
 
 function promptAdminCode() {
   const code = prompt('Voer de code in:');
   if (code === null) return;
   if (code.trim() === ADMIN_UNLOCK_CODE) {
-    localStorage.setItem('botShooterAdminUnlocked', 'true');
-    document.getElementById('adminCommandsBtn').style.display = 'block';
+    openAdminCommandsScreen();
   } else {
     alert('Onjuiste code.');
   }
