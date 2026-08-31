@@ -1175,6 +1175,10 @@ function openCoreDoubleOrNothing() {
 window.openCoreDoubleOrNothing = openCoreDoubleOrNothing;
 
 function renderMysteryBoxScreen() {
+  // Niet herrenderen terwijl je in een inzet-vakje aan het typen bent, anders verlies je door de
+  // seconde-tikkende cooldown-timers steeds je focus en je net ingetypte waarde.
+  const active = document.activeElement;
+  if (active && (active.id === 'doubleOrNothingStakeInput' || active.id === 'coreDoubleOrNothingStakeInput')) return;
   document.getElementById('mysteryBoxCoins').textContent = coins;
   const coresEl = document.getElementById('mysteryBoxCores');
   if (coresEl) coresEl.textContent = elementalCores;
@@ -1213,7 +1217,7 @@ function renderMysteryBoxScreen() {
       <div class="shopItem"><div class="info"><div class="name">🎯 Kern-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet (max ${CORE_DOUBLE_OR_NOTHING_MAX_STAKE} Elemental Cores). 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
       <div class="statsRow">
         <span class="statsLabel">Inzet:</span>
-        <input type="number" class="doubleOrNothingInput" min="0" max="${CORE_DOUBLE_OR_NOTHING_MAX_STAKE}" step="1" value="${coreDoubleOrNothingStake}" onchange="setCoreDoubleOrNothingStake(this.value)">
+        <input type="number" id="coreDoubleOrNothingStakeInput" class="doubleOrNothingInput" min="0" max="${CORE_DOUBLE_OR_NOTHING_MAX_STAKE}" step="1" value="${coreDoubleOrNothingStake}" oninput="setCoreDoubleOrNothingStake(this.value)">
         <button class="buy" onclick="openCoreDoubleOrNothing()" ${coreDonDisabled}>🎯 Gok · 🔮${coreDoubleOrNothingStake}</button>
       </div>
       ${coreDonResultHtml}
@@ -1239,7 +1243,7 @@ function renderMysteryBoxScreen() {
     <div class="shopItem"><div class="info"><div class="name">🎯 Munten-dubbel-of-niets-doos</div><div class="desc">Kies zelf je inzet. 40% kans om je inzet te verdubbelen, 60% kans om alles kwijt te raken.</div></div></div>
     <div class="statsRow">
       <span class="statsLabel">Inzet:</span>
-      <input type="number" class="doubleOrNothingInput" min="0" step="10" value="${doubleOrNothingStake}" onchange="setDoubleOrNothingStake(this.value)">
+      <input type="number" id="doubleOrNothingStakeInput" class="doubleOrNothingInput" min="0" step="10" value="${doubleOrNothingStake}" oninput="setDoubleOrNothingStake(this.value)">
       <button class="buy" onclick="openDoubleOrNothing()" ${donDisabled}>🎯 Gok · 🪙${doubleOrNothingStake}</button>
     </div>
     ${donResultHtml}
