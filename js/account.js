@@ -15,10 +15,7 @@ const ACCOUNT_KEYS = [
   'botShooterOwnedSkins', 'botShooterEquippedSkin',
   'botShooterOwnedTransforms', 'botShooterEquippedTransform',
   'botShooterHighScore', 'botShooterHighScoreHardcore', 'botShooterHighScoreWorld2', 'botShooterHighLevel',
-  'botShooterCoinGrant_3500', 'botShooterCoinGrant_500', 'botShooterCoinGrant_600',
-  'botShooterCoinGrant_1000', 'botShooterCoinGrant_1000b', 'botShooterCoinGrant_2500',
-  'botShooterCoinGrant_200', 'botShooterCoinGrant_10000',
-  'botShooterCoinGrant_2000b', 'botShooterCoinGrant_15000', 'botShooterWorld2Unlocked',
+  'botShooterWorld2Unlocked',
   'botShooterLvl2FireCore', 'botShooterLvl2FrostBlood', 'botShooterLvl2Steadfast',
   'botShooterLvl2FastReload', 'botShooterLvl2LongBoosts', 'botShooterLvl2Magnet',
   'botShooterHasRevive2', 'botShooterLvl2Vengeance', 'botShooterLvl2IronSkin', 'botShooterLvl2ExtraHp',
@@ -76,17 +73,6 @@ function defaultAccountSnapshot() {
   snap['botShooterHighScoreWorld2'] = '0';
   snap['botShooterHighLevel'] = '1';
   snap['botShooterPowerupLevels'] = '{}';
-  // munten-bonussen tellen als al opgehaald, zodat nieuwe accounts echt bij 0 beginnen
-  snap['botShooterCoinGrant_3500'] = 'true';
-  snap['botShooterCoinGrant_500'] = 'true';
-  snap['botShooterCoinGrant_600'] = 'true';
-  snap['botShooterCoinGrant_1000'] = 'true';
-  snap['botShooterCoinGrant_1000b'] = 'true';
-  snap['botShooterCoinGrant_2500'] = 'true';
-  snap['botShooterCoinGrant_200'] = 'true';
-  snap['botShooterCoinGrant_10000'] = 'true';
-  snap['botShooterCoinGrant_2000b'] = 'true';
-  snap['botShooterCoinGrant_15000'] = 'true';
   return snap;
 }
 
