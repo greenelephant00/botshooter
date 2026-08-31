@@ -2669,7 +2669,7 @@ function closeMatchKillsScreen() {
 window.closeMatchKillsScreen = closeMatchKillsScreen;
 
 // ---- Admin Commands: knop rechtsonder, vraagt elke keer opnieuw om de code ----
-const ADMIN_UNLOCK_CODE = '2001';
+const ADMIN_UNLOCK_CODE = '9999';
 
 function promptAdminCode() {
   const code = prompt('Voer de code in:');
