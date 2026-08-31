@@ -92,6 +92,12 @@ function hydrateFromSnapshot(snapshot) {
   });
 }
 
+async function hydrateFromCloud(uid) {
+  const userDoc = await db.collection('users').doc(uid).get();
+  if (userDoc.exists && userDoc.data().save) hydrateFromSnapshot(userDoc.data().save);
+  return userDoc;
+}
+
 // Munten/Elemental Cores die een admin via Admin Commands voor deze speler heeft klaargezet, worden
 // hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
 // (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
@@ -176,15 +182,11 @@ async function attemptLogin() {
   localStorage.setItem('botShooterLoginTimestamp', Date.now());
   try {
     const cred = await auth.signInWithEmailAndPassword(usernameToFakeEmail(username), password);
-    // Het ophalen van de save en het toepassen van eventuele klaarstaande admin-cadeautjes gebeurt
-    // expres niet hier, maar uitsluitend in onAuthStateChanged hieronder — die vuurt door signIn()
-    // vrijwel meteen ook af, en twee gelijktijdige aanroepen van applyPendingGrants (hier én daar)
-    // konden elkaar in de weg zitten waardoor een cadeautje verloren ging.
-    // Deze vlag zorgt dat onAuthStateChanged de save alleen ophaalt bij dit soort echte, expliciete
-    // logins — niet bij een gewone paginaherlading van een sessie die al actief was. Anders werd bij
-    // elke herlading de lokale voortgang overschreven door de cloud-stand, ook als die cloud-stand
-    // (bv. door een oudere bug of nog niet gesynchroniseerde wijziging) achterliep.
-    sessionStorage.setItem('botShooterFreshLogin', 'true');
+    // Bewust hier al (en niet pas via onAuthStateChanged) opgehaald en afgewacht, zodat dit gegarandeerd
+    // klaar is vóórdat we hieronder herladen — een eerdere versie liet dit alleen aan onAuthStateChanged
+    // over, maar die kon soms racen met de reload zelf, waardoor er af en toe niks werd opgehaald en je
+    // met 0 munten begon terwijl de cloud wel gewoon klopte.
+    await hydrateFromCloud(cred.user.uid);
     currentAccount = username;
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
@@ -223,7 +225,6 @@ async function attemptCreateAccount() {
     const snapshot = defaultAccountSnapshot();
     await db.collection('users').doc(cred.user.uid).set({ username, save: snapshot });
     hydrateFromSnapshot(snapshot);
-    sessionStorage.setItem('botShooterFreshLogin', 'true'); // zie toelichting bij attemptLogin()
     currentAccount = username;
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
@@ -268,19 +269,13 @@ auth.onAuthStateChanged(async user => {
   // naam van een vorig account bevatten, waardoor je in het verkeerde account leek te belanden.
   currentUid = user.uid;
   let resolvedAccount = localStorage.getItem('botShooterActiveAccount');
-  // Alleen bij een échte, expliciete login (net ingetypte naam/wachtwoord, of een net aangemaakt
-  // account) halen we de save uit de cloud en overschrijven we de lokale voortgang daarmee — nodig
-  // voor cross-device sync. Bij een gewone paginaherlading van een sessie die al actief was, blijft
-  // de lokale voortgang gewoon leidend; anders zou elke herlading de lokale stand kunnen overschrijven
-  // met een (mogelijk nog niet bijgewerkte) cloud-stand, wat leek op een steeds terugkerende reset.
-  const isFreshLogin = sessionStorage.getItem('botShooterFreshLogin') === 'true';
-  sessionStorage.removeItem('botShooterFreshLogin');
+  // Altijd de save ophalen en toepassen (niet alleen bij een expliciete login) — nodig voor
+  // cross-device sync, en veilig zolang syncCurrentAccountSave() de cloud betrouwbaar bijhoudt
+  // (een eerdere, kwetsbaardere versie probeerde dit te beperken tot "echte" logins via een
+  // sessionStorage-vlag, maar die kon racen met de page-reload zelf en soms met 0 munten eindigen).
   try {
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    if (userDoc.exists) {
-      if (userDoc.data().username) resolvedAccount = userDoc.data().username;
-      if (isFreshLogin && userDoc.data().save) hydrateFromSnapshot(userDoc.data().save);
-    }
+    const userDoc = await hydrateFromCloud(user.uid);
+    if (userDoc.exists && userDoc.data().username) resolvedAccount = userDoc.data().username;
   } catch (e) {
     // Kon de save niet bij Firestore ophalen (bv. even geen verbinding) — val terug op wat er al
     // lokaal staat. Belangrijk: hierna gaan we altijd door, anders blijft het hoofdmenu verborgen
