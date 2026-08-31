@@ -80,12 +80,14 @@
     <div class="statsRow">
       <span class="statsLabel">Munten:</span>
       <input type="number" id="adminGrantCoinsInput" class="doubleOrNothingInput" value="1000" min="0">
-      <button class="buy" onclick="adminGrantCoinsToPlayer()">Geef munten</button>
+      <button class="buy" onclick="adminGrantCoinsToPlayer()">➕ Geef munten</button>
+      <button class="buy" onclick="adminRemoveCoinsFromPlayer()">➖ Haal munten weg</button>
     </div>
     <div class="statsRow">
       <span class="statsLabel">Elemental Cores:</span>
       <input type="number" id="adminGrantCoresInput" class="doubleOrNothingInput" value="100" min="0">
-      <button class="buy" onclick="adminGrantCoresToPlayer()">Geef Cores</button>
+      <button class="buy" onclick="adminGrantCoresToPlayer()">➕ Geef Cores</button>
+      <button class="buy" onclick="adminRemoveCoresFromPlayer()">➖ Haal Cores weg</button>
     </div>
     <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>

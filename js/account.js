@@ -111,13 +111,13 @@ async function applyPendingGrants(uid) {
       coinsGranted += Number(data.coins) || 0;
       coresGranted += Number(data.cores) || 0;
     });
-    if (coinsGranted > 0) {
+    if (coinsGranted !== 0) {
       const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
-      localStorage.setItem('botShooterCoins', currentCoins + coinsGranted);
+      localStorage.setItem('botShooterCoins', Math.max(0, currentCoins + coinsGranted));
     }
-    if (coresGranted > 0) {
+    if (coresGranted !== 0) {
       const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-      localStorage.setItem('botShooterElementalCores', currentCores + coresGranted);
+      localStorage.setItem('botShooterElementalCores', Math.max(0, currentCores + coresGranted));
     }
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {

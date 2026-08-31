@@ -2743,39 +2743,44 @@ async function lookupUserByUsername(username) {
   return snap.docs[0];
 }
 
-async function adminGrantCoinsToPlayer() {
+async function submitPlayerGrant(coinsAmount, coresAmount, label) {
   const statusEl = document.getElementById('adminGrantStatus');
   const username = document.getElementById('adminTargetUsername').value.trim();
-  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoinsInput').value)) || 0);
-  if (!username || amount <= 0) { statusEl.textContent = 'Vul een spelernaam en bedrag in.'; return; }
+  if (!username || (coinsAmount === 0 && coresAmount === 0)) { statusEl.textContent = 'Vul een spelernaam en bedrag in.'; return; }
   statusEl.textContent = 'Bezig...';
   try {
     const doc = await lookupUserByUsername(username);
     if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
-    await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: amount, cores: 0, createdAt: Date.now() });
-    statusEl.textContent = `${amount} munten klaargezet voor ${username} — wordt toegepast bij hun volgende login.`;
+    await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: coinsAmount, cores: coresAmount, createdAt: Date.now() });
+    statusEl.textContent = `${label} voor ${username} — wordt toegepast bij hun volgende login.`;
   } catch (e) {
     statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
   }
+}
+
+function adminGrantCoinsToPlayer() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoinsInput').value)) || 0);
+  submitPlayerGrant(amount, 0, `${amount} munten klaargezet`);
 }
 window.adminGrantCoinsToPlayer = adminGrantCoinsToPlayer;
 
-async function adminGrantCoresToPlayer() {
-  const statusEl = document.getElementById('adminGrantStatus');
-  const username = document.getElementById('adminTargetUsername').value.trim();
+function adminRemoveCoinsFromPlayer() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoinsInput').value)) || 0);
+  submitPlayerGrant(-amount, 0, `${amount} munten wegnemen klaargezet`);
+}
+window.adminRemoveCoinsFromPlayer = adminRemoveCoinsFromPlayer;
+
+function adminGrantCoresToPlayer() {
   const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoresInput').value)) || 0);
-  if (!username || amount <= 0) { statusEl.textContent = 'Vul een spelernaam en bedrag in.'; return; }
-  statusEl.textContent = 'Bezig...';
-  try {
-    const doc = await lookupUserByUsername(username);
-    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
-    await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: 0, cores: amount, createdAt: Date.now() });
-    statusEl.textContent = `${amount} Elemental Cores klaargezet voor ${username} — wordt toegepast bij hun volgende login.`;
-  } catch (e) {
-    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
-  }
+  submitPlayerGrant(0, amount, `${amount} Elemental Cores klaargezet`);
 }
 window.adminGrantCoresToPlayer = adminGrantCoresToPlayer;
+
+function adminRemoveCoresFromPlayer() {
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoresInput').value)) || 0);
+  submitPlayerGrant(0, -amount, `${amount} Elemental Cores wegnemen klaargezet`);
+}
+window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
