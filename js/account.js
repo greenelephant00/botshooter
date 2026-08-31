@@ -105,26 +105,22 @@ async function applyPendingGrants(uid) {
       coinsGranted += Number(data.coins) || 0;
       coresGranted += Number(data.cores) || 0;
     });
-    let newCoins = null, newCores = null;
     if (coinsGranted !== 0) {
       const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
-      newCoins = Math.max(0, currentCoins + coinsGranted);
-      localStorage.setItem('botShooterCoins', newCoins);
+      localStorage.setItem('botShooterCoins', Math.max(0, currentCoins + coinsGranted));
     }
     if (coresGranted !== 0) {
       const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-      newCores = Math.max(0, currentCores + coresGranted);
-      localStorage.setItem('botShooterElementalCores', newCores);
+      localStorage.setItem('botShooterElementalCores', Math.max(0, currentCores + coresGranted));
     }
-    // Meteen ook terug de cloud in schrijven (niet wachten op de volgende periodieke sync) — anders kan
-    // een tussentijdse page-reload de net toegepaste aanpassing weer overschrijven met de oude cloud-stand.
-    // Genest object + merge:true zodat alleen deze twee velden binnen "save" worden bijgewerkt, de rest
-    // van de save (wapens, skins, enz.) blijft ongemoeid.
-    if (newCoins !== null || newCores !== null) {
-      const saveUpdate = {};
-      if (newCoins !== null) saveUpdate.botShooterCoins = String(newCoins);
-      if (newCores !== null) saveUpdate.botShooterElementalCores = String(newCores);
-      await db.collection('users').doc(uid).set({ save: saveUpdate }, { merge: true });
+    // Meteen ook de VOLLEDIGE save terugschrijven naar de cloud (dezelfde functie als de periodieke
+    // sync), niet wachten op het volgende interval — anders kan een tussentijdse page-reload de net
+    // toegepaste aanpassing weer overschrijven met de oude cloud-stand. Bewust de bestaande, geteste
+    // syncCurrentAccountSave() hergebruikt in plaats van zelf maar 2 velden terug te schrijven: een
+    // eerdere versie deed dat via een geneste merge-write, die per ongeluk de rest van de save
+    // (wapens, skins, enz.) leegmaakte.
+    if (coinsGranted !== 0 || coresGranted !== 0) {
+      await syncCurrentAccountSave();
     }
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {
