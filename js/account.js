@@ -89,12 +89,6 @@ function hydrateFromSnapshot(snapshot) {
   });
 }
 
-async function loadAccountFromCloud(uid) {
-  const doc = await db.collection('users').doc(uid).get();
-  const snapshot = (doc.exists && doc.data().save) ? doc.data().save : defaultAccountSnapshot();
-  hydrateFromSnapshot(snapshot);
-}
-
 // Munten/Elemental Cores die een admin via Admin Commands voor deze speler heeft klaargezet, worden
 // hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
 // (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
@@ -111,13 +105,26 @@ async function applyPendingGrants(uid) {
       coinsGranted += Number(data.coins) || 0;
       coresGranted += Number(data.cores) || 0;
     });
+    let newCoins = null, newCores = null;
     if (coinsGranted !== 0) {
       const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
-      localStorage.setItem('botShooterCoins', Math.max(0, currentCoins + coinsGranted));
+      newCoins = Math.max(0, currentCoins + coinsGranted);
+      localStorage.setItem('botShooterCoins', newCoins);
     }
     if (coresGranted !== 0) {
       const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-      localStorage.setItem('botShooterElementalCores', Math.max(0, currentCores + coresGranted));
+      newCores = Math.max(0, currentCores + coresGranted);
+      localStorage.setItem('botShooterElementalCores', newCores);
+    }
+    // Meteen ook terug de cloud in schrijven (niet wachten op de volgende periodieke sync) — anders kan
+    // een tussentijdse page-reload de net toegepaste aanpassing weer overschrijven met de oude cloud-stand.
+    // Genest object + merge:true zodat alleen deze twee velden binnen "save" worden bijgewerkt, de rest
+    // van de save (wapens, skins, enz.) blijft ongemoeid.
+    if (newCoins !== null || newCores !== null) {
+      const saveUpdate = {};
+      if (newCoins !== null) saveUpdate.botShooterCoins = String(newCoins);
+      if (newCores !== null) saveUpdate.botShooterElementalCores = String(newCores);
+      await db.collection('users').doc(uid).set({ save: saveUpdate }, { merge: true });
     }
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {
@@ -170,8 +177,10 @@ async function attemptLogin() {
   localStorage.setItem('botShooterLoginTimestamp', Date.now());
   try {
     const cred = await auth.signInWithEmailAndPassword(usernameToFakeEmail(username), password);
-    await loadAccountFromCloud(cred.user.uid);
-    await applyPendingGrants(cred.user.uid);
+    // Het ophalen van de save en het toepassen van eventuele klaarstaande admin-cadeautjes gebeurt
+    // expres niet hier, maar uitsluitend in onAuthStateChanged hieronder — die vuurt door signIn()
+    // vrijwel meteen ook af, en twee gelijktijdige aanroepen van applyPendingGrants (hier én daar)
+    // konden elkaar in de weg zitten waardoor een cadeautje verloren ging.
     currentAccount = username;
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
@@ -256,11 +265,17 @@ auth.onAuthStateChanged(async user => {
   let resolvedAccount = localStorage.getItem('botShooterActiveAccount');
   try {
     const userDoc = await db.collection('users').doc(user.uid).get();
-    if (userDoc.exists && userDoc.data().username) resolvedAccount = userDoc.data().username;
+    if (userDoc.exists) {
+      if (userDoc.data().username) resolvedAccount = userDoc.data().username;
+      // De save hydrateren gebeurt hier, op één centrale plek, in plaats van los in attemptLogin() —
+      // zo kan het nooit meer racen met de wachtrij-check hieronder (die anders soms met een oude,
+      // nog niet bijgewerkte lokale stand rekende, waardoor een toegekend/weggehaald bedrag verloren ging).
+      if (userDoc.data().save) hydrateFromSnapshot(userDoc.data().save);
+    }
   } catch (e) {
-    // Kon de gebruikersnaam niet bij Firestore verifiëren (bv. even geen verbinding) — val terug op
-    // de laatst bekende naam. Belangrijk: hierna gaan we altijd door, anders blijft het hoofdmenu
-    // verborgen omdat de rest van deze functie nooit bereikt wordt.
+    // Kon de save niet bij Firestore ophalen (bv. even geen verbinding) — val terug op wat er al
+    // lokaal staat. Belangrijk: hierna gaan we altijd door, anders blijft het hoofdmenu verborgen
+    // omdat de rest van deze functie nooit bereikt wordt.
   }
   currentAccount = resolvedAccount;
   localStorage.setItem('botShooterActiveAccount', currentAccount);
