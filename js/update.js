@@ -1355,8 +1355,11 @@ function update() {
   });
   powerups = powerups.filter(p => !p.collected);
 
-  // Coins: spawn periodically (niet tijdens oefenen, niet tijdens Eindbaas Rush)
-  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && !dronePracticeActive && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
+  // Coins: spawn periodically (niet tijdens oefenen, niet tijdens Eindbaas Rush, en niet in Levels
+  // zodra er dit level geen nieuwe bots meer spawnen — voorkomt dat je de laatste bot bewust in leven
+  // laat om oneindig munten te blijven verzamelen zonder het level af te maken)
+  const levelStalling = gameMode === 'levels' && levelKills + bots.length >= levelTarget;
+  if (gameMode !== 'practice' && !weaponPracticeActive && !transformPracticeActive && !disasterPracticeActive && !skinPracticeActive && !bossRushActive && !dronePracticeActive && !levelStalling && now - lastCoinSpawn > 4000 && coinPickups.length < 2) {
     lastCoinSpawn = now;
     spawnCoinPickup();
   }
