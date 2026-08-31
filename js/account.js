@@ -107,6 +107,29 @@ async function loadAccountFromCloud(uid) {
   hydrateFromSnapshot(snapshot);
 }
 
+// Munten/Elemental Cores die een admin via Admin Commands voor deze speler heeft klaargezet, worden
+// hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
+// (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
+async function applyPendingGrants(uid) {
+  const snap = await db.collection('users').doc(uid).collection('pendingGrants').get();
+  if (snap.empty) return;
+  let coinsGranted = 0, coresGranted = 0;
+  snap.forEach(doc => {
+    const data = doc.data();
+    coinsGranted += Number(data.coins) || 0;
+    coresGranted += Number(data.cores) || 0;
+  });
+  if (coinsGranted > 0) {
+    const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
+    localStorage.setItem('botShooterCoins', currentCoins + coinsGranted);
+  }
+  if (coresGranted > 0) {
+    const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
+    localStorage.setItem('botShooterElementalCores', currentCores + coresGranted);
+  }
+  await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+}
+
 async function syncCurrentAccountSave() {
   if (!currentAccount || !currentUid) return;
   const snapshot = {};
@@ -153,6 +176,7 @@ async function attemptLogin() {
   try {
     const cred = await auth.signInWithEmailAndPassword(usernameToFakeEmail(username), password);
     await loadAccountFromCloud(cred.user.uid);
+    await applyPendingGrants(cred.user.uid);
     currentAccount = username;
     currentUid = cred.user.uid;
     localStorage.setItem('botShooterActiveAccount', username);
@@ -234,6 +258,9 @@ auth.onAuthStateChanged(async user => {
   currentUid = user.uid;
   document.getElementById('authScreen').style.display = 'none';
   updateLoginSessionTimer();
+  await applyPendingGrants(user.uid);
+  refreshCurrencyDisplays();
+  updateHUD();
 });
 
 setInterval(syncCurrentAccountSave, 8000);

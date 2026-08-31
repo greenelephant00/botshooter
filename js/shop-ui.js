@@ -2722,6 +2722,46 @@ function adminRemoveCores() {
 }
 window.adminRemoveCores = adminRemoveCores;
 
+async function lookupUserByUsername(username) {
+  const snap = await db.collection('users').where('username', '==', username).limit(1).get();
+  if (snap.empty) return null;
+  return snap.docs[0];
+}
+
+async function adminGrantCoinsToPlayer() {
+  const statusEl = document.getElementById('adminGrantStatus');
+  const username = document.getElementById('adminTargetUsername').value.trim();
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoinsInput').value)) || 0);
+  if (!username || amount <= 0) { statusEl.textContent = 'Vul een spelernaam en bedrag in.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: amount, cores: 0, createdAt: Date.now() });
+    statusEl.textContent = `${amount} munten klaargezet voor ${username} — wordt toegepast bij hun volgende login.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminGrantCoinsToPlayer = adminGrantCoinsToPlayer;
+
+async function adminGrantCoresToPlayer() {
+  const statusEl = document.getElementById('adminGrantStatus');
+  const username = document.getElementById('adminTargetUsername').value.trim();
+  const amount = Math.max(0, Math.floor(Number(document.getElementById('adminGrantCoresInput').value)) || 0);
+  if (!username || amount <= 0) { statusEl.textContent = 'Vul een spelernaam en bedrag in.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: 0, cores: amount, createdAt: Date.now() });
+    statusEl.textContent = `${amount} Elemental Cores klaargezet voor ${username} — wordt toegepast bij hun volgende login.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminGrantCoresToPlayer = adminGrantCoresToPlayer;
+
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
