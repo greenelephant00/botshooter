@@ -97,23 +97,30 @@ async function loadAccountFromCloud(uid) {
 // hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
 // (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
 async function applyPendingGrants(uid) {
-  const snap = await db.collection('users').doc(uid).collection('pendingGrants').get();
-  if (snap.empty) return;
-  let coinsGranted = 0, coresGranted = 0;
-  snap.forEach(doc => {
-    const data = doc.data();
-    coinsGranted += Number(data.coins) || 0;
-    coresGranted += Number(data.cores) || 0;
-  });
-  if (coinsGranted > 0) {
-    const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
-    localStorage.setItem('botShooterCoins', currentCoins + coinsGranted);
+  // Mag NOOIT een fout naar buiten gooien: dit is een extraatje bovenop het inloggen, geen vereiste
+  // stap — als de wachtrij-check faalt (bv. security rules nog niet ingesteld, even geen verbinding),
+  // mag dat het inloggen zelf niet laten crashen (dat gaf eerder een verdwenen hoofdmenu).
+  try {
+    const snap = await db.collection('users').doc(uid).collection('pendingGrants').get();
+    if (snap.empty) return;
+    let coinsGranted = 0, coresGranted = 0;
+    snap.forEach(doc => {
+      const data = doc.data();
+      coinsGranted += Number(data.coins) || 0;
+      coresGranted += Number(data.cores) || 0;
+    });
+    if (coinsGranted > 0) {
+      const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
+      localStorage.setItem('botShooterCoins', currentCoins + coinsGranted);
+    }
+    if (coresGranted > 0) {
+      const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
+      localStorage.setItem('botShooterElementalCores', currentCores + coresGranted);
+    }
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+  } catch (e) {
+    // Stil negeren — zie toelichting hierboven.
   }
-  if (coresGranted > 0) {
-    const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-    localStorage.setItem('botShooterElementalCores', currentCores + coresGranted);
-  }
-  await Promise.all(snap.docs.map(doc => doc.ref.delete()));
 }
 
 async function syncCurrentAccountSave() {
