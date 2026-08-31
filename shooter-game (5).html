@@ -91,7 +91,19 @@
     </div>
     <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
+  <div class="shopSection">
+    <button class="buy" onclick="openAdminPlayersScreen()">📋 Alle spelers</button>
+  </div>
   <button class="backBtn" onclick="closeAdminCommandsScreen()">← Terug</button>
+</div>
+<div id="adminPlayersScreen">
+  <h1>📋 Alle spelers</h1>
+  <button class="topBackBtn" onclick="closeAdminPlayersScreen()">← Terug</button>
+  <div class="shopSection">
+    <h3>Munten &amp; Elemental Cores per speler</h3>
+    <div id="adminPlayersList" class="statsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeAdminPlayersScreen()">← Terug</button>
 </div>
 <div id="musicPanel">
   <div class="musicOption" data-idx="0" onclick="selectMusicTrack(0)">Pulse</div>

@@ -2787,6 +2787,37 @@ function adminRemoveCoresFromPlayer() {
 }
 window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 
+async function openAdminPlayersScreen() {
+  document.getElementById('adminCommandsScreen').style.display = 'none';
+  document.getElementById('adminPlayersScreen').style.display = 'flex';
+  const listEl = document.getElementById('adminPlayersList');
+  listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Bezig met laden...</span></div>`;
+  try {
+    const snap = await db.collection('users').get();
+    const rows = [];
+    snap.forEach(doc => {
+      const data = doc.data();
+      const name = data.username || '(onbekend)';
+      const playerCoins = (data.save && data.save.botShooterCoins) || '0';
+      const playerCores = (data.save && data.save.botShooterElementalCores) || '0';
+      rows.push({ name, coins: Number(playerCoins) || 0, cores: Number(playerCores) || 0 });
+    });
+    rows.sort((a, b) => a.name.localeCompare(b.name));
+    listEl.innerHTML = rows.length
+      ? rows.map(r => `<div class="statsRow"><span class="statsLabel">${r.name}</span><span class="statsValue">🪙 ${r.coins} &nbsp; 🔮 ${r.cores}</span></div>`).join('')
+      : `<div class="statsRow"><span class="statsLabel">Geen spelers gevonden.</span></div>`;
+  } catch (e) {
+    listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Kon de spelerslijst niet ophalen.</span></div>`;
+  }
+}
+window.openAdminPlayersScreen = openAdminPlayersScreen;
+
+function closeAdminPlayersScreen() {
+  document.getElementById('adminPlayersScreen').style.display = 'none';
+  document.getElementById('adminCommandsScreen').style.display = 'flex';
+}
+window.closeAdminPlayersScreen = closeAdminPlayersScreen;
+
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
   if (equipped) btn = `<button class="equipped" disabled>Uitgerust</button>`;
