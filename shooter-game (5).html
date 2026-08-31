@@ -91,8 +91,9 @@
     </div>
     <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
-  <div class="shopSection">
+  <div class="shopSection" style="display:flex; gap:10px;">
     <button class="buy" onclick="openAdminPlayersScreen()">📋 Alle spelers</button>
+    <button class="buy" onclick="openAdminLogScreen()">📜 Actielog</button>
   </div>
   <button class="backBtn" onclick="closeAdminCommandsScreen()">← Terug</button>
 </div>
@@ -104,6 +105,15 @@
     <div id="adminPlayersList" class="statsList"></div>
   </div>
   <button class="backBtn" onclick="closeAdminPlayersScreen()">← Terug</button>
+</div>
+<div id="adminLogScreen">
+  <h1>📜 Actielog</h1>
+  <button class="topBackBtn" onclick="closeAdminLogScreen()">← Terug</button>
+  <div class="shopSection">
+    <h3>Wie deed wat, bij wie, en wanneer</h3>
+    <div id="adminLogList" class="statsList"></div>
+  </div>
+  <button class="backBtn" onclick="closeAdminLogScreen()">← Terug</button>
 </div>
 <div id="musicPanel">
   <div class="musicOption" data-idx="0" onclick="selectMusicTrack(0)">Pulse</div>

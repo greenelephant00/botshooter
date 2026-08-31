@@ -2706,12 +2706,26 @@ function refreshCurrencyDisplays() {
   if (world2CoresEl) world2CoresEl.textContent = elementalCores;
 }
 
+// ---- Actielog: legt elke Admin Commands-actie vast (wie, wat, bij wie, wanneer) — mag nooit de
+// eigenlijke actie blokkeren, dus altijd fire-and-forget met een stille catch.
+function logAdminAction(action, currency, amount, target) {
+  db.collection('adminActionLog').add({
+    adminName: currentAccount || 'onbekend',
+    action, // 'add' of 'remove'
+    currency, // 'coins' of 'cores'
+    amount,
+    target, // 'zichzelf' of een spelernaam
+    timestamp: Date.now()
+  }).catch(() => {});
+}
+
 function adminAddCoins() {
   const amount = Math.max(0, Math.floor(Number(document.getElementById('adminCoinsInput').value)) || 0);
   coins += amount;
   saveShopState();
   updateHUD();
   refreshCurrencyDisplays();
+  logAdminAction('add', 'coins', amount, 'zichzelf');
 }
 window.adminAddCoins = adminAddCoins;
 
@@ -2721,6 +2735,7 @@ function adminRemoveCoins() {
   saveShopState();
   updateHUD();
   refreshCurrencyDisplays();
+  logAdminAction('remove', 'coins', amount, 'zichzelf');
 }
 window.adminRemoveCoins = adminRemoveCoins;
 
@@ -2730,6 +2745,7 @@ function adminAddCores() {
   localStorage.setItem('botShooterElementalCores', elementalCores);
   updateHUD();
   refreshCurrencyDisplays();
+  logAdminAction('add', 'cores', amount, 'zichzelf');
 }
 window.adminAddCores = adminAddCores;
 
@@ -2739,6 +2755,7 @@ function adminRemoveCores() {
   localStorage.setItem('botShooterElementalCores', elementalCores);
   updateHUD();
   refreshCurrencyDisplays();
+  logAdminAction('remove', 'cores', amount, 'zichzelf');
 }
 window.adminRemoveCores = adminRemoveCores;
 
@@ -2757,6 +2774,8 @@ async function submitPlayerGrant(coinsAmount, coresAmount, label) {
     const doc = await lookupUserByUsername(username);
     if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
     await db.collection('users').doc(doc.id).collection('pendingGrants').add({ coins: coinsAmount, cores: coresAmount, createdAt: Date.now() });
+    if (coinsAmount !== 0) logAdminAction(coinsAmount > 0 ? 'add' : 'remove', 'coins', Math.abs(coinsAmount), username);
+    if (coresAmount !== 0) logAdminAction(coresAmount > 0 ? 'add' : 'remove', 'cores', Math.abs(coresAmount), username);
     statusEl.textContent = `${label} voor ${username} — wordt toegepast bij hun volgende login.`;
   } catch (e) {
     statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
@@ -2817,6 +2836,43 @@ function closeAdminPlayersScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
 }
 window.closeAdminPlayersScreen = closeAdminPlayersScreen;
+
+function formatLogTimestamp(ts) {
+  const d = new Date(ts);
+  const datePart = d.toLocaleDateString('nl-NL');
+  const timePart = d.toLocaleTimeString('nl-NL', { hour: '2-digit', minute: '2-digit' });
+  return `${datePart} ${timePart}`;
+}
+
+async function openAdminLogScreen() {
+  document.getElementById('adminCommandsScreen').style.display = 'none';
+  document.getElementById('adminLogScreen').style.display = 'flex';
+  const listEl = document.getElementById('adminLogList');
+  listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Bezig met laden...</span></div>`;
+  try {
+    const snap = await db.collection('adminActionLog').orderBy('timestamp', 'desc').limit(100).get();
+    if (snap.empty) {
+      listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Nog geen acties gelogd.</span></div>`;
+      return;
+    }
+    listEl.innerHTML = snap.docs.map(doc => {
+      const d = doc.data();
+      const icon = d.currency === 'cores' ? '🔮' : '🪙';
+      const targetText = d.target === 'zichzelf' ? 'zichzelf' : d.target;
+      const desc = d.action === 'add' ? `gaf ${targetText}` : `haalde weg bij ${targetText}`;
+      return `<div class="statsRow"><span class="statsLabel">${formatLogTimestamp(d.timestamp)} — <b>${d.adminName}</b> ${desc}</span><span class="statsValue">${d.action === 'add' ? '+' : '-'}${d.amount} ${icon}</span></div>`;
+    }).join('');
+  } catch (e) {
+    listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Kon het actielog niet ophalen.</span></div>`;
+  }
+}
+window.openAdminLogScreen = openAdminLogScreen;
+
+function closeAdminLogScreen() {
+  document.getElementById('adminLogScreen').style.display = 'none';
+  document.getElementById('adminCommandsScreen').style.display = 'flex';
+}
+window.closeAdminLogScreen = closeAdminLogScreen;
 
 function weaponItemHtml(item, owned, equipped, buyFn, equipFn) {
   let btn;
