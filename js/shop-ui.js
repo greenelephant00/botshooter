@@ -2635,8 +2635,10 @@ window.closeWeaponSwitchScreen = closeWeaponSwitchScreen;
 
 function renderMatchKillsScreen() {
   const entries = Object.entries(matchBotKillCounts).sort((a, b) => b[1] - a[1]);
+  const total = entries.reduce((sum, [, count]) => sum + count, 0);
+  const totalRow = `<div class="statsRow"><span class="statsLabel">Totaal</span><span class="statsValue">${total}</span></div>`;
   document.getElementById('matchKillsList').innerHTML = entries.length
-    ? entries.map(([type, count]) =>
+    ? totalRow + entries.map(([type, count]) =>
         `<div class="statsRow"><span class="statsLabel">${BOT_DISPLAY_NAMES[type] || type}</span><span class="statsValue">${count}</span></div>`
       ).join('')
     : `<div class="statsRow"><span class="statsLabel">Je hebt dit potje nog geen bots gedood.</span></div>`;
