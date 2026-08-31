@@ -428,6 +428,10 @@ function renderAchievementCard(a) {
     <div style="min-width:90px; font-weight:bold; color:${unlocked ? '#4cd964' : '#888'};">${unlocked ? '✔ Behaald' : '🔒 Op slot'}</div></div>`;
 }
 
+function sortUnlockedFirst(arr) {
+  return [...arr].sort((a, b) => (unlockedAchievements.includes(b.id) ? 1 : 0) - (unlockedAchievements.includes(a.id) ? 1 : 0));
+}
+
 function renderAchievements() {
   checkAchievements();
   const skinRewards = ACHIEVEMENTS.filter(a => a.reward.type === 'unlockSkin');
@@ -440,16 +444,16 @@ function renderAchievements() {
   const w1Count = w1.filter(a => unlockedAchievements.includes(a.id)).length;
   const w2Count = w2.filter(a => unlockedAchievements.includes(a.id)).length;
   const w2Section = currentWorld === 2
-    ? `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${w2.map(renderAchievementCard).join('')}</div>`
+    ? `<div class="shopSection"><h3>🔥❄️🪨 Wereld 2 (${w2Count}/${w2.length})</h3>${sortUnlockedFirst(w2).map(renderAchievementCard).join('')}</div>`
     : '';
   const totalShown = (currentWorld === 2 ? w1.length + w2.length : w1.length) + skinRewards.length + hardRewards.length;
   const unlockedShown = (currentWorld === 2 ? w1Count + w2Count : w1Count) + skinCount + hardCount;
   document.getElementById('achievementsProgress').textContent = `${unlockedShown}/${totalShown} behaald`;
   document.getElementById('achievementsList').innerHTML =
-    `<div class="shopSection"><h3>🌍 Wereld 1 (${w1Count}/${w1.length})</h3>${w1.map(renderAchievementCard).join('')}</div>` +
+    `<div class="shopSection"><h3>🌍 Wereld 1 (${w1Count}/${w1.length})</h3>${sortUnlockedFirst(w1).map(renderAchievementCard).join('')}</div>` +
     w2Section +
-    `<div class="shopSection"><h3>💰 Lastige Quests (${hardCount}/${hardRewards.length})</h3>${hardRewards.map(renderAchievementCard).join('')}</div>` +
-    `<div class="shopSection"><h3>🎨 Exclusieve Skins (${skinCount}/${skinRewards.length})</h3>${skinRewards.map(renderAchievementCard).join('')}</div>`;
+    `<div class="shopSection"><h3>💰 Lastige Quests (${hardCount}/${hardRewards.length})</h3>${sortUnlockedFirst(hardRewards).map(renderAchievementCard).join('')}</div>` +
+    `<div class="shopSection"><h3>🎨 Exclusieve Skins (${skinCount}/${skinRewards.length})</h3>${sortUnlockedFirst(skinRewards).map(renderAchievementCard).join('')}</div>`;
 }
 
 function openAchievements() {
