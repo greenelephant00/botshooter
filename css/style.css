@@ -121,6 +121,7 @@
   #hud .score { color: #ffd60a; font-weight: bold; }
   #hud .hp { color: #ff5c5c; font-weight: bold; }
   #stopBtn {
+    display: none;
     position: absolute;
     top: 46px;
     left: 12px;
@@ -137,6 +138,7 @@
   }
   #stopBtn:hover { background: rgba(255,56,56,0.3); }
   #pauseBtn {
+    display: none;
     position: absolute;
     top: 46px;
     left: 90px;
@@ -152,6 +154,9 @@
     user-select: none;
   }
   #pauseBtn:hover { background: rgba(255,214,10,0.3); }
+  body.match-active #stopBtn, body.match-active #pauseBtn {
+    display: block;
+  }
   #pauseOverlay {
     display: none;
     position: absolute;
