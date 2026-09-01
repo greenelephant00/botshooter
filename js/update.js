@@ -1593,9 +1593,12 @@ function goToMenu() {
     document.getElementById('startCoins').textContent = coins;
     document.getElementById('startScreen').style.display = 'flex';
   }
-  // Een bericht van een admin hoeft niet te wachten tot de volgende keer inloggen — check het ook
-  // elke keer dat je terugkeert naar het hoofdmenu, zodat het verschijnt zodra je er weer bent.
-  if (currentUid) applyPendingMessages(currentUid);
+  // Een bericht of een munten/cores-cadeau van een admin hoeft niet te wachten tot de volgende keer
+  // inloggen — check ze ook elke keer dat je terugkeert naar het hoofdmenu.
+  if (currentUid) {
+    applyPendingMessages(currentUid);
+    applyPendingGrants(currentUid);
+  }
 }
 window.goToMenu = goToMenu;
 

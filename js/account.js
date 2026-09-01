@@ -132,13 +132,16 @@ async function applyPendingGrants(uid) {
       coinsGranted += Number(data.coins) || 0;
       coresGranted += Number(data.cores) || 0;
     });
+    // Zowel de actieve spelvariabelen (coins/elementalCores, voor wat er nu op het scherm staat) als
+    // localStorage bijwerken — deze functie wordt niet meer alleen bij het inloggen aangeroepen (waarna
+    // altijd een reload volgt), maar ook bv. bij het terugkeren naar het hoofdmenu, zonder reload.
     if (coinsGranted !== 0) {
-      const currentCoins = Number(localStorage.getItem('botShooterCoins')) || 0;
-      localStorage.setItem('botShooterCoins', Math.max(0, currentCoins + coinsGranted));
+      coins = Math.max(0, coins + coinsGranted);
+      localStorage.setItem('botShooterCoins', coins);
     }
     if (coresGranted !== 0) {
-      const currentCores = Number(localStorage.getItem('botShooterElementalCores')) || 0;
-      localStorage.setItem('botShooterElementalCores', Math.max(0, currentCores + coresGranted));
+      elementalCores = Math.max(0, elementalCores + coresGranted);
+      localStorage.setItem('botShooterElementalCores', elementalCores);
     }
     // Meteen ook de VOLLEDIGE save terugschrijven naar de cloud (dezelfde functie als de periodieke
     // sync), niet wachten op het volgende interval — anders kan een tussentijdse page-reload de net
@@ -148,6 +151,8 @@ async function applyPendingGrants(uid) {
     // (wapens, skins, enz.) leegmaakte.
     if (coinsGranted !== 0 || coresGranted !== 0) {
       await syncCurrentAccountSave();
+      refreshCurrencyDisplays();
+      updateHUD();
     }
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {
