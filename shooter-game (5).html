@@ -98,7 +98,10 @@
   </div>
   <div class="shopSection">
     <h3>Blokkeer speler</h3>
-    <div class="desc" style="margin-bottom:8px;">Gebruikt dezelfde spelernaam als hierboven bij "Geef aan andere speler".</div>
+    <div class="statsRow">
+      <span class="statsLabel">Spelernaam:</span>
+      <input type="text" id="adminBlockUsername" class="doubleOrNothingInput" placeholder="naam">
+    </div>
     <div class="statsRow">
       <button class="buy" onclick="adminBlockPlayer()">🚫 Blokkeer</button>
       <button class="buy" onclick="adminUnblockPlayer()">✅ Deblokkeer</button>
@@ -107,7 +110,10 @@
   </div>
   <div class="shopSection">
     <h3>Stuur bericht naar speler</h3>
-    <div class="desc" style="margin-bottom:8px;">Gebruikt dezelfde spelernaam als hierboven. Verschijnt bij hun volgende login.</div>
+    <div class="statsRow">
+      <span class="statsLabel">Spelernaam:</span>
+      <input type="text" id="adminMessageUsername" class="doubleOrNothingInput" placeholder="naam">
+    </div>
     <div class="statsRow">
       <input type="text" id="adminMessageInput" class="doubleOrNothingInput" style="width:220px;" placeholder="Bericht">
       <button class="buy" onclick="adminSendMessageToPlayer()">📨 Verstuur</button>

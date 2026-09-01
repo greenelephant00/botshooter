@@ -2814,7 +2814,7 @@ window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 
 async function adminBlockPlayer() {
   const statusEl = document.getElementById('adminBlockStatus');
-  const username = document.getElementById('adminTargetUsername').value.trim();
+  const username = document.getElementById('adminBlockUsername').value.trim();
   if (!username) { statusEl.textContent = 'Vul een spelernaam in.'; return; }
   statusEl.textContent = 'Bezig...';
   try {
@@ -2831,7 +2831,7 @@ window.adminBlockPlayer = adminBlockPlayer;
 
 async function adminUnblockPlayer() {
   const statusEl = document.getElementById('adminBlockStatus');
-  const username = document.getElementById('adminTargetUsername').value.trim();
+  const username = document.getElementById('adminBlockUsername').value.trim();
   if (!username) { statusEl.textContent = 'Vul een spelernaam in.'; return; }
   statusEl.textContent = 'Bezig...';
   try {
@@ -2848,7 +2848,7 @@ window.adminUnblockPlayer = adminUnblockPlayer;
 
 async function adminSendMessageToPlayer() {
   const statusEl = document.getElementById('adminMessageStatus');
-  const username = document.getElementById('adminTargetUsername').value.trim();
+  const username = document.getElementById('adminMessageUsername').value.trim();
   const text = document.getElementById('adminMessageInput').value.trim();
   if (!username || !text) { statusEl.textContent = 'Vul een spelernaam en bericht in.'; return; }
   statusEl.textContent = 'Bezig...';
