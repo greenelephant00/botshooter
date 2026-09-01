@@ -2886,7 +2886,7 @@ window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 async function adminGrantWeaponToPlayer() {
   const statusEl = document.getElementById('adminWeaponRemoveStatus');
   if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
-  const username = document.getElementById('adminWeaponRemoveUsername').value.trim();
+  const username = document.getElementById('adminTargetUsername').value.trim();
   const weaponId = document.getElementById('adminWeaponRemoveSelect').value;
   if (!username || !weaponId) { statusEl.textContent = 'Vul een spelernaam in en kies een wapen.'; return; }
   statusEl.textContent = 'Bezig...';
@@ -2906,7 +2906,7 @@ window.adminGrantWeaponToPlayer = adminGrantWeaponToPlayer;
 async function adminRemoveWeaponFromPlayer() {
   const statusEl = document.getElementById('adminWeaponRemoveStatus');
   if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
-  const username = document.getElementById('adminWeaponRemoveUsername').value.trim();
+  const username = document.getElementById('adminTargetUsername').value.trim();
   const weaponId = document.getElementById('adminWeaponRemoveSelect').value;
   if (!username || !weaponId) { statusEl.textContent = 'Vul een spelernaam in en kies een wapen.'; return; }
   statusEl.textContent = 'Bezig...';
@@ -2926,7 +2926,7 @@ window.adminRemoveWeaponFromPlayer = adminRemoveWeaponFromPlayer;
 async function adminGrantSkinToPlayer() {
   const statusEl = document.getElementById('adminSkinRemoveStatus');
   if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
-  const username = document.getElementById('adminSkinRemoveUsername').value.trim();
+  const username = document.getElementById('adminTargetUsername').value.trim();
   const skinId = document.getElementById('adminSkinRemoveSelect').value;
   if (!username || !skinId) { statusEl.textContent = 'Vul een spelernaam in en kies een skin.'; return; }
   statusEl.textContent = 'Bezig...';
@@ -2946,7 +2946,7 @@ window.adminGrantSkinToPlayer = adminGrantSkinToPlayer;
 async function adminRemoveSkinFromPlayer() {
   const statusEl = document.getElementById('adminSkinRemoveStatus');
   if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
-  const username = document.getElementById('adminSkinRemoveUsername').value.trim();
+  const username = document.getElementById('adminTargetUsername').value.trim();
   const skinId = document.getElementById('adminSkinRemoveSelect').value;
   if (!username || !skinId) { statusEl.textContent = 'Vul een spelernaam in en kies een skin.'; return; }
   statusEl.textContent = 'Bezig...';

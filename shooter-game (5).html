@@ -83,7 +83,7 @@
     </div>
   </div>
   <div class="shopSection">
-    <h3>Geef aan andere speler</h3>
+    <h3>Beheer speler (munten, cores, wapen &amp; skin)</h3>
     <div class="statsRow">
       <span class="statsLabel">Spelernaam:</span>
       <input type="text" id="adminTargetUsername" class="doubleOrNothingInput" placeholder="naam">
@@ -100,64 +100,54 @@
       <button class="buy" onclick="adminGrantCoresToPlayer()">➕ Geef Cores</button>
       <button class="buy" onclick="adminRemoveCoresFromPlayer()">➖ Haal Cores weg</button>
     </div>
-    <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
-  </div>
-  <div class="shopSection" id="adminWeaponRemoveSection" style="display:none;">
-    <h3>Wapen geven/weghalen bij speler (alleen jij)</h3>
-    <div class="statsRow">
-      <span class="statsLabel">Spelernaam:</span>
-      <input type="text" id="adminWeaponRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
+    <div id="adminGrantStatus" class="desc" style="margin-top:6px; margin-bottom:10px; color:#aaa;"></div>
+    <div id="adminWeaponRemoveSection" style="display:none;">
+      <div class="statsRow">
+        <span class="statsLabel">Wapen categorie:</span>
+        <select id="adminWeaponCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminWeaponCategoryChange()">
+          <option value="">-- Kies categorie --</option>
+          <option value="normal">Wapens</option>
+          <option value="special">Speciale wapens</option>
+          <option value="world2">World 2 wapens</option>
+        </select>
+      </div>
+      <div class="statsRow">
+        <span class="statsLabel">Wapen:</span>
+        <select id="adminWeaponRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
+          <option value="">-- Kies eerst een categorie --</option>
+        </select>
+      </div>
+      <div class="statsRow">
+        <button class="buy" onclick="adminGrantWeaponToPlayer()">➕ Geef wapen</button>
+        <button class="buy" onclick="adminRemoveWeaponFromPlayer()">🗑️ Haal wapen weg</button>
+      </div>
+      <div id="adminWeaponRemoveStatus" class="desc" style="margin-top:6px; margin-bottom:10px; color:#aaa;"></div>
     </div>
-    <div class="statsRow">
-      <span class="statsLabel">Categorie:</span>
-      <select id="adminWeaponCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminWeaponCategoryChange()">
-        <option value="">-- Kies categorie --</option>
-        <option value="normal">Wapens</option>
-        <option value="special">Speciale wapens</option>
-        <option value="world2">World 2 wapens</option>
-      </select>
+    <div id="adminSkinRemoveSection" style="display:none;">
+      <div class="statsRow">
+        <span class="statsLabel">Skin categorie:</span>
+        <select id="adminSkinCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminSkinCategoryChange()">
+          <option value="">-- Kies categorie --</option>
+          <option value="normal">Normale skins</option>
+          <option value="killstreak">Kill Streak</option>
+          <option value="element">Elementen Skins</option>
+          <option value="elementkillstreak">Elementen Kill Streak</option>
+          <option value="exclusive">Exclusieve Skins</option>
+          <option value="core">Kern-skin</option>
+        </select>
+      </div>
+      <div class="statsRow">
+        <span class="statsLabel">Skin:</span>
+        <select id="adminSkinRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
+          <option value="">-- Kies eerst een categorie --</option>
+        </select>
+      </div>
+      <div class="statsRow">
+        <button class="buy" onclick="adminGrantSkinToPlayer()">➕ Geef skin</button>
+        <button class="buy" onclick="adminRemoveSkinFromPlayer()">🗑️ Haal skin weg</button>
+      </div>
+      <div id="adminSkinRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
     </div>
-    <div class="statsRow">
-      <span class="statsLabel">Wapen:</span>
-      <select id="adminWeaponRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
-        <option value="">-- Kies eerst een categorie --</option>
-      </select>
-    </div>
-    <div class="statsRow">
-      <button class="buy" onclick="adminGrantWeaponToPlayer()">➕ Geef wapen</button>
-      <button class="buy" onclick="adminRemoveWeaponFromPlayer()">🗑️ Haal weg</button>
-    </div>
-    <div id="adminWeaponRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
-  </div>
-  <div class="shopSection" id="adminSkinRemoveSection" style="display:none;">
-    <h3>Skin geven/weghalen bij speler (alleen jij)</h3>
-    <div class="statsRow">
-      <span class="statsLabel">Spelernaam:</span>
-      <input type="text" id="adminSkinRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
-    </div>
-    <div class="statsRow">
-      <span class="statsLabel">Categorie:</span>
-      <select id="adminSkinCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminSkinCategoryChange()">
-        <option value="">-- Kies categorie --</option>
-        <option value="normal">Normale skins</option>
-        <option value="killstreak">Kill Streak</option>
-        <option value="element">Elementen Skins</option>
-        <option value="elementkillstreak">Elementen Kill Streak</option>
-        <option value="exclusive">Exclusieve Skins</option>
-        <option value="core">Kern-skin</option>
-      </select>
-    </div>
-    <div class="statsRow">
-      <span class="statsLabel">Skin:</span>
-      <select id="adminSkinRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
-        <option value="">-- Kies eerst een categorie --</option>
-      </select>
-    </div>
-    <div class="statsRow">
-      <button class="buy" onclick="adminGrantSkinToPlayer()">➕ Geef skin</button>
-      <button class="buy" onclick="adminRemoveSkinFromPlayer()">🗑️ Haal weg</button>
-    </div>
-    <div id="adminSkinRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
   <div class="shopSection">
     <h3>Blokkeer speler</h3>
