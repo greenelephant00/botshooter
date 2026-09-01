@@ -2702,19 +2702,33 @@ function promptAdminCode() {
 }
 window.promptAdminCode = promptAdminCode;
 
+const ADMIN_WEAPON_CATEGORIES = {
+  normal: WEAPONS,
+  special: SPECIAL_WEAPONS,
+  world2: [...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS]
+};
+
+function onAdminWeaponCategoryChange() {
+  const catKey = document.getElementById('adminWeaponCategorySelect').value;
+  const select = document.getElementById('adminWeaponRemoveSelect');
+  const list = ADMIN_WEAPON_CATEGORIES[catKey];
+  if (!list) {
+    select.innerHTML = `<option value="">-- Kies eerst een categorie --</option>`;
+    select.disabled = true;
+    return;
+  }
+  select.innerHTML = list.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
+  select.disabled = false;
+}
+window.onAdminWeaponCategoryChange = onAdminWeaponCategoryChange;
+
 function openAdminCommandsScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
   const weaponSection = document.getElementById('adminWeaponRemoveSection');
   if (currentUid === PRIMARY_ADMIN_UID) {
     weaponSection.style.display = 'block';
-    const select = document.getElementById('adminWeaponRemoveSelect');
-    if (!select.dataset.filled) {
-      const optionsHtml = list => list.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
-      select.innerHTML = `<optgroup label="Wapens">${optionsHtml(WEAPONS)}</optgroup>` +
-        `<optgroup label="Speciale wapens">${optionsHtml(SPECIAL_WEAPONS)}</optgroup>` +
-        `<optgroup label="World 2 wapens">${optionsHtml([...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS])}</optgroup>`;
-      select.dataset.filled = 'true';
-    }
+    document.getElementById('adminWeaponCategorySelect').value = '';
+    onAdminWeaponCategoryChange();
   } else {
     weaponSection.style.display = 'none';
   }

@@ -109,8 +109,19 @@
       <input type="text" id="adminWeaponRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
     </div>
     <div class="statsRow">
+      <span class="statsLabel">Categorie:</span>
+      <select id="adminWeaponCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminWeaponCategoryChange()">
+        <option value="">-- Kies categorie --</option>
+        <option value="normal">Wapens</option>
+        <option value="special">Speciale wapens</option>
+        <option value="world2">World 2 wapens</option>
+      </select>
+    </div>
+    <div class="statsRow">
       <span class="statsLabel">Wapen:</span>
-      <select id="adminWeaponRemoveSelect" class="doubleOrNothingInput" style="width:220px;"></select>
+      <select id="adminWeaponRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
+        <option value="">-- Kies eerst een categorie --</option>
+      </select>
     </div>
     <div class="statsRow">
       <button class="buy" onclick="adminGrantWeaponToPlayer()">➕ Geef wapen</button>
