@@ -129,6 +129,22 @@
     </div>
     <div id="adminWeaponRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
+  <div class="shopSection" id="adminSkinRemoveSection" style="display:none;">
+    <h3>Skin geven/weghalen bij speler (alleen jij)</h3>
+    <div class="statsRow">
+      <span class="statsLabel">Spelernaam:</span>
+      <input type="text" id="adminSkinRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
+    </div>
+    <div class="statsRow">
+      <span class="statsLabel">Skin:</span>
+      <select id="adminSkinRemoveSelect" class="doubleOrNothingInput" style="width:220px;"></select>
+    </div>
+    <div class="statsRow">
+      <button class="buy" onclick="adminGrantSkinToPlayer()">➕ Geef skin</button>
+      <button class="buy" onclick="adminRemoveSkinFromPlayer()">🗑️ Haal weg</button>
+    </div>
+    <div id="adminSkinRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
   <div class="shopSection">
     <h3>Blokkeer speler</h3>
     <div class="statsRow">

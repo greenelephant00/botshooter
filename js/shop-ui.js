@@ -2725,12 +2725,20 @@ window.onAdminWeaponCategoryChange = onAdminWeaponCategoryChange;
 function openAdminCommandsScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
   const weaponSection = document.getElementById('adminWeaponRemoveSection');
+  const skinSection = document.getElementById('adminSkinRemoveSection');
   if (currentUid === PRIMARY_ADMIN_UID) {
     weaponSection.style.display = 'block';
     document.getElementById('adminWeaponCategorySelect').value = '';
     onAdminWeaponCategoryChange();
+    skinSection.style.display = 'block';
+    const skinSelect = document.getElementById('adminSkinRemoveSelect');
+    if (!skinSelect.dataset.filled) {
+      skinSelect.innerHTML = SKINS.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+      skinSelect.dataset.filled = 'true';
+    }
   } else {
     weaponSection.style.display = 'none';
+    skinSection.style.display = 'none';
   }
 }
 window.openAdminCommandsScreen = openAdminCommandsScreen;
@@ -2892,6 +2900,46 @@ async function adminRemoveWeaponFromPlayer() {
   }
 }
 window.adminRemoveWeaponFromPlayer = adminRemoveWeaponFromPlayer;
+
+async function adminGrantSkinToPlayer() {
+  const statusEl = document.getElementById('adminSkinRemoveStatus');
+  if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
+  const username = document.getElementById('adminSkinRemoveUsername').value.trim();
+  const skinId = document.getElementById('adminSkinRemoveSelect').value;
+  if (!username || !skinId) { statusEl.textContent = 'Vul een spelernaam in en kies een skin.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingSkinGrants').add({ skinId, createdAt: Date.now() });
+    const skinName = (SKINS.find(s => s.id === skinId) || {}).name || skinId;
+    logAdminAction('add', 'skin', skinName, username);
+    statusEl.textContent = `${skinName} wordt gegeven aan ${username} — verschijnt de volgende keer dat ze in het hoofdmenu zijn.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminGrantSkinToPlayer = adminGrantSkinToPlayer;
+
+async function adminRemoveSkinFromPlayer() {
+  const statusEl = document.getElementById('adminSkinRemoveStatus');
+  if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
+  const username = document.getElementById('adminSkinRemoveUsername').value.trim();
+  const skinId = document.getElementById('adminSkinRemoveSelect').value;
+  if (!username || !skinId) { statusEl.textContent = 'Vul een spelernaam in en kies een skin.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingSkinRemovals').add({ skinId, createdAt: Date.now() });
+    const skinName = (SKINS.find(s => s.id === skinId) || {}).name || skinId;
+    logAdminAction('remove', 'skin', skinName, username);
+    statusEl.textContent = `${skinName} wordt weggehaald bij ${username} — verschijnt de volgende keer dat ze in het hoofdmenu zijn.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminRemoveSkinFromPlayer = adminRemoveSkinFromPlayer;
 
 async function adminBlockPlayer() {
   const statusEl = document.getElementById('adminBlockStatus');
@@ -3060,6 +3108,9 @@ async function openAdminLogScreen() {
         valueText = `"${escapeHtml(String(d.amount))}"`;
       } else if (d.currency === 'wapen') {
         desc = d.action === 'add' ? `gaf een wapen aan ${targetText}` : `haalde een wapen weg bij ${targetText}`;
+        valueText = `${d.action === 'add' ? '➕' : '🗑️'} ${escapeHtml(String(d.amount))}`;
+      } else if (d.currency === 'skin') {
+        desc = d.action === 'add' ? `gaf een skin aan ${targetText}` : `haalde een skin weg bij ${targetText}`;
         valueText = `${d.action === 'add' ? '➕' : '🗑️'} ${escapeHtml(String(d.amount))}`;
       } else if (d.currency === 'blokkade') {
         desc = d.action === 'add' ? `blokkeerde ${targetText}` : `deblokkeerde ${targetText}`;

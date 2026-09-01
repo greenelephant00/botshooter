@@ -232,6 +232,59 @@ async function applyPendingWeaponGrants(uid) {
   }
 }
 
+async function applyPendingSkinGrants(uid) {
+  // Mag net als applyPendingGrants nooit een fout naar buiten gooien.
+  try {
+    const snap = await db.collection('users').doc(uid).collection('pendingSkinGrants').get();
+    if (snap.empty) return;
+    let changed = false;
+    snap.forEach(doc => {
+      const skinId = doc.data().skinId;
+      if (skinId && !ownedSkins.includes(skinId)) {
+        ownedSkins.push(skinId);
+        changed = true;
+      }
+    });
+    if (changed) {
+      localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
+      await syncCurrentAccountSave();
+    }
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+  } catch (e) {
+    // Stil negeren — zie toelichting hierboven.
+  }
+}
+
+async function applyPendingSkinRemovals(uid) {
+  // Mag net als applyPendingGrants nooit een fout naar buiten gooien.
+  try {
+    const snap = await db.collection('users').doc(uid).collection('pendingSkinRemovals').get();
+    if (snap.empty) return;
+    let changed = false;
+    snap.forEach(doc => {
+      const skinId = doc.data().skinId;
+      const idx = ownedSkins.indexOf(skinId);
+      if (idx !== -1) {
+        ownedSkins.splice(idx, 1);
+        changed = true;
+        // Als de weggehaalde skin ook uitgerust stond, terugvallen op de standaardskin zodat er altijd
+        // een geldige, bezeten skin actief blijft.
+        if (equippedSkin === skinId) {
+          equippedSkin = 'default';
+          localStorage.setItem('botShooterEquippedSkin', equippedSkin);
+        }
+      }
+    });
+    if (changed) {
+      localStorage.setItem('botShooterOwnedSkins', JSON.stringify(ownedSkins));
+      await syncCurrentAccountSave();
+    }
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+  } catch (e) {
+    // Stil negeren — zie toelichting hierboven.
+  }
+}
+
 async function syncCurrentAccountSave() {
   if (!currentAccount || !currentUid) return;
   const snapshot = {};
@@ -426,6 +479,16 @@ auth.onAuthStateChanged(async user => {
   }
   try {
     await applyPendingWeaponGrants(user.uid);
+  } catch (e) {
+    // Idem.
+  }
+  try {
+    await applyPendingSkinGrants(user.uid);
+  } catch (e) {
+    // Idem.
+  }
+  try {
+    await applyPendingSkinRemovals(user.uid);
   } catch (e) {
     // Idem.
   }

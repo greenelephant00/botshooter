@@ -1601,6 +1601,8 @@ function goToMenu() {
     applyPendingGrants(currentUid);
     applyPendingWeaponRemovals(currentUid);
     applyPendingWeaponGrants(currentUid);
+    applyPendingSkinGrants(currentUid);
+    applyPendingSkinRemovals(currentUid);
   }
 }
 window.goToMenu = goToMenu;
