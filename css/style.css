@@ -411,6 +411,7 @@
   #adminMessageScreen p {
     font-size: 30px;
     font-weight: bold;
+    color: #ffffff;
     max-width: 800px;
     margin-bottom: 30px;
     white-space: pre-wrap;
@@ -685,7 +686,7 @@
     box-sizing: border-box;
   }
   .adminMessageTextarea {
-    width: 220px;
+    width: 340px;
     min-height: 38px;
     max-height: 300px;
     resize: none;
