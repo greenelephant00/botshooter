@@ -2903,8 +2903,7 @@ const ADMIN_INFO_CATEGORIES = [
   { label: 'Trails', ownedKey: 'botShooterOwnedTrails', items: TRAILS },
   { label: 'Menu-achtergronden', ownedKey: 'botShooterOwnedMenuBackgrounds', items: MENU_BACKGROUNDS },
   { label: 'Bot kill-effecten', ownedKey: 'botShooterOwnedBotKillEffects', items: BOT_KILL_EFFECTS },
-  { label: 'Intro-animaties', ownedKey: 'botShooterOwnedIntroAnimations', items: INTRO_ANIMATIONS },
-  { label: 'Achievements', ownedKey: 'botShooterUnlockedAchievements', items: ACHIEVEMENTS }
+  { label: 'Intro-animaties', ownedKey: 'botShooterOwnedIntroAnimations', items: INTRO_ANIMATIONS }
 ];
 
 function buildAdminPlayerInfoHtml(save) {
