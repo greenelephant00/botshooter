@@ -2836,6 +2836,26 @@ function adminRemoveCoresFromPlayer() {
 }
 window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 
+async function adminGrantWeaponToPlayer() {
+  const statusEl = document.getElementById('adminWeaponRemoveStatus');
+  if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
+  const username = document.getElementById('adminWeaponRemoveUsername').value.trim();
+  const weaponId = document.getElementById('adminWeaponRemoveSelect').value;
+  if (!username || !weaponId) { statusEl.textContent = 'Vul een spelernaam in en kies een wapen.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingWeaponGrants').add({ weaponId, createdAt: Date.now() });
+    const weaponName = (ALL_WEAPONS_FOR_ADMIN.find(w => w.id === weaponId) || {}).name || weaponId;
+    logAdminAction('add', 'wapen', weaponName, username);
+    statusEl.textContent = `${weaponName} wordt gegeven aan ${username} — verschijnt de volgende keer dat ze in het hoofdmenu zijn.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminGrantWeaponToPlayer = adminGrantWeaponToPlayer;
+
 async function adminRemoveWeaponFromPlayer() {
   const statusEl = document.getElementById('adminWeaponRemoveStatus');
   if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
@@ -3022,8 +3042,8 @@ async function openAdminLogScreen() {
         desc = `stuurde een bericht naar ${targetText}`;
         valueText = `"${escapeHtml(String(d.amount))}"`;
       } else if (d.currency === 'wapen') {
-        desc = `haalde een wapen weg bij ${targetText}`;
-        valueText = `🗑️ ${escapeHtml(String(d.amount))}`;
+        desc = d.action === 'add' ? `gaf een wapen aan ${targetText}` : `haalde een wapen weg bij ${targetText}`;
+        valueText = `${d.action === 'add' ? '➕' : '🗑️'} ${escapeHtml(String(d.amount))}`;
       } else if (d.currency === 'blokkade') {
         desc = d.action === 'add' ? `blokkeerde ${targetText}` : `deblokkeerde ${targetText}`;
         valueText = d.action === 'add' ? '🚫' : '✅';

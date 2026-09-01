@@ -1600,6 +1600,7 @@ function goToMenu() {
     applyPendingMessages(currentUid);
     applyPendingGrants(currentUid);
     applyPendingWeaponRemovals(currentUid);
+    applyPendingWeaponGrants(currentUid);
   }
 }
 window.goToMenu = goToMenu;
