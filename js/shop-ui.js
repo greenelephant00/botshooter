@@ -2712,6 +2712,10 @@ function refreshCurrencyDisplays() {
   if (world2CoresEl) world2CoresEl.textContent = elementalCores;
 }
 
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 // ---- Actielog: legt elke Admin Commands-actie vast (wie, wat, bij wie, wanneer) — mag nooit de
 // eigenlijke actie blokkeren, dus altijd fire-and-forget met een stille catch.
 function logAdminAction(action, currency, amount, target) {
@@ -2862,6 +2866,7 @@ async function adminSendMessageToPlayer() {
     const doc = await lookupUserByUsername(username);
     if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
     await db.collection('users').doc(doc.id).collection('pendingMessages').add({ text, createdAt: Date.now() });
+    logAdminAction('add', 'bericht', text, username);
     const inputEl = document.getElementById('adminMessageInput');
     inputEl.value = '';
     inputEl.style.height = 'auto';
@@ -2936,7 +2941,10 @@ async function openAdminLogScreen() {
       const d = doc.data();
       const targetText = d.target === 'zichzelf' ? 'zichzelf' : d.target;
       let desc, valueText;
-      if (d.currency === 'blokkade') {
+      if (d.currency === 'bericht') {
+        desc = `stuurde een bericht naar ${targetText}`;
+        valueText = `"${escapeHtml(String(d.amount))}"`;
+      } else if (d.currency === 'blokkade') {
         desc = d.action === 'add' ? `blokkeerde ${targetText}` : `deblokkeerde ${targetText}`;
         valueText = d.action === 'add' ? '🚫' : '✅';
       } else {
