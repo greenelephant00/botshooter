@@ -19,7 +19,8 @@ window.addEventListener('blur', () => {
   for (const k in keys) keys[k] = false;
 });
 window.addEventListener('keydown', e => {
-  if (e.key === ' ') e.preventDefault(); // voorkom scrollen
+  const typingInField = e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA');
+  if (e.key === ' ' && !typingInField) e.preventDefault(); // voorkom scrollen, maar niet in tekstvelden
   if (e.key.toLowerCase() === 'e' && player.activeTransform === 'none') {
     triggerCryoGrenade();
     triggerVampBolt();
