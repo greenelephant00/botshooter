@@ -2709,7 +2709,10 @@ function openAdminCommandsScreen() {
     weaponSection.style.display = 'block';
     const select = document.getElementById('adminWeaponRemoveSelect');
     if (!select.dataset.filled) {
-      select.innerHTML = ALL_WEAPONS_FOR_ADMIN.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
+      const optionsHtml = list => list.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
+      select.innerHTML = `<optgroup label="Wapens">${optionsHtml(WEAPONS)}</optgroup>` +
+        `<optgroup label="Speciale wapens">${optionsHtml(SPECIAL_WEAPONS)}</optgroup>` +
+        `<optgroup label="World 2 wapens">${optionsHtml([...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS])}</optgroup>`;
       select.dataset.filled = 'true';
     }
   } else {
