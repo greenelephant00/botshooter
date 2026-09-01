@@ -119,6 +119,23 @@ async function applyPendingMessages(uid) {
 // Munten/Elemental Cores die een admin via Admin Commands voor deze speler heeft klaargezet, worden
 // hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
 // (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
+async function checkIfBanned(uid) {
+  try {
+    const banDoc = await db.collection('bannedPlayers').doc(uid).get();
+    if (banDoc.exists) {
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('world2Screen').style.display = 'none';
+      document.getElementById('bannedScreen').style.display = 'flex';
+      return true;
+    }
+  } catch (e) {
+    // Kon niet checken of dit account geblokkeerd is (bv. even geen verbinding) — dan gewoon door laten
+    // gaan (fail-open), zodat een tijdelijke storing niet per ongeluk iedereen blokkeert.
+  }
+  return false;
+}
+window.checkIfBanned = checkIfBanned;
+
 async function applyPendingGrants(uid) {
   // Mag NOOIT een fout naar buiten gooien: dit is een extraatje bovenop het inloggen, geen vereiste
   // stap — als de wachtrij-check faalt (bv. security rules nog niet ingesteld, even geen verbinding),
@@ -308,18 +325,9 @@ auth.onAuthStateChanged(async user => {
   // plaats van uit een losse localStorage-vlag — die kon door een race met deze functie soms nog de
   // naam van een vorig account bevatten, waardoor je in het verkeerde account leek te belanden.
   currentUid = user.uid;
-  try {
-    const banDoc = await db.collection('bannedPlayers').doc(user.uid).get();
-    if (banDoc.exists) {
-      document.getElementById('authScreen').style.display = 'none';
-      document.getElementById('startScreen').style.display = 'none';
-      document.getElementById('world2Screen').style.display = 'none';
-      document.getElementById('bannedScreen').style.display = 'flex';
-      return;
-    }
-  } catch (e) {
-    // Kon niet checken of dit account geblokkeerd is (bv. even geen verbinding) — dan gewoon door laten
-    // gaan (fail-open), zodat een tijdelijke storing niet per ongeluk iedereen blokkeert.
+  if (await checkIfBanned(user.uid)) {
+    document.getElementById('authScreen').style.display = 'none';
+    return;
   }
   let resolvedAccount = localStorage.getItem('botShooterActiveAccount');
   // Altijd de save ophalen en toepassen (niet alleen bij een expliciete login) — nodig voor
