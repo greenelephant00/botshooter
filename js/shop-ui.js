@@ -2676,13 +2676,19 @@ window.closeMatchKillsScreen = closeMatchKillsScreen;
 // ---- Admin Commands: knop rechtsonder, vraagt elke keer opnieuw om de code ----
 const ADMIN_UNLOCK_CODE = '44004';
 
+const ADMIN_WRONG_CODE_PENALTY = 100;
+
 function promptAdminCode() {
   const code = prompt('Voer de code in:');
   if (code === null) return;
   if (code.trim() === ADMIN_UNLOCK_CODE) {
     openAdminCommandsScreen();
   } else {
-    alert('Onjuiste code.');
+    coins = Math.max(0, coins - ADMIN_WRONG_CODE_PENALTY);
+    saveShopState();
+    updateHUD();
+    refreshCurrencyDisplays();
+    alert(`Onjuiste code. Je bent ${ADMIN_WRONG_CODE_PENALTY} munten kwijt.`);
   }
 }
 window.promptAdminCode = promptAdminCode;
