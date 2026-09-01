@@ -123,6 +123,8 @@ async function checkIfBanned(uid) {
   try {
     const banDoc = await db.collection('bannedPlayers').doc(uid).get();
     if (banDoc.exists) {
+      const reason = banDoc.data().reason;
+      document.getElementById('bannedReasonText').textContent = reason ? `Reden: ${reason}` : '';
       document.getElementById('startScreen').style.display = 'none';
       document.getElementById('world2Screen').style.display = 'none';
       document.getElementById('bannedScreen').style.display = 'flex';

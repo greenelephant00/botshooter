@@ -390,6 +390,13 @@
     max-width: 400px;
     margin-bottom: 20px;
   }
+  #bannedReasonText {
+    color: #ffd60a;
+    font-weight: bold;
+  }
+  #bannedReasonText:empty {
+    display: none;
+  }
   #adminMessageScreen {
     display: none;
     position: absolute;

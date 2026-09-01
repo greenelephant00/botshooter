@@ -2819,13 +2819,15 @@ window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 async function adminBlockPlayer() {
   const statusEl = document.getElementById('adminBlockStatus');
   const username = document.getElementById('adminBlockUsername').value.trim();
+  const reason = document.getElementById('adminBlockReason').value.trim();
   if (!username) { statusEl.textContent = 'Vul een spelernaam in.'; return; }
   statusEl.textContent = 'Bezig...';
   try {
     const doc = await lookupUserByUsername(username);
     if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
-    await db.collection('bannedPlayers').doc(doc.id).set({ username, bannedAt: Date.now() });
-    logAdminAction('add', 'blokkade', 1, username);
+    await db.collection('bannedPlayers').doc(doc.id).set({ username, bannedAt: Date.now(), reason });
+    logAdminAction('add', 'blokkade', 1, reason ? `${username} (reden: ${reason})` : username);
+    document.getElementById('adminBlockReason').value = '';
     statusEl.textContent = `${username} is geblokkeerd.`;
   } catch (e) {
     statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
@@ -2939,7 +2941,7 @@ async function openAdminLogScreen() {
     }
     listEl.innerHTML = snap.docs.map(doc => {
       const d = doc.data();
-      const targetText = d.target === 'zichzelf' ? 'zichzelf' : d.target;
+      const targetText = d.target === 'zichzelf' ? 'zichzelf' : escapeHtml(String(d.target));
       let desc, valueText;
       if (d.currency === 'bericht') {
         desc = `stuurde een bericht naar ${targetText}`;

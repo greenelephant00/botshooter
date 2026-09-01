@@ -34,6 +34,7 @@
 <div id="bannedScreen">
   <h1>🚫 Geblokkeerd</h1>
   <p>Dit account is geblokkeerd door een beheerder. Je kunt niet inloggen.</p>
+  <p id="bannedReasonText"></p>
   <button class="backBtn" onclick="switchAccount()">← Terug naar inloggen</button>
 </div>
 <div id="adminMessageScreen">
@@ -106,6 +107,10 @@
     <div class="statsRow">
       <span class="statsLabel">Spelernaam:</span>
       <input type="text" id="adminBlockUsername" class="doubleOrNothingInput" placeholder="naam">
+    </div>
+    <div class="statsRow">
+      <span class="statsLabel">Reden (optioneel):</span>
+      <input type="text" id="adminBlockReason" class="doubleOrNothingInput" style="width:220px;" placeholder="bv. valsspelen">
     </div>
     <div class="statsRow">
       <button class="buy" onclick="adminBlockPlayer()">🚫 Blokkeer</button>
