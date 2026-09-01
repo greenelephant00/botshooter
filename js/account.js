@@ -109,7 +109,7 @@ async function applyPendingMessages(uid) {
     const texts = snap.docs.map(doc => doc.data().text).filter(Boolean);
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
     if (texts.length) {
-      setTimeout(() => alert(texts.join('\n\n')), 300); // even wachten tot het menu zichtbaar is
+      setTimeout(() => showAdminMessageScreen(texts.join('\n\n')), 300); // even wachten tot het menu zichtbaar is
     }
   } catch (e) {
     // Stil negeren — zie toelichting bij applyPendingGrants() hieronder.

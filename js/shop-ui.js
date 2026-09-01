@@ -2864,6 +2864,17 @@ async function adminSendMessageToPlayer() {
 }
 window.adminSendMessageToPlayer = adminSendMessageToPlayer;
 
+function showAdminMessageScreen(text) {
+  document.getElementById('adminMessageText').textContent = text;
+  document.getElementById('adminMessageScreen').style.display = 'flex';
+}
+window.showAdminMessageScreen = showAdminMessageScreen;
+
+function closeAdminMessageScreen() {
+  document.getElementById('adminMessageScreen').style.display = 'none';
+}
+window.closeAdminMessageScreen = closeAdminMessageScreen;
+
 async function openAdminPlayersScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'none';
   document.getElementById('adminPlayersScreen').style.display = 'flex';
