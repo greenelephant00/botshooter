@@ -110,6 +110,11 @@
   <h1>📜 Actielog</h1>
   <button class="topBackBtn" onclick="closeAdminLogScreen()">← Terug</button>
   <div class="shopSection">
+    <div class="statsRow">
+      <span class="statsLabel">Verwijder laatste:</span>
+      <input type="number" id="adminLogDeleteCount" class="doubleOrNothingInput" value="5" min="1">
+      <button class="buy" onclick="deleteLastLogEntries()">🗑️ Verwijderen</button>
+    </div>
     <h3>Wie deed wat, bij wie, en wanneer</h3>
     <div id="adminLogList" class="statsList"></div>
   </div>

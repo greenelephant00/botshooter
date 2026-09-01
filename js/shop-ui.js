@@ -2878,6 +2878,20 @@ async function deleteAdminLogEntry(logId) {
 }
 window.deleteAdminLogEntry = deleteAdminLogEntry;
 
+async function deleteLastLogEntries() {
+  const input = document.getElementById('adminLogDeleteCount');
+  const count = Math.max(0, Math.floor(Number(input.value)) || 0);
+  if (count <= 0) return;
+  try {
+    const snap = await db.collection('adminActionLog').orderBy('timestamp', 'desc').limit(count).get();
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+    openAdminLogScreen(); // lijst opnieuw laden zodat de verwijderde regels meteen weg zijn
+  } catch (e) {
+    alert('Kon deze logregels niet verwijderen.');
+  }
+}
+window.deleteLastLogEntries = deleteLastLogEntries;
+
 function closeAdminLogScreen() {
   document.getElementById('adminLogScreen').style.display = 'none';
   document.getElementById('adminCommandsScreen').style.display = 'flex';
