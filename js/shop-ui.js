@@ -2846,6 +2846,12 @@ async function adminUnblockPlayer() {
 }
 window.adminUnblockPlayer = adminUnblockPlayer;
 
+function autoGrowAdminMessageInput(el) {
+  el.style.height = 'auto';
+  el.style.height = el.scrollHeight + 'px';
+}
+window.autoGrowAdminMessageInput = autoGrowAdminMessageInput;
+
 async function adminSendMessageToPlayer() {
   const statusEl = document.getElementById('adminMessageStatus');
   const username = document.getElementById('adminMessageUsername').value.trim();
@@ -2856,8 +2862,10 @@ async function adminSendMessageToPlayer() {
     const doc = await lookupUserByUsername(username);
     if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
     await db.collection('users').doc(doc.id).collection('pendingMessages').add({ text, createdAt: Date.now() });
-    document.getElementById('adminMessageInput').value = '';
-    statusEl.textContent = `Bericht klaargezet voor ${username} — verschijnt bij hun volgende login.`;
+    const inputEl = document.getElementById('adminMessageInput');
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    statusEl.textContent = `Bericht klaargezet voor ${username} — verschijnt de volgende keer dat ze in het hoofdmenu zijn.`;
   } catch (e) {
     statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
   }
