@@ -2860,13 +2860,23 @@ async function openAdminLogScreen() {
       const icon = d.currency === 'cores' ? '🔮' : '🪙';
       const targetText = d.target === 'zichzelf' ? 'zichzelf' : d.target;
       const desc = d.action === 'add' ? `gaf ${targetText}` : `haalde weg bij ${targetText}`;
-      return `<div class="statsRow"><span class="statsLabel">${formatLogTimestamp(d.timestamp)} — <b>${d.adminName}</b> ${desc}</span><span class="statsValue">${d.action === 'add' ? '+' : '-'}${d.amount} ${icon}</span></div>`;
+      return `<div class="statsRow"><span class="statsLabel">${formatLogTimestamp(d.timestamp)} — <b>${d.adminName}</b> ${desc}</span><span class="statsValue">${d.action === 'add' ? '+' : '-'}${d.amount} ${icon}</span><button class="buy" style="margin-left:10px; padding:4px 10px; font-size:12px;" onclick="deleteAdminLogEntry('${doc.id}')">🗑️</button></div>`;
     }).join('');
   } catch (e) {
     listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Kon het actielog niet ophalen.</span></div>`;
   }
 }
 window.openAdminLogScreen = openAdminLogScreen;
+
+async function deleteAdminLogEntry(logId) {
+  try {
+    await db.collection('adminActionLog').doc(logId).delete();
+    openAdminLogScreen(); // lijst opnieuw laden zodat de verwijderde regel meteen weg is
+  } catch (e) {
+    alert('Kon deze logregel niet verwijderen.');
+  }
+}
+window.deleteAdminLogEntry = deleteAdminLogEntry;
 
 function closeAdminLogScreen() {
   document.getElementById('adminLogScreen').style.display = 'none';
