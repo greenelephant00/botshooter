@@ -2890,6 +2890,41 @@ function closeAdminMessageScreen() {
 }
 window.closeAdminMessageScreen = closeAdminMessageScreen;
 
+// ---- Extra info per speler: categoriseert alles wat een speler bezit (wapens, skins, enz.) aan de
+// hand van de bestaande item-lijsten uit state.js, zodat een admin dit per speler kan inzien.
+const ADMIN_INFO_CATEGORIES = [
+  { label: 'Wapens', ownedKey: 'botShooterOwnedWeapons', items: [...WEAPONS, ...WORLD2_WEAPONS] },
+  { label: 'Speciale wapens', ownedKey: 'botShooterOwnedWeapons', items: [...SPECIAL_WEAPONS, ...WORLD2_SPECIAL_WEAPONS] },
+  { label: 'Pantsers', ownedKey: 'botShooterOwnedArmor', items: ARMOR },
+  { label: 'Skins', ownedKey: 'botShooterOwnedSkins', items: SKINS },
+  { label: 'Transformaties', ownedKey: 'botShooterOwnedTransforms', items: TRANSFORMS },
+  { label: 'Wapenskins', ownedKey: 'botShooterOwnedWeaponSkins', items: WEAPON_SKINS },
+  { label: 'Death animaties', ownedKey: 'botShooterOwnedDeathAnimations', items: DEATH_ANIMATIONS },
+  { label: 'Trails', ownedKey: 'botShooterOwnedTrails', items: TRAILS },
+  { label: 'Menu-achtergronden', ownedKey: 'botShooterOwnedMenuBackgrounds', items: MENU_BACKGROUNDS },
+  { label: 'Bot kill-effecten', ownedKey: 'botShooterOwnedBotKillEffects', items: BOT_KILL_EFFECTS },
+  { label: 'Intro-animaties', ownedKey: 'botShooterOwnedIntroAnimations', items: INTRO_ANIMATIONS },
+  { label: 'Achievements', ownedKey: 'botShooterUnlockedAchievements', items: ACHIEVEMENTS }
+];
+
+function buildAdminPlayerInfoHtml(save) {
+  save = save || {};
+  return ADMIN_INFO_CATEGORIES.map(cat => {
+    let ownedIds = [];
+    try { ownedIds = JSON.parse(save[cat.ownedKey] || '[]'); } catch (e) { ownedIds = []; }
+    if (!Array.isArray(ownedIds)) ownedIds = [];
+    const names = cat.items.filter(i => ownedIds.includes(i.id)).map(i => i.name);
+    const valueText = names.length ? escapeHtml(names.join(', ')) : 'geen';
+    return `<div class="statsRow" style="flex-direction:column; align-items:flex-start; gap:4px;"><span class="statsLabel">${cat.label}:</span><span style="color:#ccc; font-size:13px;">${valueText}</span></div>`;
+  }).join('');
+}
+
+function toggleAdminPlayerInfo(id) {
+  const el = document.getElementById(`adminPlayerInfo-${id}`);
+  if (el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+window.toggleAdminPlayerInfo = toggleAdminPlayerInfo;
+
 async function openAdminPlayersScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'none';
   document.getElementById('adminPlayersScreen').style.display = 'flex';
@@ -2901,13 +2936,14 @@ async function openAdminPlayersScreen() {
     snap.forEach(doc => {
       const data = doc.data();
       const name = data.username || '(onbekend)';
-      const playerCoins = (data.save && data.save.botShooterCoins) || '0';
-      const playerCores = (data.save && data.save.botShooterElementalCores) || '0';
-      rows.push({ name, coins: Number(playerCoins) || 0, cores: Number(playerCores) || 0 });
+      const save = data.save || {};
+      const playerCoins = save.botShooterCoins || '0';
+      const playerCores = save.botShooterElementalCores || '0';
+      rows.push({ id: doc.id, name, coins: Number(playerCoins) || 0, cores: Number(playerCores) || 0, save });
     });
     rows.sort((a, b) => a.name.localeCompare(b.name));
     listEl.innerHTML = rows.length
-      ? rows.map(r => `<div class="statsRow"><span class="statsLabel">${r.name}</span><span class="statsValue">🪙 ${r.coins} &nbsp; 🔮 ${r.cores}</span></div>`).join('')
+      ? rows.map(r => `<div class="statsRow"><span class="statsLabel">${escapeHtml(r.name)}</span><span class="statsValue">🪙 ${r.coins} &nbsp; 🔮 ${r.cores}</span><button class="buy" style="margin-left:10px; padding:4px 10px; font-size:12px;" onclick="toggleAdminPlayerInfo('${r.id}')">ℹ️ Info</button></div><div id="adminPlayerInfo-${r.id}" class="shopSection" style="display:none; margin-top:-4px; margin-bottom:10px;">${buildAdminPlayerInfoHtml(r.save)}</div>`).join('')
       : `<div class="statsRow"><span class="statsLabel">Geen spelers gevonden.</span></div>`;
   } catch (e) {
     listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Kon de spelerslijst niet ophalen.</span></div>`;
