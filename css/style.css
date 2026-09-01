@@ -367,6 +367,29 @@
     margin: 0 0 4px;
     font-size: 30px;
   }
+  #bannedScreen {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: #0a0a14;
+    z-index: 55;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  #bannedScreen h1 {
+    font-size: 36px;
+    color: #ff5c5c;
+    margin-bottom: 8px;
+  }
+  #bannedScreen p {
+    color: #ccc;
+    max-width: 400px;
+    margin-bottom: 20px;
+  }
   #authScreen {
     position: absolute;
     inset: 0;

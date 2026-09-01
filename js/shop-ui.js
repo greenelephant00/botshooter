@@ -2812,6 +2812,58 @@ function adminRemoveCoresFromPlayer() {
 }
 window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
 
+async function adminBlockPlayer() {
+  const statusEl = document.getElementById('adminBlockStatus');
+  const username = document.getElementById('adminTargetUsername').value.trim();
+  if (!username) { statusEl.textContent = 'Vul een spelernaam in.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('bannedPlayers').doc(doc.id).set({ username, bannedAt: Date.now() });
+    logAdminAction('add', 'blokkade', 1, username);
+    statusEl.textContent = `${username} is geblokkeerd.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminBlockPlayer = adminBlockPlayer;
+
+async function adminUnblockPlayer() {
+  const statusEl = document.getElementById('adminBlockStatus');
+  const username = document.getElementById('adminTargetUsername').value.trim();
+  if (!username) { statusEl.textContent = 'Vul een spelernaam in.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('bannedPlayers').doc(doc.id).delete();
+    logAdminAction('remove', 'blokkade', 1, username);
+    statusEl.textContent = `${username} is gedeblokkeerd.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminUnblockPlayer = adminUnblockPlayer;
+
+async function adminSendMessageToPlayer() {
+  const statusEl = document.getElementById('adminMessageStatus');
+  const username = document.getElementById('adminTargetUsername').value.trim();
+  const text = document.getElementById('adminMessageInput').value.trim();
+  if (!username || !text) { statusEl.textContent = 'Vul een spelernaam en bericht in.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingMessages').add({ text, createdAt: Date.now() });
+    document.getElementById('adminMessageInput').value = '';
+    statusEl.textContent = `Bericht klaargezet voor ${username} — verschijnt bij hun volgende login.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminSendMessageToPlayer = adminSendMessageToPlayer;
+
 async function openAdminPlayersScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'none';
   document.getElementById('adminPlayersScreen').style.display = 'flex';
@@ -2863,10 +2915,17 @@ async function openAdminLogScreen() {
     }
     listEl.innerHTML = snap.docs.map(doc => {
       const d = doc.data();
-      const icon = d.currency === 'cores' ? '🔮' : '🪙';
       const targetText = d.target === 'zichzelf' ? 'zichzelf' : d.target;
-      const desc = d.action === 'add' ? `gaf ${targetText}` : `haalde weg bij ${targetText}`;
-      return `<div class="statsRow"><span class="statsLabel">${formatLogTimestamp(d.timestamp)} — <b>${d.adminName}</b> ${desc}</span><span class="statsValue">${d.action === 'add' ? '+' : '-'}${d.amount} ${icon}</span><button class="buy" style="margin-left:10px; padding:4px 10px; font-size:12px;" onclick="deleteAdminLogEntry('${doc.id}')">🗑️</button></div>`;
+      let desc, valueText;
+      if (d.currency === 'blokkade') {
+        desc = d.action === 'add' ? `blokkeerde ${targetText}` : `deblokkeerde ${targetText}`;
+        valueText = d.action === 'add' ? '🚫' : '✅';
+      } else {
+        const icon = d.currency === 'cores' ? '🔮' : '🪙';
+        desc = d.action === 'add' ? `gaf ${targetText}` : `haalde weg bij ${targetText}`;
+        valueText = `${d.action === 'add' ? '+' : '-'}${d.amount} ${icon}`;
+      }
+      return `<div class="statsRow"><span class="statsLabel">${formatLogTimestamp(d.timestamp)} — <b>${d.adminName}</b> ${desc}</span><span class="statsValue">${valueText}</span><button class="buy" style="margin-left:10px; padding:4px 10px; font-size:12px;" onclick="deleteAdminLogEntry('${doc.id}')">🗑️</button></div>`;
     }).join('');
   } catch (e) {
     listEl.innerHTML = `<div class="statsRow"><span class="statsLabel">Kon het actielog niet ophalen.</span></div>`;

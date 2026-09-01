@@ -100,6 +100,22 @@ async function hydrateFromCloud(uid) {
   return userDoc;
 }
 
+// Berichten die een admin via Admin Commands voor deze speler heeft klaargezet, worden bij het
+// inloggen opgehaald, getoond en daarna verwijderd uit de wachtrij.
+async function applyPendingMessages(uid) {
+  try {
+    const snap = await db.collection('users').doc(uid).collection('pendingMessages').get();
+    if (snap.empty) return;
+    const texts = snap.docs.map(doc => doc.data().text).filter(Boolean);
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+    if (texts.length) {
+      setTimeout(() => alert(texts.join('\n\n')), 300); // even wachten tot het menu zichtbaar is
+    }
+  } catch (e) {
+    // Stil negeren — zie toelichting bij applyPendingGrants() hieronder.
+  }
+}
+
 // Munten/Elemental Cores die een admin via Admin Commands voor deze speler heeft klaargezet, worden
 // hier opgehaald en toegevoegd bij het inloggen — zo overschrijft de eigen periodieke save-sync
 // (die anders een cadeau van een ander apparaat gewoon weer teniet zou doen) het nooit.
@@ -287,6 +303,19 @@ auth.onAuthStateChanged(async user => {
   // plaats van uit een losse localStorage-vlag — die kon door een race met deze functie soms nog de
   // naam van een vorig account bevatten, waardoor je in het verkeerde account leek te belanden.
   currentUid = user.uid;
+  try {
+    const banDoc = await db.collection('bannedPlayers').doc(user.uid).get();
+    if (banDoc.exists) {
+      document.getElementById('authScreen').style.display = 'none';
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('world2Screen').style.display = 'none';
+      document.getElementById('bannedScreen').style.display = 'flex';
+      return;
+    }
+  } catch (e) {
+    // Kon niet checken of dit account geblokkeerd is (bv. even geen verbinding) — dan gewoon door laten
+    // gaan (fail-open), zodat een tijdelijke storing niet per ongeluk iedereen blokkeert.
+  }
   let resolvedAccount = localStorage.getItem('botShooterActiveAccount');
   // Altijd de save ophalen en toepassen (niet alleen bij een expliciete login) — nodig voor
   // cross-device sync, en veilig zolang syncCurrentAccountSave() de cloud betrouwbaar bijhoudt
@@ -316,6 +345,11 @@ auth.onAuthStateChanged(async user => {
     await applyPendingGrants(user.uid);
   } catch (e) {
     // Idem: een mislukte wachtrij-check mag de rest van het inloggen niet blokkeren.
+  }
+  try {
+    await applyPendingMessages(user.uid);
+  } catch (e) {
+    // Idem.
   }
   refreshCurrencyDisplays();
   updateHUD();

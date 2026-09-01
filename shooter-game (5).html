@@ -31,6 +31,11 @@
     <button class="backBtn" onclick="showAuthView('gate')">← Terug</button>
   </div>
 </div>
+<div id="bannedScreen">
+  <h1>🚫 Geblokkeerd</h1>
+  <p>Dit account is geblokkeerd door een beheerder. Je kunt niet inloggen.</p>
+  <button class="backBtn" onclick="switchAccount()">← Terug naar inloggen</button>
+</div>
 <canvas id="gameCanvas"></canvas>
 <canvas id="menuBgCanvas"></canvas>
 <div id="touchJoystickZone">
@@ -90,6 +95,24 @@
       <button class="buy" onclick="adminRemoveCoresFromPlayer()">➖ Haal Cores weg</button>
     </div>
     <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
+  <div class="shopSection">
+    <h3>Blokkeer speler</h3>
+    <div class="desc" style="margin-bottom:8px;">Gebruikt dezelfde spelernaam als hierboven bij "Geef aan andere speler".</div>
+    <div class="statsRow">
+      <button class="buy" onclick="adminBlockPlayer()">🚫 Blokkeer</button>
+      <button class="buy" onclick="adminUnblockPlayer()">✅ Deblokkeer</button>
+    </div>
+    <div id="adminBlockStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
+  <div class="shopSection">
+    <h3>Stuur bericht naar speler</h3>
+    <div class="desc" style="margin-bottom:8px;">Gebruikt dezelfde spelernaam als hierboven. Verschijnt bij hun volgende login.</div>
+    <div class="statsRow">
+      <input type="text" id="adminMessageInput" class="doubleOrNothingInput" style="width:220px;" placeholder="Bericht">
+      <button class="buy" onclick="adminSendMessageToPlayer()">📨 Verstuur</button>
+    </div>
+    <div id="adminMessageStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
   <div class="shopSection" style="display:flex; gap:10px;">
     <button class="buy" onclick="openAdminPlayersScreen()">📋 Alle spelers</button>
