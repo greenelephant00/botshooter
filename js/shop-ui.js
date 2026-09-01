@@ -2722,6 +2722,31 @@ function onAdminWeaponCategoryChange() {
 }
 window.onAdminWeaponCategoryChange = onAdminWeaponCategoryChange;
 
+// Dezelfde indeling als de echte skins-shop (renderSkinsShop hierboven), zodat de categorieën hier
+// herkenbaar zijn voor wie de shop kent.
+const ADMIN_SKIN_CATEGORIES = {
+  normal: SKINS.filter(s => !s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly),
+  killstreak: SKINS.filter(s => s.killstreak && !s.element && !s.coreOnly && !s.achievementOnly),
+  element: SKINS.filter(s => s.element && !s.killstreak && !s.coreOnly && !s.achievementOnly),
+  elementkillstreak: SKINS.filter(s => s.element && s.killstreak && !s.coreOnly && !s.achievementOnly),
+  exclusive: SKINS.filter(s => s.achievementOnly),
+  core: SKINS.filter(s => s.coreOnly)
+};
+
+function onAdminSkinCategoryChange() {
+  const catKey = document.getElementById('adminSkinCategorySelect').value;
+  const select = document.getElementById('adminSkinRemoveSelect');
+  const list = ADMIN_SKIN_CATEGORIES[catKey];
+  if (!list) {
+    select.innerHTML = `<option value="">-- Kies eerst een categorie --</option>`;
+    select.disabled = true;
+    return;
+  }
+  select.innerHTML = list.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
+  select.disabled = false;
+}
+window.onAdminSkinCategoryChange = onAdminSkinCategoryChange;
+
 function openAdminCommandsScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
   const weaponSection = document.getElementById('adminWeaponRemoveSection');
@@ -2731,11 +2756,8 @@ function openAdminCommandsScreen() {
     document.getElementById('adminWeaponCategorySelect').value = '';
     onAdminWeaponCategoryChange();
     skinSection.style.display = 'block';
-    const skinSelect = document.getElementById('adminSkinRemoveSelect');
-    if (!skinSelect.dataset.filled) {
-      skinSelect.innerHTML = SKINS.map(s => `<option value="${s.id}">${escapeHtml(s.name)}</option>`).join('');
-      skinSelect.dataset.filled = 'true';
-    }
+    document.getElementById('adminSkinCategorySelect').value = '';
+    onAdminSkinCategoryChange();
   } else {
     weaponSection.style.display = 'none';
     skinSection.style.display = 'none';

@@ -136,8 +136,22 @@
       <input type="text" id="adminSkinRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
     </div>
     <div class="statsRow">
+      <span class="statsLabel">Categorie:</span>
+      <select id="adminSkinCategorySelect" class="doubleOrNothingInput" style="width:220px;" onchange="onAdminSkinCategoryChange()">
+        <option value="">-- Kies categorie --</option>
+        <option value="normal">Normale skins</option>
+        <option value="killstreak">Kill Streak</option>
+        <option value="element">Elementen Skins</option>
+        <option value="elementkillstreak">Elementen Kill Streak</option>
+        <option value="exclusive">Exclusieve Skins</option>
+        <option value="core">Kern-skin</option>
+      </select>
+    </div>
+    <div class="statsRow">
       <span class="statsLabel">Skin:</span>
-      <select id="adminSkinRemoveSelect" class="doubleOrNothingInput" style="width:220px;"></select>
+      <select id="adminSkinRemoveSelect" class="doubleOrNothingInput" style="width:220px;" disabled>
+        <option value="">-- Kies eerst een categorie --</option>
+      </select>
     </div>
     <div class="statsRow">
       <button class="buy" onclick="adminGrantSkinToPlayer()">➕ Geef skin</button>
