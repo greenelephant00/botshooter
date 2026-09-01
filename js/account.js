@@ -179,6 +179,36 @@ async function applyPendingGrants(uid) {
   }
 }
 
+async function applyPendingWeaponRemovals(uid) {
+  // Mag net als applyPendingGrants nooit een fout naar buiten gooien.
+  try {
+    const snap = await db.collection('users').doc(uid).collection('pendingWeaponRemovals').get();
+    if (snap.empty) return;
+    let changed = false;
+    snap.forEach(doc => {
+      const weaponId = doc.data().weaponId;
+      const idx = ownedWeapons.indexOf(weaponId);
+      if (idx !== -1) {
+        ownedWeapons.splice(idx, 1);
+        changed = true;
+        // Als het weggehaalde wapen ook uitgerust stond, terugvallen op het pistool zodat er altijd
+        // een geldig, bezeten wapen actief blijft.
+        if (equippedWeapon === weaponId) {
+          equippedWeapon = 'pistol';
+          localStorage.setItem('botShooterEquippedWeapon', equippedWeapon);
+        }
+      }
+    });
+    if (changed) {
+      localStorage.setItem('botShooterOwnedWeapons', JSON.stringify(ownedWeapons));
+      await syncCurrentAccountSave();
+    }
+    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+  } catch (e) {
+    // Stil negeren — zie toelichting hierboven.
+  }
+}
+
 async function syncCurrentAccountSave() {
   if (!currentAccount || !currentUid) return;
   const snapshot = {};
@@ -363,6 +393,11 @@ auth.onAuthStateChanged(async user => {
   }
   try {
     await applyPendingMessages(user.uid);
+  } catch (e) {
+    // Idem.
+  }
+  try {
+    await applyPendingWeaponRemovals(user.uid);
   } catch (e) {
     // Idem.
   }

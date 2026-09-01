@@ -102,6 +102,19 @@
     </div>
     <div id="adminGrantStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
+  <div class="shopSection" id="adminWeaponRemoveSection" style="display:none;">
+    <h3>Wapen weghalen bij speler (alleen jij)</h3>
+    <div class="statsRow">
+      <span class="statsLabel">Spelernaam:</span>
+      <input type="text" id="adminWeaponRemoveUsername" class="doubleOrNothingInput" placeholder="naam">
+    </div>
+    <div class="statsRow">
+      <span class="statsLabel">Wapen:</span>
+      <select id="adminWeaponRemoveSelect" class="doubleOrNothingInput" style="width:220px;"></select>
+      <button class="buy" onclick="adminRemoveWeaponFromPlayer()">🗑️ Haal weg</button>
+    </div>
+    <div id="adminWeaponRemoveStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
   <div class="shopSection">
     <h3>Blokkeer speler</h3>
     <div class="statsRow">

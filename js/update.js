@@ -1599,6 +1599,7 @@ function goToMenu() {
     checkIfBanned(currentUid);
     applyPendingMessages(currentUid);
     applyPendingGrants(currentUid);
+    applyPendingWeaponRemovals(currentUid);
   }
 }
 window.goToMenu = goToMenu;

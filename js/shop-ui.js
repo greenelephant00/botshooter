@@ -2678,6 +2678,15 @@ const ADMIN_UNLOCK_CODE = '44004';
 
 const ADMIN_WRONG_CODE_PENALTY = 100;
 
+// Sommige acties (zoals wapens weghalen bij een speler) mogen alleen door de hoofd-admin zelf gedaan
+// worden, ook al kent een vriend de code hierboven ook — dat UID moet gelijk zijn aan de admin-UID in
+// de Firestore security rules, anders wordt de actie daar alsnog geweigerd.
+const PRIMARY_ADMIN_UID = 'iIiPCt2UdEUvfSUPlF8gjCqM4u23';
+
+// Alle wapens uit elke wapenshop samen, gebruikt om het weghaal-dropdown te vullen en om een
+// wapen-id om te zetten naar een leesbare naam.
+const ALL_WEAPONS_FOR_ADMIN = [...WEAPONS, ...SPECIAL_WEAPONS, ...WORLD2_WEAPONS, ...WORLD2_SPECIAL_WEAPONS];
+
 function promptAdminCode() {
   const code = prompt('Voer de code in:');
   if (code === null) return;
@@ -2695,6 +2704,17 @@ window.promptAdminCode = promptAdminCode;
 
 function openAdminCommandsScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
+  const weaponSection = document.getElementById('adminWeaponRemoveSection');
+  if (currentUid === PRIMARY_ADMIN_UID) {
+    weaponSection.style.display = 'block';
+    const select = document.getElementById('adminWeaponRemoveSelect');
+    if (!select.dataset.filled) {
+      select.innerHTML = ALL_WEAPONS_FOR_ADMIN.map(w => `<option value="${w.id}">${escapeHtml(w.name)}</option>`).join('');
+      select.dataset.filled = 'true';
+    }
+  } else {
+    weaponSection.style.display = 'none';
+  }
 }
 window.openAdminCommandsScreen = openAdminCommandsScreen;
 
@@ -2815,6 +2835,26 @@ function adminRemoveCoresFromPlayer() {
   submitPlayerGrant(0, -amount, `${amount} Elemental Cores wegnemen klaargezet`);
 }
 window.adminRemoveCoresFromPlayer = adminRemoveCoresFromPlayer;
+
+async function adminRemoveWeaponFromPlayer() {
+  const statusEl = document.getElementById('adminWeaponRemoveStatus');
+  if (currentUid !== PRIMARY_ADMIN_UID) { statusEl.textContent = 'Alleen de hoofd-admin mag dit.'; return; }
+  const username = document.getElementById('adminWeaponRemoveUsername').value.trim();
+  const weaponId = document.getElementById('adminWeaponRemoveSelect').value;
+  if (!username || !weaponId) { statusEl.textContent = 'Vul een spelernaam in en kies een wapen.'; return; }
+  statusEl.textContent = 'Bezig...';
+  try {
+    const doc = await lookupUserByUsername(username);
+    if (!doc) { statusEl.textContent = `Speler "${username}" niet gevonden.`; return; }
+    await db.collection('users').doc(doc.id).collection('pendingWeaponRemovals').add({ weaponId, createdAt: Date.now() });
+    const weaponName = (ALL_WEAPONS_FOR_ADMIN.find(w => w.id === weaponId) || {}).name || weaponId;
+    logAdminAction('remove', 'wapen', weaponName, username);
+    statusEl.textContent = `${weaponName} wordt weggehaald bij ${username} — verschijnt de volgende keer dat ze in het hoofdmenu zijn.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminRemoveWeaponFromPlayer = adminRemoveWeaponFromPlayer;
 
 async function adminBlockPlayer() {
   const statusEl = document.getElementById('adminBlockStatus');
@@ -2981,6 +3021,9 @@ async function openAdminLogScreen() {
       if (d.currency === 'bericht') {
         desc = `stuurde een bericht naar ${targetText}`;
         valueText = `"${escapeHtml(String(d.amount))}"`;
+      } else if (d.currency === 'wapen') {
+        desc = `haalde een wapen weg bij ${targetText}`;
+        valueText = `🗑️ ${escapeHtml(String(d.amount))}`;
       } else if (d.currency === 'blokkade') {
         desc = d.action === 'add' ? `blokkeerde ${targetText}` : `deblokkeerde ${targetText}`;
         valueText = d.action === 'add' ? '🚫' : '✅';
