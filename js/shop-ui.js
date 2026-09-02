@@ -2749,6 +2749,16 @@ window.onAdminSkinCategoryChange = onAdminSkinCategoryChange;
 
 function openAdminCommandsScreen() {
   document.getElementById('adminCommandsScreen').style.display = 'flex';
+  // Oude statustekst/invoer van een vorig bezoek (bv. "speler niet gevonden") mag niet blijven hangen —
+  // dat leest anders alsof een actie die je nu nog moet doen al mislukt is.
+  ['adminGrantStatus', 'adminWeaponRemoveStatus', 'adminSkinRemoveStatus', 'adminBlockStatus', 'adminMessageStatus', 'adminBroadcastStatus'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = '';
+  });
+  document.getElementById('adminTargetUsername').value = '';
+  document.getElementById('adminBlockUsername').value = '';
+  document.getElementById('adminBlockReason').value = '';
+  document.getElementById('adminMessageUsername').value = '';
   const weaponSection = document.getElementById('adminWeaponRemoveSection');
   const skinSection = document.getElementById('adminSkinRemoveSection');
   if (currentUid === PRIMARY_ADMIN_UID) {
