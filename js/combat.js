@@ -2149,7 +2149,7 @@ function botShoot(bot) {
     // tank: quick burst of 3 shots in a row
     let count = 0;
     const burstInterval = setInterval(() => {
-      if (bot.dead || gameOver) { clearInterval(burstInterval); return; }
+      if (bot.dead || gameOver || levelTransition) { clearInterval(burstInterval); return; }
       const dx2 = target.x - bot.x, dy2 = target.y - bot.y;
       fireBotBullet(bot, Math.atan2(dy2, dx2));
       count++;
@@ -2165,7 +2165,7 @@ function botShoot(bot) {
     // chaser: twee snelle schoten vlak na elkaar
     fireBotBullet(bot, baseAngle);
     setTimeout(() => {
-      if (bot.dead || gameOver) return;
+      if (bot.dead || gameOver || levelTransition) return;
       const dx2 = target.x - bot.x, dy2 = target.y - bot.y;
       fireBotBullet(bot, Math.atan2(dy2, dx2));
     }, 150);
@@ -2183,7 +2183,7 @@ function botShoot(bot) {
     const n = 8;
     let wave = 0;
     const doWave = () => {
-      if (bot.dead || gameOver) return;
+      if (bot.dead || gameOver || levelTransition) return;
       for (let i = 0; i < n; i++) {
         fireBotBullet(bot, (Math.PI * 2 / n) * i + wave * 0.2);
       }
