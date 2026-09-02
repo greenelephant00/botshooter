@@ -10,7 +10,10 @@ canvas.addEventListener('mousemove', e => {
   mouse.y = e.clientY - rect.top;
 });
 canvas.addEventListener('mousedown', () => keys['mouse'] = true);
-canvas.addEventListener('mouseup', () => keys['mouse'] = false);
+// Aan window gekoppeld (niet canvas): als je tijdens het schieten loslaat boven een HUD-knop die los
+// over het canvas heen ligt (bv. pauze/stop), vuurt mouseup daar en niet op het canvas — zonder deze
+// listener op window zou keys['mouse'] dan voor altijd op true blijven staan.
+window.addEventListener('mouseup', () => keys['mouse'] = false);
 
 // Verliest het venster de focus (alt-tab, een browser-prompt die de aandacht steelt, enz.) terwijl een
 // toets of de muisknop nog ingedrukt is, dan komt de bijbehorende keyup/mouseup nooit binnen — zonder
