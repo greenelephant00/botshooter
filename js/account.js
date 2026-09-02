@@ -102,7 +102,12 @@ async function hydrateFromCloud(uid) {
 
 // Berichten die een admin via Admin Commands voor deze speler heeft klaargezet, worden bij het
 // inloggen opgehaald, getoond en daarna verwijderd uit de wachtrij.
+// De inFlight-vlag voorkomt dat twee gelijktijdige aanroepen (bv. door snel dubbelklikken op "naar
+// menu") dezelfde nog-niet-verwijderde wachtrij allebei ophalen en het bericht dubbel tonen.
+let applyPendingMessagesInFlight = false;
 async function applyPendingMessages(uid) {
+  if (applyPendingMessagesInFlight) return;
+  applyPendingMessagesInFlight = true;
   try {
     const snap = await db.collection('users').doc(uid).collection('pendingMessages').get();
     if (snap.empty) return;
@@ -113,6 +118,8 @@ async function applyPendingMessages(uid) {
     }
   } catch (e) {
     // Stil negeren — zie toelichting bij applyPendingGrants() hieronder.
+  } finally {
+    applyPendingMessagesInFlight = false;
   }
 }
 
@@ -138,10 +145,16 @@ async function checkIfBanned(uid) {
 }
 window.checkIfBanned = checkIfBanned;
 
+// De inFlight-vlag voorkomt dat twee gelijktijdige aanroepen (bv. door snel dubbelklikken op "naar
+// menu") dezelfde nog-niet-verwijderde wachtrij allebei ophalen en de munten/cores dubbel toekennen —
+// in tegenstelling tot de wapen/skin-varianten hieronder heeft deze geen eigen "al toegepast"-check.
+let applyPendingGrantsInFlight = false;
 async function applyPendingGrants(uid) {
   // Mag NOOIT een fout naar buiten gooien: dit is een extraatje bovenop het inloggen, geen vereiste
   // stap — als de wachtrij-check faalt (bv. security rules nog niet ingesteld, even geen verbinding),
   // mag dat het inloggen zelf niet laten crashen (dat gaf eerder een verdwenen hoofdmenu).
+  if (applyPendingGrantsInFlight) return;
+  applyPendingGrantsInFlight = true;
   try {
     const snap = await db.collection('users').doc(uid).collection('pendingGrants').get();
     if (snap.empty) return;
@@ -176,6 +189,8 @@ async function applyPendingGrants(uid) {
     await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {
     // Stil negeren — zie toelichting hierboven.
+  } finally {
+    applyPendingGrantsInFlight = false;
   }
 }
 
