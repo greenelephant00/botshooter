@@ -133,6 +133,9 @@ const MUSIC_TRACKS = [
 
 function scheduleMusicLoop() {
   if (!musicPlaying || !audioCtx) return;
+  // Een ongeldige opgeslagen index (bv. door devtools-geknoei of een oudere versie met meer nummers)
+  // zou hier anders een onopgevangen crash geven die de muziek voorgoed stil laat vallen.
+  if (!MUSIC_TRACKS[currentTrackIndex]) currentTrackIndex = 0;
   const track = MUSIC_TRACKS[currentTrackIndex];
   const now = audioCtx.currentTime;
   const stepDur = track.stepDur;
