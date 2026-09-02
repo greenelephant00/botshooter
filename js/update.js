@@ -603,7 +603,7 @@ function update() {
             const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
             if (dd < nearestDist) { nearest = other; nearestDist = dd; }
           });
-          if (nearest) {
+          if (nearest && !(nearest.invulnUntil && performance.now() < nearest.invulnUntil)) {
             const chainDmg = Math.max(1, Math.round((b.dmg || 1) * 0.6));
             nearest.hp -= chainDmg;
             lightningBolts.push({ x1: bot.x, y1: bot.y, x2: nearest.x, y2: nearest.y, born: performance.now() });
@@ -661,6 +661,7 @@ function update() {
           spawnParticles(b.x, b.y, '#ffcc00');
           bots.forEach(other => {
             if (other === bot || other.dead) return;
+            if (other.invulnUntil && performance.now() < other.invulnUntil) return;
             const dd = Math.hypot(b.x - other.x, b.y - other.y);
             if (dd < b.splashRadius) {
               other.hp -= b.splashDmg;
@@ -1024,6 +1025,7 @@ function update() {
       if (outOfBounds) {
         t.captured.forEach(bot => {
           if (bot.dead) return;
+          if (bot.invulnUntil && now0 < bot.invulnUntil) { bot.tornadoCaptured = false; return; }
           bot.dead = true;
           handleBotDeath(bot, bot.maxHp);
           spawnParticles(bot.x, bot.y, '#cfe8ee');
@@ -1156,6 +1158,7 @@ function update() {
         const nukeDmg = info.dmgs[lvl];
         bots.forEach(bot => {
           if (bot.dead) return;
+          if (bot.invulnUntil && now < bot.invulnUntil) return;
           bot.hp -= nukeDmg;
           spawnParticles(bot.x, bot.y, '#ff8800');
           if (bot.hp <= 0 && !bot.immortal) {

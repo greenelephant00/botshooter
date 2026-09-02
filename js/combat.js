@@ -1174,7 +1174,7 @@ function meleeAttack(bot) {
   const armor = getArmorStats();
   const thorns = armor.thorns;
 
-  if (notBlocked && !bot.dead) {
+  if (notBlocked && !bot.dead && !(bot.invulnUntil && now < bot.invulnUntil)) {
     let reflectedDmg = 0;
     // Thorns
     if (thorns) {
@@ -2263,6 +2263,7 @@ function rootGrabAttack(count) {
     }, riseDur + wrapDur * 0.3);
     setTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
+      if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
       spawnParticles(tx, ty, '#5c3a1e');
       spawnParticles(tx, ty, '#3fa34d');
       spawnParticles(tx, ty, '#2f7d3c');
@@ -2294,6 +2295,7 @@ function rootDragNearest(x, y, maxRange) {
   spawnParticles(tx, ty, '#3fa34d');
   setTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
+    if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
     spawnParticles(tx, ty, '#5c3a1e');
     spawnParticles(tx, ty, '#3fa34d');
     spawnParticles(tx, ty, '#2f7d3c');
