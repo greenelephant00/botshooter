@@ -3026,6 +3026,29 @@ async function adminSendMessageToPlayer() {
 }
 window.adminSendMessageToPlayer = adminSendMessageToPlayer;
 
+async function adminSendMessageToAll() {
+  const statusEl = document.getElementById('adminBroadcastStatus');
+  const inputEl = document.getElementById('adminBroadcastInput');
+  const text = inputEl.value.trim();
+  if (!text) { statusEl.textContent = 'Vul een bericht in.'; return; }
+  if (!confirm('Weet je zeker dat je dit bericht naar ALLE spelers wilt sturen?')) return;
+  statusEl.textContent = 'Bezig...';
+  try {
+    const snap = await db.collection('users').get();
+    const createdAt = Date.now();
+    await Promise.all(snap.docs.map(doc =>
+      db.collection('users').doc(doc.id).collection('pendingMessages').add({ text, createdAt })
+    ));
+    logAdminAction('add', 'bericht', text, `iedereen (${snap.size} spelers)`);
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    statusEl.textContent = `Aankondiging verstuurd naar ${snap.size} spelers.`;
+  } catch (e) {
+    statusEl.textContent = 'Er ging iets mis, probeer het opnieuw.';
+  }
+}
+window.adminSendMessageToAll = adminSendMessageToAll;
+
 function showAdminMessageScreen(text) {
   document.getElementById('adminMessageText').textContent = text;
   document.getElementById('adminMessageScreen').style.display = 'flex';

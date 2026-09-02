@@ -177,6 +177,14 @@
     </div>
     <div id="adminMessageStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
   </div>
+  <div class="shopSection">
+    <h3>Aankondiging aan alle spelers</h3>
+    <div class="statsRow" style="align-items:flex-start;">
+      <textarea id="adminBroadcastInput" class="doubleOrNothingInput adminMessageTextarea" placeholder="Bericht voor iedereen" rows="1" oninput="autoGrowAdminMessageInput(this)"></textarea>
+      <button class="buy" onclick="adminSendMessageToAll()">📢 Verstuur naar iedereen</button>
+    </div>
+    <div id="adminBroadcastStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
   <div class="shopSection" style="display:flex; gap:10px;">
     <button class="buy" onclick="openAdminPlayersScreen()">📋 Alle spelers</button>
     <button class="buy" onclick="openAdminLogScreen()">📜 Actielog</button>
