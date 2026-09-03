@@ -1,5 +1,16 @@
+// Beschermt tegen een corrupte/onverwacht-gevormde waarde in localStorage (bv. na een probleem met een
+// cloud-sync) die anders JSON.parse ongevangen zou laten crashen — en daarmee de rest van dit script,
+// en dus het hele spel, zou breken. Valt dan gewoon terug op de meegegeven standaardwaarde.
+function safeJsonParse(str, fallbackJson) {
+  try {
+    return JSON.parse(str || fallbackJson);
+  } catch (e) {
+    return JSON.parse(fallbackJson);
+  }
+}
+
 // ---- Favorieten: markeer skins/wapens zodat ze bovenaan hun shoplijst verschijnen ----
-let favoriteItems = JSON.parse(localStorage.getItem('botShooterFavoriteItems') || '[]');
+let favoriteItems = safeJsonParse(localStorage.getItem('botShooterFavoriteItems'), '[]');
 function isFavorite(key) { return favoriteItems.includes(key); }
 function toggleFavorite(key) {
   const idx = favoriteItems.indexOf(key);
@@ -20,7 +31,7 @@ const KILLSTREAK_DRONES = KILLSTREAK_DRONE_THRESHOLDS.map((threshold, i) => ({
   x: 0, y: 0, lastShot: 0, beam: null
 }));
 // Drone Upgrade: elke drone heeft zijn eigen, aparte upgrade-niveau — meer schade, sneller vuren, groter en feller uiterlijk
-let droneLevels = JSON.parse(localStorage.getItem('botShooterDroneLevels') || JSON.stringify(KILLSTREAK_DRONE_THRESHOLDS.map(() => 0)));
+let droneLevels = safeJsonParse(localStorage.getItem('botShooterDroneLevels'), JSON.stringify(KILLSTREAK_DRONE_THRESHOLDS.map(() => 0)));
 const DRONE_UPGRADE_PRICES = [1500, 2500, 4000];
 const DRONE_DMG_LEVELS = [2, 4, 6, 8];
 const DRONE_COOLDOWN_LEVELS = [700, 550, 450, 380];
@@ -56,7 +67,7 @@ function updateOneDrone(drone, lvl, now0) {
 }
 
 // ---- Intro Animatie: koop hoe je verschijnt bij het begin van een potje ----
-let ownedIntroAnimations = JSON.parse(localStorage.getItem('botShooterOwnedIntroAnimations') || '["none"]');
+let ownedIntroAnimations = safeJsonParse(localStorage.getItem('botShooterOwnedIntroAnimations'), '["none"]');
 let equippedIntroAnimation = localStorage.getItem('botShooterEquippedIntroAnimation') || 'none';
 const INTRO_ANIM_DURATION = 1600;
 const INTRO_ANIMATIONS = [
@@ -216,7 +227,7 @@ const EXCLUSIVE_SKIN_DEATH_ANIM = { titanchrome: 'chromeshatter', supernova: 'no
 // Sommige player killeffecten spelen korter af dan de standaard death-animation-duur (novacollapse iets korter dan de rest)
 const EXCLUSIVE_SKIN_DEATH_ANIM_DURATION = { novacollapse: 1900 };
 // Bot Kill Effect-shop: eigen, kortere en compactere animaties dan Death Animation, los bezit/uitgerust
-let ownedBotKillEffects = JSON.parse(localStorage.getItem('botShooterOwnedBotKillEffects') || '["none"]');
+let ownedBotKillEffects = safeJsonParse(localStorage.getItem('botShooterOwnedBotKillEffects'), '["none"]');
 let equippedBotKillEffect = localStorage.getItem('botShooterEquippedBotKillEffect') || 'none';
 const BOT_KILL_EFFECTS = [
   { id: 'none',       name: 'Geen',        price: 0,    duration: 0,   desc: 'Geen extra effect op de bot.' },
@@ -245,8 +256,8 @@ function maybeTriggerPlayerKillEffect(bot) {
 
 // ---- Lifetime statistieken (Statistieken-scherm) ----
 let totalLifetimeKills = Number(localStorage.getItem('botShooterTotalLifetimeKills')) || 0;
-let weaponKillCounts = JSON.parse(localStorage.getItem('botShooterWeaponKillCounts') || '{}');
-let botKillCounts = JSON.parse(localStorage.getItem('botShooterBotKillCounts') || '{}');
+let weaponKillCounts = safeJsonParse(localStorage.getItem('botShooterWeaponKillCounts'), '{}');
+let botKillCounts = safeJsonParse(localStorage.getItem('botShooterBotKillCounts'), '{}');
 let matchBotKillCounts = {}; // per-potje kill-telling per bot-type, te zien via de Kills-knop op het Game Over-scherm
 function recordKillStat(bot) {
   totalLifetimeKills++;
@@ -406,8 +417,8 @@ let hasFirstBoss = localStorage.getItem('botShooterHasFirstBoss') === 'true';
 let hasWorldBoss = localStorage.getItem('botShooterHasWorldBoss') === 'true';
 let hasBossRushW1 = localStorage.getItem('botShooterHasBossRushW1') === 'true';
 let hasBossRushW2 = localStorage.getItem('botShooterHasBossRushW2') === 'true';
-let unlockedAchievements = JSON.parse(localStorage.getItem('botShooterUnlockedAchievements') || '[]');
-let claimedAchievementRewards = JSON.parse(localStorage.getItem('botShooterClaimedAchievementRewards') || '[]');
+let unlockedAchievements = safeJsonParse(localStorage.getItem('botShooterUnlockedAchievements'), '[]');
+let claimedAchievementRewards = safeJsonParse(localStorage.getItem('botShooterClaimedAchievementRewards'), '[]');
 
 function rewardText(r) {
   if (r.type === 'cores') return `🔮 ${r.amount} Elemental Cores`;
@@ -570,12 +581,12 @@ let activeControlScheme = 'pc'; // 'pc' (muis) of 'touch' (virtuele joysticks) �
 // ---- Coins & shop state ----
 let coins = Number(localStorage.getItem('botShooterCoins')) || 0;
 
-let ownedWeapons = JSON.parse(localStorage.getItem('botShooterOwnedWeapons') || '["pistol"]');
-let ownedArmor = JSON.parse(localStorage.getItem('botShooterOwnedArmor') || '["none"]');
+let ownedWeapons = safeJsonParse(localStorage.getItem('botShooterOwnedWeapons'), '["pistol"]');
+let ownedArmor = safeJsonParse(localStorage.getItem('botShooterOwnedArmor'), '["none"]');
 let equippedWeapon = localStorage.getItem('botShooterEquippedWeapon') || 'pistol';
 let equippedArmor = localStorage.getItem('botShooterEquippedArmor') || 'none';
 let equippedArmor2 = localStorage.getItem('botShooterEquippedArmor2') || 'none';
-let ownedSkins = JSON.parse(localStorage.getItem('botShooterOwnedSkins') || '["default"]');
+let ownedSkins = safeJsonParse(localStorage.getItem('botShooterOwnedSkins'), '["default"]');
 let equippedSkin = localStorage.getItem('botShooterEquippedSkin') || 'default';
 const SKIN_PRICE = 1500;
 const SKIN_PRICE_MID = 1600;
@@ -661,7 +672,7 @@ function getSkin() {
 let world2Unlocked = localStorage.getItem('botShooterWorld2Unlocked') === 'true';
 let currentWorld = 1; // 1 = normale wereld, 2 = Elementen-wereld — reset altijd naar 1 bij herladen
 const WORLD2_PRICE = 15000;
-let ownedTransforms = JSON.parse(localStorage.getItem('botShooterOwnedTransforms') || '["none"]');
+let ownedTransforms = safeJsonParse(localStorage.getItem('botShooterOwnedTransforms'), '["none"]');
 let equippedTransform = localStorage.getItem('botShooterEquippedTransform') || 'none';
 // Gedeeld door alle transformaties: sterf je in een transformatie, dan word je één keer
 // teruggevormd tot je normale poppetje met dit vaste HP, in plaats van dat het potje eindigt.
@@ -1020,7 +1031,7 @@ const CORE_SHOCK_PRICE = 38;
 const CORE_SHOCK_CHANCE = 0.12;
 
 // Powerup-upgrades: elke soort powerup kan permanent verbeterd worden
-let powerupLevels = JSON.parse(localStorage.getItem('botShooterPowerupLevels') || '{}'); // id -> huidig niveau (0-3)
+let powerupLevels = safeJsonParse(localStorage.getItem('botShooterPowerupLevels'), '{}'); // id -> huidig niveau (0-3)
 const POWERUP_LEVELS = {
   speed:     { name: '⚡ Speed',       prices: [300, 500, 750],   durations: [5000, 6000, 7000, 8000] },
   heal:      { name: '+ Heal',         prices: [300, 500, 750],   heals: [30, 50, 65, 75] },
@@ -1120,8 +1131,8 @@ const WORLD2_SPECIAL_WEAPONS = [
 ];
 
 // ---- Wapenskins: per speciaal wapen één alternatieve kogelkleur, los van je personage-skin, met munten te koop ----
-let ownedWeaponSkins = JSON.parse(localStorage.getItem('botShooterOwnedWeaponSkins') || '[]');
-let equippedWeaponSkins = JSON.parse(localStorage.getItem('botShooterEquippedWeaponSkins') || '{}'); // weaponId -> skinId
+let ownedWeaponSkins = safeJsonParse(localStorage.getItem('botShooterOwnedWeaponSkins'), '[]');
+let equippedWeaponSkins = safeJsonParse(localStorage.getItem('botShooterEquippedWeaponSkins'), '{}'); // weaponId -> skinId
 const WEAPON_SKINS = [
   { id: 'cryorifle_neon',     weaponId: 'cryorifle',    name: 'Neon Cryo',        price: 350, color: '#00e5ff', coreColor: '#ffffff' },
   { id: 'vampcannon_blood',   weaponId: 'vampcannon',   name: 'Bloedkanon',       price: 350, color: '#ff0044', coreColor: '#330008' },
@@ -1140,7 +1151,7 @@ const WEAPON_SKINS = [
 ];
 
 // ---- Death Animations: koop een eigen animatie die afspeelt op het moment dat je doodgaat ----
-let ownedDeathAnimations = JSON.parse(localStorage.getItem('botShooterOwnedDeathAnimations') || '["default"]');
+let ownedDeathAnimations = safeJsonParse(localStorage.getItem('botShooterOwnedDeathAnimations'), '["default"]');
 let equippedDeathAnimation = localStorage.getItem('botShooterEquippedDeathAnimation') || 'default';
 const DEATH_ANIM_DURATION = 2600;
 const DEATH_ANIMATIONS = [
@@ -1168,7 +1179,7 @@ const DEATH_ANIMATIONS = [
 ];
 
 // ---- Trails: bewegingsspoor los van je skin, laat een spoor van deeltjes achter je vallen terwijl je beweegt ----
-let ownedTrails = JSON.parse(localStorage.getItem('botShooterOwnedTrails') || '["none"]');
+let ownedTrails = safeJsonParse(localStorage.getItem('botShooterOwnedTrails'), '["none"]');
 let equippedTrail = localStorage.getItem('botShooterEquippedTrail') || 'none';
 let trailParticles = [];
 const TRAILS = [
@@ -1182,7 +1193,7 @@ const TRAILS = [
 ];
 
 // ---- Menu-achtergronden: animated achtergrond voor het hoofdmenu (Wereld 1 en Wereld 2) ----
-let ownedMenuBackgrounds = JSON.parse(localStorage.getItem('botShooterOwnedMenuBackgrounds') || '["none"]');
+let ownedMenuBackgrounds = safeJsonParse(localStorage.getItem('botShooterOwnedMenuBackgrounds'), '["none"]');
 let equippedMenuBackground = localStorage.getItem('botShooterEquippedMenuBackground') || 'none';
 const MENU_BACKGROUNDS = [
   { id: 'none',      name: 'Geen',          price: 0,    desc: 'Geen animatie, gewoon de standaard donkere achtergrond.' },
