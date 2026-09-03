@@ -1949,6 +1949,8 @@ window.buyArmor = buyArmor;
 
 function equipArmor(id) {
   if (!ownedArmor.includes(id)) return;
+  // Voorkom dat hetzelfde pantser in beide sloten komt te staan — anders tellen alle bonussen dubbel
+  if (id !== 'none' && id === equippedArmor2) return;
   equippedArmor = id;
   saveShopState();
   renderShop();
@@ -1958,6 +1960,7 @@ window.equipArmor = equipArmor;
 function equipArmor2(id) {
   const dualArmorOwned = currentWorld === 2 ? hasDualArmor2 : hasDualArmor;
   if (!dualArmorOwned || !ownedArmor.includes(id)) return;
+  if (id !== 'none' && id === equippedArmor) return;
   equippedArmor2 = id;
   saveShopState();
   renderShop();
