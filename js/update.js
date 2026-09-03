@@ -1,3 +1,15 @@
+// Stun-powerup: elke bot die op het punt staat te vuren/aan te vallen terwijl de speler gestund heeft,
+// wordt zelf 1,5 sec verlamd in plaats van de aanval uit te voeren. Alle aanval-patronen hieronder
+// moeten hun daadwerkelijke aanval-aanroep hierdoorheen laten lopen, niet alleen de paar patronen die
+// dat oorspronkelijk deden — anders werkt Stun alleen tegen een klein deel van de bots.
+function tryBotAttack(bot, now, attackFn) {
+  if (now < player.stunUntil) {
+    bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
+  } else {
+    attackFn();
+  }
+}
+
 function update() {
   // Stop/Pauze-knoppen linksboven horen alleen tijdens een lopend potje te staan (ook tijdens pauze zelf),
   // niet in de menu's/shops — dus los van de 'gameplay-active'-check hieronder (die pauze juist uitsluit).
@@ -147,7 +159,7 @@ function update() {
         bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, player.x + Math.cos(ang) * dist));
         bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, player.y + Math.sin(ang) * dist));
         spawnParticles(bot.x, bot.y, bot.color);
-        botShoot(bot);
+        tryBotAttack(bot, now, () => botShoot(bot));
       }
       return;
     }
@@ -177,7 +189,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
         bot.lastShot = now;
-        mortarStrike(bot);
+        tryBotAttack(bot, now, () => mortarStrike(bot));
       }
       return;
     }
@@ -196,7 +208,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
         bot.lastShot = now;
-        mineDrop(bot);
+        tryBotAttack(bot, now, () => mineDrop(bot));
       }
       return;
     }
@@ -209,7 +221,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
         bot.lastShot = now;
-        shockBolt(bot);
+        tryBotAttack(bot, now, () => shockBolt(bot));
       }
       return;
     }
@@ -222,7 +234,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
         bot.lastShot = now;
-        gasCloudDrop(bot);
+        tryBotAttack(bot, now, () => gasCloudDrop(bot));
       }
       return;
     }
@@ -235,11 +247,7 @@ function update() {
       }
       if (bdist < bot.r + player.r + 8 && now - bot.lastShot > bot.shootCooldown * cooldownMult) {
         bot.lastShot = now;
-        if (now < player.stunUntil) {
-          bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
-        } else {
-          shieldBash(bot);
-        }
+        tryBotAttack(bot, now, () => shieldBash(bot));
       }
       return;
     }
@@ -252,7 +260,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
-        broodSummon(bot);
+        tryBotAttack(bot, now, () => broodSummon(bot));
       }
       return;
     }
@@ -281,7 +289,7 @@ function update() {
       }
       if (!bot.gravityWell && now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
-        gravityWellCast(bot);
+        tryBotAttack(bot, now, () => gravityWellCast(bot));
       }
       return;
     }
@@ -294,7 +302,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
         bot.lastShot = now;
-        freezeTrap(bot);
+        tryBotAttack(bot, now, () => freezeTrap(bot));
       }
       return;
     }
@@ -311,7 +319,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 650) {
         bot.lastShot = now;
-        lavaRainAttack(bot);
+        tryBotAttack(bot, now, () => lavaRainAttack(bot));
       }
       return;
     }
@@ -324,7 +332,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 500) {
         bot.lastShot = now;
-        frostNovaAttack(bot);
+        tryBotAttack(bot, now, () => frostNovaAttack(bot));
       }
       return;
     }
@@ -337,7 +345,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 550) {
         bot.lastShot = now;
-        stormChainBolt(bot);
+        tryBotAttack(bot, now, () => stormChainBolt(bot));
       }
       return;
     }
@@ -350,7 +358,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
-        rootSnareAttack(bot);
+        tryBotAttack(bot, now, () => rootSnareAttack(bot));
       }
       return;
     }
@@ -363,7 +371,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 750) {
         bot.lastShot = now;
-        railgunSnipe(bot);
+        tryBotAttack(bot, now, () => railgunSnipe(bot));
       }
       return;
     }
@@ -376,7 +384,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
-        curseBolt(bot);
+        tryBotAttack(bot, now, () => curseBolt(bot));
       }
       return;
     }
@@ -389,7 +397,7 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
         bot.lastShot = now;
-        clusterBombardment(bot);
+        tryBotAttack(bot, now, () => clusterBombardment(bot));
       }
       return;
     }
@@ -403,62 +411,72 @@ function update() {
       }
       if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 700) {
         bot.lastShot = now;
-        botShoot(bot);
+        tryBotAttack(bot, now, () => botShoot(bot));
       }
       // Special 1 - Schokgolf: alle bosses hebben deze, geschaald via specialDmg
       if (now - (bot.specialALastUsed || 0) > (bot.specialACooldown || 7000)) {
         bot.specialALastUsed = now;
-        bossSlam(bot);
+        tryBotAttack(bot, now, () => bossSlam(bot));
       }
       // Special 2 - uniek per boss-type
       if (now - (bot.specialBLastUsed || 0) > (bot.specialBCooldown || 9000)) {
         bot.specialBLastUsed = now;
-        if (bot.type === 'colossus') bossBulletStorm(bot);
-        else if (bot.type === 'titan') bossMeteorShower(bot);
-        else if (bot.type === 'behemoth') bossLaserSweep(bot);
-        else if (bot.type === 'nemesis') bossDoomSpiral(bot);
-        else if (bot.type === 'leviathan') bossWaterStrike(bot);
-        else if (bot.type === 'abomination') bossChaosBurst(bot);
-        else if (bot.type === 'vuurtitaan') lavaRainAttack(bot);
-        else if (bot.type === 'vriesreus') frostNovaAttack(bot);
-        else if (bot.type === 'aardkoning') bossRootSnare(bot);
-        else if (bot.type === 'stormvorst') bossLightningStrike(bot);
-        else if (bot.type === 'oerelementaal') [lavaRainAttack, frostNovaAttack, bossRootSnare, bossLightningStrike][Math.floor(Math.random() * 4)](bot);
+        tryBotAttack(bot, now, () => {
+          if (bot.type === 'colossus') bossBulletStorm(bot);
+          else if (bot.type === 'titan') bossMeteorShower(bot);
+          else if (bot.type === 'behemoth') bossLaserSweep(bot);
+          else if (bot.type === 'nemesis') bossDoomSpiral(bot);
+          else if (bot.type === 'leviathan') bossWaterStrike(bot);
+          else if (bot.type === 'abomination') bossChaosBurst(bot);
+          else if (bot.type === 'vuurtitaan') lavaRainAttack(bot);
+          else if (bot.type === 'vriesreus') frostNovaAttack(bot);
+          else if (bot.type === 'aardkoning') bossRootSnare(bot);
+          else if (bot.type === 'stormvorst') bossLightningStrike(bot);
+          else if (bot.type === 'oerelementaal') [lavaRainAttack, frostNovaAttack, bossRootSnare, bossLightningStrike][Math.floor(Math.random() * 4)](bot);
+        });
       }
       // Special 3 - Nemesis, Leviathan, Abomination, en alle Wereld 2-bosses
       if (bot.specialCCooldown && now - (bot.specialCLastUsed || 0) > bot.specialCCooldown) {
         bot.specialCLastUsed = now;
-        if (bot.type === 'nemesis') bossCrossLaser(bot);
-        else if (bot.type === 'leviathan') bossWaterStrike(bot);
-        else if (bot.type === 'abomination') bossSpawnMinions(bot);
-        else if (bot.type === 'vuurtitaan') bossFireNova(bot);
-        else if (bot.type === 'vriesreus') bossFrostLance(bot);
-        else if (bot.type === 'aardkoning') bossEarthSlam(bot);
-        else if (bot.type === 'stormvorst') bossHurricane(bot);
-        else if (bot.type === 'oerelementaal') [bossFireNova, bossFrostLance, bossEarthSlam, bossHurricane][Math.floor(Math.random() * 4)](bot);
+        tryBotAttack(bot, now, () => {
+          if (bot.type === 'nemesis') bossCrossLaser(bot);
+          else if (bot.type === 'leviathan') bossWaterStrike(bot);
+          else if (bot.type === 'abomination') bossSpawnMinions(bot);
+          else if (bot.type === 'vuurtitaan') bossFireNova(bot);
+          else if (bot.type === 'vriesreus') bossFrostLance(bot);
+          else if (bot.type === 'aardkoning') bossEarthSlam(bot);
+          else if (bot.type === 'stormvorst') bossHurricane(bot);
+          else if (bot.type === 'oerelementaal') [bossFireNova, bossFrostLance, bossEarthSlam, bossHurricane][Math.floor(Math.random() * 4)](bot);
+        });
       }
       // Special 4 - alleen Vuurtitaan (en de Wereldbaas): vuurring
       if (bot.specialDCooldown && now - (bot.specialDLastUsed || 0) > bot.specialDCooldown) {
         bot.specialDLastUsed = now;
-        if (bot.type === 'vuurtitaan' || bot.type === 'oerelementaal') bossFireRing(bot);
+        tryBotAttack(bot, now, () => {
+          if (bot.type === 'vuurtitaan' || bot.type === 'oerelementaal') bossFireRing(bot);
+        });
       }
       // Special 5 - unieke 2e extra aanval per Wereld 2-boss
       if (bot.specialECooldown && now - (bot.specialELastUsed || 0) > bot.specialECooldown) {
         bot.specialELastUsed = now;
-        if (bot.type === 'vuurtitaan') bossFireLine(bot);
-        else if (bot.type === 'vriesreus') bossIceFan(bot);
-        else if (bot.type === 'aardkoning') bossGroundSpike(bot);
-        else if (bot.type === 'stormvorst') bossLightningCluster(bot);
-        else if (bot.type === 'oerelementaal') [bossFireLine, bossIceFan, bossGroundSpike, bossLightningCluster][Math.floor(Math.random() * 4)](bot);
+        tryBotAttack(bot, now, () => {
+          if (bot.type === 'vuurtitaan') bossFireLine(bot);
+          else if (bot.type === 'vriesreus') bossIceFan(bot);
+          else if (bot.type === 'aardkoning') bossGroundSpike(bot);
+          else if (bot.type === 'stormvorst') bossLightningCluster(bot);
+          else if (bot.type === 'oerelementaal') [bossFireLine, bossIceFan, bossGroundSpike, bossLightningCluster][Math.floor(Math.random() * 4)](bot);
+        });
       }
       // Special 6 - unieke 3e extra aanval per Wereld 2-boss
       if (bot.specialFCooldown && now - (bot.specialFLastUsed || 0) > bot.specialFCooldown) {
         bot.specialFLastUsed = now;
-        if (bot.type === 'vuurtitaan') bossPhoenixDive(bot);
-        else if (bot.type === 'vriesreus') bossIceField(bot);
-        else if (bot.type === 'aardkoning') bossChasingCrack(bot);
-        else if (bot.type === 'stormvorst') bossEmpJam(bot);
-        else if (bot.type === 'oerelementaal') [bossPhoenixDive, bossIceField, bossChasingCrack, bossEmpJam][Math.floor(Math.random() * 4)](bot);
+        tryBotAttack(bot, now, () => {
+          if (bot.type === 'vuurtitaan') bossPhoenixDive(bot);
+          else if (bot.type === 'vriesreus') bossIceField(bot);
+          else if (bot.type === 'aardkoning') bossChasingCrack(bot);
+          else if (bot.type === 'stormvorst') bossEmpJam(bot);
+          else if (bot.type === 'oerelementaal') [bossPhoenixDive, bossIceField, bossChasingCrack, bossEmpJam][Math.floor(Math.random() * 4)](bot);
+        });
       }
       return;
     }
@@ -472,19 +490,11 @@ function update() {
     if (isMelee) {
       if (bdist < bot.r + player.r + 14 && now - bot.lastShot > bot.shootCooldown * cooldownMult) {
         bot.lastShot = now;
-        if (now < player.stunUntil) {
-          bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
-        } else {
-          meleeAttack(bot);
-        }
+        tryBotAttack(bot, now, () => meleeAttack(bot));
       }
     } else if (now - bot.lastShot > bot.shootCooldown * cooldownMult && bdist < 600) {
       bot.lastShot = now;
-      if (now < player.stunUntil) {
-        bot.stunUntil = Math.max(bot.stunUntil || 0, now + 1500);
-      } else {
-        botShoot(bot);
-      }
+      tryBotAttack(bot, now, () => botShoot(bot));
     }
   });
 
