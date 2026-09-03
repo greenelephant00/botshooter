@@ -2768,6 +2768,10 @@ function openAdminCommandsScreen() {
   document.getElementById('adminBlockUsername').value = '';
   document.getElementById('adminBlockReason').value = '';
   document.getElementById('adminMessageUsername').value = '';
+  ['adminMessageInput', 'adminBroadcastInput'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.value = ''; el.style.height = 'auto'; }
+  });
   const weaponSection = document.getElementById('adminWeaponRemoveSection');
   const skinSection = document.getElementById('adminSkinRemoveSection');
   if (currentUid === PRIMARY_ADMIN_UID) {
