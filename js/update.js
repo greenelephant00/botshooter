@@ -1607,15 +1607,20 @@ function goToMenu() {
     document.getElementById('startScreen').style.display = 'flex';
   }
   // Een bericht, een munten/cores-cadeau of een blokkade van een admin hoeft niet te wachten tot de
-  // volgende keer inloggen — check ze ook elke keer dat je terugkeert naar het hoofdmenu.
+  // volgende keer inloggen — check ze ook elke keer dat je terugkeert naar het hoofdmenu. Eerst de
+  // blokkade-check afwachten en de rest pas daarna starten: anders kan een berichtoverlay nog even
+  // boven het blokkade-scherm verschijnen als applyPendingMessages() net iets sneller klaar is.
   if (currentUid) {
-    checkIfBanned(currentUid);
-    applyPendingMessages(currentUid);
-    applyPendingGrants(currentUid);
-    applyPendingWeaponRemovals(currentUid);
-    applyPendingWeaponGrants(currentUid);
-    applyPendingSkinGrants(currentUid);
-    applyPendingSkinRemovals(currentUid);
+    const uidAtMenuReturn = currentUid; // vastleggen op dit moment, niet pas na de (asynchrone) blokkade-check
+    checkIfBanned(uidAtMenuReturn).then(banned => {
+      if (banned) return;
+      applyPendingMessages(uidAtMenuReturn);
+      applyPendingGrants(uidAtMenuReturn);
+      applyPendingWeaponRemovals(uidAtMenuReturn);
+      applyPendingWeaponGrants(uidAtMenuReturn);
+      applyPendingSkinGrants(uidAtMenuReturn);
+      applyPendingSkinRemovals(uidAtMenuReturn);
+    });
   }
 }
 window.goToMenu = goToMenu;
