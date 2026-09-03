@@ -1381,7 +1381,10 @@ function update() {
       lastLevelSpawn = now;
       spawnBot();
     }
-    if (levelKills >= levelTarget && bots.length === 0) {
+    if (levelKills >= levelTarget && bots.length === 0 && !bossWarningActive) {
+      // De !bossWarningActive-check voorkomt dat het level compleet wordt verklaard terwijl een boss
+      // al wel getriggerd is maar nog niet daadwerkelijk gespawnd (dat gebeurt pas na de 2,5 sec
+      // waarschuwing) — anders zou die boss bij het afgaan van zijn timer stilletjes worden overgeslagen.
       levelComplete();
       return;
     }
