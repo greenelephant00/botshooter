@@ -540,10 +540,17 @@ updateLoginSessionTimer();
 setInterval(updateLoginSessionTimer, 1000);
 
 async function switchAccount() {
+  await syncCurrentAccountSave(); // laatste stand nog even wegschrijven voordat we uitloggen
+  // Vanaf hier meteen currentUid/currentAccount loskoppelen, VOOR de localStorage-wipe hieronder —
+  // syncCurrentAccountSave() checkt steeds de actuele currentUid/currentAccount (niet een oud
+  // vastgehouden argument), dus een nog lopende achtergrondactie (bv. een admin-cadeau dat via
+  // goToMenu() net werd toegepast) kan hierna niet meer per ongeluk een net-geleegde save
+  // terugschrijven naar de cloud en zo bijna alle voortgang van dit account wissen.
+  currentUid = null;
+  currentAccount = null;
   goToMenu();
   document.getElementById('startScreen').style.display = 'none';
   document.getElementById('world2Screen').style.display = 'none';
-  await syncCurrentAccountSave(); // laatste stand nog even wegschrijven voordat we uitloggen
   localStorage.removeItem('botShooterActiveAccount');
   localStorage.removeItem('botShooterActiveUid');
   localStorage.removeItem('botShooterLoginTimestamp');
