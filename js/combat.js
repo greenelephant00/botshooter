@@ -1601,7 +1601,7 @@ function mortarStrike(bot) {
     lavaPools.push({ x: targetX, y: targetY, born, fallDelay: delay, lingerDuration: 3500, fadeDuration: 900, totalLife: delay + 3500 + 900, radius, lastIgniteTick: 0 });
   }
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     explosions.push({ x: targetX, y: targetY, born: performance.now(), maxR: radius });
     if (bot.type === 'magmawicht') {
       // gesmolten lava-inslag i.p.v. de standaard rode explosie
@@ -1958,7 +1958,7 @@ function bossFireLine(bot) {
     const fireDelay = delay + i * 90;
     telegraphs.push({ x: px, y: py, radius: pillarRadius, warnUntil: performance.now() + fireDelay });
     pausableTimeout(() => {
-      if (gameOver || levelTransition) return;
+      if (gameOver || levelTransition || bot.dead) return;
       explosions.push({ x: px, y: py, born: performance.now(), maxR: pillarRadius });
       spawnParticles(px, py, '#ff5a1f');
       spawnParticles(px, py, '#fff275');
@@ -1980,7 +1980,7 @@ function bossPhoenixDive(bot) {
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
   spawnParticles(bot.x, bot.y, '#ff5a1f');
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     const impactNow = performance.now();
     explosions.push({ x: tx, y: ty, born: impactNow, maxR: radius });
     shockRings.push({ x: tx, y: ty, born: impactNow, maxR: radius * 1.4, duration: 500, color: '#ffb703' });
@@ -1990,7 +1990,7 @@ function bossPhoenixDive(bot) {
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < radius + player.r) {
       applyDamageToPlayer(dmg);
-      player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
+      player.burnUntil = Math.max(player.burnUntil || 0, performance.now() + 3000 * (1 - getArmorStats().fireResist));
     }
   }, delay);
 }
@@ -2059,7 +2059,7 @@ function bossGroundSpike(bot) {
   const dmg = Math.round((bot.specialDmg || 26) * 1.1);
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
     spawnParticles(tx, ty, '#8a6a3a');
     spawnParticles(tx, ty, '#5c3a1e');
@@ -2114,7 +2114,7 @@ function bossEmpJam(bot) {
   const delay = 700;
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     shockRings.push({ x: tx, y: ty, born: performance.now(), maxR: radius, duration: 400, color: '#c9a3ff' });
     spawnParticles(tx, ty, '#c9a3ff');
     spawnParticles(tx, ty, '#8ecbff');
@@ -2428,7 +2428,7 @@ function rootSnareAttack(bot) {
   treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur });
   telegraphs.push({ x: tx, y: ty, radius: 30, warnUntil: born + riseDur });
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < 40) {
       applyDamageToPlayer(bot.specialDmg || 14);
@@ -2451,7 +2451,7 @@ function bossRootSnare(bot) {
   treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur, scale });
   telegraphs.push({ x: tx, y: ty, radius: 46, warnUntil: born + riseDur });
   pausableTimeout(() => {
-    if (gameOver || levelTransition) return;
+    if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < grabRadius) {
       applyDamageToPlayer(Math.round((bot.specialDmg || 26) * 0.7));
