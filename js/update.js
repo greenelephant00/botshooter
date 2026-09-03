@@ -1431,7 +1431,7 @@ function update() {
       // Transformatie sterft: word één keer teruggevormd tot normaal poppetje met vast HP en je uitgeruste wapen
       player.activeTransform = 'none';
       player.r = PLAYER_BASE_R;
-      player.baseSpeed = 3.5 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL);
+      player.baseSpeed = 4 * (1 + w1Lvl(lvlSprint) * SPRINT_PER_LEVEL) * (1 + getArmorStats().speedBonus);
       player.maxHp = 100 + getArmorStats().hpBonus + w1Lvl(lvlExtraHp) * EXTRA_HP_PER_LEVEL + w2Lvl(lvl2ExtraHp) * EXTRAHP2_PER_LEVEL;
       player.hp = Math.min(player.maxHp, TRANSFORM_REVIVE_HP);
       player.shieldUntil = now0 + 1500; // korte adempauze na de transformatie
