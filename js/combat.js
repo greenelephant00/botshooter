@@ -692,7 +692,10 @@ function handleBotDeath(bot, dmg) {
   const effOverkill = w1Lvl(lvlOverkill);
   const effOverkill2 = w2Lvl(lvl2Overkill);
   if ((effOverkill > 0 || effOverkill2 > 0) && dmg > bot.maxHp * 0.2) {
-    const overkillDmg = dmg - bot.maxHp;
+    // bot.hp staat op dit punt al negatief (de klap die de bot doodde is al afgetrokken) — het werkelijke
+    // schade-overschot is dus -bot.hp, niet dmg - bot.maxHp (dat was bijna altijd negatief, aangezien een
+    // bot meestal al onder max HP zat toen de dodende klap viel).
+    const overkillDmg = -bot.hp;
     const radius = 60 + (effOverkill > 0 ? effOverkill : effOverkill2) * 30;
     bots.forEach(other => {
       if (other === bot || other.dead) return;
