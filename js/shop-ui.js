@@ -1626,7 +1626,7 @@ function startPractice(botName) {
   isPaused = false;
   levelTransition = false;
   bossAlive = false;
-  bossWarningActive = false;
+  cancelPendingBossWarning();
   lastPowerupSpawn = performance.now();
   lastCoinSpawn = performance.now();
 

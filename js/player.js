@@ -367,19 +367,35 @@ function showBossAlert(type) {
   setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
+let bossWarningTimeoutId = null;
+
 function triggerBossWarning(type) {
   bossWarningActive = true;
   bossesSpawned[type.name] = true;
   showBossAlert(type);
-  setTimeout(() => {
+  if (bossWarningTimeoutId) clearTimeout(bossWarningTimeoutId);
+  bossWarningTimeoutId = setTimeout(() => {
+    bossWarningTimeoutId = null;
     bossWarningActive = false;
     if (gameOver || levelTransition) return;
     spawnBoss(type);
   }, 2500);
 }
 
+// Annuleert een eventueel nog lopende boss-spawn-timer van een vorige sessie — anders kan die alsnog
+// afgaan nadat je al opnieuw bent begonnen (opnieuw spelen, terug naar menu, of een oefensessie), en
+// een boss uit de oude sessie in de nieuwe laten verschijnen.
+function cancelPendingBossWarning() {
+  if (bossWarningTimeoutId) {
+    clearTimeout(bossWarningTimeoutId);
+    bossWarningTimeoutId = null;
+  }
+  bossWarningActive = false;
+}
+
 
 function initGame() {
+  cancelPendingBossWarning();
   resetPlayer();
   if (equippedIntroAnimation !== 'none') player.introAnimStart = performance.now();
   isPaused = false;

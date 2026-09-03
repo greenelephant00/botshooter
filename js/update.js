@@ -1594,7 +1594,7 @@ function goToMenu() {
   exitSkinPractice();
   syncCurrentAccountSave();
   document.getElementById('pauseOverlay').style.display = 'none';
-  bossWarningActive = false;
+  cancelPendingBossWarning();
   const alertEl = document.getElementById('bossAlert');
   if (alertEl) alertEl.style.display = 'none';
   document.getElementById('msg').style.display = 'none';
