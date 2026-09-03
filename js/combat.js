@@ -1,3 +1,14 @@
+// Pauzeren bevriest update() (zie main.js) maar niet de gewone JS-klok waar setTimeout op draait —
+// zonder deze wrapper zouden getelegrafeerde aanvallen (mijnen, sticky bombs, boss-specials, enz.)
+// alsnog op tijd "afgaan" en schade doen terwijl het spel zichtbaar gepauzeerd staat. pausableTimeout
+// wacht simpelweg tot de pauze voorbij is voordat de eigenlijke actie alsnog wordt uitgevoerd.
+function pausableTimeout(fn, delay) {
+  return setTimeout(function run() {
+    if (isPaused) { setTimeout(run, 50); return; }
+    fn();
+  }, delay);
+}
+
 function shoot() {
   if (gameOver || isPaused) return;
   if (performance.now() < player.rootedUntil || performance.now() < player.mireUntil) return; // bevroren of vastgezogen, kan niet schieten
@@ -241,7 +252,7 @@ function pyroFireball() {
   const tx = Math.max(20, Math.min(canvas.width - 20, player.x + Math.cos(angle) * PYRO_FIREBALL_RANGE));
   const ty = Math.max(20, Math.min(canvas.height - 20, player.y + Math.sin(angle) * PYRO_FIREBALL_RANGE));
   fireballThrows.push({ startX: player.x, startY: player.y, tx, ty, born: now, duration: PYRO_FIREBALL_TRAVEL_TIME });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x: tx, y: ty, born: performance.now(), maxR: PYRO_ZONE_RADIUS });
     spawnParticles(tx, ty, '#ff8800');
@@ -740,7 +751,7 @@ function handleBotDeath(bot, dmg) {
     const deathX = bot.x, deathY = bot.y, deathR = bot.r, deathSpeed = bot.speed, deathMaxHp = bot.maxHp,
       deathCooldown = bot.shootCooldown, deathColor = bot.color, deathType = bot.type, deathPattern = bot.pattern,
       deathBulletSpeed = bot.bulletSpeed, deathBulletDmg = bot.bulletDmg || 0;
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const aliveSplitters = bots.filter(b => !b.dead && b.type === 'splitter').length;
       const spawnCount = Math.min(count, Math.max(0, MAX_SPLITTERS_ALIVE - aliveSplitters));
@@ -823,7 +834,7 @@ function triggerCryoGrenade() {
       born: now,
       duration: travelTime
     });
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const ix = target.x, iy = target.y; // laatst bekende positie van het doelwit
       explosions.push({ x: ix, y: iy, born: performance.now(), maxR: 45 });
@@ -869,7 +880,7 @@ function triggerVampBolt() {
       born: now,
       duration: travelTime
     });
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const ix = target.x, iy = target.y; // laatst bekende positie van het doelwit
       explosions.push({ x: ix, y: iy, born: performance.now(), maxR: 40 });
@@ -1046,11 +1057,11 @@ function triggerStickyBarrage() {
       born: now,
       duration: travelTime
     });
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const bx = target.x, by = target.y; // laatst bekende positie van het doelwit
       telegraphs.push({ x: bx, y: by, radius: 90, warnUntil: performance.now() + 800 });
-      setTimeout(() => {
+      pausableTimeout(() => {
         if (gameOver || levelTransition) return;
         explosions.push({ x: bx, y: by, born: performance.now(), maxR: 90 });
         spawnParticles(bx, by, '#ff8800');
@@ -1242,7 +1253,7 @@ function shockBolt(bot) {
     targets.push({ x: player.x + Math.cos(a) * spreadDist, y: player.y + Math.sin(a) * spreadDist });
   }
   targets.forEach(t => telegraphs.push({ x: t.x, y: t.y, radius, warnUntil: performance.now() + delay }));
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     targets.forEach(t => {
       lightningBolts.push({ x1: bot.x, y1: bot.y, x2: t.x, y2: t.y, born: performance.now() });
@@ -1321,7 +1332,7 @@ function freezeTrap(bot) {
   const radius = 95;
   const delay = 1100;
   telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
@@ -1336,7 +1347,7 @@ function railgunSnipe(bot) {
   // railgunner: lange telegraaf, daarna een instant maar verwoestende precisiestraal die exact langs de getelegrafeerde lijn schiet
   const angle0 = Math.atan2(player.y - bot.y, player.x - bot.x);
   laserTelegraphs.push({ bot, angle: angle0, warnUntil: performance.now() + 1400 });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     const beam = { x1: bot.x, y1: bot.y, angle: angle0, born: performance.now(), duration: 180 };
     activeLasers.push(beam);
@@ -1350,7 +1361,7 @@ function curseBolt(bot) {
   const targetY = player.y;
   const radius = 45;
   const delay = 500;
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     lightningBolts.push({ x1: bot.x, y1: bot.y, x2: targetX, y2: targetY, born: performance.now() });
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
@@ -1373,7 +1384,7 @@ function clusterBombardment(bot) {
     impacts.push({ x: player.x + Math.cos(a) * d, y: player.y + Math.sin(a) * d });
   }
   impacts.forEach(p => telegraphs.push({ x: p.x, y: p.y, radius, warnUntil: performance.now() + delay }));
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     impacts.forEach(p => {
       explosions.push({ x: p.x, y: p.y, born: performance.now(), maxR: radius });
@@ -1389,7 +1400,7 @@ function elementStorm(dmg, count) {
   const interval = 125; // 8 per sec
   const warnDelay = 500;
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const edge = Math.floor(Math.random() * 4);
       let x1, y1, x2, y2;
@@ -1401,7 +1412,7 @@ function elementStorm(dmg, count) {
 
       barrageTelegraphs.push({ x1, y1, x2, y2, elementType, warnUntil: performance.now() + warnDelay });
 
-      setTimeout(() => {
+      pausableTimeout(() => {
         if (gameOver || levelTransition) return;
         barrageLasers.push({ x1, y1, x2, y2, elementType, born: performance.now(), duration: 250 });
 
@@ -1429,7 +1440,7 @@ function showDisasterAlert(text) {
   if (!el) return;
   el.textContent = text;
   el.style.display = 'flex';
-  setTimeout(() => { el.style.display = 'none'; }, 2500);
+  pausableTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
 function startRandomDisaster() {
@@ -1535,7 +1546,7 @@ function triggerLightningStrike() {
   const radius = 55;
   const delay = 500;
   telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     lightningBolts.push({ x1: x + (Math.random() - 0.5) * 30, y1: -40, x2: x, y2: y, born: performance.now() });
     explosions.push({ x, y, born: performance.now(), maxR: radius });
@@ -1559,7 +1570,7 @@ function triggerMeteorImpact() {
   const delay = 700;
   telegraphs.push({ x, y, radius, warnUntil: performance.now() + delay });
   fallingMeteors.push({ x, y, born: performance.now(), fallDelay: delay, lingerDuration: 1200, fadeDuration: 900, totalLife: delay + 1200 + 900, radius: 22 });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x, y, born: performance.now(), maxR: radius });
     spawnParticles(x, y, '#ff8800');
@@ -1586,7 +1597,7 @@ function mortarStrike(bot) {
     const born = performance.now();
     lavaPools.push({ x: targetX, y: targetY, born, fallDelay: delay, lingerDuration: 3500, fadeDuration: 900, totalLife: delay + 3500 + 900, radius, lastIgniteTick: 0 });
   }
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x: targetX, y: targetY, born: performance.now(), maxR: radius });
     if (bot.type === 'magmawicht') {
@@ -1617,7 +1628,7 @@ function bossSlam(bot) {
   const delay = 900;
   const dmg = bot.specialDmg || 30;
   telegraphs.push({ x: targetX, y: targetY, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     explosions.push({ x: targetX, y: targetY, born: performance.now(), maxR: radius });
     spawnParticles(targetX, targetY, '#ff3838');
@@ -1639,7 +1650,7 @@ function bossBulletStorm(bot) {
       fireBotBullet(bot, (Math.PI * 2 / n) * i + wave * 0.26);
     }
     wave++;
-    if (wave < 3) setTimeout(doWave, 260);
+    if (wave < 3) pausableTimeout(doWave, 260);
   };
   doWave();
 }
@@ -1649,7 +1660,7 @@ function bossMeteorShower(bot) {
   const count = 4;
   const dmgEach = Math.round((bot.specialDmg || 38) * 0.6);
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (bot.dead || gameOver || levelTransition) return;
       const angle = Math.random() * Math.PI * 2;
       const dist = Math.random() * 120;
@@ -1657,7 +1668,7 @@ function bossMeteorShower(bot) {
       const ty = Math.max(30, Math.min(canvas.height - 30, player.y + Math.sin(angle) * dist));
       const radius = 60;
       telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + 650 });
-      setTimeout(() => {
+      pausableTimeout(() => {
         if (gameOver || levelTransition) return;
         explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
         spawnParticles(tx, ty, '#ff8800');
@@ -1683,7 +1694,7 @@ function bossLaserSweep(bot) {
   // Behemoth special 2 - Laserstraal: telegrafeert een lijn, vuurt daarna een dodelijke, doorlopende straal
   const angle0 = Math.atan2(player.y - bot.y, player.x - bot.x);
   laserTelegraphs.push({ bot, angle: angle0, warnUntil: performance.now() + 900 });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (bot.dead || gameOver || levelTransition) return;
     const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x); // laatste moment richten
     const beam = { x1: bot.x, y1: bot.y, angle: beamAngle, born: performance.now(), duration: 900 };
@@ -1694,6 +1705,7 @@ function bossLaserSweep(bot) {
         clearInterval(tickInterval);
         return;
       }
+      if (isPaused) return;
       if (isPlayerInBeam(beam)) applyDamageToPlayer(dmgPerTick);
     }, 150);
   }, 900);
@@ -1710,7 +1722,7 @@ function bossDoomSpiral(bot) {
       fireBotBullet(bot, (Math.PI * 2 / n) * i + wave * 0.35);
     }
     wave++;
-    if (wave < totalWaves) setTimeout(doWave, 180);
+    if (wave < totalWaves) pausableTimeout(doWave, 180);
   };
   doWave();
 }
@@ -1720,7 +1732,7 @@ function bossCrossLaser(bot) {
   const angle0 = Math.atan2(player.y - bot.y, player.x - bot.x);
   laserTelegraphs.push({ bot, angle: angle0, warnUntil: performance.now() + 1000 });
   laserTelegraphs.push({ bot, angle: angle0 + Math.PI / 2, warnUntil: performance.now() + 1000 });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (bot.dead || gameOver || levelTransition) return;
     const beamAngle = Math.atan2(player.y - bot.y, player.x - bot.x); // laatste moment richten
     const beamA = { x1: bot.x, y1: bot.y, angle: beamAngle, born: performance.now(), duration: 1000 };
@@ -1732,6 +1744,7 @@ function bossCrossLaser(bot) {
         clearInterval(tickInterval);
         return;
       }
+      if (isPaused) return;
       if (isPlayerInBeam(beamA) || isPlayerInBeam(beamB)) applyDamageToPlayer(dmgPerTick);
     }, 150);
   }, 1000);
@@ -1756,6 +1769,7 @@ function bossWaterStrike(bot) {
       clearInterval(scanInterval);
       return;
     }
+    if (isPaused) return;
     const progress = elapsed / duration;
     const currentX = startX + (endX - startX) * progress;
 
@@ -1814,7 +1828,7 @@ function bossFireNova(bot) {
   const radius = 190;
   const delay = 700;
   telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
     shockRings.push({ x: cx, y: cy, born: performance.now(), maxR: radius * 1.3, duration: 500, color: '#ffb703' });
@@ -1861,7 +1875,7 @@ function bossFrostLance(bot) {
   const delay = 1000;
   const angle = Math.atan2(player.y - bot.y, player.x - bot.x);
   laserTelegraphs.push({ bot, angle, warnUntil: now0 + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     const endX = bot.x + Math.cos(angle) * 900;
     const endY = bot.y + Math.sin(angle) * 900;
@@ -1886,7 +1900,7 @@ function bossEarthSlam(bot) {
   const radius = 210;
   const delay = 800;
   telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
     spawnParticles(cx, cy, '#8a6a3a');
@@ -1914,6 +1928,7 @@ function bossHurricane(bot) {
       clearInterval(tickInterval);
       return;
     }
+    if (isPaused) return;
     const dd = Math.hypot(player.x - bot.x, player.y - bot.y);
     if (dd < 260) {
       applyDamageToPlayer(dmgPerTick);
@@ -1939,7 +1954,7 @@ function bossFireLine(bot) {
     if (px < -50 || px > canvas.width + 50 || py < -50 || py > canvas.height + 50) continue;
     const fireDelay = delay + i * 90;
     telegraphs.push({ x: px, y: py, radius: pillarRadius, warnUntil: performance.now() + fireDelay });
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       explosions.push({ x: px, y: py, born: performance.now(), maxR: pillarRadius });
       spawnParticles(px, py, '#ff5a1f');
@@ -1961,7 +1976,7 @@ function bossPhoenixDive(bot) {
   const dmg = Math.round((bot.specialDmg || 22) * 1.4);
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
   spawnParticles(bot.x, bot.y, '#ff5a1f');
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     const impactNow = performance.now();
     explosions.push({ x: tx, y: ty, born: impactNow, maxR: radius });
@@ -1986,7 +2001,7 @@ function bossIceFan(bot) {
   offsets.forEach(off => {
     laserTelegraphs.push({ bot, angle: baseAngle + off, warnUntil: now0 + delay });
   });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     spawnParticles(bot.x, bot.y, '#9ef7ff');
     offsets.forEach(off => {
@@ -2013,12 +2028,12 @@ function bossIceField(bot) {
   const count = 6;
   const radius = 55;
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
       const tx = 60 + Math.random() * (canvas.width - 120);
       const ty = 60 + Math.random() * (canvas.height - 120);
       telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + 600 });
-      setTimeout(() => {
+      pausableTimeout(() => {
         if (gameOver || levelTransition) return;
         explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
         spawnParticles(tx, ty, '#9ef7ff');
@@ -2040,7 +2055,7 @@ function bossGroundSpike(bot) {
   const delay = 750;
   const dmg = Math.round((bot.specialDmg || 26) * 1.1);
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
     spawnParticles(tx, ty, '#8a6a3a');
@@ -2078,7 +2093,7 @@ function bossLightningCluster(bot) {
     const tx = cx + off[0], ty = cy + off[1];
     const delay = 500 + i * 220;
     telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
       lightningBolts.push({ x1: tx + (Math.random() - 0.5) * 40, y1: -40, x2: tx, y2: ty, born: performance.now() });
       spawnParticles(tx, ty, '#fff066');
@@ -2095,7 +2110,7 @@ function bossEmpJam(bot) {
   const radius = 90;
   const delay = 700;
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     shockRings.push({ x: tx, y: ty, born: performance.now(), maxR: radius, duration: 400, color: '#c9a3ff' });
     spawnParticles(tx, ty, '#c9a3ff');
@@ -2150,6 +2165,7 @@ function botShoot(bot) {
     let count = 0;
     const burstInterval = setInterval(() => {
       if (bot.dead || gameOver || levelTransition) { clearInterval(burstInterval); return; }
+      if (isPaused) return;
       const dx2 = target.x - bot.x, dy2 = target.y - bot.y;
       fireBotBullet(bot, Math.atan2(dy2, dx2));
       count++;
@@ -2164,7 +2180,7 @@ function botShoot(bot) {
   } else if (bot.pattern === 'double') {
     // chaser: twee snelle schoten vlak na elkaar
     fireBotBullet(bot, baseAngle);
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (bot.dead || gameOver || levelTransition) return;
       const dx2 = target.x - bot.x, dy2 = target.y - bot.y;
       fireBotBullet(bot, Math.atan2(dy2, dx2));
@@ -2188,7 +2204,7 @@ function botShoot(bot) {
         fireBotBullet(bot, (Math.PI * 2 / n) * i + wave * 0.2);
       }
       wave++;
-      if (wave < 3) setTimeout(doWave, 220);
+      if (wave < 3) pausableTimeout(doWave, 220);
     };
     doWave();
   } else if (bot.pattern === 'spiral') {
@@ -2256,12 +2272,12 @@ function rootGrabAttack(count) {
     telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: now0 + riseDur });
     spawnParticles(tx, ty, '#5c3a1e');
     spawnParticles(tx, ty, '#3fa34d');
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       spawnParticles(tx, ty, '#c9a96a');
       spawnParticles(tx, ty, '#baff5c');
     }, riseDur + wrapDur * 0.3);
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
       if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
       spawnParticles(tx, ty, '#5c3a1e');
@@ -2293,7 +2309,7 @@ function rootDragNearest(x, y, maxRange) {
   telegraphs.push({ x: tx, y: ty, radius: 26, warnUntil: now0 + riseDur });
   spawnParticles(tx, ty, '#5c3a1e');
   spawnParticles(tx, ty, '#3fa34d');
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     if (bot.invulnUntil && performance.now() < bot.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
     spawnParticles(tx, ty, '#5c3a1e');
@@ -2315,7 +2331,7 @@ function lavaRainAttack(bot) {
   // Vulkaanheer (Wereld 2, special): laat 3 lavaklodders na elkaar rond de speler neerkomen
   const count = 3;
   for (let i = 0; i < count; i++) {
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition || bot.dead) return;
       const ang = Math.random() * Math.PI * 2;
       const dist = 30 + Math.random() * 90;
@@ -2326,7 +2342,7 @@ function lavaRainAttack(bot) {
       telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
       const born = performance.now();
       lavaPools.push({ x: tx, y: ty, born, fallDelay: delay, lingerDuration: 3000, fadeDuration: 800, totalLife: delay + 3000 + 800, radius, lastIgniteTick: 0 });
-      setTimeout(() => {
+      pausableTimeout(() => {
         if (gameOver || levelTransition) return;
         explosions.push({ x: tx, y: ty, born: performance.now(), maxR: radius });
         spawnParticles(tx, ty, '#ff8c00');
@@ -2351,6 +2367,7 @@ function frostNovaAttack(bot) {
   let hit = false;
   const checkInterval = setInterval(() => {
     if (gameOver || levelTransition) { clearInterval(checkInterval); return; }
+    if (isPaused) return;
     const age = performance.now() - born;
     const t = Math.min(1, age / duration);
     const r = maxR * t;
@@ -2385,7 +2402,7 @@ function bossLightningStrike(bot) {
   const radius = 55;
   const delay = 650;
   telegraphs.push({ x: tx, y: ty, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition || bot.dead) return;
     lightningBolts.push({ x1: bot.x, y1: bot.y, x2: tx, y2: ty, born: performance.now() });
     spawnParticles(tx, ty, '#fff066');
@@ -2407,7 +2424,7 @@ function rootSnareAttack(bot) {
   const born = performance.now();
   treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur });
   telegraphs.push({ x: tx, y: ty, radius: 30, warnUntil: born + riseDur });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < 40) {
@@ -2430,7 +2447,7 @@ function bossRootSnare(bot) {
   const grabRadius = 62;
   treeGrabs.push({ x: tx, y: ty, born, duration, riseDur, wrapDur, scale });
   telegraphs.push({ x: tx, y: ty, radius: 46, warnUntil: born + riseDur });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     const dd = Math.hypot(player.x - tx, player.y - ty);
     if (dd < grabRadius) {
@@ -2448,7 +2465,7 @@ function triggerCenterLightningStrike(dmg) {
   const radius = 150;
   const delay = 500;
   telegraphs.push({ x: cx, y: cy, radius, warnUntil: performance.now() + delay });
-  setTimeout(() => {
+  pausableTimeout(() => {
     if (gameOver || levelTransition) return;
     lightningBolts.push({ x1: cx + (Math.random() - 0.5) * 40, y1: -40, x2: cx, y2: cy, born: performance.now() });
     explosions.push({ x: cx, y: cy, born: performance.now(), maxR: radius });
@@ -2467,7 +2484,7 @@ function triggerTopHpLightningBarrage(dmg) {
   const targets = bots.filter(b => !b.dead).sort((a, c) => c.hp - a.hp).slice(0, 3);
   if (targets.length === 0) return;
   for (let i = 0; i < 4; i++) {
-    setTimeout(() => {
+    pausableTimeout(() => {
       if (gameOver || levelTransition) return;
       const target = targets[i % targets.length];
       if (target.dead) return;

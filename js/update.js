@@ -593,7 +593,7 @@ function update() {
           b.stuckTriggered = true;
           const bx = bot.x, by = bot.y;
           telegraphs.push({ x: bx, y: by, radius: 90, warnUntil: performance.now() + 800 });
-          setTimeout(() => {
+          pausableTimeout(() => {
             if (gameOver || levelTransition) return;
             explosions.push({ x: bx, y: by, born: performance.now(), maxR: 90 });
             spawnParticles(bx, by, '#ff8800');
