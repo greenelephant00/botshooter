@@ -528,8 +528,9 @@ function onBossDefeated(bot) {
   if (currentWorld === 2) {
     if (bossRushActive) {
       // Tijdens Eindbaas Rush altijd precies 1 kern-munt per boss, niet de oplopende tabel hieronder
-      // (die is bedoeld voor normale potjes, waar bosses zeldzamer zijn).
-      elementalCores += 1;
+      // (die is bedoeld voor normale potjes, waar bosses zeldzamer zijn) — de Kernoogst-bonus telt hier
+      // wel gewoon mee, want die belooft expliciet "+3 Cores per boss tijdens Eindbaas Rush".
+      elementalCores += 1 + (hasCoreHarvest ? CORE_HARVEST_BONUS : 0);
       localStorage.setItem('botShooterElementalCores', elementalCores);
     } else {
       world2BossKillCount++;
