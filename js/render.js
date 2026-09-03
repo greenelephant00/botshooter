@@ -29,8 +29,13 @@ function recordMoment(importance, label) {
   }
 }
 
+function expandHexShorthand(hex) {
+  // '#555' -> '#555555' zodat parseInt hieronder niet per ongeluk '#000555' (donkerblauw) leest i.p.v. grijs
+  const h = hex.slice(1);
+  return h.length === 3 ? '#' + h[0] + h[0] + h[1] + h[1] + h[2] + h[2] : hex;
+}
 function lerpColor(hexA, hexB, t) {
-  const a = parseInt(hexA.slice(1), 16), b = parseInt(hexB.slice(1), 16);
+  const a = parseInt(expandHexShorthand(hexA).slice(1), 16), b = parseInt(expandHexShorthand(hexB).slice(1), 16);
   const ar = (a >> 16) & 255, ag = (a >> 8) & 255, ab = a & 255;
   const br = (b >> 16) & 255, bg = (b >> 8) & 255, bb = b & 255;
   const r = Math.round(ar + (br - ar) * t), g = Math.round(ag + (bg - ag) * t), bl = Math.round(ab + (bb - ab) * t);
@@ -5372,7 +5377,7 @@ function drawBot(bot) {
     ctx.fillStyle = 'rgba(0,0,0,0.5)';
     ctx.fillRect(barX, barY, barW, 5);
     ctx.fillStyle = bot.hp / bot.maxHp > 0.5 ? '#4cd964' : bot.hp / bot.maxHp > 0.25 ? '#ffd60a' : '#ff5c5c';
-    ctx.fillRect(barX, barY, barW * (bot.hp / bot.maxHp), 5);
+    ctx.fillRect(barX, barY, barW * Math.max(0, bot.hp / bot.maxHp), 5);
   }
 }
 
