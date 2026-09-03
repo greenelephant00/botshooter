@@ -111,8 +111,18 @@ async function applyPendingMessages(uid) {
   try {
     const snap = await db.collection('users').doc(uid).collection('pendingMessages').get();
     if (snap.empty) return;
-    const texts = snap.docs.map(doc => doc.data().text).filter(Boolean);
-    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
+    // Eerst per bericht verwijderen uit de wachtrij, en het bericht alleen tonen als dat verwijderen ook
+    // echt lukte — zo kan een mislukte verwijdering (bv. netwerkfoutje) een bericht nooit stilletjes
+    // laten verdwijnen (het blijft dan gewoon in de wachtrij staan voor de volgende poging).
+    const texts = [];
+    for (const doc of snap.docs) {
+      try {
+        await doc.ref.delete();
+        if (doc.data().text) texts.push(doc.data().text);
+      } catch (e) {
+        // Verwijderen mislukt — dit bericht overslaan, blijft in de wachtrij staan.
+      }
+    }
     if (texts.length) {
       setTimeout(() => showAdminMessageScreen(texts.join('\n\n')), 300); // even wachten tot het menu zichtbaar is
     }
@@ -158,12 +168,20 @@ async function applyPendingGrants(uid) {
   try {
     const snap = await db.collection('users').doc(uid).collection('pendingGrants').get();
     if (snap.empty) return;
+    // Eerst per item verwijderen uit de wachtrij, en het bedrag alleen meetellen als dat verwijderen ook
+    // echt lukte — zo kan een mislukte verwijdering (bv. netwerkfoutje) een cadeau nooit dubbel laten
+    // toekennen (het item blijft dan gewoon in de wachtrij staan voor de volgende poging).
     let coinsGranted = 0, coresGranted = 0;
-    snap.forEach(doc => {
+    for (const doc of snap.docs) {
       const data = doc.data();
-      coinsGranted += Number(data.coins) || 0;
-      coresGranted += Number(data.cores) || 0;
-    });
+      try {
+        await doc.ref.delete();
+        coinsGranted += Number(data.coins) || 0;
+        coresGranted += Number(data.cores) || 0;
+      } catch (e) {
+        // Verwijderen mislukt — dit item overslaan, blijft in de wachtrij staan.
+      }
+    }
     // Zowel de actieve spelvariabelen (coins/elementalCores, voor wat er nu op het scherm staat) als
     // localStorage bijwerken — deze functie wordt niet meer alleen bij het inloggen aangeroepen (waarna
     // altijd een reload volgt), maar ook bv. bij het terugkeren naar het hoofdmenu, zonder reload.
@@ -186,7 +204,6 @@ async function applyPendingGrants(uid) {
       refreshCurrencyDisplays();
       updateHUD();
     }
-    await Promise.all(snap.docs.map(doc => doc.ref.delete()));
   } catch (e) {
     // Stil negeren — zie toelichting hierboven.
   } finally {
