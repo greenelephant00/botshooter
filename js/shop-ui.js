@@ -491,6 +491,7 @@ function buyCoreArmor() {
   ownedArmor.push('coreplate');
   localStorage.setItem('botShooterElementalCores', elementalCores);
   saveShopState();
+  checkAchievements();
   renderCoreShop();
 }
 window.buyCoreArmor = buyCoreArmor;
@@ -502,6 +503,7 @@ function buyCoreWeapon() {
   ownedWeapons.push('coreblaster');
   localStorage.setItem('botShooterElementalCores', elementalCores);
   saveShopState();
+  checkAchievements();
   renderCoreShop();
 }
 window.buyCoreWeapon = buyCoreWeapon;
@@ -513,6 +515,7 @@ function buyCoreSkin() {
   ownedSkins.push('coreessence');
   localStorage.setItem('botShooterElementalCores', elementalCores);
   saveShopState();
+  checkAchievements();
   renderCoreShop();
 }
 window.buyCoreSkin = buyCoreSkin;
@@ -1925,6 +1928,7 @@ function buyWeapon(id) {
   coins -= w.price;
   ownedWeapons.push(id);
   saveShopState();
+  checkAchievements();
   renderShop();
 }
 window.buyWeapon = buyWeapon;
@@ -1943,6 +1947,7 @@ function buyArmor(id) {
   coins -= a.price;
   ownedArmor.push(id);
   saveShopState();
+  checkAchievements();
   renderShop();
 }
 window.buyArmor = buyArmor;
@@ -1992,6 +1997,7 @@ function buySkin(id) {
   coins -= skin.price;
   ownedSkins.push(id);
   saveShopState();
+  checkAchievements();
   renderSkinsShop();
 }
 window.buySkin = buySkin;
