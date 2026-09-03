@@ -558,6 +558,7 @@ function update() {
         if (b.effect === 'shatterHit') {
           bots.forEach(other => {
             if (other === bot || other.dead) return;
+            if (other.invulnUntil && performance.now() < other.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
             const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
             if (dd < 70) {
               damageBotSimple(other, Math.max(1, Math.round((b.dmg || 1) * 0.5)), '#9ef7ff');
@@ -634,8 +635,9 @@ function update() {
             const freezeRadius = 100;
             bots.forEach(other => {
               if (other === bot || other.dead) return;
+              if (other.invulnUntil && performance.now() < other.invulnUntil) return; // net gesplitste bot, nog onsterfelijk
               const dd = Math.hypot(bot.x - other.x, bot.y - other.y);
-              if (dd < freezeRadius) other.frozenUntil = performance.now() + 2000;
+              if (dd < freezeRadius) other.frozenUntil = Math.max(other.frozenUntil || 0, performance.now() + 2000);
             });
             spawnParticles(bot.x, bot.y, '#9be3ff');
             spawnParticles(bot.x, bot.y, '#ffffff');
