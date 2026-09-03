@@ -1339,7 +1339,7 @@ function freezeTrap(bot) {
     if (gameOver || levelTransition || bot.dead) return;
     const dd = Math.hypot(player.x - targetX, player.y - targetY);
     if (dd < radius + player.r) {
-      player.rootedUntil = performance.now() + 2200;
+      player.rootedUntil = Math.max(player.rootedUntil, performance.now() + 2200);
       applyDamageToPlayer(bot.specialDmg || 8);
       spawnParticles(targetX, targetY, '#9be3ff');
     }
@@ -1616,7 +1616,7 @@ function mortarStrike(bot) {
       applyDamageToPlayer(bot.meleeDamage || 40);
       if (bot.type === 'magmawicht') {
         // door de lava geraakt: 3 sec lang in brand, elke sec 4 schade (korter met fireResist-pantser)
-        player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
+        player.burnUntil = Math.max(player.burnUntil || 0, performance.now() + 3000 * (1 - getArmorStats().fireResist));
         spawnParticles(player.x, player.y, '#ff5a1f');
       }
     }
@@ -1840,7 +1840,7 @@ function bossFireNova(bot) {
     const dd = Math.hypot(player.x - cx, player.y - cy);
     if (dd < radius + player.r) {
       applyDamageToPlayer(bot.specialDmg || 22);
-      player.burnUntil = performance.now() + 3500 * (1 - getArmorStats().fireResist);
+      player.burnUntil = Math.max(player.burnUntil || 0, performance.now() + 3500 * (1 - getArmorStats().fireResist));
     }
   }, delay);
 }
@@ -1965,7 +1965,7 @@ function bossFireLine(bot) {
       const dd = Math.hypot(player.x - px, player.y - py);
       if (dd < pillarRadius + player.r) {
         applyDamageToPlayer(dmg);
-        player.burnUntil = performance.now() + 2000 * (1 - getArmorStats().fireResist);
+        player.burnUntil = Math.max(player.burnUntil || 0, performance.now() + 2000 * (1 - getArmorStats().fireResist));
       }
     }, fireDelay);
   }
@@ -2353,7 +2353,7 @@ function lavaRainAttack(bot) {
         const dd = Math.hypot(player.x - tx, player.y - ty);
         if (dd < radius + player.r) {
           applyDamageToPlayer(bot.specialDmg || 16);
-          player.burnUntil = performance.now() + 3000 * (1 - getArmorStats().fireResist);
+          player.burnUntil = Math.max(player.burnUntil || 0, performance.now() + 3000 * (1 - getArmorStats().fireResist));
         }
       }, delay);
     }, i * 500);
