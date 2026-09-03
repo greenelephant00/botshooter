@@ -157,7 +157,7 @@
     </div>
     <div class="statsRow">
       <span class="statsLabel">Reden (optioneel):</span>
-      <input type="text" id="adminBlockReason" class="doubleOrNothingInput" style="width:220px;" placeholder="bv. valsspelen">
+      <input type="text" id="adminBlockReason" class="doubleOrNothingInput" style="width:220px;" placeholder="bv. valsspelen" maxlength="120">
     </div>
     <div class="statsRow">
       <button class="buy" onclick="adminBlockPlayer()">🚫 Blokkeer</button>
@@ -172,7 +172,7 @@
       <input type="text" id="adminMessageUsername" class="doubleOrNothingInput" placeholder="naam">
     </div>
     <div class="statsRow" style="align-items:flex-start;">
-      <textarea id="adminMessageInput" class="doubleOrNothingInput adminMessageTextarea" placeholder="Bericht" rows="1" oninput="autoGrowAdminMessageInput(this)"></textarea>
+      <textarea id="adminMessageInput" class="doubleOrNothingInput adminMessageTextarea" placeholder="Bericht" rows="1" maxlength="500" oninput="autoGrowAdminMessageInput(this)"></textarea>
       <button class="buy" onclick="adminSendMessageToPlayer()">📨 Verstuur</button>
     </div>
     <div id="adminMessageStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
@@ -180,7 +180,7 @@
   <div class="shopSection">
     <h3>Aankondiging aan alle spelers</h3>
     <div class="statsRow" style="align-items:flex-start;">
-      <textarea id="adminBroadcastInput" class="doubleOrNothingInput adminMessageTextarea" placeholder="Bericht voor iedereen" rows="1" oninput="autoGrowAdminMessageInput(this)"></textarea>
+      <textarea id="adminBroadcastInput" class="doubleOrNothingInput adminMessageTextarea" placeholder="Bericht voor iedereen" rows="1" maxlength="500" oninput="autoGrowAdminMessageInput(this)"></textarea>
       <button class="buy" onclick="adminSendMessageToAll()">📢 Verstuur naar iedereen</button>
     </div>
     <div id="adminBroadcastStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
