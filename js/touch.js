@@ -37,6 +37,7 @@ function setupTouchJoystick() {
 
   zone.addEventListener('touchstart', e => {
     e.preventDefault();
+    if (activeTouchId !== null) return; // al een vinger actief in deze zone, een 2e vinger mag 'm niet overnemen
     const t = e.changedTouches[0];
     activeTouchId = t.identifier;
     updateStick(t);
@@ -53,7 +54,11 @@ function setupTouchJoystick() {
       if (t.identifier === activeTouchId) resetStick();
     }
   }, { passive: false });
-  zone.addEventListener('touchcancel', resetStick);
+  zone.addEventListener('touchcancel', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === activeTouchId) resetStick();
+    }
+  }, { passive: false });
 }
 
 // Laatst aangegeven richtrichting (eenheidsvector) — blijft staan nadat je loslaat,
@@ -89,6 +94,7 @@ function setupTouchAim() {
 
   zone.addEventListener('touchstart', e => {
     e.preventDefault();
+    if (activeTouchId !== null) return; // al een vinger actief in deze zone, een 2e vinger mag 'm niet overnemen
     const t = e.changedTouches[0];
     activeTouchId = t.identifier;
     updateStick(t);
@@ -105,7 +111,11 @@ function setupTouchAim() {
       if (t.identifier === activeTouchId) resetStick();
     }
   }, { passive: false });
-  zone.addEventListener('touchcancel', resetStick);
+  zone.addEventListener('touchcancel', e => {
+    for (const t of e.changedTouches) {
+      if (t.identifier === activeTouchId) resetStick();
+    }
+  }, { passive: false });
 }
 
 // De luisteraars staan altijd klaar; de zones zijn alleen zichtbaar/aanklikbaar (CSS) als
