@@ -65,12 +65,34 @@ let coopMyPos = { x: 0, y: 0 }; // gast: laatst bekende eigen positie, voor het 
 // wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
 const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'killstreak'];
 
+// getWeapon()/getArmorStats() uit state.js kijken naar `currentWorld` en negeren een Wereld
+//2-wapen/pantser stil als je toevallig niet "in" Wereld 2 staat — logisch voor single-player (je kunt
+// een Wereld 2-item nooit gebruiken in een Wereld 1-potje), maar Co-op is alleen vanuit het Wereld
+// 1-menu te openen, dus die check zou een uitgerust Wereld 2-wapen/pantser altijd laten verdwijnen.
+// Deze twee lezen daarom rechtstreeks uit alle wapen-/pantsertabellen, zonder wereld-gating.
+function coopGetOwnWeapon() {
+  const id = equippedWeapon;
+  return WEAPONS.find(w => w.id === id) || SPECIAL_WEAPONS.find(w => w.id === id) || WORLD2_WEAPONS.find(w => w.id === id) || WORLD2_SPECIAL_WEAPONS.find(w => w.id === id) || WEAPONS[0];
+}
+function coopGetOwnArmorPiece(id) {
+  return ARMOR.find(a => a.id === id) || WORLD2_ARMOR.find(a => a.id === id) || ARMOR[0];
+}
+function coopGetOwnArmorStats() {
+  const a1 = coopGetOwnArmorPiece(equippedArmor);
+  const dualOwned = hasDualArmor || hasDualArmor2; // in Co-op telt de 2e-slot-upgrade van beide werelden mee
+  const a2 = dualOwned ? coopGetOwnArmorPiece(equippedArmor2) : ARMOR[0];
+  return {
+    hpBonus: a1.hpBonus + a2.hpBonus,
+    reduction: 1 - (1 - (a1.reduction || 0)) * (1 - (a2.reduction || 0))
+  };
+}
+
 // Elke speler leest zíjn eigen uitgeruste wapen/pantser lokaal (het account waarmee je bent
 // ingelogd op DIT apparaat) en meldt de resulterende statistieken — de host kan onmogelijk weten wat
 // een gast heeft uitgerust, dus dat moet elke speler zelf doorgeven.
 function coopReadLocalLoadout() {
-  const weapon = getWeapon();
-  const armor = getArmorStats();
+  const weapon = coopGetOwnWeapon();
+  const armor = coopGetOwnArmorStats();
   return {
     weaponDmg: weapon.dmg,
     weaponCooldownMs: shootCooldown * weapon.cooldownMult,
