@@ -24,6 +24,10 @@
 // brand, kleine schok-splash+bevriezen, terugstoot, en killstreak-schaalschade. Niet ondersteund:
 // zwart gat, kleefbom, windduw, wortelsleur — die vallen terug op kale schade zonder effect.
 //
+// Bots laten bij het sterven kans op een munt vallen (echte munten, worden bijgeschreven op je eigen
+// account) en er spawnen periodiek 3 simpele powerups: schild (🛡️ tijdelijk onkwetsbaar), snelheid
+// (⚡ tijdelijk sneller) en heal (❤️ direct HP terug).
+//
 // Overige bekende beperkingen van deze versie:
 // - Alleen het skin-LICHAAM wordt getekend, geen wapen-in-hand, transformaties of dood-animaties.
 // - Alleen toetsenbord+muis, geen touch-besturing.
@@ -60,6 +64,17 @@ let coopInputPushTimer = null;
 let coopLastTick = 0;
 let coopLastStatePush = 0;
 let coopMyPos = { x: 0, y: 0 }; // gast: laatst bekende eigen positie, voor het bepalen van de mikhoek
+let coopMyCoinsApplied = 0; // hoeveel van je eigen coopSim/coopRemoteState-coinsEarned je al aan je echte account hebt toegevoegd
+
+const COOP_COIN_DROP_CHANCE = 0.6;
+const COOP_COIN_VALUE_MIN = 1;
+const COOP_COIN_VALUE_MAX = 3;
+const COOP_COIN_PICKUP_R = 22;
+const COOP_POWERUP_SPAWN_MS = 10000;
+const COOP_POWERUP_PICKUP_R = 24;
+const COOP_POWERUP_TYPES = ['shield', 'speed', 'heal'];
+const COOP_POWERUP_COLORS = { shield: '#4cc9f0', speed: '#ffd60a', heal: '#4cd964' };
+const COOP_POWERUP_ICONS = { shield: '🛡️', speed: '⚡', heal: '❤️' };
 
 // Ondersteunde speciale-wapen-effecten in Co-op — niet allemaal (zwart gat, kleefbom, windduw,
 // wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
@@ -145,10 +160,11 @@ function coopReadLocalInput() {
 function enterCoopMatchAsHost() {
   coopRole = 'host';
   coopMatchActive = true;
+  coopMyCoinsApplied = 0;
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
-  coopSim = { players: {}, bots: [], bullets: [], score: 0, lastBotSpawn: 0, nextId: 1, status: 'playing' };
+  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], score: 0, lastBotSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
   db.collection('lobbies').doc(coopLobbyCode).collection('players').get().then(snap => {
     let i = 0;
     snap.forEach(doc => {
@@ -194,6 +210,7 @@ window.enterCoopMatchAsHost = enterCoopMatchAsHost;
 function enterCoopMatchAsGuest() {
   coopRole = 'guest';
   coopMatchActive = true;
+  coopMyCoinsApplied = 0;
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
@@ -233,6 +250,7 @@ function coopHostLoop(now) {
   }
   coopRenderFrame(coopSim);
   coopUpdateHud(coopSim);
+  coopSyncMyCoins(coopSim.players[currentUid]);
   coopRafId = requestAnimationFrame(coopHostLoop);
 }
 
@@ -255,8 +273,9 @@ function coopHostUpdate(dt, now) {
   // Spelers bewegen + schieten
   Object.entries(coopSim.players).forEach(([uid, p]) => {
     if (!p.alive) return;
-    p.x += p.inputMoveX * COOP_PLAYER_SPEED * stepMult;
-    p.y += p.inputMoveY * COOP_PLAYER_SPEED * stepMult;
+    const speedMult = now < (p.boostUntil || 0) ? 1.7 : 1; // Snelheid-powerup
+    p.x += p.inputMoveX * COOP_PLAYER_SPEED * speedMult * stepMult;
+    p.y += p.inputMoveY * COOP_PLAYER_SPEED * speedMult * stepMult;
     p.x = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.width - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.x));
     p.y = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.height - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.y));
     if (now - p.lastKillAt > 2500) p.killStreak = 0; // killstreak (Momentum Blade) vervalt na 2,5 sec zonder kill
@@ -285,18 +304,46 @@ function coopHostUpdate(dt, now) {
     coopSpawnBot();
   }
 
+  // Powerups spawnen
+  if (now - coopSim.lastPowerupSpawn > COOP_POWERUP_SPAWN_MS) {
+    coopSim.lastPowerupSpawn = now;
+    coopSpawnPowerup();
+  }
+
+  // Munten en powerups oppakken
+  alivePlayers.forEach(p => {
+    coopSim.coins.forEach(c => {
+      if (c.collected) return;
+      if (Math.hypot(p.x - c.x, p.y - c.y) < COOP_COIN_PICKUP_R) {
+        c.collected = true;
+        p.coinsEarned = (p.coinsEarned || 0) + c.value;
+      }
+    });
+    coopSim.powerups.forEach(pu => {
+      if (pu.collected) return;
+      if (Math.hypot(p.x - pu.x, p.y - pu.y) < COOP_POWERUP_PICKUP_R) {
+        pu.collected = true;
+        if (pu.type === 'shield') p.shieldUntil = now + 4000;
+        else if (pu.type === 'speed') p.boostUntil = now + 5000;
+        else if (pu.type === 'heal') p.hp = Math.min(p.maxHp, p.hp + p.maxHp * 0.4);
+      }
+    });
+  });
+  coopSim.coins = coopSim.coins.filter(c => !c.collected);
+  coopSim.powerups = coopSim.powerups.filter(pu => !pu.collected);
+
   // Gif/brand-schade-over-tijd (Toxic Cannon / Vlammenwerper e.a.) — apart van de aanval-AI hieronder
   coopSim.bots.forEach(bot => {
     if (bot.dead) return;
     if (bot.poisonUntil && now < bot.poisonUntil && now - (bot.lastPoisonTick || 0) > 400) {
       bot.lastPoisonTick = now;
       bot.hp -= 1;
-      if (bot.hp <= 0) { bot.dead = true; coopSim.score += bot.scoreValue; }
+      if (bot.hp <= 0) coopKillBot(bot);
     }
     if (!bot.dead && bot.igniteUntil && now < bot.igniteUntil && now - (bot.lastIgniteTick || 0) > 400) {
       bot.lastIgniteTick = now;
       bot.hp -= 2;
-      if (bot.hp <= 0) { bot.dead = true; coopSim.score += bot.scoreValue; }
+      if (bot.hp <= 0) coopKillBot(bot);
     }
   });
   coopSim.bots = coopSim.bots.filter(bot => !bot.dead);
@@ -319,15 +366,15 @@ function coopHostUpdate(dt, now) {
         bot.y += (dy / dist) * bot.speed * stepMult;
       } else if (now - bot.lastAttack > 900) {
         bot.lastAttack = now;
-        coopDamagePlayer(nearest, bot.meleeDmg);
+        coopDamagePlayer(nearest, bot.meleeDmg, now);
       }
     } else if (COOP_SUICIDE_PATTERNS.includes(bot.pattern)) {
       if (dist > bot.r + COOP_PLAYER_R + 6) {
         bot.x += (dx / dist) * bot.speed * stepMult;
         bot.y += (dy / dist) * bot.speed * stepMult;
       } else {
-        coopDamagePlayer(nearest, bot.meleeDmg || 30);
-        bot.dead = true;
+        coopDamagePlayer(nearest, bot.meleeDmg || 30, now);
+        coopKillBot(bot);
       }
     } else if (COOP_STATIONARY_PATTERNS.includes(bot.pattern)) {
       if (now - bot.lastAttack > bot.shootCooldown) {
@@ -363,9 +410,9 @@ function coopHostUpdate(dt, now) {
           b.hit = true;
           bot.hp -= b.dmg;
           if (b.effect === 'execute' && bot.hp > 0 && bot.hp / bot.maxHp < 0.25) bot.hp = 0; // Executioner Rifle: onder 25% HP altijd meteen af
-          if (bot.hp <= 0) {
-            bot.dead = true;
-            coopSim.score += bot.scoreValue;
+          const wasAlreadyDead = bot.dead;
+          if (bot.hp <= 0 && !wasAlreadyDead) {
+            coopKillBot(bot);
             const shooter = b.ownerUid && coopSim.players[b.ownerUid];
             if (shooter) { shooter.killStreak++; shooter.lastKillAt = now; }
             if (b.effect === 'lifestealKill' && shooter) shooter.hp = Math.min(shooter.maxHp, shooter.hp + 3);
@@ -385,7 +432,7 @@ function coopHostUpdate(dt, now) {
             });
             if (nearest) {
               nearest.hp -= Math.max(1, Math.round(b.dmg * 0.6));
-              if (nearest.hp <= 0 && !nearest.dead) { nearest.dead = true; coopSim.score += nearest.scoreValue; }
+              if (nearest.hp <= 0) coopKillBot(nearest);
             }
           }
           if (b.effect === 'shatterHit') {
@@ -394,7 +441,7 @@ function coopHostUpdate(dt, now) {
               if (Math.hypot(other.x - bot.x, other.y - bot.y) < 70) {
                 other.hp -= Math.max(1, Math.round(b.dmg * 0.5));
                 other.frozenUntil = Math.max(other.frozenUntil || 0, now + 400);
-                if (other.hp <= 0 && !other.dead) { other.dead = true; coopSim.score += other.scoreValue; }
+                if (other.hp <= 0) coopKillBot(other);
               }
             });
           }
@@ -412,7 +459,7 @@ function coopHostUpdate(dt, now) {
         if (b.hit) return;
         if (Math.hypot(b.x - p.x, b.y - p.y) < b.r + COOP_PLAYER_R) {
           b.hit = true;
-          coopDamagePlayer(p, b.dmg);
+          coopDamagePlayer(p, b.dmg, now);
         }
       });
     }
@@ -425,9 +472,34 @@ function coopHostUpdate(dt, now) {
   }
 }
 
-function coopDamagePlayer(p, dmg) {
+function coopDamagePlayer(p, dmg, now) {
+  if (now !== undefined && now < (p.shieldUntil || 0)) return; // Schild-powerup: volledig immuun tot het afloopt
   p.hp -= dmg * (1 - (p.armorReduction || 0));
   if (p.hp <= 0) { p.hp = 0; p.alive = false; }
+}
+
+// Eén centrale plek om een bot te doden: telt altijd de score, en laat 'm een munt vallen — zodat
+// iedere kill-plek (kogel-treffer, gif/brand-schade-over-tijd, kettingbliksem, schok-splash) hetzelfde
+// gedrag krijgt in plaats van dat elke plek dit los moet doen.
+function coopKillBot(bot) {
+  if (bot.dead) return;
+  bot.dead = true;
+  coopSim.score += bot.scoreValue;
+  if (Math.random() < COOP_COIN_DROP_CHANCE) {
+    coopSim.coins.push({
+      id: coopSim.nextId++, x: bot.x, y: bot.y,
+      value: COOP_COIN_VALUE_MIN + Math.floor(Math.random() * (COOP_COIN_VALUE_MAX - COOP_COIN_VALUE_MIN + 1))
+    });
+  }
+}
+
+function coopSpawnPowerup() {
+  const type = COOP_POWERUP_TYPES[Math.floor(Math.random() * COOP_POWERUP_TYPES.length)];
+  coopSim.powerups.push({
+    id: coopSim.nextId++, type,
+    x: COOP_ARENA_MARGIN + 60 + Math.random() * (canvas.width - 2 * (COOP_ARENA_MARGIN + 60)),
+    y: COOP_ARENA_MARGIN + 60 + Math.random() * (canvas.height - 2 * (COOP_ARENA_MARGIN + 60))
+  });
 }
 
 function coopSpawnBot() {
@@ -459,15 +531,21 @@ function coopPushHostState() {
   const players = {};
   Object.keys(coopSim.players).forEach(uid => {
     const p = coopSim.players[uid];
-    players[uid] = { x: Math.round(p.x), y: Math.round(p.y), angle: p.angle, hp: p.hp, maxHp: p.maxHp, name: p.name, color: p.color, alive: p.alive, skinId: p.skinId || 'default' };
+    players[uid] = {
+      x: Math.round(p.x), y: Math.round(p.y), angle: p.angle, hp: p.hp, maxHp: p.maxHp, name: p.name, color: p.color, alive: p.alive,
+      skinId: p.skinId || 'default', coinsEarned: p.coinsEarned || 0,
+      shieldActive: performance.now() < (p.shieldUntil || 0), boostActive: performance.now() < (p.boostUntil || 0)
+    };
   });
   const bots = coopSim.bots.slice(0, COOP_MAX_BOTS_SENT).map(b => ({
     x: Math.round(b.x), y: Math.round(b.y), hp: b.hp, maxHp: b.maxHp, r: b.r, color: b.color, type: b.type, pattern: b.pattern,
     frozenUntil: b.frozenUntil || 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false
   }));
   const bullets = coopSim.bullets.slice(0, COOP_MAX_BULLETS_SENT).map(b => ({ x: Math.round(b.x), y: Math.round(b.y), r: b.r, color: b.color }));
+  const coins = coopSim.coins.map(c => ({ x: Math.round(c.x), y: Math.round(c.y) }));
+  const powerups = coopSim.powerups.map(pu => ({ x: Math.round(pu.x), y: Math.round(pu.y), type: pu.type }));
   db.collection('lobbies').doc(coopLobbyCode).collection('state').doc('live')
-    .set({ players, bots, bullets, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
+    .set({ players, bots, bullets, coins, powerups, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
     .catch(() => {});
 }
 
@@ -484,6 +562,7 @@ function coopGuestRenderLoop() {
   if (coopRemoteState) {
     coopRenderFrame(coopRemoteState);
     coopUpdateHud(coopRemoteState);
+    coopSyncMyCoins(coopRemoteState.players && coopRemoteState.players[currentUid]);
   }
   coopRafId = requestAnimationFrame(coopGuestRenderLoop);
 }
@@ -508,6 +587,27 @@ function coopRenderFrame(state) {
 
   const players = state.players || {};
   const bots = state.bots || [];
+
+  // Munten en powerups
+  (state.coins || []).forEach(c => {
+    ctx.beginPath();
+    ctx.fillStyle = '#ffd60a';
+    ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  (state.powerups || []).forEach(pu => {
+    ctx.beginPath();
+    ctx.fillStyle = COOP_POWERUP_COLORS[pu.type] || '#fff';
+    ctx.globalAlpha = 0.25;
+    ctx.arc(pu.x, pu.y, 22, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.font = '20px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(COOP_POWERUP_ICONS[pu.type] || '?', pu.x, pu.y);
+    ctx.textBaseline = 'alphabetic';
+  });
 
   // Bots tekenen met de ECHTE drawBot() uit render.js — die bepaalt zelf kleur/vorm/hp-balk/status-
   // ringen aan de hand van bot.type/pattern/hp/maxHp/frozenUntil/enz., en kijkt naar de globale
@@ -550,6 +650,22 @@ function coopRenderFrame(state) {
   });
 }
 
+// Munten die JOUW speler oppakte staan als een oplopend totaal (coinsEarned) in de simulatie/snapshot —
+// elke client (host voor zichzelf, elke gast voor zichzelf) houdt bij hoeveel daarvan al is bijgeschreven
+// op het echte account, en boekt alleen het verschil bij. Zo kan de host nooit per ongeluk munten op een
+// ANDER account bijschrijven (dat mag alleen het account zelf, lokaal), en telt niets dubbel.
+function coopSyncMyCoins(myPlayerState) {
+  if (!myPlayerState) return;
+  const total = myPlayerState.coinsEarned || 0;
+  if (total > coopMyCoinsApplied) {
+    coins += (total - coopMyCoinsApplied);
+    coopMyCoinsApplied = total;
+    saveShopState();
+    if (typeof refreshCurrencyDisplays === 'function') refreshCurrencyDisplays();
+    if (typeof updateHUD === 'function') updateHUD();
+  }
+}
+
 function coopUpdateHud(state) {
   const scoreEl = document.getElementById('coopScoreVal');
   if (scoreEl) scoreEl.textContent = state.score || 0;
@@ -581,6 +697,7 @@ async function leaveCoopMatch() {
   if (coopRole === 'host' && coopLobbyCode) {
     try { await db.collection('lobbies').doc(coopLobbyCode).update({ status: 'ended' }); } catch (e) { /* stil negeren */ }
   }
+  if (coopMyCoinsApplied > 0) { try { await syncCurrentAccountSave(); } catch (e) { /* stil negeren, de gewone 8-sec-sync pakt het alsnog op */ } }
   coopSim = null;
   coopRemoteState = null;
   coopRole = null;
