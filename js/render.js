@@ -4481,7 +4481,8 @@ function menuBgLoop() {
   // en niet op het Game Over-scherm zelf, want daar moet de bevroren eindstand/death animation zichtbaar blijven, niet de menu-achtergrond)
   const msgEl = document.getElementById('msg');
   const msgVisible = msgEl && msgEl.style.display === 'flex';
-  const inMenuOrShop = (!loopRunning || gameOver) && !msgVisible;
+  const coopActive = typeof coopMatchActive !== 'undefined' && coopMatchActive;
+  const inMenuOrShop = (!loopRunning || gameOver) && !msgVisible && !coopActive;
   if (inMenuOrShop) drawMenuBackground(menuBgCanvas, menuBgCtx, equippedMenuBackground, 'shared');
   else menuBgCtx.clearRect(0, 0, menuBgCanvas.width, menuBgCanvas.height);
   requestAnimationFrame(menuBgLoop);
