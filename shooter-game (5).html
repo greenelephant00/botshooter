@@ -252,6 +252,9 @@
     <button class="modeBtn sprint" onclick="openControlSchemeScreen('sprint')">⏱ Golfsprint
       <small>5 min, zoveel mogelijk score · eigen highscore</small>
     </button>
+    <button class="modeBtn coop" onclick="openCoopHub()">👥 2-Speler
+      <small>Lobby maken of joinen met een code</small>
+    </button>
   </div>
   <div class="menuBtnRow">
     <button class="shopOpenBtn" onclick="openShop()" style="border-color:#ff4d4d; color:#ff4d4d;">🛒 Shop</button>
@@ -312,6 +315,29 @@
     <button class="shopOpenBtn" onclick="openMysteryBoxScreen()" style="border-color:#d4af37; color:#d4af37;">🎁 Mysterie-doos</button>
     <button class="shopOpenBtn" onclick="openDroneInfoScreen()" style="border-color:#4cc9f0; color:#4cc9f0;">🤖 Drones</button>
   </div>
+</div>
+<div id="coopHubScreen">
+  <h1>👥 2-Speler Co-op</h1>
+  <p>Speel samen met 1 of 2 vrienden tegen dezelfde bots</p>
+  <button class="modeBtn coop" onclick="createCoopLobby()">➕ Lobby aanmaken</button>
+  <div class="shopSection" style="max-width:400px; margin:20px auto;">
+    <h3>Lobby joinen</h3>
+    <div class="statsRow">
+      <input type="text" id="coopJoinCodeInput" class="doubleOrNothingInput" style="width:140px; text-transform:uppercase;" placeholder="CODE" maxlength="5">
+      <button class="buy" onclick="joinCoopLobby()">Join</button>
+    </div>
+    <div id="coopJoinStatus" class="desc" style="margin-top:6px; color:#aaa;"></div>
+  </div>
+  <button class="backBtn" onclick="closeCoopHub()">← Terug</button>
+</div>
+<div id="coopLobbyScreen">
+  <h1>👥 Lobby</h1>
+  <div id="coopLobbyCode" class="coopLobbyCode"></div>
+  <p>Deel deze code met je vrienden</p>
+  <div id="coopPlayersList" style="max-width:400px; width:92vw; margin:16px auto;"></div>
+  <button class="modeBtn coop" id="coopStartBtn" onclick="startCoopMatch()" style="display:none;">▶️ Start potje</button>
+  <div id="coopLobbyStatus" class="desc" style="margin-top:10px; color:#aaa;"></div>
+  <button class="backBtn" onclick="leaveCoopLobby()">← Lobby verlaten</button>
 </div>
 <div id="shopScreen">
   <h1>🛒 Shop</h1>
@@ -614,6 +640,7 @@
 <script src="js/firebase-config.js"></script>
 <script src="js/canvas.js"></script>
 <script src="js/account.js"></script>
+<script src="js/coop.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/input.js"></script>
 <script src="js/touch.js"></script>
