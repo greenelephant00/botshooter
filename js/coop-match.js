@@ -22,11 +22,20 @@
 // Een deel van de speciale-wapen-effecten is ook geïmplementeerd (zie COOP_SUPPORTED_EFFECTS):
 // bevriezen bij kill, lifesteal bij kill, kettingbliksem, direct executeren onder 25% HP, gif,
 // brand, kleine schok-splash+bevriezen, terugstoot, en killstreak-schaalschade. Niet ondersteund:
-// zwart gat, kleefbom, windduw, wortelsleur — die vallen terug op kale schade zonder effect.
+// zwart gat (Singularity Gun), kleefbom, windduw, wortelsleur — die vallen terug op kale schade
+// zonder effect.
 //
 // Bots laten bij het sterven kans op een munt vallen (echte munten, worden bijgeschreven op je eigen
 // account) en er spawnen periodiek 3 simpele powerups: schild (🛡️ tijdelijk onkwetsbaar), snelheid
 // (⚡ tijdelijk sneller) en heal (❤️ direct HP terug).
+//
+// Een deel van de gekochte UPGRADES telt nu ook mee (zie coopReadLocalUpgrades()): Extra HP, Sprint,
+// Snel Herladen, Critical Hit, Iron Skin, Revive (1x per potje), Coin Rain, en de Wereld 2 Kern-
+// upgrades (Kernschade, Kernsnelheid, Kernregeneratie, Kernvampirisme), plus Shockwave en Overkill
+// (schade-splash bij een kill). Lucky Drop is niet meegenomen (verkort in single-player alleen het
+// powerup-spawn-interval, en Co-op heeft al een eigen vaste powerup-timer). Multi-Shield, Splinter-
+// schoten, Sharpshooter, Second Wind, Flying Start, Piercing Rounds, Bloodlust en Core Shield/Aura/
+// Shock zitten er ook nog niet in.
 //
 // Overige bekende beperkingen van deze versie:
 // - Alleen het skin-LICHAAM wordt getekend, geen wapen-in-hand, transformaties of dood-animaties.
@@ -78,7 +87,11 @@ const COOP_POWERUP_ICONS = { shield: '🛡️', speed: '⚡', heal: '❤️' };
 
 // Ondersteunde speciale-wapen-effecten in Co-op — niet allemaal (zwart gat, kleefbom, windduw,
 // wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
-const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'killstreak'];
+const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'killstreak', 'blackholeKill'];
+const COOP_BLACKHOLE_RADIUS = 150;
+const COOP_BLACKHOLE_DURATION = 1200;
+const COOP_BLACKHOLE_TICK_DMG = 2;
+const COOP_BLACKHOLE_BURST_DMG = 14;
 
 // getWeapon()/getArmorStats() uit state.js kijken naar `currentWorld` en negeren een Wereld
 //2-wapen/pantser stil als je toevallig niet "in" Wereld 2 staat — logisch voor single-player (je kunt
@@ -105,18 +118,49 @@ function coopGetOwnArmorStats() {
 // Elke speler leest zíjn eigen uitgeruste wapen/pantser lokaal (het account waarmee je bent
 // ingelogd op DIT apparaat) en meldt de resulterende statistieken — de host kan onmogelijk weten wat
 // een gast heeft uitgerust, dus dat moet elke speler zelf doorgeven.
+// Upgrades (winkel "Upgrades" + Wereld 2 Kern-winkel) — gelezen los van currentWorld (zelfde reden als
+// coopGetOwnWeapon/coopGetOwnArmorStats hierboven), en bonussen uit Wereld 1- én Wereld 2-bomen worden
+// gewoon bij elkaar opgeteld. Lucky Drop is hier niet in verwerkt (verkort in single-player alleen het
+// powerup-spawn-interval, en Co-op heeft al een eigen, vaste powerup-timer).
+function coopReadLocalUpgrades() {
+  const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : (lvl2CriticalHit > 0 ? CRITICALHIT2_CHANCES[lvl2CriticalHit - 1] : 0);
+  const ironSkinReduction = lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : (lvl2IronSkin > 0 ? IRONSKIN2_REDUCTIONS[lvl2IronSkin - 1] : 0);
+  const coinRainBonus = (lvlCoinRain > 0 ? COIN_RAIN_BONUSES[lvlCoinRain - 1] : 0) + (lvl2CoinRain > 0 ? COINRAIN2_BONUSES[lvl2CoinRain - 1] : 0);
+  return {
+    extraHpBonus: (lvlExtraHp || 0) * EXTRA_HP_PER_LEVEL + (lvl2ExtraHp || 0) * EXTRAHP2_PER_LEVEL,
+    reloadMult: 1 - (lvlFastReload || 0) * FAST_RELOAD_PER_LEVEL - (lvl2FastReload || 0) * FASTRELOAD2_PER_LEVEL,
+    speedMult: (1 + (lvlSprint || 0) * SPRINT_PER_LEVEL) * (1 + (lvlCoreSpeed || 0) * CORE_SPEED_PER_LEVEL),
+    coreDamageMult: 1 + (lvlCoreDamage || 0) * CORE_DAMAGE_PER_LEVEL,
+    critChance, ironSkinReduction, coinRainBonus,
+    hasRevive: !!(hasRevive || hasRevive2),
+    coreRegenPerSec: (lvlCoreRegen || 0) * CORE_REGEN_PER_LEVEL,
+    coreVampireHeal: (lvlCoreVampire || 0) * CORE_VAMPIRE_PER_LEVEL,
+    overkillLevel: Math.max(lvlOverkill || 0, lvl2Overkill || 0),
+    shockwaveLevel: lvlShockwave || 0
+  };
+}
+
 function coopReadLocalLoadout() {
   const weapon = coopGetOwnWeapon();
   const armor = coopGetOwnArmorStats();
+  const up = coopReadLocalUpgrades();
   return {
-    weaponDmg: weapon.dmg,
-    weaponCooldownMs: shootCooldown * weapon.cooldownMult,
+    weaponDmg: weapon.dmg * up.coreDamageMult,
+    weaponCooldownMs: shootCooldown * weapon.cooldownMult * up.reloadMult,
     weaponBulletSpeed: COOP_WEAPON.bulletSpeed * (weapon.bulletSpeedMult || 1),
     weaponPellets: weapon.pellets || 1,
     weaponSpread: weapon.spread || 0,
     weaponEffect: COOP_SUPPORTED_EFFECTS.includes(weapon.effect) ? weapon.effect : null,
-    armorHpBonus: armor.hpBonus || 0,
-    armorReduction: armor.reduction || 0,
+    armorHpBonus: (armor.hpBonus || 0) + up.extraHpBonus,
+    armorReduction: 1 - (1 - (armor.reduction || 0)) * (1 - up.ironSkinReduction),
+    speedMult: up.speedMult,
+    critChance: up.critChance,
+    hasRevive: up.hasRevive,
+    coinRainBonus: up.coinRainBonus,
+    coreRegenPerSec: up.coreRegenPerSec,
+    coreVampireHeal: up.coreVampireHeal,
+    overkillLevel: up.overkillLevel,
+    shockwaveLevel: up.shockwaveLevel,
     skinId: getSkin()
   };
 }
@@ -142,6 +186,14 @@ function coopApplyLoadoutToPlayer(p, loadout) {
     }
     p.armorHpBonus = loadout.armorHpBonus;
   }
+  if (typeof loadout.speedMult === 'number') p.speedMult = loadout.speedMult;
+  if (typeof loadout.critChance === 'number') p.critChance = loadout.critChance;
+  if (typeof loadout.hasRevive === 'boolean') p.hasRevive = loadout.hasRevive;
+  if (typeof loadout.coinRainBonus === 'number') p.coinRainBonus = loadout.coinRainBonus;
+  if (typeof loadout.coreRegenPerSec === 'number') p.coreRegenPerSec = loadout.coreRegenPerSec;
+  if (typeof loadout.coreVampireHeal === 'number') p.coreVampireHeal = loadout.coreVampireHeal;
+  if (typeof loadout.overkillLevel === 'number') p.overkillLevel = loadout.overkillLevel;
+  if (typeof loadout.shockwaveLevel === 'number') p.shockwaveLevel = loadout.shockwaveLevel;
 }
 
 function coopReadLocalInput() {
@@ -164,7 +216,7 @@ function enterCoopMatchAsHost() {
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
-  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], score: 0, lastBotSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
+  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], blackholes: [], score: 0, lastBotSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
   db.collection('lobbies').doc(coopLobbyCode).collection('players').get().then(snap => {
     let i = 0;
     snap.forEach(doc => {
@@ -181,7 +233,9 @@ function enterCoopMatchAsHost() {
         // (host leest ze lokaal, gasten sturen ze mee met hun invoer). Tot dan een neutrale standaard.
         weaponDmg: COOP_WEAPON.dmg, weaponCooldownMs: COOP_WEAPON.cooldownMs, weaponBulletSpeed: COOP_WEAPON.bulletSpeed,
         weaponPellets: 1, weaponSpread: 0, weaponEffect: null, armorHpBonus: 0, armorReduction: 0,
-        killStreak: 0, lastKillAt: 0, skinId: 'default'
+        killStreak: 0, lastKillAt: 0, skinId: 'default',
+        speedMult: 1, critChance: 0, hasRevive: false, reviveUsed: false, coinRainBonus: 0,
+        coreRegenPerSec: 0, coreVampireHeal: 0, overkillLevel: 0, shockwaveLevel: 0, lastRegenTick: 0
       };
       i++;
     });
@@ -273,16 +327,24 @@ function coopHostUpdate(dt, now) {
   // Spelers bewegen + schieten
   Object.entries(coopSim.players).forEach(([uid, p]) => {
     if (!p.alive) return;
-    const speedMult = now < (p.boostUntil || 0) ? 1.7 : 1; // Snelheid-powerup
-    p.x += p.inputMoveX * COOP_PLAYER_SPEED * speedMult * stepMult;
-    p.y += p.inputMoveY * COOP_PLAYER_SPEED * speedMult * stepMult;
+    const boostMult = now < (p.boostUntil || 0) ? 1.7 : 1; // Snelheid-powerup
+    const totalSpeedMult = (p.speedMult || 1) * boostMult; // Sprint/Kernsnelheid-upgrades x powerup
+    p.x += p.inputMoveX * COOP_PLAYER_SPEED * totalSpeedMult * stepMult;
+    p.y += p.inputMoveY * COOP_PLAYER_SPEED * totalSpeedMult * stepMult;
     p.x = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.width - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.x));
     p.y = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.height - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.y));
     if (now - p.lastKillAt > 2500) p.killStreak = 0; // killstreak (Momentum Blade) vervalt na 2,5 sec zonder kill
+    // Kern-regeneratie: passieve HP-genezing per seconde
+    if (p.coreRegenPerSec > 0 && now - (p.lastRegenTick || 0) > 1000) {
+      p.lastRegenTick = now;
+      p.hp = Math.min(p.maxHp, p.hp + p.coreRegenPerSec);
+    }
     if (p.firing && now - p.lastShot > p.weaponCooldownMs) {
       p.lastShot = now;
       const pellets = Math.max(1, p.weaponPellets || 1);
       const streakMult = p.weaponEffect === 'killstreak' ? 1 + Math.min(p.killStreak, 10) * 0.15 : 1;
+      const isCrit = Math.random() < (p.critChance || 0);
+      const critMult = isCrit ? 2 : 1;
       for (let i = 0; i < pellets; i++) {
         // Meerdere pellets (bv. shotgun) waaieren symmetrisch rond de mikrichting uit, net als single-player
         const spreadOffset = pellets === 1 ? 0 : (p.weaponSpread || 0) * (i / (pellets - 1) - 0.5);
@@ -291,7 +353,7 @@ function coopHostUpdate(dt, now) {
           id: coopSim.nextId++, owner: 'player', ownerUid: uid,
           x: p.x + Math.cos(shotAngle) * (COOP_PLAYER_R + 6), y: p.y + Math.sin(shotAngle) * (COOP_PLAYER_R + 6),
           vx: Math.cos(shotAngle) * p.weaponBulletSpeed, vy: Math.sin(shotAngle) * p.weaponBulletSpeed,
-          r: COOP_WEAPON.bulletR, dmg: Math.round(p.weaponDmg * streakMult), color: p.color, effect: p.weaponEffect
+          r: COOP_WEAPON.bulletR, dmg: Math.round(p.weaponDmg * streakMult * critMult), color: p.color, effect: p.weaponEffect
         });
       }
     }
@@ -316,7 +378,7 @@ function coopHostUpdate(dt, now) {
       if (c.collected) return;
       if (Math.hypot(p.x - c.x, p.y - c.y) < COOP_COIN_PICKUP_R) {
         c.collected = true;
-        p.coinsEarned = (p.coinsEarned || 0) + c.value;
+        p.coinsEarned = (p.coinsEarned || 0) + c.value + (p.coinRainBonus || 0); // Coin Rain-upgrade: vaste bonus bovenop elke munt
       }
     });
     coopSim.powerups.forEach(pu => {
@@ -331,6 +393,36 @@ function coopHostUpdate(dt, now) {
   });
   coopSim.coins = coopSim.coins.filter(c => !c.collected);
   coopSim.powerups = coopSim.powerups.filter(pu => !pu.collected);
+
+  // Zwarte gaten (Singularity Gun): zuigen bots naar binnen, doen geleidelijk schade, en imploderen
+  // na COOP_BLACKHOLE_DURATION met een flinke schadeburst
+  coopSim.blackholes.forEach(bh => {
+    const age = now - bh.born;
+    if (age > COOP_BLACKHOLE_DURATION) {
+      coopSim.bots.forEach(bot => {
+        if (bot.dead) return;
+        if (Math.hypot(bot.x - bh.x, bot.y - bh.y) < COOP_BLACKHOLE_RADIUS) {
+          bot.hp -= COOP_BLACKHOLE_BURST_DMG;
+          if (bot.hp <= 0) coopKillBot(bot);
+        }
+      });
+      bh.expired = true;
+      return;
+    }
+    if (now - bh.lastTick > 200) {
+      bh.lastTick = now;
+      coopSim.bots.forEach(bot => {
+        if (bot.dead) return;
+        const d = Math.hypot(bot.x - bh.x, bot.y - bh.y);
+        if (d < COOP_BLACKHOLE_RADIUS) {
+          if (d > 10) { bot.x += (bh.x - bot.x) / d * 8; bot.y += (bh.y - bot.y) / d * 8; }
+          bot.hp -= COOP_BLACKHOLE_TICK_DMG;
+          if (bot.hp <= 0) coopKillBot(bot);
+        }
+      });
+    }
+  });
+  coopSim.blackholes = coopSim.blackholes.filter(bh => !bh.expired);
 
   // Gif/brand-schade-over-tijd (Toxic Cannon / Vlammenwerper e.a.) — apart van de aanval-AI hieronder
   coopSim.bots.forEach(bot => {
@@ -414,13 +506,45 @@ function coopHostUpdate(dt, now) {
           if (bot.hp <= 0 && !wasAlreadyDead) {
             coopKillBot(bot);
             const shooter = b.ownerUid && coopSim.players[b.ownerUid];
-            if (shooter) { shooter.killStreak++; shooter.lastKillAt = now; }
+            if (shooter) {
+              shooter.killStreak++;
+              shooter.lastKillAt = now;
+              if (shooter.coreVampireHeal > 0) shooter.hp = Math.min(shooter.maxHp, shooter.hp + shooter.coreVampireHeal); // Kern-vampirisme: heelt bij ELKE kill
+              if (shooter.shockwaveLevel > 0) {
+                const swRadius = SHOCKWAVE_RADII[shooter.shockwaveLevel - 1];
+                const swDmg = 5 + shooter.shockwaveLevel * 2;
+                coopSim.bots.forEach(other => {
+                  if (other === bot || other.dead) return;
+                  if (Math.hypot(other.x - bot.x, other.y - bot.y) < swRadius) {
+                    other.hp -= swDmg;
+                    if (other.hp <= 0) coopKillBot(other);
+                  }
+                });
+              }
+              if (shooter.overkillLevel > 0 && b.dmg > bot.maxHp * 0.2) {
+                const overkillExcess = -bot.hp; // bot.hp staat al op <=0, dus dit is het schade-overschot
+                if (overkillExcess > 0) {
+                  const okRadius = 60 + shooter.overkillLevel * 30;
+                  const okDmg = Math.max(3, Math.round(overkillExcess * 0.3));
+                  coopSim.bots.forEach(other => {
+                    if (other === bot || other.dead) return;
+                    if (Math.hypot(other.x - bot.x, other.y - bot.y) < okRadius) {
+                      other.hp -= okDmg;
+                      if (other.hp <= 0) coopKillBot(other);
+                    }
+                  });
+                }
+              }
+            }
             if (b.effect === 'lifestealKill' && shooter) shooter.hp = Math.min(shooter.maxHp, shooter.hp + 3);
             if (b.effect === 'freezeKill') {
               coopSim.bots.forEach(other => {
                 if (other === bot || other.dead) return;
                 if (Math.hypot(other.x - bot.x, other.y - bot.y) < 100) other.frozenUntil = now + 2000;
               });
+            }
+            if (b.effect === 'blackholeKill') {
+              coopSim.blackholes.push({ id: coopSim.nextId++, x: bot.x, y: bot.y, born: now, lastTick: now });
             }
           }
           if (b.effect === 'chainLightning') {
@@ -475,7 +599,17 @@ function coopHostUpdate(dt, now) {
 function coopDamagePlayer(p, dmg, now) {
   if (now !== undefined && now < (p.shieldUntil || 0)) return; // Schild-powerup: volledig immuun tot het afloopt
   p.hp -= dmg * (1 - (p.armorReduction || 0));
-  if (p.hp <= 0) { p.hp = 0; p.alive = false; }
+  if (p.hp <= 0) {
+    if (p.hasRevive && !p.reviveUsed) {
+      // Revive-upgrade: één keer per potje terugkomen op 35% HP i.p.v. dood te gaan
+      p.reviveUsed = true;
+      p.hp = p.maxHp * 0.35;
+      if (now !== undefined) p.shieldUntil = Math.max(p.shieldUntil || 0, now + 1000); // korte adempauze
+    } else {
+      p.hp = 0;
+      p.alive = false;
+    }
+  }
 }
 
 // Eén centrale plek om een bot te doden: telt altijd de score, en laat 'm een munt vallen — zodat
@@ -544,8 +678,9 @@ function coopPushHostState() {
   const bullets = coopSim.bullets.slice(0, COOP_MAX_BULLETS_SENT).map(b => ({ x: Math.round(b.x), y: Math.round(b.y), r: b.r, color: b.color }));
   const coins = coopSim.coins.map(c => ({ x: Math.round(c.x), y: Math.round(c.y) }));
   const powerups = coopSim.powerups.map(pu => ({ x: Math.round(pu.x), y: Math.round(pu.y), type: pu.type }));
+  const blackholes = coopSim.blackholes.map(bh => ({ x: Math.round(bh.x), y: Math.round(bh.y), age: performance.now() - bh.born }));
   db.collection('lobbies').doc(coopLobbyCode).collection('state').doc('live')
-    .set({ players, bots, bullets, coins, powerups, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
+    .set({ players, bots, bullets, coins, powerups, blackholes, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
     .catch(() => {});
 }
 
@@ -607,6 +742,18 @@ function coopRenderFrame(state) {
     ctx.textBaseline = 'middle';
     ctx.fillText(COOP_POWERUP_ICONS[pu.type] || '?', pu.x, pu.y);
     ctx.textBaseline = 'alphabetic';
+  });
+  (state.blackholes || []).forEach(bh => {
+    const t = Math.min(1, (bh.age || 0) / COOP_BLACKHOLE_DURATION);
+    const r = COOP_BLACKHOLE_RADIUS * (0.4 + t * 0.6);
+    const grad = ctx.createRadialGradient(bh.x, bh.y, 4, bh.x, bh.y, r);
+    grad.addColorStop(0, '#000000');
+    grad.addColorStop(0.6, '#3a0a5c');
+    grad.addColorStop(1, 'rgba(58,10,92,0)');
+    ctx.beginPath();
+    ctx.fillStyle = grad;
+    ctx.arc(bh.x, bh.y, r, 0, Math.PI * 2);
+    ctx.fill();
   });
 
   // Bots tekenen met de ECHTE drawBot() uit render.js — die bepaalt zelf kleur/vorm/hp-balk/status-
