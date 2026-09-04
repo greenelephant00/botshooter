@@ -51,6 +51,46 @@ let coopLastTick = 0;
 let coopLastStatePush = 0;
 let coopMyPos = { x: 0, y: 0 }; // gast: laatst bekende eigen positie, voor het bepalen van de mikhoek
 
+// Elke speler leest zíjn eigen uitgeruste wapen/pantser lokaal (het account waarmee je bent
+// ingelogd op DIT apparaat) en meldt de resulterende statistieken — de host kan onmogelijk weten wat
+// een gast heeft uitgerust, dus dat moet elke speler zelf doorgeven. Speciale wapen-EFFECTEN (bevriezen,
+// gif, lifesteal, enz.) zijn hier nog niet in verwerkt, alleen de kale schade/vuursnelheid/pellets/
+// spreiding en pantser-bonussen (HP + schadereductie).
+function coopReadLocalLoadout() {
+  const weapon = getWeapon();
+  const armor = getArmorStats();
+  return {
+    weaponDmg: weapon.dmg,
+    weaponCooldownMs: shootCooldown * weapon.cooldownMult,
+    weaponBulletSpeed: COOP_WEAPON.bulletSpeed * (weapon.bulletSpeedMult || 1),
+    weaponPellets: weapon.pellets || 1,
+    weaponSpread: weapon.spread || 0,
+    armorHpBonus: armor.hpBonus || 0,
+    armorReduction: armor.reduction || 0
+  };
+}
+
+// Zet gerapporteerde wapen/pantser-waarden op een simulatie-speler. Bij een NIEUWE (of gewijzigde)
+// pantser-HP-bonus wordt zowel max-HP als huidige HP met hetzelfde bedrag opgehoogd, zodat een speler
+// niet plotseling een deel van zijn nieuwe max-HP als "ontbrekend" ziet zodra dit voor het eerst
+// binnenkomt.
+function coopApplyLoadoutToPlayer(p, loadout) {
+  if (typeof loadout.weaponDmg === 'number') p.weaponDmg = loadout.weaponDmg;
+  if (typeof loadout.weaponCooldownMs === 'number') p.weaponCooldownMs = loadout.weaponCooldownMs;
+  if (typeof loadout.weaponBulletSpeed === 'number') p.weaponBulletSpeed = loadout.weaponBulletSpeed;
+  if (typeof loadout.weaponPellets === 'number') p.weaponPellets = loadout.weaponPellets;
+  if (typeof loadout.weaponSpread === 'number') p.weaponSpread = loadout.weaponSpread;
+  if (typeof loadout.armorReduction === 'number') p.armorReduction = loadout.armorReduction;
+  if (typeof loadout.armorHpBonus === 'number') {
+    const newMaxHp = COOP_PLAYER_MAX_HP + loadout.armorHpBonus;
+    if (newMaxHp !== p.maxHp) {
+      p.hp += (newMaxHp - p.maxHp);
+      p.maxHp = newMaxHp;
+    }
+    p.armorHpBonus = loadout.armorHpBonus;
+  }
+}
+
 function coopReadLocalInput() {
   let dx = 0, dy = 0;
   if (keys['w'] || keys['arrowup']) dy -= 1;
@@ -82,7 +122,11 @@ function enterCoopMatchAsHost() {
         angle: 0, hp: COOP_PLAYER_MAX_HP, maxHp: COOP_PLAYER_MAX_HP,
         name: data.name || '?', color: COOP_PLAYER_COLORS[i % COOP_PLAYER_COLORS.length],
         alive: true, lastShot: 0,
-        inputMoveX: 0, inputMoveY: 0, firing: false
+        inputMoveX: 0, inputMoveY: 0, firing: false,
+        // Eigen wapen/pantser-statistieken — worden hieronder bijgewerkt zodra de speler ze meestuurt
+        // (host leest ze lokaal, gasten sturen ze mee met hun invoer). Tot dan een neutrale standaard.
+        weaponDmg: COOP_WEAPON.dmg, weaponCooldownMs: COOP_WEAPON.cooldownMs, weaponBulletSpeed: COOP_WEAPON.bulletSpeed,
+        weaponPellets: 1, weaponSpread: 0, armorHpBonus: 0, armorReduction: 0
       };
       i++;
     });
@@ -99,6 +143,7 @@ function enterCoopMatchAsHost() {
         p.inputMoveY = data.moveY || 0;
         p.angle = typeof data.aimAngle === 'number' ? data.aimAngle : p.angle;
         p.firing = !!data.firing;
+        coopApplyLoadoutToPlayer(p, data);
       });
     }, () => {});
   coopLastTick = performance.now();
@@ -131,8 +176,9 @@ function coopPushGuestInput() {
   if (!coopLobbyCode || !currentUid || coopRole !== 'guest') return;
   const input = coopReadLocalInput();
   const aimAngle = Math.atan2(mouse.y - coopMyPos.y, mouse.x - coopMyPos.x);
+  const loadout = coopReadLocalLoadout();
   db.collection('lobbies').doc(coopLobbyCode).collection('inputs').doc(currentUid)
-    .set({ moveX: input.moveX, moveY: input.moveY, aimAngle, firing: input.firing, ts: Date.now() })
+    .set({ moveX: input.moveX, moveY: input.moveY, aimAngle, firing: input.firing, ts: Date.now(), ...loadout })
     .catch(() => {});
 }
 
@@ -162,6 +208,7 @@ function coopHostUpdate(dt, now) {
     hostP.inputMoveY = input.moveY;
     hostP.firing = input.firing;
     hostP.angle = Math.atan2(mouse.y - hostP.y, mouse.x - hostP.x);
+    coopApplyLoadoutToPlayer(hostP, coopReadLocalLoadout());
   }
 
   const alivePlayers = Object.values(coopSim.players).filter(p => p.alive);
@@ -173,14 +220,20 @@ function coopHostUpdate(dt, now) {
     p.y += p.inputMoveY * COOP_PLAYER_SPEED * stepMult;
     p.x = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.width - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.x));
     p.y = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.height - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.y));
-    if (p.firing && now - p.lastShot > COOP_WEAPON.cooldownMs) {
+    if (p.firing && now - p.lastShot > p.weaponCooldownMs) {
       p.lastShot = now;
-      coopSim.bullets.push({
-        id: coopSim.nextId++, owner: 'player',
-        x: p.x + Math.cos(p.angle) * (COOP_PLAYER_R + 6), y: p.y + Math.sin(p.angle) * (COOP_PLAYER_R + 6),
-        vx: Math.cos(p.angle) * COOP_WEAPON.bulletSpeed, vy: Math.sin(p.angle) * COOP_WEAPON.bulletSpeed,
-        r: COOP_WEAPON.bulletR, dmg: COOP_WEAPON.dmg, color: p.color
-      });
+      const pellets = Math.max(1, p.weaponPellets || 1);
+      for (let i = 0; i < pellets; i++) {
+        // Meerdere pellets (bv. shotgun) waaieren symmetrisch rond de mikrichting uit, net als single-player
+        const spreadOffset = pellets === 1 ? 0 : (p.weaponSpread || 0) * (i / (pellets - 1) - 0.5);
+        const shotAngle = p.angle + spreadOffset;
+        coopSim.bullets.push({
+          id: coopSim.nextId++, owner: 'player',
+          x: p.x + Math.cos(shotAngle) * (COOP_PLAYER_R + 6), y: p.y + Math.sin(shotAngle) * (COOP_PLAYER_R + 6),
+          vx: Math.cos(shotAngle) * p.weaponBulletSpeed, vy: Math.sin(shotAngle) * p.weaponBulletSpeed,
+          r: COOP_WEAPON.bulletR, dmg: p.weaponDmg, color: p.color
+        });
+      }
     }
   });
 
@@ -273,7 +326,7 @@ function coopHostUpdate(dt, now) {
 }
 
 function coopDamagePlayer(p, dmg) {
-  p.hp -= dmg;
+  p.hp -= dmg * (1 - (p.armorReduction || 0));
   if (p.hp <= 0) { p.hp = 0; p.alive = false; }
 }
 
