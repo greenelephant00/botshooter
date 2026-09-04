@@ -119,8 +119,9 @@ function listenToCoopLobby(code) {
         return;
       }
       const data = doc.data();
-      if (data.status === 'playing' && !coopIsHost && statusEl) {
-        statusEl.textContent = 'De host is gestart! (het gedeelde potje zelf volgt in een latere update)';
+      if (data.status === 'playing' && !coopIsHost && coopRole !== 'guest') {
+        stopCoopListeners(); // de lobby-listeners zijn klaar, het potje-scherm neemt het van hier over
+        enterCoopMatchAsGuest();
       }
     }, () => { /* stil negeren bij een tijdelijke verbindingsstoring */ });
 }
@@ -152,7 +153,8 @@ async function startCoopMatch() {
   const statusEl = document.getElementById('coopLobbyStatus');
   try {
     await db.collection('lobbies').doc(coopLobbyCode).update({ status: 'playing' });
-    if (statusEl) statusEl.textContent = 'Lobby gestart! Het gedeelde potje zelf (samen bots doden) volgt in een latere update — deze lobby-basis werkt al.';
+    stopCoopListeners(); // de lobby-listeners zijn klaar, het potje-scherm neemt het van hier over
+    enterCoopMatchAsHost();
   } catch (e) {
     if (statusEl) statusEl.textContent = 'Kon niet starten, probeer het opnieuw.';
   }

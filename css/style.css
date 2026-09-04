@@ -18,6 +18,62 @@
     display: block;
     pointer-events: none;
   }
+  #coopMatchScreen {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 15;
+  }
+  #coopCanvas {
+    display: block;
+    background: #16213e;
+    cursor: crosshair;
+  }
+  #coopHud {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    color: #fff;
+    font-size: 15px;
+    background: rgba(10, 10, 20, 0.6);
+    border-radius: 8px;
+    padding: 10px 14px;
+    pointer-events: none;
+  }
+  #coopPlayersHud {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  #coopLeaveBtn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #ff5c5c;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  #coopMatchOverlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(10, 10, 20, 0.85);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    text-align: center;
+  }
+  #coopMatchOverlay h1 {
+    font-size: 32px;
+    color: #ff5c5c;
+    margin-bottom: 20px;
+  }
   #muteBtn {
     position: absolute;
     top: 12px;

@@ -44,6 +44,18 @@
 </div>
 <canvas id="gameCanvas"></canvas>
 <canvas id="menuBgCanvas"></canvas>
+<div id="coopMatchScreen">
+  <canvas id="coopCanvas"></canvas>
+  <div id="coopHud">
+    <div>🏆 Score: <span id="coopScoreVal">0</span></div>
+    <div id="coopPlayersHud"></div>
+  </div>
+  <button id="coopLeaveBtn" onclick="leaveCoopMatch()">✖ Verlaten</button>
+  <div id="coopMatchOverlay">
+    <h1 id="coopMatchOverlayTitle"></h1>
+    <button class="modeBtn coop" onclick="leaveCoopMatch()">Terug naar menu</button>
+  </div>
+</div>
 <div id="touchJoystickZone">
   <div id="touchJoystickBase">
     <div id="touchJoystickStick"></div>
@@ -641,6 +653,7 @@
 <script src="js/canvas.js"></script>
 <script src="js/account.js"></script>
 <script src="js/coop.js"></script>
+<script src="js/coop-match.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/input.js"></script>
 <script src="js/touch.js"></script>
