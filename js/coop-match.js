@@ -16,11 +16,21 @@
 // afstand-houden-en-schieten) gebaseerd op zijn `pattern`-veld. Dat is bewust nog een vereenvoudiging;
 // de bots ZIEN er wel al echt uit en de basis-roster (grunt t/m splitter) is de echte data.
 //
+// Spelers tekenen nu met hun eigen echte uitgeruste skin (drawPlayerSkin), en vechten met hun eigen
+// wapen (schade/vuursnelheid/pellets/spreiding) en pantser (HP-bonus + schadereductie) — elke speler
+// leest dit lokaal van zijn eigen account en meldt het aan de host (zie coopReadLocalLoadout()).
+// Een deel van de speciale-wapen-effecten is ook geïmplementeerd (zie COOP_SUPPORTED_EFFECTS):
+// bevriezen bij kill, lifesteal bij kill, kettingbliksem, direct executeren onder 25% HP, gif,
+// brand, kleine schok-splash+bevriezen, terugstoot, en killstreak-schaalschade. Niet ondersteund:
+// zwart gat, kleefbom, windduw, wortelsleur — die vallen terug op kale schade zonder effect.
+//
 // Overige bekende beperkingen van deze versie:
-// - Spelers zelf zijn nog simpele gekleurde bolletjes, nog niet met hun eigen echte skin.
-// - Iedereen vecht met hetzelfde simpele standaardwapen, niet je eigen uitgeruste wapen/upgrades.
+// - Alleen het skin-LICHAAM wordt getekend, geen wapen-in-hand, transformaties of dood-animaties.
 // - Alleen toetsenbord+muis, geen touch-besturing.
 // - Geen client-side prediction: je eigen bewegingen op een gast-scherm voelen iets vertraagd.
+// - De bevriezings-visual op een GAST-scherm kan soms net niet kloppen (elke browser heeft zijn eigen
+//   interne klok voor animatie-timing) — de daadwerkelijke bevriezing (bot staat stil) is wel altijd
+//   correct, want die wordt volledig door de host bepaald.
 
 const COOP_ARENA_MARGIN = 20;
 const COOP_STATE_PUSH_MS = 120; // hoe vaak de host een snapshot naar Firestore schrijft
@@ -51,11 +61,13 @@ let coopLastTick = 0;
 let coopLastStatePush = 0;
 let coopMyPos = { x: 0, y: 0 }; // gast: laatst bekende eigen positie, voor het bepalen van de mikhoek
 
+// Ondersteunde speciale-wapen-effecten in Co-op — niet allemaal (zwart gat, kleefbom, windduw,
+// wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
+const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'killstreak'];
+
 // Elke speler leest zíjn eigen uitgeruste wapen/pantser lokaal (het account waarmee je bent
 // ingelogd op DIT apparaat) en meldt de resulterende statistieken — de host kan onmogelijk weten wat
-// een gast heeft uitgerust, dus dat moet elke speler zelf doorgeven. Speciale wapen-EFFECTEN (bevriezen,
-// gif, lifesteal, enz.) zijn hier nog niet in verwerkt, alleen de kale schade/vuursnelheid/pellets/
-// spreiding en pantser-bonussen (HP + schadereductie).
+// een gast heeft uitgerust, dus dat moet elke speler zelf doorgeven.
 function coopReadLocalLoadout() {
   const weapon = getWeapon();
   const armor = getArmorStats();
@@ -65,8 +77,10 @@ function coopReadLocalLoadout() {
     weaponBulletSpeed: COOP_WEAPON.bulletSpeed * (weapon.bulletSpeedMult || 1),
     weaponPellets: weapon.pellets || 1,
     weaponSpread: weapon.spread || 0,
+    weaponEffect: COOP_SUPPORTED_EFFECTS.includes(weapon.effect) ? weapon.effect : null,
     armorHpBonus: armor.hpBonus || 0,
-    armorReduction: armor.reduction || 0
+    armorReduction: armor.reduction || 0,
+    skinId: getSkin()
   };
 }
 
@@ -80,6 +94,8 @@ function coopApplyLoadoutToPlayer(p, loadout) {
   if (typeof loadout.weaponBulletSpeed === 'number') p.weaponBulletSpeed = loadout.weaponBulletSpeed;
   if (typeof loadout.weaponPellets === 'number') p.weaponPellets = loadout.weaponPellets;
   if (typeof loadout.weaponSpread === 'number') p.weaponSpread = loadout.weaponSpread;
+  if (loadout.weaponEffect !== undefined) p.weaponEffect = loadout.weaponEffect;
+  if (loadout.skinId) p.skinId = loadout.skinId;
   if (typeof loadout.armorReduction === 'number') p.armorReduction = loadout.armorReduction;
   if (typeof loadout.armorHpBonus === 'number') {
     const newMaxHp = COOP_PLAYER_MAX_HP + loadout.armorHpBonus;
@@ -126,7 +142,8 @@ function enterCoopMatchAsHost() {
         // Eigen wapen/pantser-statistieken — worden hieronder bijgewerkt zodra de speler ze meestuurt
         // (host leest ze lokaal, gasten sturen ze mee met hun invoer). Tot dan een neutrale standaard.
         weaponDmg: COOP_WEAPON.dmg, weaponCooldownMs: COOP_WEAPON.cooldownMs, weaponBulletSpeed: COOP_WEAPON.bulletSpeed,
-        weaponPellets: 1, weaponSpread: 0, armorHpBonus: 0, armorReduction: 0
+        weaponPellets: 1, weaponSpread: 0, weaponEffect: null, armorHpBonus: 0, armorReduction: 0,
+        killStreak: 0, lastKillAt: 0, skinId: 'default'
       };
       i++;
     });
@@ -214,24 +231,26 @@ function coopHostUpdate(dt, now) {
   const alivePlayers = Object.values(coopSim.players).filter(p => p.alive);
 
   // Spelers bewegen + schieten
-  Object.values(coopSim.players).forEach(p => {
+  Object.entries(coopSim.players).forEach(([uid, p]) => {
     if (!p.alive) return;
     p.x += p.inputMoveX * COOP_PLAYER_SPEED * stepMult;
     p.y += p.inputMoveY * COOP_PLAYER_SPEED * stepMult;
     p.x = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.width - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.x));
     p.y = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.height - COOP_ARENA_MARGIN - COOP_PLAYER_R, p.y));
+    if (now - p.lastKillAt > 2500) p.killStreak = 0; // killstreak (Momentum Blade) vervalt na 2,5 sec zonder kill
     if (p.firing && now - p.lastShot > p.weaponCooldownMs) {
       p.lastShot = now;
       const pellets = Math.max(1, p.weaponPellets || 1);
+      const streakMult = p.weaponEffect === 'killstreak' ? 1 + Math.min(p.killStreak, 10) * 0.15 : 1;
       for (let i = 0; i < pellets; i++) {
         // Meerdere pellets (bv. shotgun) waaieren symmetrisch rond de mikrichting uit, net als single-player
         const spreadOffset = pellets === 1 ? 0 : (p.weaponSpread || 0) * (i / (pellets - 1) - 0.5);
         const shotAngle = p.angle + spreadOffset;
         coopSim.bullets.push({
-          id: coopSim.nextId++, owner: 'player',
+          id: coopSim.nextId++, owner: 'player', ownerUid: uid,
           x: p.x + Math.cos(shotAngle) * (COOP_PLAYER_R + 6), y: p.y + Math.sin(shotAngle) * (COOP_PLAYER_R + 6),
           vx: Math.cos(shotAngle) * p.weaponBulletSpeed, vy: Math.sin(shotAngle) * p.weaponBulletSpeed,
-          r: COOP_WEAPON.bulletR, dmg: p.weaponDmg, color: p.color
+          r: COOP_WEAPON.bulletR, dmg: Math.round(p.weaponDmg * streakMult), color: p.color, effect: p.weaponEffect
         });
       }
     }
@@ -244,8 +263,25 @@ function coopHostUpdate(dt, now) {
     coopSpawnBot();
   }
 
+  // Gif/brand-schade-over-tijd (Toxic Cannon / Vlammenwerper e.a.) — apart van de aanval-AI hieronder
+  coopSim.bots.forEach(bot => {
+    if (bot.dead) return;
+    if (bot.poisonUntil && now < bot.poisonUntil && now - (bot.lastPoisonTick || 0) > 400) {
+      bot.lastPoisonTick = now;
+      bot.hp -= 1;
+      if (bot.hp <= 0) { bot.dead = true; coopSim.score += bot.scoreValue; }
+    }
+    if (!bot.dead && bot.igniteUntil && now < bot.igniteUntil && now - (bot.lastIgniteTick || 0) > 400) {
+      bot.lastIgniteTick = now;
+      bot.hp -= 2;
+      if (bot.hp <= 0) { bot.dead = true; coopSim.score += bot.scoreValue; }
+    }
+  });
+  coopSim.bots = coopSim.bots.filter(bot => !bot.dead);
+
   // Bots bewegen/aanvallen — vier simpele gedragsgroepen op basis van het echte pattern-veld
   coopSim.bots.forEach(bot => {
+    if (now < (bot.frozenUntil || 0)) return; // bevroren, geen actie
     if (alivePlayers.length === 0) return;
     let nearest = alivePlayers[0], nd = Math.hypot(alivePlayers[0].x - bot.x, alivePlayers[0].y - bot.y);
     alivePlayers.forEach(p => {
@@ -304,7 +340,49 @@ function coopHostUpdate(dt, now) {
         if (Math.hypot(b.x - bot.x, b.y - bot.y) < b.r + bot.r) {
           b.hit = true;
           bot.hp -= b.dmg;
-          if (bot.hp <= 0) { bot.dead = true; coopSim.score += bot.scoreValue; }
+          if (b.effect === 'execute' && bot.hp > 0 && bot.hp / bot.maxHp < 0.25) bot.hp = 0; // Executioner Rifle: onder 25% HP altijd meteen af
+          if (bot.hp <= 0) {
+            bot.dead = true;
+            coopSim.score += bot.scoreValue;
+            const shooter = b.ownerUid && coopSim.players[b.ownerUid];
+            if (shooter) { shooter.killStreak++; shooter.lastKillAt = now; }
+            if (b.effect === 'lifestealKill' && shooter) shooter.hp = Math.min(shooter.maxHp, shooter.hp + 3);
+            if (b.effect === 'freezeKill') {
+              coopSim.bots.forEach(other => {
+                if (other === bot || other.dead) return;
+                if (Math.hypot(other.x - bot.x, other.y - bot.y) < 100) other.frozenUntil = now + 2000;
+              });
+            }
+          }
+          if (b.effect === 'chainLightning') {
+            let nearest = null, nd = 140;
+            coopSim.bots.forEach(other => {
+              if (other === bot || other.dead) return;
+              const d = Math.hypot(other.x - bot.x, other.y - bot.y);
+              if (d < nd) { nd = d; nearest = other; }
+            });
+            if (nearest) {
+              nearest.hp -= Math.max(1, Math.round(b.dmg * 0.6));
+              if (nearest.hp <= 0 && !nearest.dead) { nearest.dead = true; coopSim.score += nearest.scoreValue; }
+            }
+          }
+          if (b.effect === 'shatterHit') {
+            coopSim.bots.forEach(other => {
+              if (other === bot || other.dead) return;
+              if (Math.hypot(other.x - bot.x, other.y - bot.y) < 70) {
+                other.hp -= Math.max(1, Math.round(b.dmg * 0.5));
+                other.frozenUntil = Math.max(other.frozenUntil || 0, now + 400);
+                if (other.hp <= 0 && !other.dead) { other.dead = true; coopSim.score += other.scoreValue; }
+              }
+            });
+          }
+          if (b.effect === 'poison' && !bot.dead) bot.poisonUntil = now + 4000;
+          if (b.effect === 'igniteHit' && !bot.dead) bot.igniteUntil = now + 2500;
+          if (b.effect === 'knockbackHit' && !bot.dead) {
+            const kd = Math.hypot(b.vx, b.vy) || 1;
+            bot.x += (b.vx / kd) * 40;
+            bot.y += (b.vy / kd) * 40;
+          }
         }
       });
     } else {
@@ -349,6 +427,7 @@ function coopSpawnBot() {
     shootCooldown: def.cooldown[0] + Math.random() * (def.cooldown[1] - def.cooldown[0]),
     lastAttack: 0,
     frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false,
+    poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0,
     scoreValue: Math.max(5, def.hp)
   });
 }
@@ -358,11 +437,11 @@ function coopPushHostState() {
   const players = {};
   Object.keys(coopSim.players).forEach(uid => {
     const p = coopSim.players[uid];
-    players[uid] = { x: Math.round(p.x), y: Math.round(p.y), angle: p.angle, hp: p.hp, maxHp: p.maxHp, name: p.name, color: p.color, alive: p.alive };
+    players[uid] = { x: Math.round(p.x), y: Math.round(p.y), angle: p.angle, hp: p.hp, maxHp: p.maxHp, name: p.name, color: p.color, alive: p.alive, skinId: p.skinId || 'default' };
   });
   const bots = coopSim.bots.slice(0, COOP_MAX_BOTS_SENT).map(b => ({
     x: Math.round(b.x), y: Math.round(b.y), hp: b.hp, maxHp: b.maxHp, r: b.r, color: b.color, type: b.type, pattern: b.pattern,
-    frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false
+    frozenUntil: b.frozenUntil || 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false
   }));
   const bullets = coopSim.bullets.slice(0, COOP_MAX_BULLETS_SENT).map(b => ({ x: Math.round(b.x), y: Math.round(b.y), r: b.r, color: b.color }));
   db.collection('lobbies').doc(coopLobbyCode).collection('state').doc('live')
@@ -427,18 +506,15 @@ function coopRenderFrame(state) {
     ctx.fill();
   });
 
-  // Spelers: nog simpele gekleurde bolletjes (nog geen echte skin — dat is de volgende stap)
+  // Spelers: tekent de ECHTE, eigen uitgeruste skin van elke speler via drawPlayerSkin() — net als
+  // drawPlayer() in render.js zelf doet, maar dan met de x/y/hoek/skin van DEZE speler i.p.v. de globale
+  // player. Transformaties/dood-animaties/wapen-in-hand zijn hier nog niet in verwerkt.
   Object.values(players).forEach(p => {
     if (!p.alive) return;
     ctx.save();
     ctx.translate(p.x, p.y);
     ctx.rotate(p.angle || 0);
-    ctx.fillStyle = p.color || '#4cc9f0';
-    ctx.beginPath();
-    ctx.arc(0, 0, COOP_PLAYER_R, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(COOP_PLAYER_R - 6, -3, 14, 6); // richting-'loop'
+    drawPlayerSkin(ctx, p.skinId || 'default', COOP_PLAYER_R);
     ctx.restore();
     ctx.fillStyle = '#fff';
     ctx.font = '13px Segoe UI';
