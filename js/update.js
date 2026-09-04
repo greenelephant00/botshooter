@@ -14,6 +14,7 @@ function update() {
   // Stop/Pauze-knoppen linksboven horen alleen tijdens een lopend potje te staan (ook tijdens pauze zelf),
   // niet in de menu's/shops — dus los van de 'gameplay-active'-check hieronder (die pauze juist uitsluit).
   document.body.classList.toggle('match-active', loopRunning && !gameOver);
+  if (typeof coopMatchActive !== 'undefined' && coopMatchActive) return; // Co-op draait zijn eigen, aparte simulatie
   if (gameOver || levelTransition || isPaused) {
     document.body.classList.remove('gameplay-active');
     return;

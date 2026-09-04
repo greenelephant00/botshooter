@@ -23,11 +23,10 @@
     position: absolute;
     inset: 0;
     z-index: 15;
+    pointer-events: none; /* het echte spelcanvas (#gameCanvas) zit hieronder en moet muisbewegingen/klikken blijven ontvangen */
   }
-  #coopCanvas {
-    display: block;
-    background: #16213e;
-    cursor: crosshair;
+  #coopMatchScreen > * {
+    pointer-events: auto; /* de HUD-elementen/knoppen zelf werken gewoon weer */
   }
   #coopHud {
     position: absolute;

@@ -5382,6 +5382,7 @@ function drawBot(bot) {
 }
 
 function draw() {
+  if (typeof coopMatchActive !== 'undefined' && coopMatchActive) return; // Co-op tekent zelf naar hetzelfde canvas, niet tegelijk laten meetekenen
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   const nowShake = performance.now();
