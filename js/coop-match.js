@@ -256,7 +256,7 @@ function enterCoopMatchAsHost() {
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
-  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], blackholes: [], score: 0, lastBotSpawn: 0, lastCoinSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
+  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], blackholes: [], stickyBombs: [], score: 0, lastBotSpawn: 0, lastCoinSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
   db.collection('lobbies').doc(coopLobbyCode).collection('players').get().then(snap => {
     let i = 0;
     snap.forEach(doc => {
@@ -307,6 +307,8 @@ function enterCoopMatchAsGuest() {
   coopMatchActive = true;
   coopMyCoinsApplied = 0;
   coopGuestDisplay = { players: {}, bots: {} };
+  coopLocalPredictedPos = null;
+  coopLastPredictTick = 0;
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
@@ -316,13 +318,45 @@ function enterCoopMatchAsGuest() {
       if (!doc.exists) return;
       coopRemoteState = doc.data();
       const me = coopRemoteState.players && coopRemoteState.players[currentUid];
-      if (me) coopMyPos = { x: me.x, y: me.y };
+      if (me) {
+        coopMyPos = { x: me.x, y: me.y };
+        if (!coopLocalPredictedPos) coopLocalPredictedPos = { x: me.x, y: me.y }; // startpunt, daarna lokaal voorspeld
+      }
       if (coopRemoteState.status === 'ended') coopShowMatchOverlay('Potje voorbij');
     }, () => {});
   coopInputPushTimer = setInterval(coopPushGuestInput, COOP_INPUT_PUSH_MS);
   coopRafId = requestAnimationFrame(coopGuestRenderLoop);
 }
 window.enterCoopMatchAsGuest = enterCoopMatchAsGuest;
+
+// Client-side prediction voor je EIGEN speler op een gast-scherm: zonder dit moest elke beweging eerst
+// een rondje via Firestore maken (invoer versturen -> host verwerkt -> host stuurt snapshot terug) voor
+// je 'm zag, wat als vertraagd/glitchy aanvoelt. In plaats daarvan beweegt de gast zijn eigen speler
+// meteen lokaal (zelfde formule als de host gebruikt), en trekt zachtjes bij richting de door de host
+// bevestigde positie om afwijkingen (bv. door terugstoot/zwart-gat) recht te trekken zonder te haperen.
+let coopLocalPredictedPos = null;
+let coopLastPredictTick = 0;
+
+function coopUpdateLocalPrediction(now) {
+  if (!coopLocalPredictedPos) return;
+  const dt = Math.min(50, now - (coopLastPredictTick || now));
+  coopLastPredictTick = now;
+  const stepMult = dt / 16.67;
+  const input = coopReadLocalInput();
+  const loadout = coopReadLocalLoadout();
+  const me = coopRemoteState && coopRemoteState.players && coopRemoteState.players[currentUid];
+  const boostMult = me && me.boostActive ? 1.7 : 1;
+  const totalSpeedMult = (loadout.speedMult || 1) * boostMult;
+  coopLocalPredictedPos.x += input.moveX * COOP_PLAYER_SPEED * totalSpeedMult * stepMult;
+  coopLocalPredictedPos.y += input.moveY * COOP_PLAYER_SPEED * totalSpeedMult * stepMult;
+  coopLocalPredictedPos.x = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.width - COOP_ARENA_MARGIN - COOP_PLAYER_R, coopLocalPredictedPos.x));
+  coopLocalPredictedPos.y = Math.max(COOP_ARENA_MARGIN + COOP_PLAYER_R, Math.min(canvas.height - COOP_ARENA_MARGIN - COOP_PLAYER_R, coopLocalPredictedPos.y));
+  if (me) {
+    coopLocalPredictedPos.x += (me.x - coopLocalPredictedPos.x) * 0.06;
+    coopLocalPredictedPos.y += (me.y - coopLocalPredictedPos.y) * 0.06;
+  }
+  coopMyPos = coopLocalPredictedPos;
+}
 
 function coopPushGuestInput() {
   if (!coopLobbyCode || !currentUid || coopRole !== 'guest') return;
@@ -482,6 +516,23 @@ function coopHostUpdate(dt, now) {
   });
   coopSim.blackholes = coopSim.blackholes.filter(bh => !bh.expired);
 
+  // Kleefbom Werper: ontploft 800ms na het plakken (zelfde telegraph-waarschuwing + explosie-visual als
+  // single-player, zie coopRenderFrame())
+  coopSim.stickyBombs.forEach(sb => {
+    if (!sb.exploded && now - sb.born > 800) {
+      sb.exploded = true;
+      sb.explodedAt = now;
+      coopSim.bots.forEach(other => {
+        if (other.dead) return;
+        if (Math.hypot(sb.x - other.x, sb.y - other.y) < 90) {
+          other.hp -= 5;
+          if (other.hp <= 0) coopKillBot(other, sb.ownerUid, now);
+        }
+      });
+    }
+  });
+  coopSim.stickyBombs = coopSim.stickyBombs.filter(sb => !sb.exploded || now - sb.explodedAt < 400);
+
   // Gif/brand-schade-over-tijd (Toxic Cannon / Vlammenwerper e.a.) — apart van de aanval-AI hieronder
   coopSim.bots.forEach(bot => {
     if (bot.dead) return;
@@ -628,19 +679,10 @@ function coopHostUpdate(dt, now) {
           }
           if (b.effect === 'poison' && !bot.dead) { bot.poisonUntil = now + 3000; bot.poisonOwnerUid = b.ownerUid; bot.poisonSpread = true; }
           if (b.effect === 'stickyBomb' && !bot.dead && !b.stuckTriggered) {
-            // Kleefbom Werper: ontploft na een korte vertraging (zelfde 800ms/90px/5dmg als single-player)
+            // Kleefbom Werper: plakt en ontploft na een korte vertraging (zelfde 800ms/90px/5dmg als
+            // single-player) — zie de coopSim.stickyBombs-tick verderop voor de daadwerkelijke explosie
             b.stuckTriggered = true;
-            const bx = bot.x, by = bot.y, bombShooter = b.ownerUid;
-            setTimeout(() => {
-              if (!coopSim || coopRole !== 'host') return;
-              coopSim.bots.forEach(other => {
-                if (other.dead) return;
-                if (Math.hypot(bx - other.x, by - other.y) < 90) {
-                  other.hp -= 5;
-                  if (other.hp <= 0) coopKillBot(other, bombShooter, performance.now());
-                }
-              });
-            }, 800);
+            coopSim.stickyBombs.push({ id: coopSim.nextId++, x: bot.x, y: bot.y, born: now, ownerUid: b.ownerUid, exploded: false });
           }
           if (b.effect === 'igniteHit' && !bot.dead) { bot.igniteUntil = now + 2500; bot.igniteOwnerUid = b.ownerUid; }
           if (b.effect === 'knockbackHit' && !bot.dead) {
@@ -942,8 +984,13 @@ function coopPushHostState() {
   const coins = coopSim.coins.map(c => ({ x: Math.round(c.x), y: Math.round(c.y) }));
   const powerups = coopSim.powerups.map(pu => ({ x: Math.round(pu.x), y: Math.round(pu.y), type: pu.type }));
   const blackholes = coopSim.blackholes.map(bh => ({ x: Math.round(bh.x), y: Math.round(bh.y), age: performance.now() - bh.born }));
+  const nowTs = performance.now();
+  const stickyBombs = coopSim.stickyBombs.map(sb => ({
+    x: Math.round(sb.x), y: Math.round(sb.y), exploded: sb.exploded,
+    age: sb.exploded ? nowTs - sb.explodedAt : 0
+  }));
   db.collection('lobbies').doc(coopLobbyCode).collection('state').doc('live')
-    .set({ players, bots, bullets, coins, powerups, blackholes, botCount: coopSim.bots.length, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
+    .set({ players, bots, bullets, coins, powerups, blackholes, stickyBombs, botCount: coopSim.bots.length, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
     .catch(() => {});
 }
 
@@ -975,7 +1022,13 @@ function coopSmoothEntity(displayMap, key, target) {
 function coopBuildSmoothedGuestState(remote) {
   const newPlayers = {};
   Object.keys(remote.players || {}).forEach(uid => {
-    newPlayers[uid] = coopSmoothEntity(coopGuestDisplay.players, uid, remote.players[uid]);
+    if (uid === currentUid && coopLocalPredictedPos) {
+      // Eigen speler: de lokaal voorspelde positie tekenen i.p.v. de (mogelijk iets oude) netwerk-positie
+      newPlayers[uid] = { ...remote.players[uid], x: coopLocalPredictedPos.x, y: coopLocalPredictedPos.y };
+      coopGuestDisplay.players[uid] = newPlayers[uid];
+    } else {
+      newPlayers[uid] = coopSmoothEntity(coopGuestDisplay.players, uid, remote.players[uid]);
+    }
   });
   coopGuestDisplay.players = newPlayers;
   const newBots = {};
@@ -993,6 +1046,7 @@ function coopBuildSmoothedGuestState(remote) {
 function coopGuestRenderLoop() {
   if (coopRole !== 'guest') return;
   if (coopRemoteState) {
+    coopUpdateLocalPrediction(performance.now());
     const smoothed = coopBuildSmoothedGuestState(coopRemoteState);
     coopRenderFrame(smoothed);
     coopUpdateHud(smoothed);
@@ -1030,6 +1084,11 @@ function coopRenderFrame(state) {
     x: bh.x, y: bh.y, radius: COOP_BLACKHOLE_RADIUS, duration: COOP_BLACKHOLE_DURATION,
     born: performance.now() - (bh.age || 0) // eigen klok van deze client, zie toelichting bovenaan het bestand
   }));
+  // Kleefbom Werper: waarschuwingscirkel terwijl hij nog "plakt", explosie-visual zodra hij afgaat
+  (state.stickyBombs || []).forEach(sb => {
+    if (sb.exploded) drawExplosion({ x: sb.x, y: sb.y, born: performance.now() - (sb.age || 0), maxR: 90 });
+    else drawTelegraph({ x: sb.x, y: sb.y, radius: 90 });
+  });
 
   // Bots tekenen met de ECHTE drawBot() uit render.js — die bepaalt zelf kleur/vorm/hp-balk/status-
   // ringen aan de hand van bot.type/pattern/hp/maxHp/frozenUntil/enz., en kijkt naar de globale
