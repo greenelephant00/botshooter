@@ -306,6 +306,7 @@ function enterCoopMatchAsGuest() {
   coopRole = 'guest';
   coopMatchActive = true;
   coopMyCoinsApplied = 0;
+  coopGuestDisplay = { players: {}, bots: {} };
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
@@ -891,7 +892,7 @@ function coopPushHostState() {
     };
   });
   const bots = coopSim.bots.slice(0, COOP_MAX_BOTS_SENT).map(b => ({
-    x: Math.round(b.x), y: Math.round(b.y), hp: b.hp, maxHp: b.maxHp, r: b.r, color: b.color, type: b.type, pattern: b.pattern,
+    id: b.id, x: Math.round(b.x), y: Math.round(b.y), hp: b.hp, maxHp: b.maxHp, r: b.r, color: b.color, type: b.type, pattern: b.pattern,
     frozenUntil: b.frozenUntil || 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false
   }));
   const bullets = coopSim.bullets.slice(0, COOP_MAX_BULLETS_SENT).map(b => ({ x: Math.round(b.x), y: Math.round(b.y), r: b.r, color: b.color }));
@@ -911,12 +912,48 @@ function coopEndMatch() {
 }
 
 // ---- Gast: renderen wat de host stuurt ----
+// De host tekent zijn eigen simulatie 60x/sec, maar een gast krijgt maar zo'n 5x/sec een nieuwe
+// snapshot binnen via Firestore (COOP_STATE_PUSH_MS). Zonder meer zou dat elke keer een zichtbare
+// sprong geven ("lag/glitch") — daarom wordt hier per speler/bot elke render-frame een stukje
+// (COOP_SMOOTH_FACTOR) richting de laatst ontvangen positie bewogen i.p.v. er meteen naartoe te
+// springen, zodat beweging er op een gast-scherm net zo vloeiend uitziet als bij de host.
+const COOP_SMOOTH_FACTOR = 0.3;
+let coopGuestDisplay = { players: {}, bots: {} };
+
+function coopSmoothEntity(displayMap, key, target) {
+  let d = displayMap[key];
+  if (!d) { d = { ...target }; displayMap[key] = d; return d; }
+  d.x += (target.x - d.x) * COOP_SMOOTH_FACTOR;
+  d.y += (target.y - d.y) * COOP_SMOOTH_FACTOR;
+  Object.keys(target).forEach(k => { if (k !== 'x' && k !== 'y') d[k] = target[k]; });
+  return d;
+}
+
+function coopBuildSmoothedGuestState(remote) {
+  const newPlayers = {};
+  Object.keys(remote.players || {}).forEach(uid => {
+    newPlayers[uid] = coopSmoothEntity(coopGuestDisplay.players, uid, remote.players[uid]);
+  });
+  coopGuestDisplay.players = newPlayers;
+  const newBots = {};
+  (remote.bots || []).forEach(b => { newBots[b.id] = coopSmoothEntity(coopGuestDisplay.bots, b.id, b); });
+  coopGuestDisplay.bots = newBots;
+  return {
+    score: remote.score, botCount: remote.botCount, status: remote.status,
+    players: newPlayers, bots: Object.values(newBots),
+    // Kogels/munten/powerups/zwarte gaten bewegen snel of helemaal niet — die rechtstreeks doorgeven
+    // (glad strijken zou kogels juist trager/verkeerd laten aanvoelen)
+    bullets: remote.bullets || [], coins: remote.coins || [], powerups: remote.powerups || [], blackholes: remote.blackholes || []
+  };
+}
+
 function coopGuestRenderLoop() {
   if (coopRole !== 'guest') return;
   if (coopRemoteState) {
-    coopRenderFrame(coopRemoteState);
-    coopUpdateHud(coopRemoteState);
-    coopSyncMyCoins(coopRemoteState.players && coopRemoteState.players[currentUid]);
+    const smoothed = coopBuildSmoothedGuestState(coopRemoteState);
+    coopRenderFrame(smoothed);
+    coopUpdateHud(smoothed);
+    coopSyncMyCoins(smoothed.players && smoothed.players[currentUid]);
   }
   coopRafId = requestAnimationFrame(coopGuestRenderLoop);
 }
