@@ -11,36 +11,54 @@
 // single-player teken-/update-lus tijdelijk overgeslagen via de coopMatchActive-vlag (zie de
 // eenregelige checks bovenaan draw() in render.js en update() in update.js).
 //
-// De aanval-PATRONEN van elke bot (mortier, gifwolk, gravity well, enz.) zijn NIET overgenomen — elke
-// bot valt hier aan volgens één van vier simpele gedragingen (melee/zelfmoord/stilstaand-schieten/
-// afstand-houden-en-schieten) gebaseerd op zijn `pattern`-veld. Dat is bewust nog een vereenvoudiging;
-// de bots ZIEN er wel al echt uit en de basis-roster (grunt t/m splitter) is de echte data.
+// Bots gebruiken de ECHTE score-progressie van Endless (pickBotType() in player.js: bottypes
+// ontgrendelen op basis van score, Splitter-cap) en dezelfde spawnkans/-cap (3 + score/50, 1,5%
+// kans/frame). Hun aanval-PATRONEN vuren nu ook dezelfde kogel-volleys als single-player (single/fast/
+// triple/burst/circle/double/wide/megaburst/spiral/teleport, zie coopBotShoot()), met per-bottype
+// schade/herlaadtijd. Swarmqueen splitst bij dood, Bomber doet zijn explosie-splash ongeacht doodsoorzaak.
+// NIET overgenomen: de 11 zeldzame SPECIAL_BOT_TYPES (mortier/gifwolk/gravity well/mijn/vloek/enz.),
+// bosses, Wereld 2-bots/-disasters — die zijn te complex voor deze stap en komen in Co-op nog niet voor.
 //
-// Spelers tekenen nu met hun eigen echte uitgeruste skin (drawPlayerSkin), en vechten met hun eigen
-// wapen (schade/vuursnelheid/pellets/spreiding) en pantser (HP-bonus + schadereductie) — elke speler
-// leest dit lokaal van zijn eigen account en meldt het aan de host (zie coopReadLocalLoadout()).
-// Een deel van de speciale-wapen-effecten is ook geïmplementeerd (zie COOP_SUPPORTED_EFFECTS):
-// bevriezen bij kill, lifesteal bij kill, kettingbliksem, direct executeren onder 25% HP, gif,
-// brand, kleine schok-splash+bevriezen, terugstoot, en killstreak-schaalschade. Niet ondersteund:
-// zwart gat (Singularity Gun), kleefbom, windduw, wortelsleur — die vallen terug op kale schade
-// zonder effect.
+// Spelers tekenen met hun eigen echte uitgeruste skin (drawPlayerSkin), en vechten met hun eigen wapen
+// (schade/vuursnelheid/kogelgrootte/pellets/spreiding — zelfde formules als single-player) en pantser
+// (HP-bonus, schadereductie, muntenvermenigvuldiger) — elke speler leest dit lokaal van zijn eigen
+// account en meldt het aan de host (zie coopReadLocalLoadout()). De meeste speciale-wapen-effecten zijn
+// geïmplementeerd met dezelfde getallen als single-player (zie COOP_SUPPORTED_EFFECTS): bevriezen bij
+// kill, lifesteal bij kill, kettingbliksem, direct executeren onder 25% HP, gif, brand, shatter-splash+
+// bevriezen, terugstoot, windduw, zwart gat, en killstreak-schaalschade — en Kernvampirisme/Shockwave/
+// Overkill/killstreak-teller gelden nu bij ELKE kill-oorzaak, niet alleen een directe kogeltreffer.
+// Niet ondersteund: kleefbom (Kleefbom Werper) en wortelsleur (Wortelgeweer) — die vallen terug op kale
+// schade zonder effect. Ook nog niet overgenomen: kogel-doorboring/-splash/-bereiklimiet (Railgun,
+// Raketwerper, Windgeweer, Vlammenwerper), Minigun-inaccuracy, en de elementale/curse/Bloodlust-
+// schademultipliers op een schot.
 //
-// Munten en powerups spawnen periodiek willekeurig op de kaart — net als single-player, NIET als
-// bot-drop bij een kill. 3 powerups zijn geïmplementeerd: schild (🛡️ tijdelijk onkwetsbaar), snelheid
-// (⚡ tijdelijk sneller) en heal (❤️ direct HP terug). Munten worden echt bijgeschreven op je account.
+// Munten en powerups spawnen periodiek willekeurig op de kaart — net als single-player (zelfde
+// interval/kans/veld-cap/levensduur), NIET als bot-drop bij een kill, en met hetzelfde plukbereik
+// (Magneet + Goudtrek) en dezelfde muntenwaarde (Fortuinpantser + Muntenregen). 3 van de 26 echte
+// powerup-types zijn geïmplementeerd: schild/snelheid/heal, met dezelfde duur-/heelbedrag-tabellen en
+// Long Boosts-verlenging als single-player. De overige 23 (snelvuur, damage, multishot, freeze, nuke,
+// onzichtbaar, timewarp, terugkaats, homing, stun, aura, overload, verwarring, elementenstorm, en de
+// Wereld 2-exclusieve types) bestaan nog niet in Co-op. Munten worden echt bijgeschreven op je account.
 // Munten/powerups/het zwarte gat gebruiken de ECHTE tekenfuncties (drawCoinPickup/drawPowerup/
 // drawBlackHole uit render.js), niet een eigen tekenstijl.
 //
-// Een deel van de gekochte UPGRADES telt nu ook mee (zie coopReadLocalUpgrades()): Extra HP, Sprint,
-// Snel Herladen, Critical Hit, Iron Skin, Revive (1x per potje), Coin Rain, en de Wereld 2 Kern-
-// upgrades (Kernschade, Kernsnelheid, Kernregeneratie, Kernvampirisme), plus Shockwave en Overkill
-// (schade-splash bij een kill). Lucky Drop is niet meegenomen (verkort in single-player alleen het
-// powerup-spawn-interval, en Co-op heeft al een eigen vaste powerup-timer). Multi-Shield, Splinter-
-// schoten, Sharpshooter, Second Wind, Flying Start, Piercing Rounds, Bloodlust en Core Shield/Aura/
-// Shock zitten er ook nog niet in.
+// De meeste gekochte UPGRADES tellen mee (zie coopReadLocalUpgrades()): Extra HP, Sprint, Snel Herladen,
+// Critical Hit, Iron Skin, Revive (1x per potje), Coin Rain, Magneet, Goudtrek, Long Boosts, en de
+// Wereld 2 Kern-upgrades (Kernschade, Kernsnelheid, Kernregeneratie, Kernvampirisme), plus Shockwave en
+// Overkill. Bonussen uit Wereld 1- én Wereld 2-bomen worden gewoon bij elkaar opgeteld (bewuste keuze:
+// Co-op is niet aan één wereld gebonden, dus anders zou een Wereld 2-upgrade nooit meetellen). Lucky
+// Drop is niet meegenomen (verkort in single-player alleen het powerup-spawn-interval, en Co-op heeft
+// al een eigen vaste powerup-timer). Multi-Shield, Splinter-schoten, Sharpshooter, Second Wind, Flying
+// Start, Piercing Rounds, Bloodlust en Core Shield/Aura/Shock zitten er nog niet in. Ook de meeste
+// pantser-bijeffecten (regen, thorns, adrenaline, reflectie, gif-/bevries-reflectie, elementale
+// weerstand/schademultiplier, terugstoot-weerstand) doen in Co-op nog niets, buiten HP-bonus/reductie/
+// muntenvermenigvuldiger.
 //
 // Overige bekende beperkingen van deze versie:
+// - Geen bosses, geen Wereld 2-disasters (tornado/zandstorm/aardbeving/enz.).
 // - Alleen het skin-LICHAAM wordt getekend, geen wapen-in-hand, transformaties of dood-animaties.
+// - Geen deeltjes-effecten (hits/kills/pickups) en geen aanval-telegraphs (waarschuwing vóór een
+//   speciale aanval) — bots vallen dus zonder visuele wind-up aan.
 // - Alleen toetsenbord+muis, geen touch-besturing.
 // - Geen client-side prediction: je eigen bewegingen op een gast-scherm voelen iets vertraagd.
 // - De bevriezings-visual op een GAST-scherm kan soms net niet kloppen (elke browser heeft zijn eigen
