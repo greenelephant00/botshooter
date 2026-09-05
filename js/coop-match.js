@@ -25,9 +25,11 @@
 // zwart gat (Singularity Gun), kleefbom, windduw, wortelsleur — die vallen terug op kale schade
 // zonder effect.
 //
-// Bots laten bij het sterven kans op een munt vallen (echte munten, worden bijgeschreven op je eigen
-// account) en er spawnen periodiek 3 simpele powerups: schild (🛡️ tijdelijk onkwetsbaar), snelheid
-// (⚡ tijdelijk sneller) en heal (❤️ direct HP terug).
+// Munten en powerups spawnen periodiek willekeurig op de kaart — net als single-player, NIET als
+// bot-drop bij een kill. 3 powerups zijn geïmplementeerd: schild (🛡️ tijdelijk onkwetsbaar), snelheid
+// (⚡ tijdelijk sneller) en heal (❤️ direct HP terug). Munten worden echt bijgeschreven op je account.
+// Munten/powerups/het zwarte gat gebruiken de ECHTE tekenfuncties (drawCoinPickup/drawPowerup/
+// drawBlackHole uit render.js), niet een eigen tekenstijl.
 //
 // Een deel van de gekochte UPGRADES telt nu ook mee (zie coopReadLocalUpgrades()): Extra HP, Sprint,
 // Snel Herladen, Critical Hit, Iron Skin, Revive (1x per potje), Coin Rain, en de Wereld 2 Kern-
@@ -75,15 +77,16 @@ let coopLastStatePush = 0;
 let coopMyPos = { x: 0, y: 0 }; // gast: laatst bekende eigen positie, voor het bepalen van de mikhoek
 let coopMyCoinsApplied = 0; // hoeveel van je eigen coopSim/coopRemoteState-coinsEarned je al aan je echte account hebt toegevoegd
 
-const COOP_COIN_DROP_CHANCE = 0.6;
-const COOP_COIN_VALUE_MIN = 1;
-const COOP_COIN_VALUE_MAX = 3;
+// Munten spawnen — net als single-player — periodiek op een willekeurige plek, LOS van bot-kills
+// (niet als bot-drop, zoals een eerdere versie deed).
+const COOP_COIN_SPAWN_MS = 4000;
+const COOP_COIN_MAX_ON_FIELD = 2;
+const COOP_COIN_VALUE_MIN = 5;
+const COOP_COIN_VALUE_MAX = 15;
 const COOP_COIN_PICKUP_R = 22;
 const COOP_POWERUP_SPAWN_MS = 10000;
 const COOP_POWERUP_PICKUP_R = 24;
 const COOP_POWERUP_TYPES = ['shield', 'speed', 'heal'];
-const COOP_POWERUP_COLORS = { shield: '#4cc9f0', speed: '#ffd60a', heal: '#4cd964' };
-const COOP_POWERUP_ICONS = { shield: '🛡️', speed: '⚡', heal: '❤️' };
 
 // Ondersteunde speciale-wapen-effecten in Co-op — niet allemaal (zwart gat, kleefbom, windduw,
 // wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
@@ -216,7 +219,7 @@ function enterCoopMatchAsHost() {
   document.getElementById('coopLobbyScreen').style.display = 'none';
   document.getElementById('coopMatchScreen').style.display = 'block';
   document.getElementById('coopMatchOverlay').style.display = 'none';
-  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], blackholes: [], score: 0, lastBotSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
+  coopSim = { players: {}, bots: [], bullets: [], coins: [], powerups: [], blackholes: [], score: 0, lastBotSpawn: 0, lastCoinSpawn: 0, lastPowerupSpawn: 0, nextId: 1, status: 'playing' };
   db.collection('lobbies').doc(coopLobbyCode).collection('players').get().then(snap => {
     let i = 0;
     snap.forEach(doc => {
@@ -366,7 +369,12 @@ function coopHostUpdate(dt, now) {
     coopSpawnBot();
   }
 
-  // Powerups spawnen
+  // Munten en powerups spawnen — periodiek op een willekeurige plek, net als single-player (niet als
+  // bot-drop)
+  if (now - coopSim.lastCoinSpawn > COOP_COIN_SPAWN_MS && coopSim.coins.length < COOP_COIN_MAX_ON_FIELD) {
+    coopSim.lastCoinSpawn = now;
+    coopSpawnCoin();
+  }
   if (now - coopSim.lastPowerupSpawn > COOP_POWERUP_SPAWN_MS) {
     coopSim.lastPowerupSpawn = now;
     coopSpawnPowerup();
@@ -474,13 +482,11 @@ function coopHostUpdate(dt, now) {
         coopSim.bullets.push({ id: coopSim.nextId++, owner: 'bot', x: bot.x, y: bot.y, vx: (dx / dist) * bot.bulletSpeed, vy: (dy / dist) * bot.bulletSpeed, r: 5, dmg: COOP_BOT_BULLET_DMG, color: bot.color });
       }
     } else {
-      // generiek: probeer op afstand te blijven en op de dichtstbijzijnde speler te schieten
-      if (dist > COOP_KEEP_DIST + 20) {
+      // generiek: nadert tot in schietbereik en blijft daar staan (loopt NIET terug als je dichterbij
+      // komt — single-player's ranged bots wijken ook niet uit, ze schieten gewoon door)
+      if (dist > COOP_KEEP_DIST) {
         bot.x += (dx / dist) * bot.speed * stepMult;
         bot.y += (dy / dist) * bot.speed * stepMult;
-      } else if (dist < COOP_KEEP_DIST - 20) {
-        bot.x -= (dx / dist) * bot.speed * stepMult;
-        bot.y -= (dy / dist) * bot.speed * stepMult;
       }
       if (now - bot.lastAttack > bot.shootCooldown) {
         bot.lastAttack = now;
@@ -612,19 +618,23 @@ function coopDamagePlayer(p, dmg, now) {
   }
 }
 
-// Eén centrale plek om een bot te doden: telt altijd de score, en laat 'm een munt vallen — zodat
-// iedere kill-plek (kogel-treffer, gif/brand-schade-over-tijd, kettingbliksem, schok-splash) hetzelfde
-// gedrag krijgt in plaats van dat elke plek dit los moet doen.
+// Eén centrale plek om een bot te doden: telt altijd de score — zodat iedere kill-plek (kogel-treffer,
+// gif/brand-schade-over-tijd, kettingbliksem, schok-splash) hetzelfde gedrag krijgt in plaats van dat
+// elke plek dit los moet doen. Munten spawnen HIER niet meer (dat gebeurt periodiek, zie coopSpawnCoin).
 function coopKillBot(bot) {
   if (bot.dead) return;
   bot.dead = true;
   coopSim.score += bot.scoreValue;
-  if (Math.random() < COOP_COIN_DROP_CHANCE) {
-    coopSim.coins.push({
-      id: coopSim.nextId++, x: bot.x, y: bot.y,
-      value: COOP_COIN_VALUE_MIN + Math.floor(Math.random() * (COOP_COIN_VALUE_MAX - COOP_COIN_VALUE_MIN + 1))
-    });
-  }
+}
+
+function coopSpawnCoin() {
+  const margin = 60;
+  coopSim.coins.push({
+    id: coopSim.nextId++,
+    x: margin + Math.random() * (canvas.width - margin * 2),
+    y: margin + Math.random() * (canvas.height - margin * 2),
+    value: COOP_COIN_VALUE_MIN + Math.floor(Math.random() * (COOP_COIN_VALUE_MAX - COOP_COIN_VALUE_MIN + 1))
+  });
 }
 
 function coopSpawnPowerup() {
@@ -638,12 +648,20 @@ function coopSpawnPowerup() {
 
 function coopSpawnBot() {
   const def = BOT_TYPES[Math.floor(Math.random() * BOT_TYPES.length)];
-  const edge = Math.floor(Math.random() * 4);
   let x, y;
-  if (edge === 0) { x = Math.random() * canvas.width; y = -20; }
-  else if (edge === 1) { x = canvas.width + 20; y = Math.random() * canvas.height; }
-  else if (edge === 2) { x = Math.random() * canvas.width; y = canvas.height + 20; }
-  else { x = -20; y = Math.random() * canvas.height; }
+  if (COOP_STATIONARY_PATTERNS.includes(def.pattern)) {
+    // Stilstaande bots (turrets) bewegen nooit, dus ze moeten meteen binnen beeld verschijnen —
+    // buiten beeld spawnen zou ze voorgoed onzichtbaar laten staan.
+    const margin = 80;
+    x = margin + Math.random() * (canvas.width - margin * 2);
+    y = margin + Math.random() * (canvas.height - margin * 2);
+  } else {
+    const edge = Math.floor(Math.random() * 4);
+    if (edge === 0) { x = Math.random() * canvas.width; y = -20; }
+    else if (edge === 1) { x = canvas.width + 20; y = Math.random() * canvas.height; }
+    else if (edge === 2) { x = Math.random() * canvas.width; y = canvas.height + 20; }
+    else { x = -20; y = Math.random() * canvas.height; }
+  }
   coopSim.bots.push({
     id: coopSim.nextId++,
     type: def.name, pattern: def.pattern,
@@ -723,38 +741,14 @@ function coopRenderFrame(state) {
   const players = state.players || {};
   const bots = state.bots || [];
 
-  // Munten en powerups
-  (state.coins || []).forEach(c => {
-    ctx.beginPath();
-    ctx.fillStyle = '#ffd60a';
-    ctx.arc(c.x, c.y, 8, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  (state.powerups || []).forEach(pu => {
-    ctx.beginPath();
-    ctx.fillStyle = COOP_POWERUP_COLORS[pu.type] || '#fff';
-    ctx.globalAlpha = 0.25;
-    ctx.arc(pu.x, pu.y, 22, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-    ctx.font = '20px Segoe UI';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(COOP_POWERUP_ICONS[pu.type] || '?', pu.x, pu.y);
-    ctx.textBaseline = 'alphabetic';
-  });
-  (state.blackholes || []).forEach(bh => {
-    const t = Math.min(1, (bh.age || 0) / COOP_BLACKHOLE_DURATION);
-    const r = COOP_BLACKHOLE_RADIUS * (0.4 + t * 0.6);
-    const grad = ctx.createRadialGradient(bh.x, bh.y, 4, bh.x, bh.y, r);
-    grad.addColorStop(0, '#000000');
-    grad.addColorStop(0.6, '#3a0a5c');
-    grad.addColorStop(1, 'rgba(58,10,92,0)');
-    ctx.beginPath();
-    ctx.fillStyle = grad;
-    ctx.arc(bh.x, bh.y, r, 0, Math.PI * 2);
-    ctx.fill();
-  });
+  // Munten/powerups/zwarte gaten: de ECHTE drawCoinPickup()/drawPowerup()/drawBlackHole() uit render.js,
+  // zodat deze er precies zo uitzien als in single-player i.p.v. eigen verzonnen vormen.
+  (state.coins || []).forEach(c => drawCoinPickup({ x: c.x, y: c.y, r: 11 }));
+  (state.powerups || []).forEach(pu => drawPowerup({ x: pu.x, y: pu.y, r: 14, type: pu.type }));
+  (state.blackholes || []).forEach(bh => drawBlackHole({
+    x: bh.x, y: bh.y, radius: COOP_BLACKHOLE_RADIUS, duration: COOP_BLACKHOLE_DURATION,
+    born: performance.now() - (bh.age || 0) // eigen klok van deze client, zie toelichting bovenaan het bestand
+  }));
 
   // Bots tekenen met de ECHTE drawBot() uit render.js — die bepaalt zelf kleur/vorm/hp-balk/status-
   // ringen aan de hand van bot.type/pattern/hp/maxHp/frozenUntil/enz., en kijkt naar de globale
