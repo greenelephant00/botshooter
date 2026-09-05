@@ -48,8 +48,8 @@
 //   correct, want die wordt volledig door de host bepaald.
 
 const COOP_ARENA_MARGIN = 20;
-const COOP_STATE_PUSH_MS = 120; // hoe vaak de host een snapshot naar Firestore schrijft
-const COOP_INPUT_PUSH_MS = 100; // hoe vaak een gast zijn invoer naar Firestore schrijft
+const COOP_STATE_PUSH_MS = 200; // hoe vaak de host een snapshot naar Firestore schrijft
+const COOP_INPUT_PUSH_MS = 180; // hoe vaak een gast zijn invoer naar Firestore schrijft
 const COOP_PLAYER_R = 18;
 const COOP_PLAYER_SPEED = 4.2;
 const COOP_PLAYER_MAX_HP = 100;
