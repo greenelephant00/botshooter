@@ -53,15 +53,16 @@ const COOP_INPUT_PUSH_MS = 180; // hoe vaak een gast zijn invoer naar Firestore 
 const COOP_PLAYER_R = 18;
 const COOP_PLAYER_SPEED = 4.2;
 const COOP_PLAYER_MAX_HP = 100;
-const COOP_WEAPON = { dmg: 2, cooldownMs: 220, bulletSpeed: 10, bulletR: 4 }; // iedereen deelt dit simpele standaardwapen
-const COOP_BOT_BULLET_DMG = 6;
+const COOP_WEAPON = { dmg: 2, cooldownMs: 220, bulletSpeed: 9, bulletR: 4 }; // iedereen deelt dit simpele standaardwapen
 const COOP_MAX_BOTS_SENT = 40;
 const COOP_MAX_BULLETS_SENT = 60;
 const COOP_PLAYER_COLORS = ['#4cc9f0', '#ff5cf1', '#c3e600'];
 const COOP_MELEE_PATTERNS = ['melee'];
 const COOP_SUICIDE_PATTERNS = ['suicide'];
 const COOP_STATIONARY_PATTERNS = ['turret'];
-const COOP_KEEP_DIST = 260; // hoe ver "afstand houden"-bots proberen te blijven van hun doelwit
+const COOP_TELEPORT_PATTERNS = ['teleport'];
+const COOP_KEEP_DIST = 140; // hoe ver "afstand houden"-bots proberen te blijven van hun doelwit (zelfde als single-player)
+const COOP_RANGED_FIRE_RANGE = 600; // ranged bots schieten alleen binnen dit bereik, net als single-player
 
 // ---- Gedeelde toestand ----
 let coopMatchActive = false;  // true zolang een co-op potje loopt — schakelt de single-player teken-/update-lus uit
@@ -84,17 +85,19 @@ const COOP_COIN_MAX_ON_FIELD = 2;
 const COOP_COIN_VALUE_MIN = 5;
 const COOP_COIN_VALUE_MAX = 15;
 const COOP_COIN_PICKUP_R = 22;
-const COOP_POWERUP_SPAWN_MS = 10000;
+const COOP_POWERUP_SPAWN_MS = 6000; // zelfde basis-interval als single-player (spawnkans hieronder ook 70%)
 const COOP_POWERUP_PICKUP_R = 24;
+const COOP_POWERUP_MAX_ON_FIELD = 2;
+const COOP_POWERUP_LIFE_MS = 9000;
+const COOP_COIN_LIFE_MS = 8000;
 const COOP_POWERUP_TYPES = ['shield', 'speed', 'heal'];
 
-// Ondersteunde speciale-wapen-effecten in Co-op — niet allemaal (zwart gat, kleefbom, windduw,
-// wortelsleur ontbreken nog, die zijn te complex voor deze stap en vallen terug op kale schade).
-const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'killstreak', 'blackholeKill'];
-const COOP_BLACKHOLE_RADIUS = 150;
+// Ondersteunde speciale-wapen-effecten in Co-op — kleefbom en wortelsleur ontbreken nog (die zijn
+// te complex voor deze stap en vallen terug op kale schade).
+const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'gustPush', 'killstreak', 'blackholeKill'];
+const COOP_BLACKHOLE_RADIUS = 130;
 const COOP_BLACKHOLE_DURATION = 1200;
-const COOP_BLACKHOLE_TICK_DMG = 2;
-const COOP_BLACKHOLE_BURST_DMG = 14;
+const COOP_BLACKHOLE_BURST_DMG = 6;
 
 // getWeapon()/getArmorStats() uit state.js kijken naar `currentWorld` en negeren een Wereld
 //2-wapen/pantser stil als je toevallig niet "in" Wereld 2 staat — logisch voor single-player (je kunt
@@ -114,7 +117,8 @@ function coopGetOwnArmorStats() {
   const a2 = dualOwned ? coopGetOwnArmorPiece(equippedArmor2) : ARMOR[0];
   return {
     hpBonus: a1.hpBonus + a2.hpBonus,
-    reduction: 1 - (1 - (a1.reduction || 0)) * (1 - (a2.reduction || 0))
+    reduction: 1 - (1 - (a1.reduction || 0)) * (1 - (a2.reduction || 0)),
+    coinMult: (a1.coinMult || 1) * (a2.coinMult || 1)
   };
 }
 
@@ -129,17 +133,20 @@ function coopReadLocalUpgrades() {
   const critChance = lvlCriticalHit > 0 ? CRITICAL_HIT_CHANCES[lvlCriticalHit - 1] : (lvl2CriticalHit > 0 ? CRITICALHIT2_CHANCES[lvl2CriticalHit - 1] : 0);
   const ironSkinReduction = lvlIronSkin > 0 ? IRON_SKIN_REDUCTIONS[lvlIronSkin - 1] : (lvl2IronSkin > 0 ? IRONSKIN2_REDUCTIONS[lvl2IronSkin - 1] : 0);
   const coinRainBonus = (lvlCoinRain > 0 ? COIN_RAIN_BONUSES[lvlCoinRain - 1] : 0) + (lvl2CoinRain > 0 ? COINRAIN2_BONUSES[lvl2CoinRain - 1] : 0);
+  const pickupBonus = (lvlMagnet || 0) * MAGNET_RADIUS_PER_LEVEL + (lvlGoldRush > 0 ? GOLD_RUSH_RADIUS[lvlGoldRush - 1] : 0);
   return {
     extraHpBonus: (lvlExtraHp || 0) * EXTRA_HP_PER_LEVEL + (lvl2ExtraHp || 0) * EXTRAHP2_PER_LEVEL,
     reloadMult: 1 - (lvlFastReload || 0) * FAST_RELOAD_PER_LEVEL - (lvl2FastReload || 0) * FASTRELOAD2_PER_LEVEL,
     speedMult: (1 + (lvlSprint || 0) * SPRINT_PER_LEVEL) * (1 + (lvlCoreSpeed || 0) * CORE_SPEED_PER_LEVEL),
     coreDamageMult: 1 + (lvlCoreDamage || 0) * CORE_DAMAGE_PER_LEVEL,
-    critChance, ironSkinReduction, coinRainBonus,
+    critChance, ironSkinReduction, coinRainBonus, pickupBonus,
     hasRevive: !!(hasRevive || hasRevive2),
     coreRegenPerSec: (lvlCoreRegen || 0) * CORE_REGEN_PER_LEVEL,
     coreVampireHeal: (lvlCoreVampire || 0) * CORE_VAMPIRE_PER_LEVEL,
     overkillLevel: Math.max(lvlOverkill || 0, lvl2Overkill || 0),
-    shockwaveLevel: lvlShockwave || 0
+    shockwaveLevel: lvlShockwave || 0,
+    longBoostsMult: 1 + (lvlLongBoosts || 0) * LONG_BOOSTS_MULT_PER_LEVEL,
+    puSpeedLvl: getPuLevel('speed'), puHealLvl: getPuLevel('heal'), puShieldLvl: getPuLevel('shield')
   };
 }
 
@@ -151,19 +158,24 @@ function coopReadLocalLoadout() {
     weaponDmg: weapon.dmg * up.coreDamageMult,
     weaponCooldownMs: shootCooldown * weapon.cooldownMult * up.reloadMult,
     weaponBulletSpeed: COOP_WEAPON.bulletSpeed * (weapon.bulletSpeedMult || 1),
+    weaponBulletR: weapon.bulletR || 4,
     weaponPellets: weapon.pellets || 1,
-    weaponSpread: weapon.spread || 0,
+    weaponSpread: weapon.spread || 0.18,
     weaponEffect: COOP_SUPPORTED_EFFECTS.includes(weapon.effect) ? weapon.effect : null,
     armorHpBonus: (armor.hpBonus || 0) + up.extraHpBonus,
     armorReduction: 1 - (1 - (armor.reduction || 0)) * (1 - up.ironSkinReduction),
+    coinMult: armor.coinMult || 1,
     speedMult: up.speedMult,
     critChance: up.critChance,
     hasRevive: up.hasRevive,
     coinRainBonus: up.coinRainBonus,
+    pickupBonus: up.pickupBonus,
     coreRegenPerSec: up.coreRegenPerSec,
     coreVampireHeal: up.coreVampireHeal,
     overkillLevel: up.overkillLevel,
     shockwaveLevel: up.shockwaveLevel,
+    longBoostsMult: up.longBoostsMult,
+    puSpeedLvl: up.puSpeedLvl, puHealLvl: up.puHealLvl, puShieldLvl: up.puShieldLvl,
     skinId: getSkin()
   };
 }
@@ -176,6 +188,7 @@ function coopApplyLoadoutToPlayer(p, loadout) {
   if (typeof loadout.weaponDmg === 'number') p.weaponDmg = loadout.weaponDmg;
   if (typeof loadout.weaponCooldownMs === 'number') p.weaponCooldownMs = loadout.weaponCooldownMs;
   if (typeof loadout.weaponBulletSpeed === 'number') p.weaponBulletSpeed = loadout.weaponBulletSpeed;
+  if (typeof loadout.weaponBulletR === 'number') p.weaponBulletR = loadout.weaponBulletR;
   if (typeof loadout.weaponPellets === 'number') p.weaponPellets = loadout.weaponPellets;
   if (typeof loadout.weaponSpread === 'number') p.weaponSpread = loadout.weaponSpread;
   if (loadout.weaponEffect !== undefined) p.weaponEffect = loadout.weaponEffect;
@@ -193,10 +206,16 @@ function coopApplyLoadoutToPlayer(p, loadout) {
   if (typeof loadout.critChance === 'number') p.critChance = loadout.critChance;
   if (typeof loadout.hasRevive === 'boolean') p.hasRevive = loadout.hasRevive;
   if (typeof loadout.coinRainBonus === 'number') p.coinRainBonus = loadout.coinRainBonus;
+  if (typeof loadout.pickupBonus === 'number') p.pickupBonus = loadout.pickupBonus;
+  if (typeof loadout.coinMult === 'number') p.coinMult = loadout.coinMult;
   if (typeof loadout.coreRegenPerSec === 'number') p.coreRegenPerSec = loadout.coreRegenPerSec;
   if (typeof loadout.coreVampireHeal === 'number') p.coreVampireHeal = loadout.coreVampireHeal;
   if (typeof loadout.overkillLevel === 'number') p.overkillLevel = loadout.overkillLevel;
   if (typeof loadout.shockwaveLevel === 'number') p.shockwaveLevel = loadout.shockwaveLevel;
+  if (typeof loadout.longBoostsMult === 'number') p.longBoostsMult = loadout.longBoostsMult;
+  if (typeof loadout.puSpeedLvl === 'number') p.puSpeedLvl = loadout.puSpeedLvl;
+  if (typeof loadout.puHealLvl === 'number') p.puHealLvl = loadout.puHealLvl;
+  if (typeof loadout.puShieldLvl === 'number') p.puShieldLvl = loadout.puShieldLvl;
 }
 
 function coopReadLocalInput() {
@@ -234,11 +253,12 @@ function enterCoopMatchAsHost() {
         inputMoveX: 0, inputMoveY: 0, firing: false,
         // Eigen wapen/pantser-statistieken — worden hieronder bijgewerkt zodra de speler ze meestuurt
         // (host leest ze lokaal, gasten sturen ze mee met hun invoer). Tot dan een neutrale standaard.
-        weaponDmg: COOP_WEAPON.dmg, weaponCooldownMs: COOP_WEAPON.cooldownMs, weaponBulletSpeed: COOP_WEAPON.bulletSpeed,
-        weaponPellets: 1, weaponSpread: 0, weaponEffect: null, armorHpBonus: 0, armorReduction: 0,
+        weaponDmg: COOP_WEAPON.dmg, weaponCooldownMs: COOP_WEAPON.cooldownMs, weaponBulletSpeed: COOP_WEAPON.bulletSpeed, weaponBulletR: COOP_WEAPON.bulletR,
+        weaponPellets: 1, weaponSpread: 0.18, weaponEffect: null, armorHpBonus: 0, armorReduction: 0,
         killStreak: 0, lastKillAt: 0, skinId: 'default',
-        speedMult: 1, critChance: 0, hasRevive: false, reviveUsed: false, coinRainBonus: 0,
-        coreRegenPerSec: 0, coreVampireHeal: 0, overkillLevel: 0, shockwaveLevel: 0, lastRegenTick: 0
+        speedMult: 1, critChance: 0, hasRevive: false, reviveUsed: false, coinRainBonus: 0, pickupBonus: 0, coinMult: 1,
+        coreRegenPerSec: 0, coreVampireHeal: 0, overkillLevel: 0, shockwaveLevel: 0, lastRegenTick: 0,
+        longBoostsMult: 1, puSpeedLvl: 0, puHealLvl: 0, puShieldLvl: 0
       };
       i++;
     });
