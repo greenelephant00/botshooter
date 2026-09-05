@@ -23,12 +23,13 @@
 // (schade/vuursnelheid/kogelgrootte/pellets/spreiding — zelfde formules als single-player) en pantser
 // (HP-bonus, schadereductie, muntenvermenigvuldiger) — elke speler leest dit lokaal van zijn eigen
 // account en meldt het aan de host (zie coopReadLocalLoadout()). De meeste speciale-wapen-effecten zijn
-// geïmplementeerd met dezelfde getallen als single-player (zie COOP_SUPPORTED_EFFECTS): bevriezen bij
-// kill, lifesteal bij kill, kettingbliksem, direct executeren onder 25% HP, gif, brand, shatter-splash+
-// bevriezen, terugstoot, windduw, zwart gat, en killstreak-schaalschade — en Kernvampirisme/Shockwave/
-// Overkill/killstreak-teller gelden nu bij ELKE kill-oorzaak, niet alleen een directe kogeltreffer.
-// Niet ondersteund: kleefbom (Kleefbom Werper) en wortelsleur (Wortelgeweer) — die vallen terug op kale
-// schade zonder effect. Ook nog niet overgenomen: kogel-doorboring/-splash/-bereiklimiet (Railgun,
+// geïmplementeerd met dezelfde getallen als single-player (zie COOP_SUPPORTED_EFFECTS) — dit zijn nu
+// ALLE speciale-wapen-effecten uit single-player: bevriezen bij kill, lifesteal bij kill, ketting-
+// bliksem, direct executeren onder 25% HP, gif (verspreidt zich naar bots in de buurt bij dood), brand,
+// shatter-splash+bevriezen, terugstoot, windduw, zwart gat, kleefbom (vertraagde explosie) en
+// wortelsleur (sleurt bij een kill de dichtstbijzijnde bot de grond in), en killstreak-schaalschade —
+// en Kernvampirisme/Shockwave/Overkill/killstreak-teller gelden nu bij ELKE kill-oorzaak, niet alleen
+// een directe kogeltreffer. Nog niet overgenomen: kogel-doorboring/-splash/-bereiklimiet (Railgun,
 // Raketwerper, Windgeweer, Vlammenwerper), Minigun-inaccuracy, en de elementale/curse/Bloodlust-
 // schademultipliers op een schot.
 //
@@ -110,9 +111,8 @@ const COOP_POWERUP_LIFE_MS = 9000;
 const COOP_COIN_LIFE_MS = 8000;
 const COOP_POWERUP_TYPES = ['shield', 'speed', 'heal'];
 
-// Ondersteunde speciale-wapen-effecten in Co-op — kleefbom en wortelsleur ontbreken nog (die zijn
-// te complex voor deze stap en vallen terug op kale schade).
-const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'gustPush', 'killstreak', 'blackholeKill'];
+// Alle speciale-wapen-effecten uit single-player zijn nu ondersteund in Co-op.
+const COOP_SUPPORTED_EFFECTS = ['freezeKill', 'lifestealKill', 'chainLightning', 'execute', 'poison', 'igniteHit', 'shatterHit', 'knockbackHit', 'gustPush', 'killstreak', 'blackholeKill', 'stickyBomb', 'rootDragKill'];
 const COOP_BLACKHOLE_RADIUS = 130;
 const COOP_BLACKHOLE_DURATION = 1200;
 const COOP_BLACKHOLE_BURST_DMG = 6;
@@ -585,6 +585,23 @@ function coopHostUpdate(dt, now) {
             if (b.effect === 'blackholeKill') {
               coopSim.blackholes.push({ id: coopSim.nextId++, x: bot.x, y: bot.y, born: now, lastTick: now, ownerUid: b.ownerUid });
             }
+            if (b.effect === 'rootDragKill') {
+              // Wortelgeweer: sleurt bij een kill de dichtstbijzijnde andere bot de grond in (instant-kill na 840ms)
+              let nearest = null, nd = ROOT_DRAG_RANGE;
+              coopSim.bots.forEach(other => {
+                if (other === bot || other.dead) return;
+                const dd = Math.hypot(other.x - bot.x, other.y - bot.y);
+                if (dd < nd) { nd = dd; nearest = other; }
+              });
+              if (nearest) {
+                const rootTarget = nearest, rootShooter = b.ownerUid;
+                rootTarget.rootedUntil = now + 1400;
+                setTimeout(() => {
+                  if (!coopSim || coopRole !== 'host' || rootTarget.dead) return;
+                  coopKillBot(rootTarget, rootShooter, performance.now());
+                }, 840);
+              }
+            }
           }
           if (b.effect === 'chainLightning') {
             let nearest = null, nd = 140;
@@ -609,7 +626,22 @@ function coopHostUpdate(dt, now) {
               }
             });
           }
-          if (b.effect === 'poison' && !bot.dead) { bot.poisonUntil = now + 3000; bot.poisonOwnerUid = b.ownerUid; }
+          if (b.effect === 'poison' && !bot.dead) { bot.poisonUntil = now + 3000; bot.poisonOwnerUid = b.ownerUid; bot.poisonSpread = true; }
+          if (b.effect === 'stickyBomb' && !bot.dead && !b.stuckTriggered) {
+            // Kleefbom Werper: ontploft na een korte vertraging (zelfde 800ms/90px/5dmg als single-player)
+            b.stuckTriggered = true;
+            const bx = bot.x, by = bot.y, bombShooter = b.ownerUid;
+            setTimeout(() => {
+              if (!coopSim || coopRole !== 'host') return;
+              coopSim.bots.forEach(other => {
+                if (other.dead) return;
+                if (Math.hypot(bx - other.x, by - other.y) < 90) {
+                  other.hp -= 5;
+                  if (other.hp <= 0) coopKillBot(other, bombShooter, performance.now());
+                }
+              });
+            }, 800);
+          }
           if (b.effect === 'igniteHit' && !bot.dead) { bot.igniteUntil = now + 2500; bot.igniteOwnerUid = b.ownerUid; }
           if (b.effect === 'knockbackHit' && !bot.dead) {
             // Duwt de bot weg van de SCHUTTER (net als single-player), niet van de kogel-vliegrichting
@@ -689,9 +721,20 @@ function coopKillBot(bot, shooterUid, now) {
         r: 10, color: bot.color, speed: 2.2, hp: 1, maxHp: 1, bulletSpeed: 5, bulletDmg: 0, meleeDmg: 0,
         shootCooldown: 1400, lastAttack: 0, spiralAngle: 0, splits: false,
         frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false,
-        poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0, scoreValue: 10
+        poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0, poisonSpread: false, scoreValue: 10
       });
     }
+  }
+  // Toxic Cannon: gif verspreidt zich naar bots in de buurt zodra een vergiftigde bot sterft, ongeacht doodsoorzaak
+  if (bot.poisonSpread) {
+    coopSim.bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      if (Math.hypot(other.x - bot.x, other.y - bot.y) < 80) {
+        other.poisonUntil = Math.max(other.poisonUntil || 0, now + 3000);
+        other.poisonSpread = true;
+        other.poisonOwnerUid = bot.poisonOwnerUid;
+      }
+    });
   }
   // Bomber ontploft ook als hij op een andere manier dan zijn eigen aanval sterft: schade aan bots eromheen
   if (bot.pattern === 'suicide') {
@@ -875,7 +918,7 @@ function coopSpawnBot() {
     lastAttack: 0, spiralAngle: 0,
     splits: def.splits || false,
     frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false,
-    poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0,
+    poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0, poisonSpread: false,
     scoreValue: def.hp >= 10 ? 40 : def.hp >= 6 ? 25 : def.hp >= 3 ? 15 : 10
   });
 }
