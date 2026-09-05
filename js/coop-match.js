@@ -368,24 +368,23 @@ function coopHostUpdate(dt, now) {
       const streakMult = p.weaponEffect === 'killstreak' ? 1 + Math.min(p.killStreak, 10) * 0.15 : 1;
       const isCrit = Math.random() < (p.critChance || 0);
       const critMult = isCrit ? 2 : 1;
+      const spread = p.weaponSpread || 0;
+      const startAngle = p.angle - spread * (pellets - 1) / 2;
       for (let i = 0; i < pellets; i++) {
         // Meerdere pellets (bv. shotgun) waaieren symmetrisch rond de mikrichting uit, net als single-player
-        const spreadOffset = pellets === 1 ? 0 : (p.weaponSpread || 0) * (i / (pellets - 1) - 0.5);
-        const shotAngle = p.angle + spreadOffset;
+        const shotAngle = pellets === 1 ? p.angle : startAngle + spread * i;
         coopSim.bullets.push({
           id: coopSim.nextId++, owner: 'player', ownerUid: uid,
           x: p.x + Math.cos(shotAngle) * (COOP_PLAYER_R + 6), y: p.y + Math.sin(shotAngle) * (COOP_PLAYER_R + 6),
           vx: Math.cos(shotAngle) * p.weaponBulletSpeed, vy: Math.sin(shotAngle) * p.weaponBulletSpeed,
-          r: COOP_WEAPON.bulletR, dmg: Math.round(p.weaponDmg * streakMult * critMult), color: p.color, effect: p.weaponEffect
+          r: p.weaponBulletR || 4, dmg: p.weaponDmg * streakMult * critMult, color: p.color, effect: p.weaponEffect
         });
       }
     }
   });
 
-  // Bots spawnen — uit de ECHTE BOT_TYPES-roster (player.js), zodat ze er straks ook echt zo uitzien
-  const spawnInterval = Math.max(500, 1100 - coopSim.score * 2);
-  if (now - coopSim.lastBotSpawn > spawnInterval && coopSim.bots.length < 25) {
-    coopSim.lastBotSpawn = now;
+  // Bots spawnen — zelfde spawn-cap/-kans als single-player Endless (3 + score/50 tegelijk, 1,5% kans per frame)
+  if (coopSim.bots.length < 3 + Math.floor(coopSim.score / 50) && Math.random() < 0.015) {
     coopSpawnBot();
   }
 
@@ -666,8 +665,22 @@ function coopSpawnPowerup() {
   });
 }
 
+// Zelfde progressie als single-player Endless (pickBotType() in player.js): bottypes ontgrendelen op
+// basis van score, Splitter is beperkt tot MAX_SPLITTERS_ALIVE tegelijk. De 11 zeldzame SPECIAL_BOT_TYPES
+// (met exotische aanvalspatronen als mortier/gifwolk/gravity well) en bosses zijn in Co-op nog niet
+// geïmplementeerd, dus die worden hier bewust nog overgeslagen.
+function coopPickBotType() {
+  let unlocked = BOT_TYPES.filter(t => coopSim.score >= t.minScore);
+  const splitterCount = coopSim.bots.filter(b => !b.dead && b.type === 'splitter').length;
+  if (splitterCount >= MAX_SPLITTERS_ALIVE) {
+    const withoutSplitter = unlocked.filter(t => t.name !== 'splitter');
+    if (withoutSplitter.length) unlocked = withoutSplitter;
+  }
+  return unlocked[Math.floor(Math.random() * unlocked.length)];
+}
+
 function coopSpawnBot() {
-  const def = BOT_TYPES[Math.floor(Math.random() * BOT_TYPES.length)];
+  const def = coopPickBotType();
   let x, y;
   if (COOP_STATIONARY_PATTERNS.includes(def.pattern)) {
     // Stilstaande bots (turrets) bewegen nooit, dus ze moeten meteen binnen beeld verschijnen —
@@ -689,12 +702,14 @@ function coopSpawnBot() {
     speed: def.speed[0] + Math.random() * (def.speed[1] - def.speed[0]),
     hp: def.hp, maxHp: def.hp,
     bulletSpeed: def.bulletSpeed || 5,
+    bulletDmg: def.bulletDmg || 0,
     meleeDmg: def.meleeDamage || 10,
     shootCooldown: def.cooldown[0] + Math.random() * (def.cooldown[1] - def.cooldown[0]),
-    lastAttack: 0,
+    lastAttack: 0, spiralAngle: 0,
+    splits: def.splits || false,
     frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false,
     poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0,
-    scoreValue: Math.max(5, def.hp)
+    scoreValue: def.hp >= 10 ? 40 : def.hp >= 6 ? 25 : def.hp >= 3 ? 15 : 10
   });
 }
 
