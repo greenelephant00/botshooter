@@ -467,7 +467,8 @@ function coopHostUpdate(dt, now) {
   });
   coopSim.bots = coopSim.bots.filter(bot => !bot.dead);
 
-  // Bots bewegen/aanvallen — vier simpele gedragsgroepen op basis van het echte pattern-veld
+  // Bots bewegen/aanvallen — zelfde standoff-afstanden, per-bot-type herlaadtijden/schade en
+  // kogel-volleys als single-player (zie coopBotShoot() verderop in dit bestand).
   coopSim.bots.forEach(bot => {
     if (now < (bot.frozenUntil || 0)) return; // bevroren, geen actie
     if (alivePlayers.length === 0) return;
@@ -483,33 +484,45 @@ function coopHostUpdate(dt, now) {
       if (dist > bot.r + COOP_PLAYER_R - 4) {
         bot.x += (dx / dist) * bot.speed * stepMult;
         bot.y += (dy / dist) * bot.speed * stepMult;
-      } else if (now - bot.lastAttack > 900) {
+      } else if (now - bot.lastAttack > bot.shootCooldown) {
         bot.lastAttack = now;
         coopDamagePlayer(nearest, bot.meleeDmg, now);
       }
     } else if (COOP_SUICIDE_PATTERNS.includes(bot.pattern)) {
-      if (dist > bot.r + COOP_PLAYER_R + 6) {
+      if (dist > bot.r + COOP_PLAYER_R + 10) {
         bot.x += (dx / dist) * bot.speed * stepMult;
         bot.y += (dy / dist) * bot.speed * stepMult;
       } else {
-        coopDamagePlayer(nearest, bot.meleeDmg || 30, now);
+        coopDamagePlayer(nearest, bot.meleeDmg || 35, now);
         coopKillBot(bot);
       }
-    } else if (COOP_STATIONARY_PATTERNS.includes(bot.pattern)) {
+    } else if (COOP_TELEPORT_PATTERNS.includes(bot.pattern)) {
+      // ghost: teleporteert naar een willekeurige plek 150-250px van zijn doelwit en schiet direct
       if (now - bot.lastAttack > bot.shootCooldown) {
         bot.lastAttack = now;
-        coopSim.bullets.push({ id: coopSim.nextId++, owner: 'bot', x: bot.x, y: bot.y, vx: (dx / dist) * bot.bulletSpeed, vy: (dy / dist) * bot.bulletSpeed, r: 5, dmg: COOP_BOT_BULLET_DMG, color: bot.color });
+        const tAng = Math.random() * Math.PI * 2;
+        const tDist = 150 + Math.random() * 100;
+        bot.x = Math.max(bot.r, Math.min(canvas.width - bot.r, nearest.x + Math.cos(tAng) * tDist));
+        bot.y = Math.max(bot.r, Math.min(canvas.height - bot.r, nearest.y + Math.sin(tAng) * tDist));
+        coopFireBotBullet(bot, Math.atan2(nearest.y - bot.y, nearest.x - bot.x));
+      }
+    } else if (COOP_STATIONARY_PATTERNS.includes(bot.pattern)) {
+      // turret: staat stil, schiet snel en precies, alleen binnen bereik
+      if (dist < COOP_RANGED_FIRE_RANGE && now - bot.lastAttack > bot.shootCooldown) {
+        bot.lastAttack = now;
+        coopFireBotBullet(bot, Math.atan2(dy, dx), 1.3);
       }
     } else {
       // generiek: nadert tot in schietbereik en blijft daar staan (loopt NIET terug als je dichterbij
-      // komt — single-player's ranged bots wijken ook niet uit, ze schieten gewoon door)
+      // komt — single-player's ranged bots wijken ook niet uit, ze schieten gewoon door), en schiet
+      // alleen binnen bereik, net als single-player
       if (dist > COOP_KEEP_DIST) {
         bot.x += (dx / dist) * bot.speed * stepMult;
         bot.y += (dy / dist) * bot.speed * stepMult;
       }
-      if (now - bot.lastAttack > bot.shootCooldown) {
+      if (dist < COOP_RANGED_FIRE_RANGE && now - bot.lastAttack > bot.shootCooldown) {
         bot.lastAttack = now;
-        coopSim.bullets.push({ id: coopSim.nextId++, owner: 'bot', x: bot.x, y: bot.y, vx: (dx / dist) * bot.bulletSpeed, vy: (dy / dist) * bot.bulletSpeed, r: 5, dmg: COOP_BOT_BULLET_DMG, color: bot.color });
+        coopBotShoot(bot, Math.atan2(dy, dx));
       }
     }
   });
@@ -644,6 +657,78 @@ function coopKillBot(bot) {
   if (bot.dead) return;
   bot.dead = true;
   coopSim.score += bot.scoreValue;
+}
+
+function coopFireBotBullet(bot, angle, speedMult) {
+  coopSim.bullets.push({
+    id: coopSim.nextId++, owner: 'bot',
+    x: bot.x + Math.cos(angle) * (bot.r + 5), y: bot.y + Math.sin(angle) * (bot.r + 5),
+    vx: Math.cos(angle) * bot.bulletSpeed * (speedMult || 1), vy: Math.sin(angle) * bot.bulletSpeed * (speedMult || 1),
+    r: bot.pattern === 'fast' ? 3 : 4,
+    dmg: bot.bulletDmg || (bot.pattern === 'fast' ? 15 : 8),
+    color: bot.color
+  });
+}
+
+function coopNearestAlivePlayer(bot) {
+  if (!coopSim) return null;
+  const alive = Object.values(coopSim.players).filter(p => p.alive);
+  if (!alive.length) return null;
+  let best = alive[0], bd = Math.hypot(best.x - bot.x, best.y - bot.y);
+  alive.forEach(p => { const d = Math.hypot(p.x - bot.x, p.y - bot.y); if (d < bd) { bd = d; best = p; } });
+  return best;
+}
+
+// Zelfde kogel-volleys per pattern als single-player's botShoot() (combat.js) — dekt alle patronen die
+// in de basis-BOT_TYPES-roster voorkomen (de zeldzame SPECIAL_BOT_TYPES-patronen als mortier/gifwolk
+// komen in Co-op nog niet voor, zie coopPickBotType()).
+function coopBotShoot(bot, baseAngle) {
+  if (bot.pattern === 'fast') {
+    coopFireBotBullet(bot, baseAngle, 1.4);
+  } else if (bot.pattern === 'triple') {
+    const spread = 0.22;
+    coopFireBotBullet(bot, baseAngle - spread);
+    coopFireBotBullet(bot, baseAngle);
+    coopFireBotBullet(bot, baseAngle + spread);
+  } else if (bot.pattern === 'burst') {
+    let count = 0;
+    const burstInterval = setInterval(() => {
+      if (bot.dead || !coopSim || coopRole !== 'host') { clearInterval(burstInterval); return; }
+      const nearest = coopNearestAlivePlayer(bot);
+      if (nearest) coopFireBotBullet(bot, Math.atan2(nearest.y - bot.y, nearest.x - bot.x));
+      count++;
+      if (count >= 3) clearInterval(burstInterval);
+    }, 120);
+  } else if (bot.pattern === 'circle') {
+    const n = 8;
+    for (let i = 0; i < n; i++) coopFireBotBullet(bot, (Math.PI * 2 / n) * i);
+  } else if (bot.pattern === 'double') {
+    coopFireBotBullet(bot, baseAngle);
+    setTimeout(() => {
+      if (bot.dead || !coopSim || coopRole !== 'host') return;
+      const nearest = coopNearestAlivePlayer(bot);
+      if (nearest) coopFireBotBullet(bot, Math.atan2(nearest.y - bot.y, nearest.x - bot.x));
+    }, 150);
+  } else if (bot.pattern === 'wide') {
+    const spread = 0.16;
+    for (let i = -2; i <= 2; i++) coopFireBotBullet(bot, baseAngle + spread * i);
+  } else if (bot.pattern === 'megaburst') {
+    const n = 8;
+    let wave = 0;
+    const doWave = () => {
+      if (bot.dead || !coopSim || coopRole !== 'host') return;
+      for (let i = 0; i < n; i++) coopFireBotBullet(bot, (Math.PI * 2 / n) * i + wave * 0.2);
+      wave++;
+      if (wave < 3) setTimeout(doWave, 220);
+    };
+    doWave();
+  } else if (bot.pattern === 'spiral') {
+    bot.spiralAngle = (bot.spiralAngle || 0) + 0.5;
+    coopFireBotBullet(bot, bot.spiralAngle);
+  } else {
+    // 'single' en alles wat hier verder nog binnenkomt: één gericht schot
+    coopFireBotBullet(bot, baseAngle);
+  }
 }
 
 function coopSpawnCoin() {
