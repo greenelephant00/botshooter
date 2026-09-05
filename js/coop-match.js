@@ -394,57 +394,69 @@ function coopHostUpdate(dt, now) {
     coopSim.lastCoinSpawn = now;
     coopSpawnCoin();
   }
-  if (now - coopSim.lastPowerupSpawn > COOP_POWERUP_SPAWN_MS) {
+  if (now - coopSim.lastPowerupSpawn > COOP_POWERUP_SPAWN_MS && coopSim.powerups.length < COOP_POWERUP_MAX_ON_FIELD) {
     coopSim.lastPowerupSpawn = now;
-    coopSpawnPowerup();
+    if (Math.random() < 0.7) coopSpawnPowerup();
   }
 
-  // Munten en powerups oppakken
+  // Munten en powerups oppakken — plukbereik/waarde met Magneet, Goudtrek, Fortuinpantser en Long
+  // Boosts, en de duur/heelbedrag uit dezelfde niveau-tabellen als single-player (POWERUP_LEVELS)
   alivePlayers.forEach(p => {
+    const pickupR = COOP_COIN_PICKUP_R + (p.pickupBonus || 0);
     coopSim.coins.forEach(c => {
       if (c.collected) return;
-      if (Math.hypot(p.x - c.x, p.y - c.y) < COOP_COIN_PICKUP_R) {
+      if (Math.hypot(p.x - c.x, p.y - c.y) < pickupR) {
         c.collected = true;
-        p.coinsEarned = (p.coinsEarned || 0) + c.value + (p.coinRainBonus || 0); // Coin Rain-upgrade: vaste bonus bovenop elke munt
+        p.coinsEarned = (p.coinsEarned || 0) + Math.round(c.value * (p.coinMult || 1)) + (p.coinRainBonus || 0);
       }
     });
+    const puPickupR = COOP_POWERUP_PICKUP_R + (p.pickupBonus || 0);
     coopSim.powerups.forEach(pu => {
       if (pu.collected) return;
-      if (Math.hypot(p.x - pu.x, p.y - pu.y) < COOP_POWERUP_PICKUP_R) {
+      if (Math.hypot(p.x - pu.x, p.y - pu.y) < puPickupR) {
         pu.collected = true;
-        if (pu.type === 'shield') p.shieldUntil = now + 4000;
-        else if (pu.type === 'speed') p.boostUntil = now + 5000;
-        else if (pu.type === 'heal') p.hp = Math.min(p.maxHp, p.hp + p.maxHp * 0.4);
+        const boostDurMult = p.longBoostsMult || 1;
+        if (pu.type === 'shield') p.shieldUntil = now + POWERUP_LEVELS.shield.durations[p.puShieldLvl || 0] * boostDurMult;
+        else if (pu.type === 'speed') p.boostUntil = now + POWERUP_LEVELS.speed.durations[p.puSpeedLvl || 0] * boostDurMult;
+        else if (pu.type === 'heal') p.hp = Math.min(p.maxHp, p.hp + POWERUP_LEVELS.heal.heals[p.puHealLvl || 0]);
       }
     });
   });
-  coopSim.coins = coopSim.coins.filter(c => !c.collected);
-  coopSim.powerups = coopSim.powerups.filter(pu => !pu.collected);
+  coopSim.coins = coopSim.coins.filter(c => !c.collected && now - c.born < COOP_COIN_LIFE_MS);
+  coopSim.powerups = coopSim.powerups.filter(pu => !pu.collected && now - pu.born < COOP_POWERUP_LIFE_MS);
 
   // Zwarte gaten (Singularity Gun): zuigen bots naar binnen, doen geleidelijk schade, en imploderen
-  // na COOP_BLACKHOLE_DURATION met een flinke schadeburst
+  // na COOP_BLACKHOLE_DURATION met een flinke schadeburst — zelfde zuigsnelheid/schadetempo als
+  // single-player (daar per animatieframe, hier per tick van 200ms omgerekend naar hetzelfde tempo)
   coopSim.blackholes.forEach(bh => {
     const age = now - bh.born;
     if (age > COOP_BLACKHOLE_DURATION) {
       coopSim.bots.forEach(bot => {
         if (bot.dead) return;
-        if (Math.hypot(bot.x - bh.x, bot.y - bh.y) < COOP_BLACKHOLE_RADIUS) {
+        if (Math.hypot(bot.x - bh.x, bot.y - bh.y) < COOP_BLACKHOLE_RADIUS * 0.7) {
           bot.hp -= COOP_BLACKHOLE_BURST_DMG;
-          if (bot.hp <= 0) coopKillBot(bot);
+          if (bot.hp <= 0) coopKillBot(bot, bh.ownerUid, now);
         }
       });
       bh.expired = true;
       return;
     }
-    if (now - bh.lastTick > 200) {
+    const tickElapsed = now - (bh.lastTick || bh.born);
+    if (tickElapsed > 200) {
       bh.lastTick = now;
+      const ticksPassed = tickElapsed / 16.67; // schaal naar "aantal animatieframes" zoals single-player
       coopSim.bots.forEach(bot => {
         if (bot.dead) return;
         const d = Math.hypot(bot.x - bh.x, bot.y - bh.y);
         if (d < COOP_BLACKHOLE_RADIUS) {
-          if (d > 10) { bot.x += (bh.x - bot.x) / d * 8; bot.y += (bh.y - bot.y) / d * 8; }
-          bot.hp -= COOP_BLACKHOLE_TICK_DMG;
-          if (bot.hp <= 0) coopKillBot(bot);
+          if (d > 10) { bot.x += (bh.x - bot.x) / d * 1.6 * ticksPassed; bot.y += (bh.y - bot.y) / d * 1.6 * ticksPassed; }
+          bot.bhDmgAccum = (bot.bhDmgAccum || 0) + 0.05 * ticksPassed; // 5% kans per frame op 1 schade = gemiddeld ~3 schade/sec
+          if (bot.bhDmgAccum >= 1) {
+            const dmgNow = Math.floor(bot.bhDmgAccum);
+            bot.bhDmgAccum -= dmgNow;
+            bot.hp -= dmgNow;
+            if (bot.hp <= 0) coopKillBot(bot, bh.ownerUid, now);
+          }
         }
       });
     }
@@ -457,12 +469,12 @@ function coopHostUpdate(dt, now) {
     if (bot.poisonUntil && now < bot.poisonUntil && now - (bot.lastPoisonTick || 0) > 400) {
       bot.lastPoisonTick = now;
       bot.hp -= 1;
-      if (bot.hp <= 0) coopKillBot(bot);
+      if (bot.hp <= 0) coopKillBot(bot, bot.poisonOwnerUid, now);
     }
     if (!bot.dead && bot.igniteUntil && now < bot.igniteUntil && now - (bot.lastIgniteTick || 0) > 400) {
       bot.lastIgniteTick = now;
       bot.hp -= 2;
-      if (bot.hp <= 0) coopKillBot(bot);
+      if (bot.hp <= 0) coopKillBot(bot, bot.igniteOwnerUid, now);
     }
   });
   coopSim.bots = coopSim.bots.filter(bot => !bot.dead);
@@ -542,38 +554,8 @@ function coopHostUpdate(dt, now) {
           if (b.effect === 'execute' && bot.hp > 0 && bot.hp / bot.maxHp < 0.25) bot.hp = 0; // Executioner Rifle: onder 25% HP altijd meteen af
           const wasAlreadyDead = bot.dead;
           if (bot.hp <= 0 && !wasAlreadyDead) {
-            coopKillBot(bot);
+            coopKillBot(bot, b.ownerUid, now);
             const shooter = b.ownerUid && coopSim.players[b.ownerUid];
-            if (shooter) {
-              shooter.killStreak++;
-              shooter.lastKillAt = now;
-              if (shooter.coreVampireHeal > 0) shooter.hp = Math.min(shooter.maxHp, shooter.hp + shooter.coreVampireHeal); // Kern-vampirisme: heelt bij ELKE kill
-              if (shooter.shockwaveLevel > 0) {
-                const swRadius = SHOCKWAVE_RADII[shooter.shockwaveLevel - 1];
-                const swDmg = 5 + shooter.shockwaveLevel * 2;
-                coopSim.bots.forEach(other => {
-                  if (other === bot || other.dead) return;
-                  if (Math.hypot(other.x - bot.x, other.y - bot.y) < swRadius) {
-                    other.hp -= swDmg;
-                    if (other.hp <= 0) coopKillBot(other);
-                  }
-                });
-              }
-              if (shooter.overkillLevel > 0 && b.dmg > bot.maxHp * 0.2) {
-                const overkillExcess = -bot.hp; // bot.hp staat al op <=0, dus dit is het schade-overschot
-                if (overkillExcess > 0) {
-                  const okRadius = 60 + shooter.overkillLevel * 30;
-                  const okDmg = Math.max(3, Math.round(overkillExcess * 0.3));
-                  coopSim.bots.forEach(other => {
-                    if (other === bot || other.dead) return;
-                    if (Math.hypot(other.x - bot.x, other.y - bot.y) < okRadius) {
-                      other.hp -= okDmg;
-                      if (other.hp <= 0) coopKillBot(other);
-                    }
-                  });
-                }
-              }
-            }
             if (b.effect === 'lifestealKill' && shooter) shooter.hp = Math.min(shooter.maxHp, shooter.hp + 3);
             if (b.effect === 'freezeKill') {
               coopSim.bots.forEach(other => {
@@ -582,7 +564,7 @@ function coopHostUpdate(dt, now) {
               });
             }
             if (b.effect === 'blackholeKill') {
-              coopSim.blackholes.push({ id: coopSim.nextId++, x: bot.x, y: bot.y, born: now, lastTick: now });
+              coopSim.blackholes.push({ id: coopSim.nextId++, x: bot.x, y: bot.y, born: now, lastTick: now, ownerUid: b.ownerUid });
             }
           }
           if (b.effect === 'chainLightning') {
@@ -594,25 +576,40 @@ function coopHostUpdate(dt, now) {
             });
             if (nearest) {
               nearest.hp -= Math.max(1, Math.round(b.dmg * 0.6));
-              if (nearest.hp <= 0) coopKillBot(nearest);
+              if (nearest.hp <= 0) coopKillBot(nearest, b.ownerUid, now);
             }
           }
           if (b.effect === 'shatterHit') {
             coopSim.bots.forEach(other => {
               if (other === bot || other.dead) return;
+              if (other.invulnUntil && now < other.invulnUntil) return;
               if (Math.hypot(other.x - bot.x, other.y - bot.y) < 70) {
                 other.hp -= Math.max(1, Math.round(b.dmg * 0.5));
                 other.frozenUntil = Math.max(other.frozenUntil || 0, now + 400);
-                if (other.hp <= 0) coopKillBot(other);
+                if (other.hp <= 0) coopKillBot(other, b.ownerUid, now);
               }
             });
           }
-          if (b.effect === 'poison' && !bot.dead) bot.poisonUntil = now + 4000;
-          if (b.effect === 'igniteHit' && !bot.dead) bot.igniteUntil = now + 2500;
+          if (b.effect === 'poison' && !bot.dead) { bot.poisonUntil = now + 3000; bot.poisonOwnerUid = b.ownerUid; }
+          if (b.effect === 'igniteHit' && !bot.dead) { bot.igniteUntil = now + 2500; bot.igniteOwnerUid = b.ownerUid; }
           if (b.effect === 'knockbackHit' && !bot.dead) {
-            const kd = Math.hypot(b.vx, b.vy) || 1;
-            bot.x += (b.vx / kd) * 40;
-            bot.y += (b.vy / kd) * 40;
+            // Duwt de bot weg van de SCHUTTER (net als single-player), niet van de kogel-vliegrichting
+            const shooterForKb = b.ownerUid && coopSim.players[b.ownerUid];
+            const kAng = shooterForKb ? Math.atan2(bot.y - shooterForKb.y, bot.x - shooterForKb.x) : Math.atan2(b.vy, b.vx);
+            bot.x += Math.cos(kAng) * 45;
+            bot.y += Math.sin(kAng) * 45;
+          }
+          if (b.effect === 'gustPush' && !bot.dead) {
+            // Duwt de geraakte bot + alle bots binnen 90px mee in de vliegrichting van de kogel
+            const kd2 = Math.hypot(b.vx, b.vy) || 1;
+            const pdx = b.vx / kd2, pdy = b.vy / kd2;
+            coopSim.bots.forEach(other => {
+              if (other.dead) return;
+              if (other === bot || Math.hypot(other.x - bot.x, other.y - bot.y) < 90) {
+                other.x += pdx * 55;
+                other.y += pdy * 55;
+              }
+            });
           }
         }
       });
@@ -642,7 +639,7 @@ function coopDamagePlayer(p, dmg, now) {
       // Revive-upgrade: één keer per potje terugkomen op 35% HP i.p.v. dood te gaan
       p.reviveUsed = true;
       p.hp = p.maxHp * 0.35;
-      if (now !== undefined) p.shieldUntil = Math.max(p.shieldUntil || 0, now + 1000); // korte adempauze
+      if (now !== undefined) p.shieldUntil = Math.max(p.shieldUntil || 0, now + 1500); // korte adempauze
     } else {
       p.hp = 0;
       p.alive = false;
@@ -650,13 +647,77 @@ function coopDamagePlayer(p, dmg, now) {
   }
 }
 
-// Eén centrale plek om een bot te doden: telt altijd de score — zodat iedere kill-plek (kogel-treffer,
-// gif/brand-schade-over-tijd, kettingbliksem, schok-splash) hetzelfde gedrag krijgt in plaats van dat
-// elke plek dit los moet doen. Munten spawnen HIER niet meer (dat gebeurt periodiek, zie coopSpawnCoin).
-function coopKillBot(bot) {
+// Eén centrale plek om een bot te doden: telt altijd de score, laat Swarmqueen/Bomber hun dood-effect
+// afgaan, en past (als een shooterUid bekend is) Vampirisme/Shockwave/Overkill/killstreak-teller toe —
+// zodat iedere kill-oorzaak (kogel-treffer, gif/brand-schade-over-tijd, kettingbliksem, shatter-splash,
+// zwart-gat) hetzelfde gedrag krijgt, net als single-player's handleBotDeath(). Munten spawnen HIER
+// niet meer (dat gebeurt periodiek, zie coopSpawnCoin).
+function coopKillBot(bot, shooterUid, now) {
   if (bot.dead) return;
   bot.dead = true;
+  if (now === undefined) now = performance.now();
   coopSim.score += bot.scoreValue;
+
+  // Swarmqueen splitst bij dood in 2 zwakke minions, ongeacht de doodsoorzaak
+  if (bot.splits) {
+    for (let i = 0; i < 2; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 20 + Math.random() * 15;
+      coopSim.bots.push({
+        id: coopSim.nextId++, type: 'swarmling', pattern: 'single',
+        x: Math.max(10, Math.min(canvas.width - 10, bot.x + Math.cos(ang) * dist)),
+        y: Math.max(10, Math.min(canvas.height - 10, bot.y + Math.sin(ang) * dist)),
+        r: 10, color: bot.color, speed: 2.2, hp: 1, maxHp: 1, bulletSpeed: 5, bulletDmg: 0, meleeDmg: 0,
+        shootCooldown: 1400, lastAttack: 0, spiralAngle: 0, splits: false,
+        frozenUntil: 0, rootedUntil: 0, slashUntil: 0, invulnUntil: 0, immortal: false, isBoss: false,
+        poisonUntil: 0, igniteUntil: 0, lastPoisonTick: 0, lastIgniteTick: 0, scoreValue: 10
+      });
+    }
+  }
+  // Bomber ontploft ook als hij op een andere manier dan zijn eigen aanval sterft: schade aan bots eromheen
+  if (bot.pattern === 'suicide') {
+    coopSim.bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      if (Math.hypot(other.x - bot.x, other.y - bot.y) < 65) {
+        other.hp -= 4;
+        if (other.hp <= 0) coopKillBot(other, shooterUid, now);
+      }
+    });
+  }
+  if (shooterUid) coopApplyKillEffects(shooterUid, bot, now);
+}
+
+// Vampirisme/Shockwave/Overkill/killstreak-teller gelden voor ELKE kill-oorzaak (niet alleen een
+// directe kogel-treffer), net als single-player's handleBotDeath().
+function coopApplyKillEffects(shooterUid, bot, now) {
+  const shooter = coopSim.players[shooterUid];
+  if (!shooter) return;
+  if (shooter.weaponEffect === 'killstreak') shooter.killStreak++;
+  shooter.lastKillAt = now;
+  if (shooter.coreVampireHeal > 0) shooter.hp = Math.min(shooter.maxHp, shooter.hp + shooter.coreVampireHeal); // Kern-vampirisme: heelt bij ELKE kill
+  if (shooter.shockwaveLevel > 0) {
+    const swRadius = SHOCKWAVE_RADII[shooter.shockwaveLevel - 1];
+    const swDmg = 5 + shooter.shockwaveLevel * 2;
+    coopSim.bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      if (Math.hypot(other.x - bot.x, other.y - bot.y) < swRadius) {
+        other.hp -= swDmg;
+        if (other.hp <= 0) coopKillBot(other, shooterUid, now);
+      }
+    });
+  }
+  if (shooter.overkillLevel > 0 && -bot.hp > bot.maxHp * 0.2) {
+    const overkillExcess = -bot.hp; // bot.hp staat al op <=0, dus dit is het schade-overschot
+    const okRadius = 60 + shooter.overkillLevel * 30;
+    const okDmg = Math.max(3, Math.round(overkillExcess * 0.3));
+    coopSim.bots.forEach(other => {
+      if (other === bot || other.dead) return;
+      if (Math.hypot(other.x - bot.x, other.y - bot.y) < okRadius) {
+        other.hp -= okDmg;
+        if (other.hp <= 0) coopKillBot(other, shooterUid, now);
+      }
+    });
+  }
 }
 
 function coopFireBotBullet(bot, angle, speedMult) {
@@ -737,7 +798,8 @@ function coopSpawnCoin() {
     id: coopSim.nextId++,
     x: margin + Math.random() * (canvas.width - margin * 2),
     y: margin + Math.random() * (canvas.height - margin * 2),
-    value: COOP_COIN_VALUE_MIN + Math.floor(Math.random() * (COOP_COIN_VALUE_MAX - COOP_COIN_VALUE_MIN + 1))
+    value: COOP_COIN_VALUE_MIN + Math.floor(Math.random() * (COOP_COIN_VALUE_MAX - COOP_COIN_VALUE_MIN + 1)),
+    born: performance.now()
   });
 }
 
@@ -746,7 +808,8 @@ function coopSpawnPowerup() {
   coopSim.powerups.push({
     id: coopSim.nextId++, type,
     x: COOP_ARENA_MARGIN + 60 + Math.random() * (canvas.width - 2 * (COOP_ARENA_MARGIN + 60)),
-    y: COOP_ARENA_MARGIN + 60 + Math.random() * (canvas.height - 2 * (COOP_ARENA_MARGIN + 60))
+    y: COOP_ARENA_MARGIN + 60 + Math.random() * (canvas.height - 2 * (COOP_ARENA_MARGIN + 60)),
+    born: performance.now()
   });
 }
 
