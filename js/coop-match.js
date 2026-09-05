@@ -881,7 +881,7 @@ function coopPushHostState() {
   const powerups = coopSim.powerups.map(pu => ({ x: Math.round(pu.x), y: Math.round(pu.y), type: pu.type }));
   const blackholes = coopSim.blackholes.map(bh => ({ x: Math.round(bh.x), y: Math.round(bh.y), age: performance.now() - bh.born }));
   db.collection('lobbies').doc(coopLobbyCode).collection('state').doc('live')
-    .set({ players, bots, bullets, coins, powerups, blackholes, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
+    .set({ players, bots, bullets, coins, powerups, blackholes, botCount: coopSim.bots.length, score: coopSim.score, status: coopSim.status, updatedAt: Date.now() })
     .catch(() => {});
 }
 
@@ -993,6 +993,13 @@ function coopSyncMyCoins(myPlayerState) {
 function coopUpdateHud(state) {
   const scoreEl = document.getElementById('coopScoreVal');
   if (scoreEl) scoreEl.textContent = state.score || 0;
+  const botCountEl = document.getElementById('coopBotCountVal');
+  if (botCountEl) botCountEl.textContent = typeof state.botCount === 'number' ? state.botCount : (state.bots || []).length;
+  const coinEl = document.getElementById('coopCoinVal');
+  if (coinEl) {
+    const me = state.players && state.players[currentUid];
+    coinEl.textContent = me ? Math.round(me.coinsEarned || 0) : 0;
+  }
   const hudEl = document.getElementById('coopPlayersHud');
   if (hudEl && state.players) {
     hudEl.innerHTML = Object.values(state.players).map(p =>
